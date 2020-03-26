@@ -1,4 +1,5 @@
-﻿
+# Release notes for Wayfair
+
 ## v1.0.0 (2019-03-06)
 - Release des Plugin mit folgenden Funktionen: stündlicher Auftragsimport, stündlicher Bestandsabgleich, automatisierte Generierung der Versandlabels
 
