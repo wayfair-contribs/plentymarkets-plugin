@@ -1,4 +1,5 @@
-﻿## v1.0.0 (2019-03-06)
+
+## v1.0.0 (2019-03-06)
 - Release of plugin with following functions: hourly order import, hourly inventory update, automated shipping label generation
 
 ## v1.0.1 (2019-04-03)
