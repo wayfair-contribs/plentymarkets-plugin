@@ -75,9 +75,6 @@ class ConfigHelper extends AbstractConfigHelper {
     return (int)$keyValueRepository->get(self::SETTINGS_ORDER_REFERRER_KEY);
   }
 
-  /**
-   * @return string
-   */
   public function getDryRun(): string {
     return $this->config->get(self::PLUGIN_NAME . '.global.container.dryRunMode');
   }
@@ -119,4 +116,9 @@ class ConfigHelper extends AbstractConfigHelper {
   public function getIntegrationAgentHeader() {
     return self::INTEGRATION_AGENT_NAME . ' - v:' . $this->getPluginVersion();
   }
+
+  public function isTestingEnabled(): bool {
+    return filter_var($this->getDryRun(), FILTER_VALIDATE_BOOLEAN);
+  }
+
 }

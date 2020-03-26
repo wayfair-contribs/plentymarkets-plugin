@@ -52,7 +52,7 @@ class LogSenderService {
           $useVariables     .= ', ';
         }
         $declareVariables            .= '$l' . ($key + 1) . ': ExternalLogInput!';
-        $useVariables                .= 'log' . ($key + 1) . ': log(log: $l' . ($key + 1) . ', dryRun: ' . $this->configHelper->getDryRun() . ')';
+        $useVariables                .= 'log' . ($key + 1) . ': log(log: $l' . ($key + 1) . ')';
         $variables['l' . ($key + 1)] = [
             'app'     => ConfigHelper::INTEGRATION_AGENT_NAME,
             'level'   => $log['level'],
@@ -93,12 +93,12 @@ class LogSenderService {
   public function query($query, $method = 'post', $variables = []) {
     $this->authService->refresh();
     $headers = [];
-    $headers['Authorization'] = $this->authService->getOAuthToken();
+    $headers['Authorization'] = $this->authService->generateOAuthHeader();
     $headers['Content-Type'] = ['application/json'];
     $headers[ConfigHelper::WAYFAIR_INTEGRATION_HEADER] = $this->configHelper->getIntegrationAgentHeader();
 
     $arguments = [
-        URLHelper::getUrl(URLHelper::URL_GRAPHQL),
+        URLHelper::getUrl(URLHelper::URL_ID_GRAPHQL),
         [
             'json' => [
                 'query' => $query,

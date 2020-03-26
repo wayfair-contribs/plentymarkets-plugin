@@ -12,12 +12,12 @@ interface AuthenticationContract {
   public function getOAuthToken();
 
   /**
-   * @return array
-   */
-  public function authenticate();
-
-  /**
    * @return void
    */
   public function refresh();
+
+  /**
+   * @return string
+   */
+  public function generateOAuthHeader();
 }

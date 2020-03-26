@@ -57,7 +57,6 @@ class FetchOrderService extends APIService {
     }
     $query = 'query purchaseOrders { '
       . 'purchaseOrders( '
-        . 'dryRun: ' . $this->configHelper->getDryRun() . ' '
         . 'limit: ' . self::FETCH_LIMIT . ' '
         . 'offset: ' . self::FETCH_LIMIT * ($circle - 1) . ' '
         . 'filters:[ '

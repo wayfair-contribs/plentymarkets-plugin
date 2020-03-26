@@ -53,6 +53,8 @@ abstract class AbstractConfigHelper {
   abstract public function getStockBufferValue();
 
   /**
+   * Check dry run mode value (true/false string)
+   * @deprecated 1.1.2
    * @return string
    */
   abstract public function getDryRun(): string;
@@ -61,4 +63,11 @@ abstract class AbstractConfigHelper {
    * @return bool
    */
   abstract public function isAllItemsActive(): bool;
+
+  /**
+   * Check if the plugin is in "test" mode instead of "live" mode.
+   *
+   * @return boolean
+   */
+  abstract public function isTestingEnabled(): bool;
 }

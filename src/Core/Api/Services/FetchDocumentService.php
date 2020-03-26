@@ -35,23 +35,26 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
     // FIXME: this should be using a generic client via an interface, not cURL!
     $this->loggerContract
       ->debug(TranslationHelper::getLoggerKey('fetchingShipmentForURL'), ['additionalInfo' => ['url' => $url], 'method' => __METHOD__]);
+    $httpHeaders = [ConfigHelper::WAYFAIR_INTEGRATION_HEADER . ': ' . $this->configHelper->getIntegrationAgentHeader()];
+
     $ch = curl_init();
     try {
-      if (strpos($url, URLHelper::BASE_URL) !== false) {
+      if (URLHelper::usesWayfairAuthToken($url)) {
         // Check if token has already been expired and refresh it.
         $this->authService->refresh();
-        curl_setopt(
-          $ch, CURLOPT_HTTPHEADER, [
-            'Authorization: ' . $this->authService->getOAuthToken(),
-            ConfigHelper::WAYFAIR_INTEGRATION_HEADER . ': ' . $this->configHelper->getIntegrationAgentHeader()
-          ]
-        );
+        $authHeaderValue = $this->authService->generateOAuthHeader();
+        if (isset($authHeaderValue) && !empty($authHeaderValue)) {
+          $httpHeaders[] = 'Authorization: ' . $authHeaderValue;
+        }
       }
+
+      curl_setopt($ch, CURLOPT_HTTPHEADER, $httpHeaders);
+
       // FIXME: set timeout(s) - we have seen this timeout after 10 seconds, leading to errors.
       curl_setopt($ch, CURLOPT_URL, $url);
       curl_setopt($ch, CURLOPT_HEADER, 0);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-      curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+      curl_setopt($ch, CURLOPT_TIMEOUT, 30);
       $output = curl_exec($ch);
       if (curl_errno($ch)) {
         $this->loggerContract

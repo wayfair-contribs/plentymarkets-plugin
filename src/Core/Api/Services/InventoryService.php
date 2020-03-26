@@ -109,7 +109,6 @@ class InventoryService extends APIService
       . 'save('
       . 'inventory: $inventory,'
       . 'feedKind: ' . ($fullInventory ? 'TRUE_UP' : 'DIFFERENTIAL') . ','
-      . 'dryRun: ' . $configHelper->getDryRun()
       . ') {'
       . 'id,'
       . 'handle,'

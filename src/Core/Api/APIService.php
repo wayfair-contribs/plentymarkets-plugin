@@ -51,14 +51,17 @@ class APIService {
   /**
    * @return string
    */
-  public function getAuthenticationToken() {
+  private function generateAuthHeader() {
     try {
       $this->authService->refresh();
 
-      return $this->authService->getOAuthToken();
+      return $this->authService->generateOAuthHeader();
     } catch (\Exception $e) {
       $this->loggerContract
-          ->error(TranslationHelper::getLoggerKey('apiService'), ['additionalInfo' => ['message' => $e->getMessage()], 'method' => __METHOD__]);
+          ->error(TranslationHelper::getLoggerKey('apiService'), [
+            'additionalInfo' => [
+              'message' => $e->getMessage()], 
+              'method' => __METHOD__]);
     }
   }
 
@@ -72,7 +75,7 @@ class APIService {
    */
   public function query($query, $method = 'post', $variables = []) {
     $headers = [];
-    $headers['Authorization'] = $this->getAuthenticationToken();
+    $headers['Authorization'] = $this->generateAuthHeader();
     $headers['Content-Type'] = ['application/json'];
     $headers[ConfigHelper::WAYFAIR_INTEGRATION_HEADER] = $this->configHelper->getIntegrationAgentHeader();
 
@@ -101,6 +104,6 @@ class APIService {
    * @return string
    */
   public function getUrl() {
-    return URLHelper::getUrl(URLHelper::URL_GRAPHQL);
+    return URLHelper::getUrl(URLHelper::URL_ID_GRAPHQL);
   }
 }

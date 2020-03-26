@@ -63,7 +63,7 @@ class AuthService implements AuthenticationContract {
   /**
    * @return WayfairResponse
    */
-  public function authenticate() {
+  private function authenticate() {
     $targetURL = URLHelper::getAuthUrl();
     $method = 'post';
     $arguments = [
@@ -77,6 +77,7 @@ class AuthService implements AuthenticationContract {
                 [
                     'client_id' => $this->client_id,
                     'client_secret' => $this->client_secret,
+                    // FIXME: base URL can change between building endpoint URL and calling this.
                     'audience' => URLHelper::getBaseUrl(),
                     'grant_type' => 'client_credentials'
                 ]
@@ -96,12 +97,14 @@ class AuthService implements AuthenticationContract {
    * @throws \Exception
    */
   public function refresh() {
-    $token = $this->getToken();
+    // FIXME: refresh for what domain - needs argument.
+    $token = $this->getStoredTokenModel();
     if (!isset($token) or $this->isTokenExpired()) {
       $response = $this->authenticate()->getBodyAsArray();
       if (isset($response['errors'])) {
         throw new \Exception("Unable to authenticate user: " . $response['error']);
       }
+      // FIXME: token is domain-specific, should be stored as such
       $this->saveToken($response);
     }
   }
@@ -112,6 +115,7 @@ class AuthService implements AuthenticationContract {
    * @return void
    */
   public function saveToken($token) {
+    // FIXME: save token for what domain? - needs argument.
     $token['store_time'] = time();
     $this->store->set('token', json_encode($token));
   }
@@ -120,7 +124,7 @@ class AuthService implements AuthenticationContract {
    * @return bool
    */
   public function isTokenExpired() {
-    $token = $this->getToken();
+    $token = $this->getStoredTokenModel();
     if (isset($token) && isset($token['access_token']) && isset($token['store_time'])) {
       if (($token['expires_in'] + $token['store_time']) > time()) {
         return false;
@@ -131,9 +135,11 @@ class AuthService implements AuthenticationContract {
   }
 
   /**
+   * Get token that's currently stored
    * @return mixed
    */
-  public function getToken() {
+  private function getStoredTokenModel() {
+    // FIXME: token is not appropriate for all domains
     return json_decode($this->store->get('token'), true);
   }
 
@@ -141,12 +147,21 @@ class AuthService implements AuthenticationContract {
    * @return string
    * @throws TokenNotFoundException
    */
-  public function getOAuthToken() {
-    $token = $this->getToken();
+  public function generateOAuthHeader() {
+    $token = $this->getStoredTokenModel();
     if (!isset($token)) {
       throw new TokenNotFoundException("Token not found.");
     }
 
     return 'Bearer ' . $token['access_token'];
+  }
+
+  public function getOAuthToken() {
+    $token = $this->getStoredTokenModel();
+    if (!isset($token)) {
+      throw new TokenNotFoundException("Token not found.");
+    }
+
+    return $token['access_token'];
   }
 }
