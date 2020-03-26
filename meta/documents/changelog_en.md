@@ -1,3 +1,4 @@
+# Release notes for Wayfair
 
 ## v1.0.0 (2019-03-06)
 - Release of plugin with following functions: hourly order import, hourly inventory update, automated shipping label generation
