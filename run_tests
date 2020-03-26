@@ -1,0 +1,211 @@
+#!/bin/bash
+
+# defaults for options
+RED=$'\e[91m'
+GRN=$'\e[92m'
+YLW=$'\e[93m'
+BLU=$'\e[94m'
+MAG=$'\e[95m'
+DEF=$'\e[0m'
+OUTPUT_PREFIX="* "
+PAD="  "
+NON_WEB_DIR="tests/non-web"
+# regex to search for errors/warnings
+SNIFF_ERROR_REGEX=".* ([0-9]+) (err|ERR).*"
+SNIFF_WARNING_REGEX=".* ([0-9]+) (warn|WARN).*"
+
+###
+# Sum an array of numbers; Echo the sum of all items in the array
+#
+# @param number_array local Array of number to summise
+#
+###
+sum_items() {
+  local number_array=($@)
+  local sum=0
+
+  for num in "${number_array[@]}"; do
+    sum=$((sum + num))
+  done
+
+  echo ${sum}
+}
+
+###
+# Display usage
+#
+###
+usage() {
+
+  cat <<-EOF
+
+USAGE: run_tests COMMAND [FILES]
+
+COMMANDS
+
+  all        Runs all tools
+  sniff      Runs CodeSniffer on code
+  analyze    Runs PHPStan on code
+  test       Runs PHPUnit
+
+  sniff-fix  Automatically fix codesniffer errors
+EOF
+}
+
+print_header() {
+  echo -e "\n\n--------------------------------- \n${1} \n---------------------------------\n"
+}
+
+get_script_dir () {
+     SOURCE="${BASH_SOURCE[0]}"
+     # While $SOURCE is a symlink, resolve it
+     while [ -h "$SOURCE" ]; do
+          DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+          SOURCE="$( readlink "$SOURCE" )"
+          # If $SOURCE was a relative symlink (so no "/" as prefix, need to resolve it relative to the symlink base directory
+          [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+     done
+     DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+     echo "$DIR"
+}
+
+run_phpunit() {
+  if [[ $# -ge 1 ]]
+  then
+      files="$@"
+  else
+      files="tests"
+  fi
+
+  print_header "RUNNING PHPUnit"
+  php $(get_script_dir)/vendor/bin/phpunit --bootstrap $(get_script_dir)/vendor/autoload.php ${files}
+}
+
+run_phpstan() {
+  if [[ $# -ge 1 ]]
+  then
+      files="$@"
+  else
+      files="src"
+  fi
+
+  print_header "RUNNING PHPStan"
+  $(get_script_dir)/vendor/bin/phpstan analyze --level 7 -c ${NON_WEB_DIR}/phpstan/phpstan.neon ${files}
+}
+
+run_codesniffer() {
+  if [[ $# -ge 1 ]]
+  then
+      files="$@"
+  else
+      files="src tests"
+  fi
+
+  print_header "RUNNING CODESNIFFER"
+
+  sniff_command="$(get_script_dir)/vendor/bin/phpcs --standard=$(get_script_dir)/${NON_WEB_DIR}/codesniffer/standards/CSNStores --colors ${files}"
+   # sniff! this is a bit hacky so that it doesn't exit when errors
+  # are found because command will have exit code of 1
+  SNIFF_OUTPUT="$(${sniff_command} || true)"
+
+  if [[ "${#SNIFF_OUTPUT}" -gt 0 ]]; then
+    # get summary of errors and warnings for each file sniffed
+    sniff_summary=$(echo "${SNIFF_OUTPUT}" | grep FOUND || true)
+  fi
+
+
+  echo "${SNIFF_OUTPUT}" | sed 's/^/  /'
+  # print sniff summary results
+  if [[ ${#SNIFF_OUTPUT} -ne 0 ]]; then
+    # get error and warning counts by:
+    #   1. Remove everything from each line except the number
+    #      of [errors/warnings] after checking if the string exists
+    #   2. Remove newlines to make an array of numbers
+    #   3. Get a sum of each number in array
+    sniff_errors="$(echo "${sniff_summary}" | grep ERROR \
+  | sed -E "s/${SNIFF_ERROR_REGEX}/\1/")"
+    if [[ -n "${sniff_errors}" ]]; then
+      sniff_errors="${sniff_errors//$'\n'/ }"
+      TOTAL_SNIFF_ERRORS=$(sum_items "${sniff_errors[@]}")
+    fi
+    sniff_warnings="$(echo "${sniff_summary}" | grep WARNING \
+  | sed -E "s/${SNIFF_WARNING_REGEX}/\1/")"
+    if [[ -n "${sniff_warnings}" ]]; then
+      sniff_warnings="${sniff_warnings//$'\n'/ }"
+      TOTAL_SNIFF_WARNINGS=$(sum_items "${sniff_warnings[@]}")
+    fi
+  fi
+
+  if [[ ${TOTAL_SNIFF_ERRORS} -eq 0 \
+    && (${TOTAL_SNIFF_WARNINGS} -eq 0) \
+  ]]; then
+    echo "${OUTPUT_PREFIX}${GRN}Great success!${DEF} Your code smells gooooood."
+  elif [[ ${TOTAL_SNIFF_ERRORS} -eq 0 && ${TOTAL_SNIFF_WARNINGS} -ne 0 ]]; then
+    echo
+    echo "${OUTPUT_PREFIX}${YLW}There's a whiff of something in the air!${DEF}"
+    echo "${PAD}There are no errors in your code, but there are some warnings that could be cleaned up."
+
+    echo "${OUTPUT_PREFIX}Codesniffs found ${YLW}${TOTAL_SNIFF_WARNINGS} WARNINGS${DEF}."
+  else
+    echo
+    echo "${OUTPUT_PREFIX}${RED}Oh no!${DEF} Your code is stinky."
+    echo "${OUTPUT_PREFIX}Codesniffs found a total of ${RED}${TOTAL_SNIFF_ERRORS} \
+ERRORS${DEF} and ${YLW}${TOTAL_SNIFF_WARNINGS} WARNINGS${DEF}."
+
+    echo "${OUTPUT_PREFIX}Please fix these before committing your changes to master."
+  fi
+}
+
+run_autofixsniff() {
+  if [[ $# -ge 1 ]]
+  then
+      files="$@"
+  else
+      files="src tests"
+  fi
+
+  print_header "RUNNING AUTOFIX SNIFFS"
+  $(get_script_dir)/vendor/bin/phpcbf --standard=$(get_script_dir)/${NON_WEB_DIR}/codesniffer/standards/CSNStores --colors --report=full ${files}
+}
+
+run_all() {
+  run_codesniffer "$@"
+  run_phpstan "$@"
+  run_phpunit "$@"
+}
+
+parse_command() {
+  # ensure command exists
+  if [[ $# -eq 0 ]]; then
+    usage
+    clean_exit 2
+  fi
+
+  local command="${1}"
+  local subcommand="${2:-}"
+  case "${command}" in
+    # we use shift first so that all commands/options after the initial command
+    # are sent along to the next function
+
+    sniff)             shift; run_codesniffer "$@"; return ;;
+    sniff-fix)         shift; run_autofixsniff "$@"; return ;;
+    analyze)           shift; run_phpstan "$@"; return ;;
+    test)              shift; run_phpunit "$@"; return ;;
+    all)               shift; run_all "$@"; return;;
+
+    # Default
+    *)                  usage; exit 2 ;;
+  esac
+}
+
+###
+# Main script function
+#
+###
+main() {
+  parse_command "$@"
+
+  exit 0
+}
+
+main "$@"

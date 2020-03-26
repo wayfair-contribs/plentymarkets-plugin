@@ -1,0 +1,49 @@
+{
+    "formatVersion": 1.0,
+    "menu": {
+       "global": {
+          "label": "Config.global",
+          "fullWidth": true,
+          "formFields": {
+             "global.container": {
+                "type": "verticalContainer",
+                "label": "Config.globalConfigContainerLabel",
+                "options": {
+                   "containerEntries":
+                   {
+                      "global.container.clientId": {
+                         "type": "inputText",
+                         "label": "Config.globalContainerClientLabel",
+                         "required": true
+                      },
+                      "global.container.clientSecret": {
+                        "type": "inputText",
+                        "label": "Config.globalContainerClientSecretLabel",
+                        "required": true
+                     },
+                     "global.container.dryRunMode" : {
+                       "type": "selectBox",
+                       "required": true,
+                       "label": "Config.globalMode",
+                       "options" : {
+                         "defaultValue": "true",
+                         "selectBoxValues": [
+                           {
+                             "value": "true",
+                             "caption": "Config.globalModeTest"
+                           },
+                           {
+                             "value": "false",
+                             "caption": "Config.globalModeLive"
+                           }
+                         ]
+                       }
+                     }
+                   }
+                }
+             }
+          }
+       }
+    }
+  }
+   

@@ -1,0 +1,12 @@
+{
+  "defaultEntryPoint": "index.html",
+  "namespace": "Wayfair",
+  "menuEntries": [
+    {
+      "label": "Home",
+      "menu": "settings/markets/Wayfair",
+      "urlKey": "warehouse",
+      "entryPoint": "index.html"
+    }
+  ]
+}

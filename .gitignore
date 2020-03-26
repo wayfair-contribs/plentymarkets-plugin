@@ -1,0 +1,12 @@
+/vendor/
+config.php
+test.php
+data.txt
+/.idea/
+angular/node_modules
+*.DS_store
+*.phpunit.result.cache
+composer.lock
+.buildpath
+.project
+.settings

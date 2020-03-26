@@ -1,0 +1,61 @@
+[{
+    "id": 1,
+    "name": "KS Sales",
+    "note": "\n\n",
+    "typeId": 0,
+    "onStockAvailability": 1,
+    "outOfStockAvailability": 5,
+    "splitByShippingProfile": false,
+    "storageLocationType": "small",
+    "storageLocationZone": 0,
+    "repairWarehouseId": 102,
+    "isInventoryModeActive": false,
+    "logisticsType": "own",
+    "average_price_source": "0",
+    "reorder_level_dynamic": "0",
+    "address": {
+        "name1": "KS Sales",
+        "address1": "",
+        "address2": "",
+        "postalCode": "",
+        "town": "",
+        "countryId": 1,
+        "options": [{
+            "typeId": 5,
+            "value": ""
+        }, {
+            "typeId": 4,
+            "value": ""
+        }]
+    }
+}, {
+    "id": 102,
+    "name": "KS Repair",
+    "note": "\n\n",
+    "typeId": 1,
+    "onStockAvailability": 1,
+    "outOfStockAvailability": 5,
+    "splitByShippingProfile": false,
+    "storageLocationType": "none",
+    "storageLocationZone": 0,
+    "repairWarehouseId": 0,
+    "isInventoryModeActive": false,
+    "logisticsType": "own",
+    "average_price_source": "0",
+    "reorder_level_dynamic": "0",
+    "address": {
+        "name1": "KS Repair",
+        "address1": "",
+        "address2": "",
+        "postalCode": "",
+        "town": "",
+        "countryId": 1,
+        "options": [{
+            "typeId": 5,
+            "value": ""
+        }, {
+            "typeId": 4,
+            "value": ""
+        }]
+    }
+}]

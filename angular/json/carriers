@@ -1,0 +1,28 @@
+{
+  "entries":[
+    {
+      "id":1,
+      "name": "Selbstabholer"
+    },
+    {
+      "id":2,
+      "name": "DHL"
+    },
+    {
+      "id":3,
+      "name": "DPD"
+    },
+    {
+      "id":4,
+      "name": "Deutsche Post"
+    },
+    {
+      "id":5,
+      "name": "Hermes"
+    },
+    {
+      "id":6,
+      "name": "Wayfair Versand"
+    }
+  ]
+}

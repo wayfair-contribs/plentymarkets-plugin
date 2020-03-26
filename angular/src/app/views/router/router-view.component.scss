@@ -1,0 +1,10 @@
+terra-breadcrumbs + .outlet-container
+{
+    height: calc(100% - var(--breadcrumbs-height));
+    overflow: auto;
+}
+
+#page-body {
+    min-height: 50vh;
+    margin-bottom: 1rem;
+}

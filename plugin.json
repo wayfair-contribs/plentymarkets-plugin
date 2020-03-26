@@ -1,0 +1,38 @@
+{
+      "name": "Wayfair",
+      "description": "Wayfair Plugin",
+      "namespace": "Wayfair",
+      "author": "Wayfair LLC",
+      "authorIcon": "icon_author_xs.png",
+      "type": "shipping",
+      "version": "1.1.2-beta",
+      "pluginIcon": "icon_plugin_md.png",
+      "categories": ["3521"],
+      "price": 0.00,
+      "license": "proprietary",
+      "shortDescription": {
+            "en": "Wayfair plugin for Plentymarkets customers",
+            "de": "Wayfair plugin fur Plentymarkets Kunden"
+      },
+      "serviceProvider": "Wayfair\\Providers\\WayfairServiceProvider",
+      "isClosedSource": true,
+      "dependencies": {
+            "guzzlehttp/guzzle": "6.3.*",
+            "psr/http-message": "1.0.*"
+      },
+      "runOnBuild":[
+            "\\Wayfair\\Migrations\\CreateWarehouseSupplierTable",
+            "\\Wayfair\\Migrations\\CreateKeyValueTable",
+            "\\Wayfair\\Migrations\\CreateOrderReferrer",
+            "\\Wayfair\\Migrations\\CreateShippingServiceProvider",
+            "\\Wayfair\\Migrations\\CreatePaymentMethod",
+            "\\Wayfair\\Migrations\\CreatePendingOrdersTable",
+            "\\Wayfair\\Migrations\\CreateDefaultItemMapping",
+            "\\Wayfair\\Migrations\\CreateCarrierScacTable",
+            "\\Wayfair\\Migrations\\CreateOrderASNTable",
+            "\\Wayfair\\Migrations\\ReUpdateWFAddress",
+            "\\Wayfair\\Migrations\\CreateOrderImportDate",
+            "\\Wayfair\\Migrations\\CreatePendingLogsTable",
+            "\\Wayfair\\Migrations\\UpdatePendingLogsTable"
+      ]
+}
