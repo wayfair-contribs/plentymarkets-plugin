@@ -43,5 +43,9 @@
 ## v1.1.1 (2020-01-08)
 - Inventar Abgleich Problem ist behoben
 
-## v1.1.2 (2020-02-04)
-- Ein Problem mit großen Lagerbeständen wurde behoben
+
+## v1.1.2 (2020-03-31)
+- Unterstützung für die Synchronisierung paginierter Bestände hinzufügen
+- Das Herunterladen leerer Dokumente auf Plentymärkte wurde behoben
+- Erhöhte Protokollierung
+- Erhöhte Telemetrie
