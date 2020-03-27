@@ -2,6 +2,6 @@
 
 This project is not currently accepting external pull requests.
 
-Please use https://github.com/wayfair-contribs/plentymarkets-plugin/issues to report issues encountered when using the plugin.
+**To report issues while using this plugin,** create an issue on: https://github.com/wayfair-contribs/plentymarkets-plugin/issues
 
-Please contact Wayfair ERP Support <ERPSupport [at] wayfair.com> with any other questions.
+For urgent support, contact Wayfair ERP Support <ERPSupport [at] wayfair.com> with any other questions.
