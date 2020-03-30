@@ -49,11 +49,11 @@ For code changes in the `./angular` directory to be reflected in the Wayfair plu
 
 Once you are ready with the changes in `./angular` run the following commands:
  ```
- npm install
+ npm run reinstall
  npm run build
  ```
 
-* The `npm install` command will make sure the required packages are installed to the `./node_packages` folder.
+* The `npm run reinstall` command will make sure that all required packages are installed to the `./node_packages` folder.
   * The `./requirements.json` file defines what packages are required for building the Wayfair UI component
   * The `./requirements-lock.json` file is **auto-generated** It defines the specific versions of packages to be used in building.
     * Do NOT manually add information to this file
