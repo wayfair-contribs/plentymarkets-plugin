@@ -47,13 +47,23 @@ For more basic information on package installation via Composer see this [introd
 
 For code changes in the `./angular` directory to be reflected in the Wayfair plugin, one has to build the plugin and commit all the files generated in the `./ui` directory.
 
-Once you are ready with the changes in `./angular` run the following command:
+Once you are ready with the changes in `./angular` run the following commands:
  ```
+ npm install
  npm run build
  ```
 
-The above command will delete the previous `./ui` folder and generate a new one with new build files.
-Commit all the newly generated files and push.
+* The `npm install` command will make sure the required packages are installed to the `./node_packages` folder.
+  * The `./requirements.json` file defines what packages are required for building the Wayfair UI component
+  * The `./requirements-lock.json` file is **auto-generated** It defines the specific versions of packages to be used in building.
+    * Do NOT manually add information to this file
+    * The information in this file may become stale, requiring careful manual removal of entries for specific libraries in order to pull new versions and complete the UI build.
+
+* The `npm run build` command will delete the previous `./ui` folder and generate a new one with newly built UI files.
+  * The new UI's code is impacted by the packages in the `node_packages` folder.
+  * When pushing files in the `/.ui` folder, you MUST push `./requirements.json` and `./requirements-lock.json`.
+
+Once all changes and issues have been taken care of, commit all the newly generated files and push.
 
 To load the UI in PM, `ui.json` has been defined at the root. In that json config we have specified the menu on which our UI should be loaded i.e. "settings/markets/Wayfair"
 
