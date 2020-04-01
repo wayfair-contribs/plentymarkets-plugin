@@ -14,7 +14,8 @@
 	},
 	"private": true,
 	"dependencies": {
-		"@plentymarkets/terra-components": "^3.0.0-beta.14"
+		"@plentymarkets/terra-components": "^3.0.0-beta.14",
+		"mkdirp": "^0.5.1"
 	},
 	"devDependencies": {
 		"@types/jasmine": "^2.8.6",
@@ -53,7 +54,7 @@
 		"url-loader": "^1.0.1",
 		"webpack": "^3.10.0",
 		"webpack-dev-middleware": "^2.0.6",
-		"webpack-dev-server": "^3.1.11",
+		"webpack-dev-server": "~3.1.11",
 		"webpack-merge": "^4.1.2"
 	}
 }
