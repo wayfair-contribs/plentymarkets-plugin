@@ -44,7 +44,7 @@
 ## v1.1.1 (2020-01-08)
 - Fixed inventory mapping using SKU
 
-## v1.1.2 (2020-03-31)
+## v1.1.2-beta (2020-04-02)
 - Add support for paginated inventory synchronization
 - Fixed downloading empty documents to plentymarkets
 - Increased logging
