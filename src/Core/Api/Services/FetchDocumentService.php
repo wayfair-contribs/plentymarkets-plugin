@@ -47,11 +47,11 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
           ]
         );
       }
-      // FIXME: set timeout(s) - we have seen this timeout after 10 seconds, leading to errors.
+      
       curl_setopt($ch, CURLOPT_URL, $url);
       curl_setopt($ch, CURLOPT_HEADER, 0);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-      curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+      curl_setopt($ch, CURLOPT_TIMEOUT, 30);
       $output = curl_exec($ch);
       if (curl_errno($ch)) {
         $this->loggerContract
