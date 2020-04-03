@@ -126,16 +126,6 @@ class WayfairServiceProvider extends ServiceProvider
           ]
         );
       }
-    } catch(\Exception $e)
-    {
-      $this->getLogger(__METHOD__)->error(
-        TranslationHelper::getLoggerKey('failedToBoot'),
-        [
-          'exception'   => $e,
-          'message'     => $e->getMessage(),
-          'stackTrace'  => $e->getTraceAsString()
-        ]
-      );
     } finally {
       ConfigHelper::setBootFlag();
     }
