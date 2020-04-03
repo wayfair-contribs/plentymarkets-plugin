@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright 2020 Wayfair LLC - All rights reserved
  */
@@ -14,7 +15,6 @@ use Plenty\Plugin\Log\Loggable;
 use Plenty\Plugin\ServiceProvider;
 use Wayfair\Core\Api\Services\AuthService;
 use Wayfair\Core\Api\Services\FetchDocumentService;
-use Wayfair\Core\Api\Services\InventoryService;
 use Wayfair\Core\Api\Services\RegisterPurchaseOrderService;
 use Wayfair\Core\Contracts\AuthenticationContract;
 use Wayfair\Core\Contracts\ClientInterfaceContract;
@@ -40,7 +40,8 @@ use Wayfair\Cron\OrderImportCron;
  *
  * @package Wayfair\Providers
  */
-class WayfairServiceProvider extends ServiceProvider {
+class WayfairServiceProvider extends ServiceProvider
+{
   use Loggable;
 
 
@@ -49,7 +50,8 @@ class WayfairServiceProvider extends ServiceProvider {
    *
    * @return void
    */
-  public function register() {
+  public function register()
+  {
     $this->getApplication()->register(WayfairRouteServiceProvider::class);
     $this->getApplication()->bind(ClientInterfaceContract::class, ClientService::class);
     $this->getApplication()->bind(AuthenticationContract::class, AuthService::class);
@@ -69,72 +71,62 @@ class WayfairServiceProvider extends ServiceProvider {
    * @return null
    */
   public function boot(
-      CronContainer $cronContainer,
-      ShippingServiceProviderService $shippingServiceProviderService,
-      ReferenceContainer $referenceContainer,
-      EventProceduresService $eventProceduresService
+    CronContainer $cronContainer,
+    ShippingServiceProviderService $shippingServiceProviderService,
+    ReferenceContainer $referenceContainer,
+    EventProceduresService $eventProceduresService
   ) {
-    // register crons
-    $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, OrderImportCron::class);
-    $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, InventorySyncCron::class);
-    $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, OrderAcceptCron::class);
-    $cronContainer->add(CronContainer::DAILY, InventoryFullCron::class);
-    $cronContainer->add(CronContainer::HOURLY, UpdateFullInventoryStatusCron::class);
-    $this->getLogger(__METHOD__)->debug(
-        TranslationHelper::getLoggerKey('addedCronJobLog'),
-        [
-            'classes' => [
-                OrderImportCron::class,
-                InventoryService::class
-            ]
-        ]
-    );
 
-    $shippingControllers = [
+    try {
+      // register crons
+      $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, OrderImportCron::class);
+      $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, InventorySyncCron::class);
+      $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, OrderAcceptCron::class);
+      $cronContainer->add(CronContainer::DAILY, InventoryFullCron::class);
+      $cronContainer->add(CronContainer::HOURLY, UpdateFullInventoryStatusCron::class);
+
+      $shippingControllers = [
         'Wayfair\\Controllers\\ShippingController@registerShipments',
         'Wayfair\\Controllers\\ShippingController@getLabels',
         'Wayfair\\Controllers\\ShippingController@deleteShipments'
-    ];
-    $shippingServiceProviderService->registerShippingProvider(
+      ];
+      $shippingServiceProviderService->registerShippingProvider(
         ConfigHelper::PLUGIN_NAME,
         ['de' => ConfigHelper::SHIPPING_PROVIDER_NAME, 'en' => ConfigHelper::SHIPPING_PROVIDER_NAME],
         $shippingControllers
-    );
+      );
 
-    //Register ASN sending procedure.
-    $eventProceduresService->registerProcedure(
+      //Register ASN sending procedure.
+      $eventProceduresService->registerProcedure(
         'sendWayfairASN',
         ProcedureEntry::EVENT_TYPE_ORDER,
         [
-            'de' => 'Versandsbestätigung (ASN) an Wayfair senden',
-            'en' => 'Send Ship Confirmation (ASN) to Wayfair'
+          'de' => 'Versandsbestätigung (ASN) an Wayfair senden',
+          'en' => 'Send Ship Confirmation (ASN) to Wayfair'
         ],
         OrderShipmentNotifyProcedure::class . '@run'
-    );
-
-    $this->getLogger(__METHOD__)->debug(
-        TranslationHelper::getLoggerKey('registeredShippingProvider'),
-        [
-            'controllers' => $shippingControllers
-        ]
-    );
-    try {
-      $referenceContainer->add(
-          [
-              'poNumber'   => 'poNumber',
-              'orderId'    => 'orderId',
-              'statusCode' => 'statusCode',
-          ]
       );
-    } catch (\Exception $e) {
-      $this->getLogger(__METHOD__)->error(
+
+      try {
+        $referenceContainer->add(
+          [
+            'poNumber'   => 'poNumber',
+            'orderId'    => 'orderId',
+            'statusCode' => 'statusCode',
+          ]
+        );
+      } catch (\Exception $e) {
+        $this->getLogger(__METHOD__)->error(
           TranslationHelper::getLoggerKey('errorAddingReferenceContainer'),
           [
-              'poNumber'   => 'poNumber',
-              'orderId'    => 'orderId',
-              'statusCode' => 'statusCode',
+            'poNumber'   => 'poNumber',
+            'orderId'    => 'orderId',
+            'statusCode' => 'statusCode',
           ]
-      );
+        );
+      }
+    } finally {
+      ConfigHelper::setBootFlag();
     }
   }
 }
