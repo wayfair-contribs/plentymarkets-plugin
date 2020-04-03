@@ -78,15 +78,6 @@ class WayfairServiceProvider extends ServiceProvider
   ) {
 
     try {
-
-      // FIXME: remove this temporary log
-      $this->getLogger(__METHOD__)->error(
-        TranslationHelper::getLoggerKey('debugBoot'),
-        [
-          'message'     => 'start of boot'
-        ]
-      );
-
       // register crons
       $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, OrderImportCron::class);
       $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, InventorySyncCron::class);
@@ -147,13 +138,6 @@ class WayfairServiceProvider extends ServiceProvider
       );
     } finally {
       ConfigHelper::setBootFlag();
-      // FIXME: remove this temporary log
-      $this->getLogger(__METHOD__)->error(
-        TranslationHelper::getLoggerKey('debugBoot'),
-        [
-          'message'     => 'end of boot'
-        ]
-      );
     }
   }
 }

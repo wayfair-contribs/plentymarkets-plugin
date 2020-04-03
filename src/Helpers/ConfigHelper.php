@@ -132,7 +132,7 @@ class ConfigHelper extends AbstractConfigHelper {
    *
    * @return void
    */
-  protected static function setBootFlag()
+  public static function setBootFlag()
   {
     self::$bootFlag = true;
   }
