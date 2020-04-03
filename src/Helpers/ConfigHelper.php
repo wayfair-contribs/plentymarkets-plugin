@@ -21,6 +21,13 @@ class ConfigHelper extends AbstractConfigHelper {
   protected $config;
 
   /**
+   * Flag to set after boot has been completed
+   *
+   * @var boolean
+   */
+  private static $bootFlag = false;
+
+  /**
    * ConfigHelper constructor.
    *
    * @param ConfigRepository $config
@@ -118,5 +125,24 @@ class ConfigHelper extends AbstractConfigHelper {
    */
   public function getIntegrationAgentHeader() {
     return self::INTEGRATION_AGENT_NAME . ' - v:' . $this->getPluginVersion();
+  }
+
+  /**
+   * Set the flag for booting to true
+   *
+   * @return void
+   */
+  public static function setBootFlag()
+  {
+    self::$bootFlag = true;
+  }
+
+  /**
+   * Check if boot completed
+   *
+   * @return bool
+   */
+  public function hasBooted(): bool {
+    return self::$bootFlag;
   }
 }

@@ -61,4 +61,11 @@ abstract class AbstractConfigHelper {
    * @return bool
    */
   abstract public function isAllItemsActive(): bool;
+
+  /**
+   *
+   * @return bool
+   */
+  abstract public function hasBooted(): bool;
+
 }
