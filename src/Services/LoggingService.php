@@ -30,7 +30,7 @@ class LoggingService implements LoggerContract {
    */
   public function debug(string $code, $loggingInfo = null) {
 
-    if (! self->canLogLowerThanError())
+    if (! $this->canLogLowerThanError())
     {
       return;
     }
@@ -47,7 +47,7 @@ class LoggingService implements LoggerContract {
    */
   public function info(string $code, $loggingInfo = null) {
 
-    if (! self->canLogLowerThanError())
+    if (! $this->canLogLowerThanError())
     {
       return;
     }
@@ -75,7 +75,7 @@ class LoggingService implements LoggerContract {
    */
   public function warning(string $code, $loggingInfo = null) {
 
-    if (! self->canLogLowerThanError())
+    if (! $this->canLogLowerThanError())
     {
       return;
     }
