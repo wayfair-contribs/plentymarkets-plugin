@@ -76,7 +76,7 @@
 
     5.5. Remove the Plentymarkets Marketplace version of Wayfair from the new plugin set by clicking the remove button ![remove button](shared/images/pm7_button_remove.png) to allow installation of the Wayfair plugin from git
 
-    5.6. Set the plugin filters to "Git"; and "Not Installed" ![plugin search](shared/images/pm7_find_plugin_git_not_installed.png)
+    5.6. Set the plugin filters to "Git" and "Not Installed" ![plugin search](shared/images/pm7_find_plugin_git_not_installed.png)
 
     5.7. Click the search button ![search button](shared/images/pm7_button_search.png)
 
