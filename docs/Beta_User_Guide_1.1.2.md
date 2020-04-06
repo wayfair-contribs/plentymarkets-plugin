@@ -48,7 +48,6 @@
     - Token: access token created in step 3
 
     4.3 Verify that the settings look like this:
-
     ![new git plugin](shared/images/pm7_adding_git_plugin.png)
 
     4.4 Click the save button ![save button](shared/images/pm7_button_save.png)
@@ -61,11 +60,17 @@
     5.2. Observe which plugin set is currently &quot;Linked to&quot; the shop on which wayfair will be used - in a basic setup, this is named &quot;Standard Shop.&quot;
 
     5.3. Create a new plugin set in order to easily revert back to the current plugin set that is using official Wayfair releases, and prevent accidental loss of settings.
-    - Click the add ![add button](shared/images/pm7_button_plus.png) button at the top left above the plugin set(s) list
-    - Enter a unique name for the new plugin set. We recommend &quot;Wayfair Beta&quot;
-    - In the "copy plugin set" field, enter the name of the current plugin set from step 5.2
-    - Verify that the screen looks like this: ![copying plugin set](shared/images/pm7_copying_wf_plugin_set.png)
-    - Click the save icon ![picture alt](shared/images/pm7_button_save.png)
+
+    1. Click the add ![add button](shared/images/pm7_button_plus.png) button at the top left above the plugin set(s) list
+
+    2. Enter a unique name for the new plugin set. We recommend &quot;Wayfair Beta&quot;
+
+    3. In the "copy plugin set" field, enter the name of the current plugin set from step 5.2
+
+    4. Verify that the screen looks like this:
+    ![copying plugin set](shared/images/pm7_copying_wf_plugin_set.png)
+
+    5. Click the save icon ![picture alt](shared/images/pm7_button_save.png)
 
     5.4. Click on the name of the new plugin set. The list of plugins will match that of the plugin set that is currently in use. All of the plugin's settings have also been copied to this new plugin set.
 
