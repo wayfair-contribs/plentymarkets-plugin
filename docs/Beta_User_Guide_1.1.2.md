@@ -216,9 +216,9 @@ You may contact us at [ERPSupport@wayfair.com] for support with installing and u
 
 1. Go to **Plugins > Plugin Overview** to view plugin set(s)
 
-2. Click the Link Plugin Sets button ![picture alt](http://via.placeholder.com/20x20 "Title is optional")
+2. Click the Link Plugin Sets button ![link plugin sets button](shared/images/pm7_button_link_plugin_sets.png)
 
-3. In the Plugin Set field, choose the plugin set that was in use before switching to Beta ![]![picture alt](http://via.placeholder.com/600x150 "Title is optional")
+3. In the Plugin Set field, choose the plugin set that was in use before switching to Beta ![link plugin set wayfair official](shared/images/pm7_link_plugin_sets_wayfair_official.png)
 
 4. Click Save
 
@@ -241,5 +241,5 @@ You may contact us at [ERPSupport@wayfair.com] for support with installing and u
 
 7. Click on the name of the plugin set that contains the Beta Wayfair plugin
 
-8. Click the save icon ![picture alt](http://via.placeholder.com/20x20 "Title is optional") above the list, and wait for the progress bar to complete - a timestamp will display at completion. Though the "version" of the Wayfair plugin may not update, even after reloading the Plugin Overview page, the latest changes to the git branch have now been applied.
+8. Click the save button ![save button](shared/images/pm7_button_save.png) above the list, and wait for the progress bar to complete - a timestamp will display at completion. Though the "version" of the Wayfair plugin may not update, even after reloading the Plugin Overview page, the latest changes to the git branch have now been applied.
 
