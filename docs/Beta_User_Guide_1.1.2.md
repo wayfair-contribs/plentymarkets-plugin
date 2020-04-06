@@ -47,7 +47,9 @@
     - Username: Your github username created in step 2
     - Token: access token created in step 3
 
-    4.3 Verify that the settings look like this: ![new git plugin](shared/images/pm7_adding_git_plugin.png)
+    4.3 Verify that the settings look like this:
+
+    ![new git plugin](shared/images/pm7_adding_git_plugin.png)
 
     4.4 Click the save button ![save button](shared/images/pm7_button_save.png)
 
