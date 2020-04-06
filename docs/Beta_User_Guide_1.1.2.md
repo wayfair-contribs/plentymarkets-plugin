@@ -1,12 +1,12 @@
 # Plentymarkets Beta Program Guide for v1.1.2
 
-#### Prerequisites for beta testing Wayfair's plentymarkets plugin:
+## Prerequisites for beta testing Wayfair's plentymarkets plugin:
 
 - Supplier is onboarded for API usage by Wayfair.
 - Supplier is currently a plentymarkets user.
 - Supplier has a github.com account.
 
-### Follow these steps to download and test with a beta version of Wayfair&#39;s plentymarkets plugin:
+## Follow these steps to download and test with a beta version of Wayfair&#39;s plentymarkets plugin:
 
 1. Capture the current settings for the Wayfair plugin
 
@@ -87,9 +87,12 @@
     5.10. Click install ![install button](shared/images/pm7_button_download.png)
 
     5.11. There will be a prompt for choosing the desired **branch** of the plugin
-    - Select the branch **release\_1\_1\_2\_beta** (This list is **NOT** alphabetically ordered).
-    - Click "install"
-    - Click the save icon ![save button](shared/images/pm7_button_save.png) above the list, and wait for the progress bar to complete - a timestamp will display at completion
+
+    1. Select the branch **release\_1\_1\_2\_beta** (This list is **NOT** alphabetically ordered).
+
+    2. Click "install"
+
+    3. Click the save icon ![save button](shared/images/pm7_button_save.png) above the list, and wait for the progress bar to complete - a timestamp will display at completion
 
 6. Import the Wayfair configuration (client ID, etc) that was used in the older Wayfair version
 
@@ -97,13 +100,13 @@
 
     6.2. Click on the name of the new plugin set that has the beta Wayfair plugin
 
-    6.3. Click the **Plugin Set Settings** button ![picture alt](http://via.placeholder.com/20x20 "Title is optional")
+    6.3. Click the **Plugin Set Settings** button ![settings button](shared/images/pm7_button_gear.png)
 
-    6.4. In the **Import configuration** area, click the **Select file** button ![picture alt](http://via.placeholder.com/20x20 "Title is optional")
+    6.4. In the **Import configuration** area, click the **Select file** button ![select file button](shared/images/pm7_button_three_dots_horizontal.png)
 
     6.5. Select the file from step 1
 
-    6.6. Click the **Import** button ![picture alt](http://via.placeholder.com/20x20 "Title is optional")
+    6.6. Click the **Import** button ![import button](shared/images/pm7_button_upload.png)
 
     6.7. A confirmation will appear, suggesting that the plugin set page needs to be reloaded.
 
@@ -111,23 +114,23 @@
 
     7.1. Go to **Plugins > Plugin Overview**
 
-    7.2. Click the Activate button ![picture alt](http://via.placeholder.com/20x20 "Title is optional")to the left of "Wayfair"
+    7.2. Click the Activate button ![activate button](shared/images/pm7_button_activate_plugin.png) to the left of "Wayfair"
 
-
-    7.3. Click the save icon ![picture alt](http://via.placeholder.com/20x20 "Title is optional") above the plugin set list, and wait for the progress bar to complete - a timestamp will display at completion
+    7.3. Click the save button ![save button](shared/images/pm7_button_save.png) above the plugin set list, and wait for the progress bar to complete - a timestamp will display at completion
 
 
 8. Switch to using the plugin set that contains the beta plugin
 
     8.1. Go to **Plugins > Plugin Overview** to view plugin set(s)
 
-    8.2. Click the Link Plugin Sets button ![picture alt](http://via.placeholder.com/20x20 "Title is optional")
+    8.2. Click the Link Plugin Sets button ![link plugin sets button](shared/images/pm7_button_link_plugin_sets.png)
 
-    8.3. In the Plugin Set field, choose the new plugin set that uses the beta version of the plugin ![picture alt](http://via.placeholder.com/750x150 "Title is optional")
+    8.3. In the Plugin Set field, choose the new plugin set that uses the beta version of the plugin ![choose wayfair beta](shared/images/pm7_link_plugin_sets_wayfair_beta.png)
 
     8.4. Click save
 
     8.5. Log out of plentymarkets, and log back in, to ensure that the latest changes are loaded.
+
 
 9. Confirm wayfair plugin configuration
 
@@ -138,72 +141,78 @@
     - Settings
     - Ship Confirmation (ASN)
 
+
 10. Configure logging settings
 
     10.1. Go to **Data > Logs**
 
-    10.2. Click the settings button ![picture alt](http://via.placeholder.com/20x20 "Title is optional")
+    10.2. Click the settings button ![settings button](shared/images/pm7_button_gear.png)
 
-    10.3. Click on &quot;Wayfair&quot; in the list, so that the Settings for Wayfair are loaded
+    10.3. (Optional) type &quot;Wayfair&quot; into the **search** box
 
-    10.4. Enable the **active** checkbox
+    10.4. Click on &quot;Wayfair&quot; in the list, so that the Settings for Wayfair are loaded
 
-    10.5. Set the **Duration** to the expected length of the beta test period
+    10.5. Enable the **active** checkbox
 
-    10.6. Set the **Log Level** to **Debug**
+    10.6. Set the **Duration** to the expected length of the beta test period
 
-    10.7. Verify that the settings resemble this image:![picture alt](http://via.placeholder.com/650x150 "Title is optional")
+    10.7. Set the **Log Level** to **Debug**
 
-    10.8. Click **Save**
+    10.8. Verify that the settings resemble this image:
+    ![wayfair logs set to debug](shared/images/pm7_wayfair_logs_enabled.png)
 
-    10.9. Exit the logging settings by clicking the X at the top right
+    10.9. Click **Save**
 
-
-11. Validating plugin behaviors
-
-    11.1. **After some usage of the Wayfair plugin,** go to **Data > Logs**
-
-    11.2. Check for any new system errors
-
-    11.3. Type "Wayfair" in the **Integration** field on the left side  and click on it
-
-    11.4. Click the search button ![picture alt](http://via.placeholder.com/20x20 "Title is optional") to see only the Wayfair log entries
-
-    11.5. Report any issues to Wayfair - important issue details are displayed by clicking on an individual row in the logs.
+    10.10. Exit the logging settings by clicking the X at the top right
 
 
-12. How to report issues
-    12.1. Go to the plugin's issues site at [https://github.com/wayfair-contribs/plentymarkets-plugin/issues?q=is%3Aissue](https://github.com/wayfair-contribs/plentymarkets-plugin/issues?q=is%3Aissue)
+## Validating plugin behaviors
 
-    12.2. Clear make sure that the &quot;is:open&quot; filter is NOT enabled.
+1. **After some usage of the Wayfair plugin,** go to **Data > Logs**
 
-    12.3. Review the current set of issues to see if yours has already been reported. If so, please provide your information and insights on that existing issue rather than creating a new one.
+2. Check for any new system errors
 
-    12.4. Click "New Issue" to author a new issue
+3. Type "Wayfair" in the **Integration** field on the left side  and click on it
 
-    12.5. Provide the following details:
+4. Click the search button ![search button](shared/images/pm7_button_search.png) to see only the Wayfair log entries
+
+5. Report any issues to Wayfair - important issue details are displayed by clicking on an individual row in the logs.
+
+
+## How to report issues
+
+1. Go to the plugin's issues site at [https://github.com/wayfair-contribs/plentymarkets-plugin/issues?q=is%3Aissue](https://github.com/wayfair-contribs/plentymarkets-plugin/issues?q=is%3Aissue)
+
+2. Clear make sure that the &quot;is:open&quot; filter is NOT enabled.
+
+3. Review the current set of issues to see if yours has already been reported. If so, please provide your information and insights on that existing issue rather than creating a new one.
+
+4. Click "New Issue" to author a new issue
+
+5. Provide the following details:
 
     - Supplier name
     - Contact information for someone in your organization who is able to discuss the issue with representatives from Wayfair
     - Version of plugin
 
-      1. Go to **Plugins > Plugin Overview**
-      2. In the plugin set list, find the set that is currently linked to your shop, and click on it
-      3. The version is listed in the "Active Version" column in the Wayfair plugin's row.
+        1. Go to **Plugins > Plugin Overview**
+        2. In the plugin set list, find the set that is currently linked to your shop, and click on it
+        3. The version is listed in the "Active Version" column in the Wayfair plugin's row.
 
     - Date and time of occurence
     - Summary of what went wrong
     - What were you doing when the issue occurred? Did you click any buttons?
     - What is present in the logs? (See step 10 for instructions)
 
-    12.6. Monitor the email address for the github account, for notifications about the issue.
-
-##### 13. How to ask questions
-
-    13.1. You may contact us at [ERPSupport@wayfair.com] for support with installing and using the Wayfair plugin.
+6. Monitor the email address for the github account, for notifications about the issue.
 
 
-# To revert back to the official version of the Wayfair plugin, follow these steps:
+## How to ask questions
+
+You may contact us at [ERPSupport@wayfair.com] for support with installing and using the Wayfair plugin.
+
+
+## To revert back to the official version of the Wayfair plugin, follow these steps:
 
 1. Go to **Plugins > Plugin Overview** to view plugin set(s)
 
@@ -216,7 +225,7 @@
 5. Log out of plentymarkets then log back in, to ensure the correct plugin set is loaded.
 
 
-# To update the Beta version of the Wayfair plugin:
+## To update the Beta version of the Wayfair plugin:
 
 1. Go to **Plugins > Plugin Overview** to view plugin set(s)
 
