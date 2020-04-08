@@ -37,9 +37,10 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
       ->debug(TranslationHelper::getLoggerKey('fetchingShipmentForURL'), ['additionalInfo' => ['url' => $url], 'method' => __METHOD__]);
     $ch = curl_init();
     try {
-      if (strpos($url, URLHelper::BASE_URL) !== false) {
+      if (self::isWayfairAPI($url)) {
         // Check if token has already been expired and refresh it.
         $this->authService->refresh();
+        // getOAuthToken() currently returns 'Bearer MyToken' NOT the bare token.
         curl_setopt(
           $ch, CURLOPT_HTTPHEADER, [
             'Authorization: ' . $this->authService->getOAuthToken(),
@@ -168,6 +169,17 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
       . ' } '
       . '} '
       . '}';
+  }
+
+  /**
+   * Check if the url is a call to a wayfair API
+   *
+   * @param string $url
+   * @return bool
+   */
+  private static function isWayfairAPI(string $url): bool
+  {
+    return stripos($url, URLHelper::BASE_URL) === 0;
   }
 
 }
