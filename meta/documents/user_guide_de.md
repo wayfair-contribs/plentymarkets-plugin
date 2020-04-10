@@ -7,6 +7,7 @@
 Wayfair ist ein geschlossener Marktplatz. Um dieses Plugin verwenden zu können, müssen Sie bei Wayfair als Lieferant registriert sein. 
 
 Schicken Sie hierfür bitte eine Email an ERPSupport@wayfair.com
+
 **Achtung (März 2020):** Die E-Mail-Adresse ist neu. Bitte aktualisieren Sie Ihre Unterlagen entsprechend.
 
 
