@@ -38,7 +38,7 @@ After you have downloaded the Wayfair plugin from the plentyMarketplace, install
 
 ### Authentication
 
-After the plugin is installed in your plentymarket account, carry out the authenticatioin to enable access to the interface.
+After the plugin is installed in your plentymarket account, carry out the authentication to enable access to the interface.
 
 #### Activating the access to the interface
 
@@ -85,7 +85,7 @@ In order to match an item in Wayfair's database, which is defined by the Supplie
 
 To do so, follow the instructions below:
 
-1. Go to **System >> Markets >> Wayfair >> Home**.
+1. Go to **Setup >> System >> Markets >> Wayfair >> Home**.
 
 2. Once the homepage of the plugin has loaded, click on **Settings**.
 
@@ -141,15 +141,15 @@ A working order fulfillment with the Wayfair plugin requires to set up **Shippin
 
 4. In the first row, click on the dropdown menu, and choose the *Shipping service provider** you have just created (should be **WayfairShipping** if you followed our instructions)
 
-5. In the second and third row, enter a name (we recommend **WayfairShipping** for simplicity). You should also choose a language in the second row, third collumn.
+5. In the second and third row, enter a name (we recommend **WayfairShipping** for simplicity). You should also choose a language in the second row, third column.
 
 6. In the fourth row, choose the flag number 6 or 126 (which represent the Wayfair colors).
 
-7. In the fifth collumn, choose **priority n1** (the two stars).
+7. In the fifth column, choose **priority n1** (the two stars).
 
-8. In the seventeenth collumn (**Order referrer**), place a check mark next to **Wayfair** (if there are more than one, choose all).
+8. In the seventeenth column (**Order referrer**), place a check mark next to **Wayfair** (if there are more than one, choose all).
 
-9. Scroll to the top of the page, and click on the **save** button. All the other rowss and their respective data entries can be left empty.
+9. Scroll to the top of the page, and click on the **save** button. All the other rows and their respective data entries can be left empty.
 
 ### Creating a new event procedure
 
