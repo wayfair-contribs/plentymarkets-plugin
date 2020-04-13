@@ -1,4 +1,4 @@
-﻿# Release Notes für Wayfair
+﻿# Versionshinweise für Wayfair
 
 ## v1.1.2 (2020-02-04)
 - Unterstützung für die Synchronisierung paginierter Bestände hinzufügen
