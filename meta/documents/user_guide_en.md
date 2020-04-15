@@ -20,33 +20,83 @@ The installation of the Wayfair plugin allows for the following automatic proces
 
 ## 2. Retrieving your credentials
 
-In order to connect Wayfair to plentymarkets, you have to enter API credentials. To receive them, you have to first send an email to ERPSupport@wayfair.com and provide the following information:
+In order to connect Wayfair to Plentymarkets, you need to enter API credentials. To receive them, you must first send an email to ERPSupport@wayfair.com and provide the following information:
 
 - Subject : Access to plentymarkets plugin / "Name of your company" (SuID)
 - Information contact
 - Which functionalities you plan to use.
 
-You will shortly receive an email back, confirming that you have been granted access to the API tools, as well your **Supplier ID(s)**. Next, you need  to head over to your Extranet account at partners.wayfair.com. In the banner, you should see a tab named "Developer". If you don’t see it in the banner, then hover over the "More" tab, and it should appear in the dropdown menu.
+You will shortly receive an email back, containing a confirmation that you have been granted access to the API tools, as well as your **Supplier ID(s)**. Next, you need to head over to your Extranet account at partners.wayfair.com. In the banner, you should see a tab named "Developer". If you don’t see it in the banner, then hover over the "More" tab, and it should appear in the dropdown menu.
 
 Hover over the "Developer" tab, and click on "Application". You should be redirected to a new page. On this new page, click on the button named " + New Application", and give a name and description to your application
 
 Click on "Save", then you should be shown a ClientID and Client Secret, which are the credentials you will need to use for the Wayfair plugin. Save these somewhere secure, especially the Client Secret, as you will only be able to see it once.
 
-## 3. Installing the Wayfair plugin in plentymarkets
+## 3. Installing the Wayfair plugin in Plentymarkets
 
-After you have downloaded the Wayfair plugin from the plentyMarketplace, install the plugin in the menu **Plugins >> Plugin Overview**
+1. Login to the Plentymarkets system
+
+2. Go to **plugins >> plentyMarketplace**, which will use the system owner’s credentials to log you in on the Marketplace
+
+3. Click the search button  in the top-right corner of the page
+
+4. Enter “Wayfair” into the box and press enter
+
+5. If “Already purchased” appears on the page, skip to step 8
+
+6. Click the **go to checkout** button 
+7. Complete the purchasing form
+    * Accept terms and conditions
+    * Click **order now**
+
+8. Return to the Plentymarkets system, and go to **Plugins >> Plugin Overview**.
+
+9. Find/Create a Plugin Set where the plugin is to be installed - the proper plugin set will be marked as **Linked to** your "shop."
+
+10. Un-check the **installed** checkbox
+
+11. Check the **plentyMarketplace** checkbox
+
+12. Type “Wayfair” into the **name** field
+
+13. Click **search** to find the appropriate plugin - only one should appear, with the marketplace icon in the Source column.
+
+14. Click the **install** button in the Wayfair row
+
+15. Complete the pop-up modal
+    1. (Optional) in the drop-down, choose a different version to install - you probably should be using the newest one.
+
+    2. Click **install**
+
+16. Refresh the Plugin Overview page
+
+17. Click on the name of the plugin set where the plugin was installed
+
+18. Click the **Activate** button in the Wayfair plugin row of the plugin set
+
+19. Click the save icon  above the list, and wait for the progress bar to complete. A timestamp will display at successful completion.
+
+20. If an error symbol appears, check the Plentymarkets logs for plugin build and deployment failures
+
 
 ### Authentication
 
-After the plugin is installed in your plentymarket account, carry out the authentication to enable access to the interface.
+After the plugin is installed in your Plentymarkets system, carry out the authentication to enable access to the Wayfair interfaces.
 
-#### Activating the access to the interface
+#### Activating the access to the Wayfair interfaces
 
-1. Go to **Plugins >> Plugin Overview >> Wayfair >> Configuration >> Global Settings**
-2. Enter the Client ID and Client Secret you received when creating the application in Extranet into the fields **Client ID** and **Client Secret**.
-3. Change **Mode** to **Live**.
-4. **Save** the settings.
+1. Go to **Plugins >> Plugin Overview**
 
+2. Select the plugin set that contains the Wayfair plugin
+
+3. Click on the "Wayfair " name in the plugin set details
+
+4. Go to **Configuration >> Global Settings**
+
+5. Enter the Client ID and Client Secret you received when creating the application in Extranet into the fields **Client ID** and **Client Secret**.
+
+6. Change **Mode** to **Live**.
+7. **Save** the settings.
 
 ## 4. Activating the order referrer
 
