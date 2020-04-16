@@ -45,8 +45,8 @@ Click on "Save", then you should be shown a ClientID and Client Secret, which ar
 
 6. Click the **go to checkout** button 
 7. Complete the purchasing form
-    * Accept terms and conditions
-    * Click **order now**
+    1. Accept terms and conditions
+    2. Click **order now**
 
 8. Return to the Plentymarkets system, and go to **Plugins >> Plugin Overview**.
 
