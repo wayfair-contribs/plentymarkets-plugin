@@ -13,9 +13,8 @@ After you have successfully registered as a supplier on Wayfair, you will have t
 
 The installation of the Wayfair plugin allows for the following automatic processes to take place:
 
-- hourly order import
-- hourly stock synchronization
-- generation of shipping labels.
+- periodic order import
+- periodic stock synchronization
 
 
 ## 2. Retrieving your credentials
