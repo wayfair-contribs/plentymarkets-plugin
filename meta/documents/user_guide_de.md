@@ -15,9 +15,8 @@ Nachdem Sie sich erfolgreich bei Wayfair als Anbieter registriert haben, müssen
 
 Die Installation des Wayfair-Plugins ermöglicht die folgenden automatischen Prozesse:
 
-- Stündlicher Auftragsdatenimport
-- Stündliche Bestandsdatenabgleichung
-- Generierung von Versandlabels
+- Periodisch Auftragsdatenimport
+- Periodisch Bestandsdatenabgleichung
 
 
 ## 2 Rufen Sie Ihre Anmeldeinformationen ab
