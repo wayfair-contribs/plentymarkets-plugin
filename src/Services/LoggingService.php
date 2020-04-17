@@ -9,6 +9,7 @@ use Plenty\Plugin\Log\Loggable;
 
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Helpers\ConfigHelper;
 
 class LoggingService implements LoggerContract {
   use Loggable;
@@ -18,8 +19,15 @@ class LoggingService implements LoggerContract {
   const WARNING = 'WARNING';
   const ERROR = 'ERROR';
 
+  /**
+   * Stores the version of the plugin
+   * @var string $version
+   */
+  public $version;
+
   public function __construct() {
-   
+    $configHelper = new ConfigHelper();
+   $this->$version = $configHelper->getPluginVersion();
   }
 
   /**
@@ -121,7 +129,7 @@ class LoggingService implements LoggerContract {
    * Checks if it is alright to log at a level lower than ERROR.
    * Logging at levels such as INFO and DEBUG prior to the end of the "boot" period
    * Causes issues.
-   * 
+   *
    * See https://forum.plentymarkets.com/t/wayfair-log-levels-info-and-debug-not-working-for-loggable-module/581320/22
    *
    * @return boolean
