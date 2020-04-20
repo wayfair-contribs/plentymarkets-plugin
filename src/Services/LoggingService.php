@@ -30,7 +30,7 @@ class LoggingService implements LoggerContract {
    */
   public function __construct() {
     $configHelper = pluginApp(AbstractConfigHelper::class);
-    $this->$version = $configHelper->getPluginVersion();
+    $this->version = $configHelper->getPluginVersion();
   }
 
   /**
