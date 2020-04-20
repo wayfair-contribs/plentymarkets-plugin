@@ -25,9 +25,12 @@ class LoggingService implements LoggerContract {
    */
   public $version;
 
+  /**
+   * Undocumented function
+   */
   public function __construct() {
-    $configHelper = new ConfigHelper();
-   $this->$version = $configHelper->getPluginVersion();
+    $configHelper = pluginApp(AbstractConfigHelper::class);
+    $this->$version = $configHelper->getPluginVersion();
   }
 
   /**
@@ -121,6 +124,7 @@ class LoggingService implements LoggerContract {
     $method = $loggingInfo['method'] ?? null;
     $referenceType = $loggingInfo['referenceType'] ?? null;
     $referenceValue = (int) $loggingInfo['referenceValue'] ?? null;
+    $additionalInfo['wayfairPluginVersion'] = $this->version;
 
     return array($additionalInfo, $method, $referenceType, $referenceValue);
   }

@@ -68,4 +68,9 @@ abstract class AbstractConfigHelper {
    */
   abstract public function hasBooted(): bool;
 
+  /**
+   * @return string
+   */
+  abstract public function getPluginVersion(): string;
+
 }
