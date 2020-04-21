@@ -107,7 +107,7 @@ class URLHelper {
     // otherwise, someone can put our URL into the query string and trick us into sending the auth header.
     foreach (self::URLS_USING_WAYFAIR_AUTH as $wayfair_authenticated_domain)
     {
-      if (strpos($url, $wayfair_authenticated_domain) == 0)
+      if (stripos($url, $wayfair_authenticated_domain) == 0)
       {
         return true;
       }
