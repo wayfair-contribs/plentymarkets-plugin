@@ -33,16 +33,22 @@ abstract class AbstractConfigHelper {
   const INVENTORY_ITEMS_PER_PAGE = 500;
 
   /**
+   * Retrieve the configuration client id for the global client
+   *
    * @return mixed
    */
   abstract public function getClientId();
 
   /**
+   * Retrieve the configuration client secret for the global client
    * @return mixed
    */
   abstract public function getClientSecret();
 
   /**
+   * Checks if an item already exists in cache and returns the key,
+   * if the item does not exists in cache adds item to cache
+   *
    * @return int
    */
   abstract public function getOrderReferrerValue(): int;
@@ -53,6 +59,8 @@ abstract class AbstractConfigHelper {
   abstract public function getStockBufferValue();
 
   /**
+   * Retrieve the configuration values for setting up a test environment
+   *
    * @return string
    */
   abstract public function getDryRun(): string;
@@ -63,12 +71,15 @@ abstract class AbstractConfigHelper {
   abstract public function isAllItemsActive(): bool;
 
   /**
+   * Check if boot is completed
    *
    * @return bool
    */
   abstract public function hasBooted(): bool;
 
   /**
+   * Retrieves the current Wayfair plugin version
+   *
    * @return string
    */
   abstract public function getPluginVersion(): string;

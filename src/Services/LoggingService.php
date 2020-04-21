@@ -9,7 +9,6 @@ use Plenty\Plugin\Log\Loggable;
 
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
-use Wayfair\Helpers\ConfigHelper;
 
 class LoggingService implements LoggerContract {
   use Loggable;
