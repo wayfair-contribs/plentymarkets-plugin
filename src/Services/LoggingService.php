@@ -17,15 +17,17 @@ class LoggingService implements LoggerContract {
   const INFO = 'INFO';
   const WARNING = 'WARNING';
   const ERROR = 'ERROR';
+  const WAYFAIR_PLUGIN_VERSION = 'Wayfair Plugin Version';
 
   /**
    * Stores the version of the plugin
+   *
    * @var string $version
    */
   public $version;
 
   /**
-   * Undocumented function
+   * Initialize a logging service object
    */
   public function __construct() {
     $configHelper = pluginApp(AbstractConfigHelper::class);
@@ -123,7 +125,7 @@ class LoggingService implements LoggerContract {
     $method = $loggingInfo['method'] ?? null;
     $referenceType = $loggingInfo['referenceType'] ?? null;
     $referenceValue = (int) $loggingInfo['referenceValue'] ?? null;
-    $additionalInfo['wayfairPluginVersion'] = $this->version;
+    $additionalInfo[self::WAYFAIR_PLUGIN_VERSION] = $this->version;
 
     return array($additionalInfo, $method, $referenceType, $referenceValue);
   }
