@@ -116,6 +116,8 @@ class LoggingService implements LoggerContract {
   }
 
   /**
+   * Maps data from the PlentyMarket designed associative array to values of an array to be used by our different log methods
+   *
    * @param $loggingInfo
    *
    * @return array
