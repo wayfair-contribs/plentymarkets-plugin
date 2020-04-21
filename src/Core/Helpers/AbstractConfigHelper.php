@@ -63,8 +63,13 @@ abstract class AbstractConfigHelper {
    * @return bool
    */
   abstract public function isAllItemsActive(): bool;
+   
+  /*
+   * @return bool
+   */
+  abstract public function hasBooted(): bool;
 
-  /**
+   /**
    * Check if the plugin is in "test" mode instead of "live" mode.
    *
    * @return boolean

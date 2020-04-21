@@ -8,6 +8,7 @@ namespace Wayfair\Services;
 use Plenty\Plugin\Log\Loggable;
 
 use Wayfair\Core\Contracts\LoggerContract;
+use Wayfair\Core\Helpers\AbstractConfigHelper;
 
 class LoggingService implements LoggerContract {
   use Loggable;
@@ -28,6 +29,12 @@ class LoggingService implements LoggerContract {
    * @param null   $loggingInfo
    */
   public function debug(string $code, $loggingInfo = null) {
+
+    if (! $this->canLogLowerThanError())
+    {
+      return;
+    }
+
     list($additionalInfo, $method, $referenceType, $referenceValue) = $this->extractVars($loggingInfo);
     $this->getPlentyMarketLoggerInstance($method, $referenceType, $referenceValue)->debug($code, $additionalInfo);
   }
@@ -39,6 +46,12 @@ class LoggingService implements LoggerContract {
    * @param null   $loggingInfo
    */
   public function info(string $code, $loggingInfo = null) {
+
+    if (! $this->canLogLowerThanError())
+    {
+      return;
+    }
+
     list($additionalInfo, $method, $referenceType, $referenceValue) = $this->extractVars($loggingInfo);
     $this->getPlentyMarketLoggerInstance($method, $referenceType, $referenceValue)->info($code, $additionalInfo);
   }
@@ -61,6 +74,12 @@ class LoggingService implements LoggerContract {
    * @param null   $loggingInfo
    */
   public function warning(string $code, $loggingInfo = null) {
+
+    if (! $this->canLogLowerThanError())
+    {
+      return;
+    }
+
     list($additionalInfo, $method, $referenceType, $referenceValue) = $this->extractVars($loggingInfo);
     $this->getPlentyMarketLoggerInstance($method, $referenceType, $referenceValue)->warning($code, $additionalInfo);
   }
@@ -96,5 +115,22 @@ class LoggingService implements LoggerContract {
     $referenceValue = (int) $loggingInfo['referenceValue'] ?? null;
 
     return array($additionalInfo, $method, $referenceType, $referenceValue);
+  }
+
+  /**
+   * Checks if it is alright to log at a level lower than ERROR.
+   * Logging at levels such as INFO and DEBUG prior to the end of the "boot" period
+   * Causes issues.
+   * 
+   * See https://forum.plentymarkets.com/t/wayfair-log-levels-info-and-debug-not-working-for-loggable-module/581320/22
+   *
+   * @return boolean
+   */
+  private function canLogLowerThanError(): bool {
+    /**
+     * @var AbstractConfigHelper $configHelper
+     */
+    $configHelper = pluginApp(AbstractConfigHelper::class);
+    return $configHelper->hasBooted();
   }
 }

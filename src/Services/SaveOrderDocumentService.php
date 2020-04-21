@@ -147,7 +147,7 @@ class SaveOrderDocumentService
   {
     $this->loggerContract
       ->info(
-        TranslationHelper::getLoggerKey('saveFileS3'), [
+        TranslationHelper::getLoggerKey('saveFileSThree'), [
           'additionalInfo' => ['key' => $fileName, 'data' => base64_encode($fileData)],
           'method' => __METHOD__
         ]
