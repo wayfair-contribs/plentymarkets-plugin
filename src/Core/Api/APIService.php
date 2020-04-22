@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright 2019 Wayfair LLC - All rights reserved
  */
@@ -13,7 +14,13 @@ use Wayfair\Helpers\ConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Http\WayfairResponse;
 
-class APIService {
+class APIService
+{
+  const LOG_KEY_API_SERVICE = 'apiService';
+  const LOG_KEY_API_SERVICE_ERROR = 'apiServiceError';
+  const HEADER_KEY_AUTHORIATION = 'Authorization';
+  const HEADER_KEY_CONTENT_TYPE = 'Content-Type';
+  const MIME_TYPE_JSON = 'application/json';
 
   /**
    * @var AuthenticationContract
@@ -41,7 +48,8 @@ class APIService {
    * @param ConfigHelper            $configHelper
    * @param LoggerContract          $loggerContract
    */
-  public function __construct(ClientInterfaceContract $clientInterfaceContract, AuthenticationContract $authenticationContract, ConfigHelper $configHelper, LoggerContract $loggerContract) {
+  public function __construct(ClientInterfaceContract $clientInterfaceContract, AuthenticationContract $authenticationContract, ConfigHelper $configHelper, LoggerContract $loggerContract)
+  {
     $this->client = $clientInterfaceContract;
     $this->authService = $authenticationContract;
     $this->configHelper = $configHelper;
@@ -56,40 +64,46 @@ class APIService {
    * @throws \Exception
    * @return WayfairResponse
    */
-  public function query($query, $method = 'post', $variables = []) {
-    $url = $this->getUrl();
-    $audience = URLHelper::getWayfairAudience($url);
-    $this->authService->refresh($audience);
-    $authHeaderVal = $this->authService->generateOAuthHeader($audience);
-    
-    $headers = [];
-    $headers['Authorization'] = $authHeaderVal;
-    $headers['Content-Type'] = ['application/json'];
-    $headers[ConfigHelper::WAYFAIR_INTEGRATION_HEADER] = $this->configHelper->getIntegrationAgentHeader();
+  public function query($query, $method = 'post', $variables = [])
+  {
+    try {
+      $url = $this->getUrl();
+      $audience = URLHelper::getWayfairAudience($url);
+      $this->authService->refresh($audience);
+      $authHeaderVal = $this->authService->generateOAuthHeader($audience);
 
-    $arguments = [
-        $url ,
+      $headers = [];
+      $headers[self::HEADER_KEY_AUTHORIATION] = $authHeaderVal;
+      $headers[self::HEADER_KEY_CONTENT_TYPE] = [self::MIME_TYPE_JSON];
+      $headers[ConfigHelper::WAYFAIR_INTEGRATION_HEADER] = $this->configHelper->getIntegrationAgentHeader();
+
+      $arguments = [
+        $url,
         [
-            'json' => [
-                'query' => $query,
-                'variables' => $variables
-            ],
-            'headers' => $headers
+          'json' => [
+            'query' => $query,
+            'variables' => $variables
+          ],
+          'headers' => $headers
         ]
-    ];
-    $this->loggerContract
-        ->debug(TranslationHelper::getLoggerKey('apiService'), ['additionalInfo' => [
+      ];
+      $this->loggerContract
+        ->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_API_SERVICE), ['additionalInfo' => [
           'url' => $url,
           'arguments' => $arguments
         ], 'method' => __METHOD__]);
 
-    return $this->client->call($method, $arguments);
+      return $this->client->call($method, $arguments);
+    } catch (\Exception $e) {
+      $this->loggerContract->error(TranslationHelper::getLoggerKey(self::LOG_KEY_API_SERVICE_ERROR), ['additionalInfo' => ['message' => $e->getMessage()], 'method' => __METHOD__]);
+    }
   }
 
   /**
    * @return string
    */
-  private function getUrl() {
+  private function getUrl()
+  {
     return URLHelper::getUrl(URLHelper::URL_ID_GRAPHQL);
   }
 }

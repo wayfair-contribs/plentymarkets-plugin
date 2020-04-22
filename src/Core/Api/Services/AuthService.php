@@ -9,6 +9,7 @@ use Wayfair\Core\Contracts\AuthenticationContract;
 use Wayfair\Core\Contracts\ClientInterfaceContract;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Contracts\StorageInterfaceContract;
+use Wayfair\Core\Exceptions\AuthenticationException;
 use Wayfair\Core\Exceptions\TokenNotFoundException;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Core\Helpers\URLHelper;
@@ -21,6 +22,7 @@ class AuthService implements AuthenticationContract {
   const EXPIRES_IN = 'expires_in';
   const ACCESS_TOKEN = 'access_token';
   const STORE_TIME = 'store_time';
+  const TOKEN = 'token';
 
   /**
    * @var StorageInterfaceContract
@@ -130,11 +132,11 @@ class AuthService implements AuthenticationContract {
       
       if (!isset($response) || empty($response))
       {
-        throw new \Exception("Unable to authenticate user: no token data in response");
+        throw new AuthenticationException("Unable to authenticate user: no token data in response");
       }
 
       if (isset($response['errors'])) {
-        throw new \Exception("Unable to authenticate user: " . $response['error']);
+        throw new AuthenticationException("Unable to authenticate user: " . $response['error']);
       }
 
       $this->saveToken($response, $audience);
@@ -148,9 +150,10 @@ class AuthService implements AuthenticationContract {
    * @return void
    */
   private function saveToken($token, $audience) {
-    $token[self->STORE_TIME] = time();
-    // TODO: make sure audience does not need to be scrubbed of special characters
-    $this->store->set($audience, json_encode($token));
+    $token[self::STORE_TIME] = time();
+    $key = self::getKeyForToken($audience);
+    // FIXME: should be encrypted?
+    $this->store->set($key, json_encode($token));
   }
 
   /**
@@ -159,8 +162,8 @@ class AuthService implements AuthenticationContract {
    */
   public function isTokenExpired(string $audience) {
     $token = $this->getStoredTokenModel($audience);
-    if (isset($token) && isset($token[self->ACCESS_TOKEN]) && isset($token[self->STORE_TIME]) && isset($token[self->EXPIRES_IN])) {
-      if (($token[self->EXPIRES_IN] + $token[self->STORE_TIME]) > time()) {
+    if (isset($token) && isset($token[self::ACCESS_TOKEN]) && isset($token[self::STORE_TIME]) && isset($token[self::EXPIRES_IN])) {
+      if (($token[self::EXPIRES_IN] + $token[self::STORE_TIME]) > time()) {
         return false;
       }
     }
@@ -174,8 +177,10 @@ class AuthService implements AuthenticationContract {
    * @return mixed
    */
   private function getStoredTokenModel(string $audience) {
-    // TODO: make sure audience does not need to be scrubbed of special characters
-    return json_decode($this->store->get($audience), true);
+    
+    $key = self::getKeyForToken($audience);
+    // FIXME: need to decrypt if we add encryption for the token
+    return json_decode($this->store->get($key), true);
   }
 
   /**
@@ -200,6 +205,18 @@ class AuthService implements AuthenticationContract {
       throw new TokenNotFoundException("Token not found for " . $audience);
     }
 
-    return $tokenModel[self->ACCESS_TOKEN];
+    return $tokenModel[self::ACCESS_TOKEN];
+  }
+
+  /**
+   * Get the key for storing and looking up the oauth key for the audience
+   *
+   * @param string $audience
+   * @return void
+   */
+  private static function getKeyForToken(string $audience)
+  {
+    // TODO: make sure audience does not need to be scrubbed of special characters
+    return self::TOKEN . '_' . $audience;
   }
 }
