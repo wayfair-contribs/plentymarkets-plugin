@@ -17,6 +17,11 @@ use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Http\WayfairResponse;
 
 class AuthService implements AuthenticationContract {
+
+  const EXPIRES_IN = 'expires_in';
+  const ACCESS_TOKEN = 'access_token';
+  const STORE_TIME = 'store_time';
+
   /**
    * @var StorageInterfaceContract
    */
@@ -61,13 +66,33 @@ class AuthService implements AuthenticationContract {
   }
 
   /**
+   * Fetch a new auth token for the given audience
+   * @param string $audience
    * @return WayfairResponse
    */
-  private function authenticate() {
-    $targetURL = URLHelper::getAuthUrl();
+  private function fetchNewToken(string $audience) {
+
+    $wayfairAudience = URLHelper::getWayfairAudience($audience);
+
+    if (!isset($wayfairAudience) || empty($wayfairAudience))
+    {
+      // TODO: log about this - we only handle wayfair API authentication
+      return null;
+    }
+
+    return $this->wayfairAuthenticate($audience);
+  }
+
+  /**
+   * Fetch a new auth token using the wayfair authentication service
+   * @param string $audience
+   * @return WayfairResponse
+   */
+  private function wayfairAuthenticate(string $audience) {
+    // auth URL is the same for all Wayfair audiences.
     $method = 'post';
     $arguments = [
-        $targetURL,
+        URLHelper::getAuthUrl(),
         [
             'headers' => [
                 'Content-Type' => 'application/json',
@@ -77,8 +102,7 @@ class AuthService implements AuthenticationContract {
                 [
                     'client_id' => $this->client_id,
                     'client_secret' => $this->client_secret,
-                    // FIXME: base URL can change between building endpoint URL and calling this.
-                    'audience' => URLHelper::getBaseUrl(),
+                    'audience' => $audience,
                     'grant_type' => 'client_credentials'
                 ]
             )
@@ -90,43 +114,53 @@ class AuthService implements AuthenticationContract {
     return $this->client->call($method, $arguments);
   }
 
+
   /**
    * This refreshes the Authorization Token if it has been expired.
-   *
+   * @param string $audience
    * @return void
    * @throws \Exception
    */
-  public function refresh() {
-    // FIXME: refresh for what domain - needs argument.
-    $token = $this->getStoredTokenModel();
-    if (!isset($token) or $this->isTokenExpired()) {
-      $response = $this->authenticate()->getBodyAsArray();
+  public function refresh(string $audience) {
+    $token = $this->getStoredTokenModel($audience);
+    // TODO: logging around token being set or expired
+    // FIXME: no way to force when we have an unexpired, REVOKED token.
+    if (!isset($token) or $this->isTokenExpired($audience)) {
+      $response = $this->fetchNewToken($audience)->getBodyAsArray();
+      
+      if (!isset($response) || empty($response))
+      {
+        throw new \Exception("Unable to authenticate user: no token data in response");
+      }
+
       if (isset($response['errors'])) {
         throw new \Exception("Unable to authenticate user: " . $response['error']);
       }
-      // FIXME: token is domain-specific, should be stored as such
-      $this->saveToken($response);
+
+      $this->saveToken($response, $audience);
     }
   }
 
   /**
+   * Store token data for the given audience
    * @param array $token
-   *
+   * @param string $audience
    * @return void
    */
-  public function saveToken($token) {
-    // FIXME: save token for what domain? - needs argument.
-    $token['store_time'] = time();
-    $this->store->set('token', json_encode($token));
+  private function saveToken($token, $audience) {
+    $token[self->STORE_TIME] = time();
+    // TODO: make sure audience does not need to be scrubbed of special characters
+    $this->store->set($audience, json_encode($token));
   }
 
   /**
+   * @param string $audience
    * @return bool
    */
-  public function isTokenExpired() {
-    $token = $this->getStoredTokenModel();
-    if (isset($token) && isset($token['access_token']) && isset($token['store_time'])) {
-      if (($token['expires_in'] + $token['store_time']) > time()) {
+  public function isTokenExpired(string $audience) {
+    $token = $this->getStoredTokenModel($audience);
+    if (isset($token) && isset($token[self->ACCESS_TOKEN]) && isset($token[self->STORE_TIME]) && isset($token[self->EXPIRES_IN])) {
+      if (($token[self->EXPIRES_IN] + $token[self->STORE_TIME]) > time()) {
         return false;
       }
     }
@@ -136,32 +170,36 @@ class AuthService implements AuthenticationContract {
 
   /**
    * Get token that's currently stored
+   * @param string $audience
    * @return mixed
    */
-  private function getStoredTokenModel() {
-    // FIXME: token is not appropriate for all domains
-    return json_decode($this->store->get('token'), true);
+  private function getStoredTokenModel(string $audience) {
+    // TODO: make sure audience does not need to be scrubbed of special characters
+    return json_decode($this->store->get($audience), true);
   }
 
   /**
+   * @param string $audience
    * @return string
    * @throws TokenNotFoundException
    */
-  public function generateOAuthHeader() {
-    $token = $this->getStoredTokenModel();
-    if (!isset($token)) {
-      throw new TokenNotFoundException("Token not found.");
-    }
-
-    return 'Bearer ' . $token['access_token'];
+  public function generateOAuthHeader(string $audience) {
+    $tokenValue = $this->getOAuthToken($audience);
+    return 'Bearer ' . $tokenValue;
   }
 
-  public function getOAuthToken() {
-    $token = $this->getStoredTokenModel();
-    if (!isset($token)) {
-      throw new TokenNotFoundException("Token not found.");
+  /**
+   * Get the store token value for the audience
+   *
+   * @param string $audience
+   * @return void
+   */
+  public function getOAuthToken(string $audience) {
+    $tokenModel = $this->getStoredTokenModel($audience);
+    if (!isset($tokenModel)) {
+      throw new TokenNotFoundException("Token not found for " . $audience);
     }
 
-    return $token['access_token'];
+    return $tokenModel[self->ACCESS_TOKEN];
   }
 }

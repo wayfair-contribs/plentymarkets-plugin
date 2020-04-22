@@ -91,14 +91,18 @@ class LogSenderService {
    * @return WayfairResponse
    */
   public function query($query, $method = 'post', $variables = []) {
-    $this->authService->refresh();
+    // TODO: merge logic with APIService?
+    $url = URLHelper::getUrl(URLHelper::URL_ID_GRAPHQL);
+    $audience = URLHelper::getWayfairAudience($url);
+    $this->authService->refresh($audience);
+    $authHeaderVal = $this->authService->generateOAuthHeader($audience);
     $headers = [];
-    $headers['Authorization'] = $this->authService->generateOAuthHeader();
+    $headers['Authorization'] = $authHeaderVal;
     $headers['Content-Type'] = ['application/json'];
     $headers[ConfigHelper::WAYFAIR_INTEGRATION_HEADER] = $this->configHelper->getIntegrationAgentHeader();
 
     $arguments = [
-        URLHelper::getUrl(URLHelper::URL_ID_GRAPHQL),
+        $url,
         [
             'json' => [
                 'query' => $query,

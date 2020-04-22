@@ -61,12 +61,6 @@ class URLHelper {
    */
   public static function getBaseUrl($key = NULL): string {
 
-    if (is_null($key))
-    {
-      // TODO: log about defaulting to GraphQL
-      $key = self::URL_ID_GRAPHQL;
-    }
-
     if ($key === Self::URL_ID_AUTH)
     {
       // prod and sandbox use the same auth service
@@ -98,22 +92,22 @@ class URLHelper {
   }
 
   /**
-   * Checks if it is appropriate to use the wayfair OAuth token when making a request to a URL
+   * Finds the Wayfair API audience (Production or Sandbox) for a URL
    * @param string $url the URL that is being checked
-   * @return bool
+   * @return ?string
    */
-  public static function usesWayfairAuthToken(string $url): bool {
+  public static function getWayfairAudience(string $url): ?string {
     // URL must START with one of the approved URLs.
     // otherwise, someone can put our URL into the query string and trick us into sending the auth header.
     foreach (self::URLS_USING_WAYFAIR_AUTH as $wayfair_authenticated_domain)
     {
       if (stripos($url, $wayfair_authenticated_domain) == 0)
       {
-        return true;
+        return $url;
       }
     }
 
-    return false;
+    return null;
   }
 
 }

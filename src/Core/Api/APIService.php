@@ -49,23 +49,6 @@ class APIService {
   }
 
   /**
-   * @return string
-   */
-  private function generateAuthHeader() {
-    try {
-      $this->authService->refresh();
-
-      return $this->authService->generateOAuthHeader();
-    } catch (\Exception $e) {
-      $this->loggerContract
-          ->error(TranslationHelper::getLoggerKey('apiService'), [
-            'additionalInfo' => [
-              'message' => $e->getMessage()], 
-              'method' => __METHOD__]);
-    }
-  }
-
-  /**
    * @param string $query
    * @param string $method
    * @param array  $variables
@@ -74,12 +57,15 @@ class APIService {
    * @return WayfairResponse
    */
   public function query($query, $method = 'post', $variables = []) {
+    $url = $this->getUrl();
+    $audience = URLHelper::getWayfairAudience($url);
+    $this->authService->refresh($audience);
+    $authHeaderVal = $this->authService->generateOAuthHeader($audience);
+    
     $headers = [];
-    $headers['Authorization'] = $this->generateAuthHeader();
+    $headers['Authorization'] = $authHeaderVal;
     $headers['Content-Type'] = ['application/json'];
     $headers[ConfigHelper::WAYFAIR_INTEGRATION_HEADER] = $this->configHelper->getIntegrationAgentHeader();
-
-    $url = $this->getUrl();
 
     $arguments = [
         $url ,
@@ -103,7 +89,7 @@ class APIService {
   /**
    * @return string
    */
-  public function getUrl() {
+  private function getUrl() {
     return URLHelper::getUrl(URLHelper::URL_ID_GRAPHQL);
   }
 }

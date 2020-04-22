@@ -38,29 +38,32 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
     $httpHeaders = [ConfigHelper::WAYFAIR_INTEGRATION_HEADER . ': ' . $this->configHelper->getIntegrationAgentHeader()];
 
     $ch = curl_init();
+
     try {
-      if (URLHelper::usesWayfairAuthToken($url)) {
+      $wayfairAudience = URLHelper::getWayfairAudience($url);
+      if (isset($wayfairAudience) && !empty($wayfairAudience)) {
+        // only do authentication if we are contacting a secure Wayfair site
         // Check if token has already been expired and refresh it.
-        $this->authService->refresh();
-        $authHeaderValue = $this->authService->generateOAuthHeader();
+        $this->authService->refresh($wayfairAudience);
+        $authHeaderValue = $this->authService->generateOAuthHeader($wayfairAudience);
         if (isset($authHeaderValue) && !empty($authHeaderValue)) {
           $httpHeaders[] = 'Authorization: ' . $authHeaderValue;
         }
       }
 
       curl_setopt($ch, CURLOPT_HTTPHEADER, $httpHeaders);
-
-      // FIXME: set timeout(s) - we have seen this timeout after 10 seconds, leading to errors.
+      
       curl_setopt($ch, CURLOPT_URL, $url);
       curl_setopt($ch, CURLOPT_HEADER, 0);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
       curl_setopt($ch, CURLOPT_TIMEOUT, 30);
       $output = curl_exec($ch);
       if (curl_errno($ch)) {
+        // FIXME: document is not guaranteed to be at Wayfair - log may be incorrect.
         $this->loggerContract
           ->error(
             TranslationHelper::getLoggerKey('cannotCallWayfairAPI'), [
-              'additionalInfo' => ['url' => $url, 'accessToken' => $this->authService->getOAuthToken()],
+              'additionalInfo' => ['url' => $url],
               'method' => __METHOD__
             ]
           );
