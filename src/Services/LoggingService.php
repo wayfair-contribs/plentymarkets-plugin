@@ -17,9 +17,21 @@ class LoggingService implements LoggerContract {
   const INFO = 'INFO';
   const WARNING = 'WARNING';
   const ERROR = 'ERROR';
+  const WAYFAIR_PLUGIN_VERSION = 'Wayfair Plugin Version';
 
+  /**
+   * Stores the version of the plugin
+   *
+   * @var string $version
+   */
+  public $version;
+
+  /**
+   * Initialize a logging service object
+   */
   public function __construct() {
-   
+    $configHelper = pluginApp(AbstractConfigHelper::class);
+    $this->version = $configHelper->getPluginVersion();
   }
 
   /**
@@ -104,6 +116,8 @@ class LoggingService implements LoggerContract {
   }
 
   /**
+   * Maps data from the he associative array that Wayfair provides to the PlentyMarkets logging API's inputs
+   *
    * @param $loggingInfo
    *
    * @return array
@@ -113,6 +127,7 @@ class LoggingService implements LoggerContract {
     $method = $loggingInfo['method'] ?? null;
     $referenceType = $loggingInfo['referenceType'] ?? null;
     $referenceValue = (int) $loggingInfo['referenceValue'] ?? null;
+    $additionalInfo[self::WAYFAIR_PLUGIN_VERSION] = $this->version;
 
     return array($additionalInfo, $method, $referenceType, $referenceValue);
   }
@@ -121,7 +136,7 @@ class LoggingService implements LoggerContract {
    * Checks if it is alright to log at a level lower than ERROR.
    * Logging at levels such as INFO and DEBUG prior to the end of the "boot" period
    * Causes issues.
-   * 
+   *
    * See https://forum.plentymarkets.com/t/wayfair-log-levels-info-and-debug-not-working-for-loggable-module/581320/22
    *
    * @return boolean
