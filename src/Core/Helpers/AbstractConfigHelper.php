@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Core\Helpers;
@@ -33,16 +33,22 @@ abstract class AbstractConfigHelper {
   const INVENTORY_ITEMS_PER_PAGE = 500;
 
   /**
+   * Retrieve the configured client ID for connections to Wayfair's secure APIs
+   *
    * @return mixed
    */
   abstract public function getClientId();
 
   /**
+   * Retrieve the configured client secret for connections to Wayfair's secure APIs
+   *
    * @return mixed
    */
   abstract public function getClientSecret();
 
   /**
+   * Returns the PlentyMarkets identifier for Wayfair's Order Referrer value
+   *
    * @return int
    */
   abstract public function getOrderReferrerValue(): int;
@@ -53,6 +59,8 @@ abstract class AbstractConfigHelper {
   abstract public function getStockBufferValue();
 
   /**
+   * Checks if the plugin is configured to use the test / dryRun mode when communicating with the Wayfair APIs
+   *
    * @return string
    */
   abstract public function getDryRun(): string;
@@ -63,9 +71,17 @@ abstract class AbstractConfigHelper {
   abstract public function isAllItemsActive(): bool;
 
   /**
+   * Check if boot is completed
    *
    * @return bool
    */
   abstract public function hasBooted(): bool;
+
+  /**
+   * Retrieves the current Wayfair plugin version
+   *
+   * @return string
+   */
+  abstract public function getPluginVersion(): string;
 
 }
