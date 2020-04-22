@@ -47,7 +47,7 @@ abstract class AbstractConfigHelper {
   abstract public function getClientSecret();
 
   /**
-   * Returns an Order Referrer Key
+   * Returns an Order Referrer value
    *
    * @return int
    */
