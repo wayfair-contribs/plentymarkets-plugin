@@ -116,7 +116,7 @@ class LoggingService implements LoggerContract {
   }
 
   /**
-   * Maps data from the PlentyMarket designed associative array to values of an array to be used by our different log methods
+   * Maps data from the he associative array that Wayfair provides to the PlentyMarkets logging API's inputs
    *
    * @param $loggingInfo
    *

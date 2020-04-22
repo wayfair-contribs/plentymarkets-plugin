@@ -33,21 +33,21 @@ abstract class AbstractConfigHelper {
   const INVENTORY_ITEMS_PER_PAGE = 500;
 
   /**
-   * Retrieve the configuration client id for the global client
+   * Retrieve the configured client ID for connections to Wayfair's secure APIs
    *
    * @return mixed
    */
   abstract public function getClientId();
 
   /**
-   * Retrieve the configuration client secret for the global client
+   * Retrieve the configured client secret for connections to Wayfair's secure APIs
+   *
    * @return mixed
    */
   abstract public function getClientSecret();
 
   /**
-   * Checks if an item already exists in cache and returns the key,
-   * if the item does not exists in cache adds item to cache
+   * Returns an Order Referrer Key
    *
    * @return int
    */
@@ -59,7 +59,7 @@ abstract class AbstractConfigHelper {
   abstract public function getStockBufferValue();
 
   /**
-   * Retrieve the configuration values for setting up a test environment
+   * Checks if the plugin is configured to use the test / dryRun mode when communicating with the Wayfair APIs
    *
    * @return string
    */
