@@ -8,9 +8,8 @@ namespace Wayfair\Core\Api\Services;
 
 use Wayfair\Core\Api\APIService;
 use Wayfair\Core\Contracts\FetchDocumentContract;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Core\Dto\ShippingLabel\ResponseDTO;
-use Wayfair\Core\Helpers\URLHelper;
-use Wayfair\Helpers\ConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
 
 /**
@@ -36,7 +35,7 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
     // FIXME: this should be using a generic client via an interface, not cURL!
     $this->loggerContract
       ->debug(TranslationHelper::getLoggerKey('fetchingShipmentForURL'), ['additionalInfo' => ['url' => $url], 'method' => __METHOD__]);
-    $httpHeaders = [ConfigHelper::WAYFAIR_INTEGRATION_HEADER . ': ' . $this->configHelper->getIntegrationAgentHeader()];
+    $httpHeaders = [ConfigHelperContract::WAYFAIR_INTEGRATION_HEADER . ': ' . $this->configHelper->getIntegrationAgentHeader()];
 
     $ch = curl_init();
     try {

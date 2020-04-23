@@ -8,9 +8,9 @@ namespace Wayfair\Core\Api;
 
 use Wayfair\Core\Contracts\AuthenticationContract;
 use Wayfair\Core\Contracts\ClientInterfaceContract;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Core\Contracts\LoggerContract;
-use Wayfair\Core\Helpers\URLHelper;
-use Wayfair\Helpers\ConfigHelper;
+use Wayfair\Core\Contracts\URLHelperContract;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Http\WayfairResponse;
 
@@ -38,22 +38,33 @@ class APIService
   protected $loggerContract;
 
   /**
-   * @var ConfigHelper
+   * @var ConfigHelperContract
    */
   protected $configHelper;
+
+  /** 
+   * @var URLHelperContract
+  */
+  protected $urlHelper;
 
   /**
    * @param ClientInterfaceContract $clientInterfaceContract
    * @param AuthenticationContract  $authenticationContract
-   * @param ConfigHelper            $configHelper
+   * @param ConfigHelperContract    $configHelper
    * @param LoggerContract          $loggerContract
    */
-  public function __construct(ClientInterfaceContract $clientInterfaceContract, AuthenticationContract $authenticationContract, ConfigHelper $configHelper, LoggerContract $loggerContract)
-  {
+  public function __construct(
+    ClientInterfaceContract $clientInterfaceContract,
+    AuthenticationContract $authenticationContract,
+    ConfigHelperContract $configHelper,
+    LoggerContract $loggerContract,
+    URLHelperContract $urlHelper
+  ) {
     $this->client = $clientInterfaceContract;
     $this->authService = $authenticationContract;
     $this->configHelper = $configHelper;
     $this->loggerContract = $loggerContract;
+    $this->urlHelper = $urlHelper;
   }
 
   /**
@@ -70,15 +81,14 @@ class APIService
       $url = $this->getUrl();
       $authHeaderVal = $this->authService->generateAuthHeader($url);
 
-      if (!isset($authHeaderVal) or empty($authHeaderVal))
-      {
+      if (!isset($authHeaderVal) or empty($authHeaderVal)) {
         throw new \Exception("Unable to set credentials for calling API");
       }
 
       $headers = [];
       $headers[self::HEADER_KEY_AUTHORIATION] = $authHeaderVal;
       $headers[self::HEADER_KEY_CONTENT_TYPE] = [self::MIME_TYPE_JSON];
-      $headers[ConfigHelper::WAYFAIR_INTEGRATION_HEADER] = $this->configHelper->getIntegrationAgentHeader();
+      $headers[ConfigHelperContract::WAYFAIR_INTEGRATION_HEADER] = $this->configHelper->getIntegrationAgentHeader();
 
       $arguments = [
         $url,
@@ -107,6 +117,6 @@ class APIService
    */
   private function getUrl()
   {
-    return URLHelper::getUrl(URLHelper::URL_ID_GRAPHQL);
+    return self->urlHelper->getUrl(URLHelperContract::URL_ID_GRAPHQL);
   }
 }

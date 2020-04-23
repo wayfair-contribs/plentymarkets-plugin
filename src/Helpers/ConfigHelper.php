@@ -8,13 +8,12 @@ namespace Wayfair\Helpers;
 use Plenty\Modules\Plugin\Contracts\PluginRepositoryContract;
 use Plenty\Plugin\CachingRepository;
 use Plenty\Plugin\ConfigRepository;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Repositories\KeyValueRepository;
 
-class ConfigHelper extends AbstractConfigHelper {
+class ConfigHelper implements ConfigHelperContract {
 
   const CACHING_MINUTES = 360;
-  const INTEGRATION_AGENT_NAME = 'PlentyMarket';
   /**
    * @var ConfigRepository
    */
@@ -112,7 +111,7 @@ class ConfigHelper extends AbstractConfigHelper {
    */
   public function getPluginVersion(): string {
     $pluginRepo = pluginApp(PluginRepositoryContract::class);
-    $plugin = $pluginRepo->getPluginByName(AbstractConfigHelper::PLUGIN_NAME);
+    $plugin = $pluginRepo->getPluginByName(self::PLUGIN_NAME);
     $plugin = $pluginRepo->decoratePlugin($plugin);
     return $plugin->versionProductive;
   }

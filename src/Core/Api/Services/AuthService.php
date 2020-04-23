@@ -8,13 +8,12 @@ namespace Wayfair\Core\Api\Services;
 
 use Wayfair\Core\Contracts\AuthenticationContract;
 use Wayfair\Core\Contracts\ClientInterfaceContract;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Contracts\StorageInterfaceContract;
+use Wayfair\Core\Contracts\URLHelperContract;
 use Wayfair\Core\Exceptions\AuthenticationException;
 use Wayfair\Core\Exceptions\TokenNotFoundException;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
-use Wayfair\Core\Helpers\URLHelper;
-use Wayfair\Helpers\ConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Http\WayfairResponse;
 
@@ -46,27 +45,38 @@ class AuthService implements AuthenticationContract
    */
   private $client_secret;
 
+  /**
+   * @var LoggerContract
+   */
   private $loggerContract;
+
+  /**
+   * @var URLHelperContract
+   */ 
+  private $urlHelperContract;
 
   /**
    * AuthService constructor.
    *
    * @param ClientInterfaceContract  $clientInterfaceContract
    * @param StorageInterfaceContract $storageInterfaceContract
-   * @param AbstractConfigHelper     $abstractConfigHelper
+   * @param ConfigHelperContract     $configHelper
    * @param LoggerContract           $loggerContract
+   * @param URLHelperContract        $urlHelperContract
    */
   public function __construct(
     ClientInterfaceContract $clientInterfaceContract,
     StorageInterfaceContract $storageInterfaceContract,
-    AbstractConfigHelper $abstractConfigHelper,
-    LoggerContract $loggerContract
+    ConfigHelperContract $configHelper,
+    LoggerContract $loggerContract,
+    URLHelperContract $urlHelperContract
   ) {
     $this->store = $storageInterfaceContract;
-    $this->client_id = $abstractConfigHelper->getClientId();
-    $this->client_secret = $abstractConfigHelper->getClientSecret();
+    $this->client_id = $configHelper->getClientId();
+    $this->client_secret = $configHelper->getClientSecret();
     $this->client = $clientInterfaceContract;
     $this->loggerContract = $loggerContract;
+    $this->urlHelperContract = $urlHelperContract;
   }
 
   /**
@@ -77,7 +87,7 @@ class AuthService implements AuthenticationContract
   private function fetchNewToken(string $audience): ?WayfairResponse
   {
 
-    $wayfairAudience = URLHelper::getWayfairAudience($audience);
+    $wayfairAudience = $this->urlHelperContract->getWayfairAudience($audience);
 
     if (!isset($wayfairAudience) || empty($wayfairAudience)) {
       // TODO: log about this - we only handle wayfair API authentication
@@ -97,11 +107,11 @@ class AuthService implements AuthenticationContract
     // auth URL is the same for all Wayfair audiences.
     $method = 'post';
     $arguments = [
-      URLHelper::getAuthUrl(),
+      self->urlHelperContract->getWayfairAuthenticationUrl(),
       [
         'headers' => [
           'Content-Type' => 'application/json',
-          ConfigHelper::WAYFAIR_INTEGRATION_HEADER => ConfigHelper::INTEGRATION_AGENT_NAME
+          ConfigHelperContract::WAYFAIR_INTEGRATION_HEADER => ConfigHelperContract::INTEGRATION_AGENT_NAME
         ],
         'body' => json_encode(
           [
@@ -200,7 +210,7 @@ class AuthService implements AuthenticationContract
   public function generateAuthHeader(string $url): ?string
   {
 
-    $wayfairAudience = URLHelper::getWayfairAudience($url);
+    $wayfairAudience = $this->urlHelperContract->getWayfairAudience($url);
     if (isset($wayfairAudience) && !empty($wayfairAudience)) {
       // we only know how to authenticate for wayfair,
       // and we should NEVER return token data when the endpoint is not at Wayfair.
@@ -224,7 +234,7 @@ class AuthService implements AuthenticationContract
     if ($this->isTokenExpired($audience)) {
       $this->refreshOAuthToken($audience);
     }
-    
+
     $tokenModel = $this->getStoredTokenModel($audience);
     if (!isset($tokenModel)) {
       throw new TokenNotFoundException("Token not found for " . $audience);
