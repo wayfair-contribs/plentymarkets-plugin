@@ -48,7 +48,7 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
           ]
         );
       }
-      
+
       curl_setopt($ch, CURLOPT_URL, $url);
       curl_setopt($ch, CURLOPT_HEADER, 0);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -58,7 +58,7 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
         $this->loggerContract
           ->error(
             TranslationHelper::getLoggerKey('cannotCallWayfairAPI'), [
-              'additionalInfo' => ['url' => $url, 'accessToken' => $this->authService->getOAuthToken()],
+              'additionalInfo' => ['url' => $url],
               'method' => __METHOD__
             ]
           );
