@@ -7,7 +7,8 @@ namespace Wayfair\Core\Contracts;
 
 interface AuthenticationContract {
   /**
-   * Get an OAuth token for connections to the specified audience
+   * Get an OAuth token for connections to the specified audience.
+   * @see generateAuthHeader
    * @param string $audience
    * @return string
    */
@@ -16,14 +17,15 @@ interface AuthenticationContract {
   /**
    * Refresh the OAuth token stored for connections to the specified audience
    * @param string $audience
+   * @param bool $force 
    * @return void
    */
-  public function refresh(string $audience);
+  public function refreshOAuthToken(string $audience, ?bool $force = false);
 
   /**
-   * Get an OAuth token bearer header value for the given audience
-   * $param string $audience
+   * Get an HTTP Authorization header value for the given url
+   * $param string $url
    * @return string
    */
-  public function generateOAuthHeader(string $audience);
+  public function generateAuthHeader(string $url);
 }

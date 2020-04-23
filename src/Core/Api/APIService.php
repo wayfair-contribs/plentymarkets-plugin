@@ -68,9 +68,12 @@ class APIService
   {
     try {
       $url = $this->getUrl();
-      $audience = URLHelper::getWayfairAudience($url);
-      $this->authService->refresh($audience);
-      $authHeaderVal = $this->authService->generateOAuthHeader($audience);
+      $authHeaderVal = $this->authService->generateAuthHeader($url);
+
+      if (!isset($authHeaderVal) or empty($authHeaderVal))
+      {
+        throw new \Exception("Unable to set credentials for calling API");
+      }
 
       $headers = [];
       $headers[self::HEADER_KEY_AUTHORIATION] = $authHeaderVal;

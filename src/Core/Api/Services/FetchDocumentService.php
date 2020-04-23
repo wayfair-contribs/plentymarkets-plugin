@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright 2020 Wayfair LLC - All rights reserved
  */
@@ -38,21 +39,14 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
     $httpHeaders = [ConfigHelper::WAYFAIR_INTEGRATION_HEADER . ': ' . $this->configHelper->getIntegrationAgentHeader()];
 
     $ch = curl_init();
-
     try {
-      $wayfairAudience = URLHelper::getWayfairAudience($url);
-      if (isset($wayfairAudience) && !empty($wayfairAudience)) {
-        // only do authentication if we are contacting a secure Wayfair site
-        // Check if token has already been expired and refresh it.
-        $this->authService->refresh($wayfairAudience);
-        $authHeaderValue = $this->authService->generateOAuthHeader($wayfairAudience);
-        if (isset($authHeaderValue) && !empty($authHeaderValue)) {
-          $httpHeaders[] = 'Authorization: ' . $authHeaderValue;
-        }
+      $authHeaderValue = $this->authService->generateAuthHeader($url);
+      if (isset($authHeaderValue) && !empty($authHeaderValue)) {
+        $httpHeaders[] = 'Authorization: ' . $authHeaderValue;
       }
 
       curl_setopt($ch, CURLOPT_HTTPHEADER, $httpHeaders);
-      
+
       curl_setopt($ch, CURLOPT_URL, $url);
       curl_setopt($ch, CURLOPT_HEADER, 0);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -62,7 +56,8 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
         // FIXME: document is not guaranteed to be at Wayfair - log may be incorrect.
         $this->loggerContract
           ->error(
-            TranslationHelper::getLoggerKey('cannotCallWayfairAPI'), [
+            TranslationHelper::getLoggerKey('cannotCallWayfairAPI'),
+            [
               'additionalInfo' => ['url' => $url],
               'method' => __METHOD__
             ]
@@ -91,10 +86,12 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
 
     $this->loggerContract
       ->debug(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_OBTAINING_TRACKING_NUMBER), [
+        TranslationHelper::getLoggerKey(self::LOG_KEY_OBTAINING_TRACKING_NUMBER),
+        [
           'additionalInfo' => [
             'poNumber' => $poNumber,
-            'query' => $query],
+            'query' => $query
+          ],
           'method' => __METHOD__
         ]
       );
@@ -106,28 +103,26 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
 
       $this->loggerContract
         ->info(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_TRACKING_RESPONSE), [
+          TranslationHelper::getLoggerKey(self::LOG_KEY_TRACKING_RESPONSE),
+          [
             'additionalInfo' => ['responseBody' => $responseBody],
             'method' => __METHOD__
           ]
         );
 
-      if ($response->hasErrors())
-      {
+      if ($response->hasErrors()) {
         throw new \Exception("Errors received from tracking number service: "
           . json_encode($response->getError()));
       }
 
       $dataElement = $responseBody['data'];
-      if (!isset($dataElement) || empty($dataElement))
-      {
+      if (!isset($dataElement) || empty($dataElement)) {
         throw new \Exception("No data element in tracking number response from Wayfair");
       }
 
       $labelGenerationEvents = $dataElement['labelGenerationEvents'];
 
-      if (!isset($labelGenerationEvents) || empty($labelGenerationEvents))
-      {
+      if (!isset($labelGenerationEvents) || empty($labelGenerationEvents)) {
         throw new \Exception("No label generation events in tracking number response from Wayfair");
       }
 
@@ -140,7 +135,8 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
     } catch (\Exception $e) {
       $this->loggerContract
         ->error(
-          TranslationHelper::getLoggerKey('unableToGetTrackingNumber'), [
+          TranslationHelper::getLoggerKey('unableToGetTrackingNumber'),
+          [
             'additionalInfo' => [
               'message' => $e->getMessage(),
               'responseBody' => $responseBody,
@@ -176,5 +172,4 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
       . '} '
       . '}';
   }
-
 }

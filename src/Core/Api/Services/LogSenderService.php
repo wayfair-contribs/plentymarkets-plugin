@@ -93,9 +93,13 @@ class LogSenderService {
   public function query($query, $method = 'post', $variables = []) {
     // TODO: merge logic with APIService?
     $url = URLHelper::getUrl(URLHelper::URL_ID_GRAPHQL);
-    $audience = URLHelper::getWayfairAudience($url);
-    $this->authService->refresh($audience);
-    $authHeaderVal = $this->authService->generateOAuthHeader($audience);
+    $authHeaderVal = $this->authService->generateAuthHeader($url);
+    
+    if (!isset($authHeaderVal) or empty($authHeaderVal))
+    {
+      throw new \Exception("Unable to set credentials for calling Wayfair API");
+    }
+
     $headers = [];
     $headers['Authorization'] = $authHeaderVal;
     $headers['Content-Type'] = ['application/json'];

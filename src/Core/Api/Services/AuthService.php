@@ -72,7 +72,7 @@ class AuthService implements AuthenticationContract {
    * @param string $audience
    * @return WayfairResponse
    */
-  private function fetchNewToken(string $audience) {
+  private function fetchNewToken(string $audience): ?WayfairResponse {
 
     $wayfairAudience = URLHelper::getWayfairAudience($audience);
 
@@ -88,7 +88,7 @@ class AuthService implements AuthenticationContract {
   /**
    * Fetch a new auth token using the wayfair authentication service
    * @param string $audience
-   * @return WayfairResponse
+   * @return WayfairresponseArray
    */
   private function wayfairAuthenticate(string $audience) {
     // auth URL is the same for all Wayfair audiences.
@@ -118,28 +118,35 @@ class AuthService implements AuthenticationContract {
 
 
   /**
-   * This refreshes the Authorization Token if it has been expired.
    * @param string $audience
+   * @param bool $force
    * @return void
    * @throws \Exception
    */
-  public function refresh(string $audience) {
+  public function refreshOAuthToken(string $audience, ?bool $force = false) {
     $token = $this->getStoredTokenModel($audience);
     // TODO: logging around token being set or expired
-    // FIXME: no way to force when we have an unexpired, REVOKED token.
-    if (!isset($token) or $this->isTokenExpired($audience)) {
-      $response = $this->fetchNewToken($audience)->getBodyAsArray();
-      
-      if (!isset($response) || empty($response))
+    if ($force || !isset($token) || $this->isTokenExpired($audience)) {
+
+      $responseObject = $this->fetchNewToken($audience);
+
+      if (!isset($responseObject) || empty($responseObject))
       {
-        throw new AuthenticationException("Unable to authenticate user: no token data in response");
+        throw new AuthenticationException("Unable to authenticate user: no token data for " . $audience);
       }
 
-      if (isset($response['errors'])) {
-        throw new AuthenticationException("Unable to authenticate user: " . $response['error']);
+      $responseArray = $responseObject->getBodyAsArray();
+      
+      if (!isset($responseArray) || empty($responseArray))
+      {
+        throw new AuthenticationException("Unable to authenticate user: no token data for " . $audience);
       }
 
-      $this->saveToken($response, $audience);
+      if (isset($responseArray['errors'])) {
+        throw new AuthenticationException("Unable to authenticate user: " . $responseArray['error']);
+      }
+
+      $this->saveToken($responseArray, $audience);
     }
   }
 
@@ -184,13 +191,24 @@ class AuthService implements AuthenticationContract {
   }
 
   /**
-   * @param string $audience
+   * @param string $url
    * @return string
    * @throws TokenNotFoundException
    */
-  public function generateOAuthHeader(string $audience) {
-    $tokenValue = $this->getOAuthToken($audience);
-    return 'Bearer ' . $tokenValue;
+  public function generateAuthHeader(string $url): ?string 
+  {
+
+    $wayfairAudience = URLHelper::getWayfairAudience($url);
+    if (isset($wayfairAudience) && !empty($wayfairAudience)) 
+    {
+      // we only know how to authenticate for wayfair,
+      // and we should NEVER return token data when the endpoint is not at Wayfair.
+      $tokenValue = $this->getOAuthToken($wayfairAudience);
+      return 'Bearer ' . $tokenValue;
+    }
+
+    // no authentication information available for this URL
+    return null;
   }
 
   /**
@@ -200,6 +218,8 @@ class AuthService implements AuthenticationContract {
    * @return void
    */
   public function getOAuthToken(string $audience) {
+    // check for staleness and refresh
+    $this->refreshOAuthToken($audience);
     $tokenModel = $this->getStoredTokenModel($audience);
     if (!isset($tokenModel)) {
       throw new TokenNotFoundException("Token not found for " . $audience);
