@@ -20,7 +20,7 @@ interface AuthenticationContract {
    * @param bool $force 
    * @return void
    */
-  public function refreshOAuthToken(string $audience, ?bool $force = false);
+  public function refreshOAuthToken(string $audience);
 
   /**
    * Get an HTTP Authorization header value for the given url

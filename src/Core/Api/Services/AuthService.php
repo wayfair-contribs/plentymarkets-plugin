@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright 2019 Wayfair LLC - All rights reserved
  */
@@ -17,7 +18,8 @@ use Wayfair\Helpers\ConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Http\WayfairResponse;
 
-class AuthService implements AuthenticationContract {
+class AuthService implements AuthenticationContract
+{
 
   const EXPIRES_IN = 'expires_in';
   const ACCESS_TOKEN = 'access_token';
@@ -55,10 +57,10 @@ class AuthService implements AuthenticationContract {
    * @param LoggerContract           $loggerContract
    */
   public function __construct(
-      ClientInterfaceContract $clientInterfaceContract,
-      StorageInterfaceContract $storageInterfaceContract,
-      AbstractConfigHelper $abstractConfigHelper,
-      LoggerContract $loggerContract
+    ClientInterfaceContract $clientInterfaceContract,
+    StorageInterfaceContract $storageInterfaceContract,
+    AbstractConfigHelper $abstractConfigHelper,
+    LoggerContract $loggerContract
   ) {
     $this->store = $storageInterfaceContract;
     $this->client_id = $abstractConfigHelper->getClientId();
@@ -72,12 +74,12 @@ class AuthService implements AuthenticationContract {
    * @param string $audience
    * @return WayfairResponse
    */
-  private function fetchNewToken(string $audience): ?WayfairResponse {
+  private function fetchNewToken(string $audience): ?WayfairResponse
+  {
 
     $wayfairAudience = URLHelper::getWayfairAudience($audience);
 
-    if (!isset($wayfairAudience) || empty($wayfairAudience))
-    {
+    if (!isset($wayfairAudience) || empty($wayfairAudience)) {
       // TODO: log about this - we only handle wayfair API authentication
       return null;
     }
@@ -90,28 +92,29 @@ class AuthService implements AuthenticationContract {
    * @param string $audience
    * @return WayfairresponseArray
    */
-  private function wayfairAuthenticate(string $audience) {
+  private function wayfairAuthenticate(string $audience)
+  {
     // auth URL is the same for all Wayfair audiences.
     $method = 'post';
     $arguments = [
-        URLHelper::getAuthUrl(),
-        [
-            'headers' => [
-                'Content-Type' => 'application/json',
-                ConfigHelper::WAYFAIR_INTEGRATION_HEADER => ConfigHelper::INTEGRATION_AGENT_NAME
-            ],
-            'body' => json_encode(
-                [
-                    'client_id' => $this->client_id,
-                    'client_secret' => $this->client_secret,
-                    'audience' => $audience,
-                    'grant_type' => 'client_credentials'
-                ]
-            )
-        ]
+      URLHelper::getAuthUrl(),
+      [
+        'headers' => [
+          'Content-Type' => 'application/json',
+          ConfigHelper::WAYFAIR_INTEGRATION_HEADER => ConfigHelper::INTEGRATION_AGENT_NAME
+        ],
+        'body' => json_encode(
+          [
+            'client_id' => $this->client_id,
+            'client_secret' => $this->client_secret,
+            'audience' => $audience,
+            'grant_type' => 'client_credentials'
+          ]
+        )
+      ]
     ];
     $this->loggerContract
-        ->debug(TranslationHelper::getLoggerKey('attemptingAuthentication'), ['additionalInfo' => $arguments, 'method' => __METHOD__]);
+      ->debug(TranslationHelper::getLoggerKey('attemptingAuthentication'), ['additionalInfo' => $arguments, 'method' => __METHOD__]);
 
     return $this->client->call($method, $arguments);
   }
@@ -119,35 +122,31 @@ class AuthService implements AuthenticationContract {
 
   /**
    * @param string $audience
-   * @param bool $force
    * @return void
    * @throws \Exception
    */
-  public function refreshOAuthToken(string $audience, ?bool $force = false) {
+  public function refreshOAuthToken(string $audience)
+  {
     $token = $this->getStoredTokenModel($audience);
     // TODO: logging around token being set or expired
-    if ($force || !isset($token) || $this->isTokenExpired($audience)) {
 
-      $responseObject = $this->fetchNewToken($audience);
+    $responseObject = $this->fetchNewToken($audience);
 
-      if (!isset($responseObject) || empty($responseObject))
-      {
-        throw new AuthenticationException("Unable to authenticate user: no token data for " . $audience);
-      }
-
-      $responseArray = $responseObject->getBodyAsArray();
-      
-      if (!isset($responseArray) || empty($responseArray))
-      {
-        throw new AuthenticationException("Unable to authenticate user: no token data for " . $audience);
-      }
-
-      if (isset($responseArray['errors'])) {
-        throw new AuthenticationException("Unable to authenticate user: " . $responseArray['error']);
-      }
-
-      $this->saveToken($responseArray, $audience);
+    if (!isset($responseObject) || empty($responseObject)) {
+      throw new AuthenticationException("Unable to authenticate user: no token data for " . $audience);
     }
+
+    $responseArray = $responseObject->getBodyAsArray();
+
+    if (!isset($responseArray) || empty($responseArray)) {
+      throw new AuthenticationException("Unable to authenticate user: no token data for " . $audience);
+    }
+
+    if (isset($responseArray['errors'])) {
+      throw new AuthenticationException("Unable to authenticate user: " . $responseArray['error']);
+    }
+
+    $this->saveToken($responseArray, $audience);
   }
 
   /**
@@ -156,7 +155,8 @@ class AuthService implements AuthenticationContract {
    * @param string $audience
    * @return void
    */
-  private function saveToken($token, $audience) {
+  private function saveToken($token, $audience)
+  {
     $token[self::STORE_TIME] = time();
     $key = self::getKeyForToken($audience);
     // FIXME: should be encrypted?
@@ -167,7 +167,8 @@ class AuthService implements AuthenticationContract {
    * @param string $audience
    * @return bool
    */
-  public function isTokenExpired(string $audience) {
+  public function isTokenExpired(string $audience)
+  {
     $token = $this->getStoredTokenModel($audience);
     if (isset($token) && isset($token[self::ACCESS_TOKEN]) && isset($token[self::STORE_TIME]) && isset($token[self::EXPIRES_IN])) {
       if (($token[self::EXPIRES_IN] + $token[self::STORE_TIME]) > time()) {
@@ -183,8 +184,9 @@ class AuthService implements AuthenticationContract {
    * @param string $audience
    * @return mixed
    */
-  private function getStoredTokenModel(string $audience) {
-    
+  private function getStoredTokenModel(string $audience)
+  {
+
     $key = self::getKeyForToken($audience);
     // FIXME: need to decrypt if we add encryption for the token
     return json_decode($this->store->get($key), true);
@@ -195,12 +197,11 @@ class AuthService implements AuthenticationContract {
    * @return string
    * @throws TokenNotFoundException
    */
-  public function generateAuthHeader(string $url): ?string 
+  public function generateAuthHeader(string $url): ?string
   {
 
     $wayfairAudience = URLHelper::getWayfairAudience($url);
-    if (isset($wayfairAudience) && !empty($wayfairAudience)) 
-    {
+    if (isset($wayfairAudience) && !empty($wayfairAudience)) {
       // we only know how to authenticate for wayfair,
       // and we should NEVER return token data when the endpoint is not at Wayfair.
       $tokenValue = $this->getOAuthToken($wayfairAudience);
@@ -217,9 +218,13 @@ class AuthService implements AuthenticationContract {
    * @param string $audience
    * @return void
    */
-  public function getOAuthToken(string $audience) {
+  public function getOAuthToken(string $audience)
+  {
     // check for staleness and refresh
-    $this->refreshOAuthToken($audience);
+    if ($this->isTokenExpired($audience)) {
+      $this->refreshOAuthToken($audience);
+    }
+    
     $tokenModel = $this->getStoredTokenModel($audience);
     if (!isset($tokenModel)) {
       throw new TokenNotFoundException("Token not found for " . $audience);
