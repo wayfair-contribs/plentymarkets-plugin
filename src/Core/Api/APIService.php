@@ -91,7 +91,7 @@ class APIService {
     $this->loggerContract
         ->debug(TranslationHelper::getLoggerKey('apiService'), ['additionalInfo' => [
           'url' => $url,
-          'arguments' => $arguments
+          'arguments' => [$url, $arguments[1]['json']]
         ], 'method' => __METHOD__]);
 
     return $this->client->call($method, $arguments);
