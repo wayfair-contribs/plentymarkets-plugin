@@ -94,7 +94,6 @@ class LogSenderService {
    * @return WayfairResponse
    */
   public function query($query, $method = 'post', $variables = []) {
-    // TODO: merge logic with APIService?
     $url = $this->urlHelper->getUrl(URLHelperContract::URL_ID_GRAPHQL);
     $authHeaderVal = $this->authService->generateAuthHeader($url);
     
