@@ -216,7 +216,6 @@ class AuthService implements AuthenticationContract {
    */
   private static function getKeyForToken(string $audience)
   {
-    // TODO: make sure audience does not need to be scrubbed of special characters
-    return strtolower(self::TOKEN . '_' . $audience);
+    return self::TOKEN . '_' . base64_encode(strtolower($audience));
   }
 }
