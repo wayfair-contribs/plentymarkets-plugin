@@ -1,4 +1,5 @@
-﻿
+# Release notes für Wayfair
+
 ## v1.0.0 (2019-03-06)
 - Release des Plugin mit folgenden Funktionen: stündlicher Auftragsimport, stündlicher Bestandsabgleich, automatisierte Generierung der Versandlabels
 
@@ -43,5 +44,8 @@
 ## v1.1.1 (2020-01-08)
 - Inventar Abgleich Problem ist behoben
 
-## v1.1.2 (2020-02-04)
-- Ein Problem mit großen Lagerbeständen wurde behoben
+## v1.1.2-beta (2020-04-02)
+- Unterstützung für die Synchronisierung paginierter Bestände hinzufügen
+- Das Herunterladen leerer Dokumente auf Plentymärkte wurde behoben
+- Erhöhte Protokollierung
+- Erhöhte Telemetrie
