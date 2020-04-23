@@ -113,7 +113,7 @@ class ConfigHelper extends AbstractConfigHelper {
   /**
    * @return string
    */
-  public function getPluginVersion() {
+  public function getPluginVersion(): string {
     $pluginRepo = pluginApp(PluginRepositoryContract::class);
     $plugin = $pluginRepo->getPluginByName(AbstractConfigHelper::PLUGIN_NAME);
     $plugin = $pluginRepo->decoratePlugin($plugin);

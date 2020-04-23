@@ -68,4 +68,11 @@ abstract class AbstractConfigHelper {
    */
   abstract public function hasBooted(): bool;
 
+  /**
+   * Retrieves the current Wayfair plugin version
+   *
+   * @return string
+   */
+  abstract public function getPluginVersion(): string;
+
 }
