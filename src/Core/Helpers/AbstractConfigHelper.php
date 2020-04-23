@@ -54,6 +54,7 @@ abstract class AbstractConfigHelper {
   abstract public function getOrderReferrerValue(): int;
 
   /**
+   * Get the value of the user-configured Stock Buffer setting
    * @return mixed
    */
   abstract public function getStockBufferValue();
@@ -66,6 +67,7 @@ abstract class AbstractConfigHelper {
   abstract public function getDryRun(): string;
 
   /**
+   * Returns the value of the user-configured "send all inventory items to Wayfair" settting
    * @return bool
    */
   abstract public function isAllItemsActive(): bool;

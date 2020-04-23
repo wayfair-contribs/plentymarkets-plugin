@@ -79,7 +79,7 @@ class ConfigHelper extends AbstractConfigHelper {
      */
     $keyValueRepository = pluginApp(KeyValueRepository::class);
 
-    return (int)$keyValueRepository->get(self::SETTINGS_ORDER_REFERRER_KEY);
+    return (int)$keyValueRepository->get(self::SETTINGS_STOCK_BUFFER_KEY);
   }
 
   /**
