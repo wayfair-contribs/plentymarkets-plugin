@@ -135,7 +135,7 @@ class ASNService extends APIService {
       . '  purchaseOrders { '
       . '    shipment( '
       . '       notice: $notice, '
-      . '       dryRun: ' . $this->configHelper->getDryRun() . ') { '
+      . '  ) { '
       . '      id, '
       . '      handle, '
       . '      status, '

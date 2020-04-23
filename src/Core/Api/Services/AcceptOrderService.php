@@ -103,7 +103,6 @@ class AcceptOrderService extends APIService
       . 'accept ('
       . 'poNumber: "' . $poNumber . '",'
       . 'shipSpeed: GROUND,'
-      . 'dryRun: ' . $this->configHelper->getDryRun() . ','
       . 'lineItems: [' . $lineItems . ']'
       . ') { '
       . 'id'

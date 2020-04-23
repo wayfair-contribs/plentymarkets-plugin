@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Core\Contracts;
@@ -15,6 +15,7 @@ use Wayfair\Core\Exceptions\TokenNotFoundException;
  */
 interface FetchDocumentContract {
   /**
+   * Fetch a document from the document service at the specified URL
    * @param string $url
    *
    * @return ResponseDTO

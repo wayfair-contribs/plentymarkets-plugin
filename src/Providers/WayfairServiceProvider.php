@@ -18,11 +18,13 @@ use Wayfair\Core\Api\Services\FetchDocumentService;
 use Wayfair\Core\Api\Services\RegisterPurchaseOrderService;
 use Wayfair\Core\Contracts\AuthenticationContract;
 use Wayfair\Core\Contracts\ClientInterfaceContract;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Core\Contracts\FetchDocumentContract;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Contracts\RegisterPurchaseOrderContract;
 use Wayfair\Core\Contracts\StorageInterfaceContract;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Core\Contracts\URLHelperContract;
+use Wayfair\Core\Helpers\URLHelper;
 use Wayfair\Cron\InventoryFullCron;
 use Wayfair\Cron\InventorySyncCron;
 use Wayfair\Cron\OrderAcceptCron;
@@ -56,10 +58,11 @@ class WayfairServiceProvider extends ServiceProvider
     $this->getApplication()->bind(ClientInterfaceContract::class, ClientService::class);
     $this->getApplication()->bind(AuthenticationContract::class, AuthService::class);
     $this->getApplication()->bind(StorageInterfaceContract::class, StorageService::class);
-    $this->getApplication()->singleton(AbstractConfigHelper::class, ConfigHelper::class);
+    $this->getApplication()->singleton(ConfigHelperContract::class, ConfigHelper::class);
     $this->getApplication()->bind(RegisterPurchaseOrderContract::class, RegisterPurchaseOrderService::class);
     $this->getApplication()->bind(FetchDocumentContract::class, FetchDocumentService::class);
     $this->getApplication()->bind(LoggerContract::class, LoggingService::class);
+    $this->getApplication()->singleton(URLHelperContract::class, URLHelper::class);
   }
 
   /**

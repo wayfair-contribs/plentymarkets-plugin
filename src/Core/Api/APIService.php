@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright 2019 Wayfair LLC - All rights reserved
  */
@@ -7,13 +8,19 @@ namespace Wayfair\Core\Api;
 
 use Wayfair\Core\Contracts\AuthenticationContract;
 use Wayfair\Core\Contracts\ClientInterfaceContract;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Core\Contracts\LoggerContract;
-use Wayfair\Core\Helpers\URLHelper;
-use Wayfair\Helpers\ConfigHelper;
+use Wayfair\Core\Contracts\URLHelperContract;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Http\WayfairResponse;
 
-class APIService {
+class APIService
+{
+  const LOG_KEY_API_SERVICE = 'apiService';
+  const LOG_KEY_API_SERVICE_ERROR = 'apiServiceError';
+  const HEADER_KEY_AUTHORIATION = 'Authorization';
+  const HEADER_KEY_CONTENT_TYPE = 'Content-Type';
+  const MIME_TYPE_JSON = 'application/json';
 
   /**
    * @var AuthenticationContract
@@ -31,35 +38,33 @@ class APIService {
   protected $loggerContract;
 
   /**
-   * @var ConfigHelper
+   * @var ConfigHelperContract
    */
   protected $configHelper;
+
+  /** 
+   * @var URLHelperContract
+  */
+  protected $urlHelper;
 
   /**
    * @param ClientInterfaceContract $clientInterfaceContract
    * @param AuthenticationContract  $authenticationContract
-   * @param ConfigHelper            $configHelper
+   * @param ConfigHelperContract    $configHelper
    * @param LoggerContract          $loggerContract
    */
-  public function __construct(ClientInterfaceContract $clientInterfaceContract, AuthenticationContract $authenticationContract, ConfigHelper $configHelper, LoggerContract $loggerContract) {
+  public function __construct(
+    ClientInterfaceContract $clientInterfaceContract,
+    AuthenticationContract $authenticationContract,
+    ConfigHelperContract $configHelper,
+    LoggerContract $loggerContract,
+    URLHelperContract $urlHelper
+  ) {
     $this->client = $clientInterfaceContract;
     $this->authService = $authenticationContract;
     $this->configHelper = $configHelper;
     $this->loggerContract = $loggerContract;
-  }
-
-  /**
-   * @return string
-   */
-  public function getAuthenticationToken() {
-    try {
-      $this->authService->refresh();
-
-      return $this->authService->getOAuthToken();
-    } catch (\Exception $e) {
-      $this->loggerContract
-          ->error(TranslationHelper::getLoggerKey('apiService'), ['additionalInfo' => ['message' => $e->getMessage()], 'method' => __METHOD__]);
-    }
+    $this->urlHelper = $urlHelper;
   }
 
   /**
@@ -70,37 +75,48 @@ class APIService {
    * @throws \Exception
    * @return WayfairResponse
    */
-  public function query($query, $method = 'post', $variables = []) {
-    $headers = [];
-    $headers['Authorization'] = $this->getAuthenticationToken();
-    $headers['Content-Type'] = ['application/json'];
-    $headers[ConfigHelper::WAYFAIR_INTEGRATION_HEADER] = $this->configHelper->getIntegrationAgentHeader();
+  public function query($query, $method = 'post', $variables = [])
+  {
+    try {
+      $url = $this->getUrl();
+      $authHeaderVal = $this->authService->generateAuthHeader($url);
 
-    $url = $this->getUrl();
+      if (!isset($authHeaderVal) or empty($authHeaderVal)) {
+        throw new \Exception("Unable to set credentials for calling API");
+      }
 
-    $arguments = [
-        $url ,
+      $headers = [];
+      $headers[self::HEADER_KEY_AUTHORIATION] = $authHeaderVal;
+      $headers[self::HEADER_KEY_CONTENT_TYPE] = [self::MIME_TYPE_JSON];
+      $headers[ConfigHelperContract::WAYFAIR_INTEGRATION_HEADER] = $this->configHelper->getIntegrationAgentHeader();
+
+      $arguments = [
+        $url,
         [
-            'json' => [
-                'query' => $query,
-                'variables' => $variables
-            ],
-            'headers' => $headers
+          'json' => [
+            'query' => $query,
+            'variables' => $variables
+          ],
+          'headers' => $headers
         ]
-    ];
-    $this->loggerContract
-        ->debug(TranslationHelper::getLoggerKey('apiService'), ['additionalInfo' => [
+      ];
+      $this->loggerContract
+        ->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_API_SERVICE), ['additionalInfo' => [
           'url' => $url,
           'arguments' => $arguments
         ], 'method' => __METHOD__]);
 
-    return $this->client->call($method, $arguments);
+      return $this->client->call($method, $arguments);
+    } catch (\Exception $e) {
+      $this->loggerContract->error(TranslationHelper::getLoggerKey(self::LOG_KEY_API_SERVICE_ERROR), ['additionalInfo' => ['message' => $e->getMessage()], 'method' => __METHOD__]);
+    }
   }
 
   /**
    * @return string
    */
-  public function getUrl() {
-    return URLHelper::getUrl(URLHelper::URL_GRAPHQL);
+  private function getUrl()
+  {
+    return self->urlHelper->getUrl(URLHelperContract::URL_ID_GRAPHQL);
   }
 }

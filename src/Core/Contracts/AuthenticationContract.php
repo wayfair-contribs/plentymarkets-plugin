@@ -1,23 +1,31 @@
 <?php
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Core\Contracts;
 
 interface AuthenticationContract {
   /**
+   * Get an OAuth token for connections to the specified audience.
+   * @see generateAuthHeader
+   * @param string $audience
    * @return string
    */
-  public function getOAuthToken();
+  public function getOAuthToken(string $audience);
 
   /**
-   * @return array
-   */
-  public function authenticate();
-
-  /**
+   * Refresh the OAuth token stored for connections to the specified audience
+   * @param string $audience
+   * @param bool $force 
    * @return void
    */
-  public function refresh();
+  public function refreshOAuthToken(string $audience);
+
+  /**
+   * Get an HTTP Authorization header value for the given url
+   * $param string $url
+   * @return string
+   */
+  public function generateAuthHeader(string $url);
 }

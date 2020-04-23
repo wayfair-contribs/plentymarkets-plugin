@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Helpers;
@@ -8,13 +8,12 @@ namespace Wayfair\Helpers;
 use Plenty\Modules\Plugin\Contracts\PluginRepositoryContract;
 use Plenty\Plugin\CachingRepository;
 use Plenty\Plugin\ConfigRepository;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Repositories\KeyValueRepository;
 
-class ConfigHelper extends AbstractConfigHelper {
+class ConfigHelper implements ConfigHelperContract {
 
   const CACHING_MINUTES = 360;
-  const INTEGRATION_AGENT_NAME = 'PlentyMarket';
   /**
    * @var ConfigRepository
    */
@@ -82,9 +81,6 @@ class ConfigHelper extends AbstractConfigHelper {
     return (int)$keyValueRepository->get(self::SETTINGS_STOCK_BUFFER_KEY);
   }
 
-  /**
-   * @return string
-   */
   public function getDryRun(): string {
     return $this->config->get(self::PLUGIN_NAME . '.global.container.dryRunMode');
   }
@@ -115,7 +111,7 @@ class ConfigHelper extends AbstractConfigHelper {
    */
   public function getPluginVersion(): string {
     $pluginRepo = pluginApp(PluginRepositoryContract::class);
-    $plugin = $pluginRepo->getPluginByName(AbstractConfigHelper::PLUGIN_NAME);
+    $plugin = $pluginRepo->getPluginByName(self::PLUGIN_NAME);
     $plugin = $pluginRepo->decoratePlugin($plugin);
     return $plugin->versionProductive;
   }
@@ -144,5 +140,9 @@ class ConfigHelper extends AbstractConfigHelper {
    */
   public function hasBooted(): bool {
     return self::$bootFlag;
+  }
+
+  public function isTestingEnabled(): bool {
+    return filter_var($this->getDryRun(), FILTER_VALIDATE_BOOLEAN);
   }
 }

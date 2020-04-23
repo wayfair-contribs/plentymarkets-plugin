@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright 2020 Wayfair LLC - All rights reserved
  */
@@ -7,9 +8,8 @@ namespace Wayfair\Core\Api\Services;
 
 use Wayfair\Core\Api\APIService;
 use Wayfair\Core\Contracts\FetchDocumentContract;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Core\Dto\ShippingLabel\ResponseDTO;
-use Wayfair\Core\Helpers\URLHelper;
-use Wayfair\Helpers\ConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
 
 /**
@@ -35,30 +35,29 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
     // FIXME: this should be using a generic client via an interface, not cURL!
     $this->loggerContract
       ->debug(TranslationHelper::getLoggerKey('fetchingShipmentForURL'), ['additionalInfo' => ['url' => $url], 'method' => __METHOD__]);
+    $httpHeaders = [ConfigHelperContract::WAYFAIR_INTEGRATION_HEADER . ': ' . $this->configHelper->getIntegrationAgentHeader()];
+
     $ch = curl_init();
     try {
-      if (self::isWayfairAPI($url)) {
-        // Check if token has already been expired and refresh it.
-        $this->authService->refresh();
-        // getOAuthToken() currently returns 'Bearer MyToken' NOT the bare token.
-        curl_setopt(
-          $ch, CURLOPT_HTTPHEADER, [
-            'Authorization: ' . $this->authService->getOAuthToken(),
-            ConfigHelper::WAYFAIR_INTEGRATION_HEADER . ': ' . $this->configHelper->getIntegrationAgentHeader()
-          ]
-        );
+      $authHeaderValue = $this->authService->generateAuthHeader($url);
+      if (isset($authHeaderValue) && !empty($authHeaderValue)) {
+        $httpHeaders[] = 'Authorization: ' . $authHeaderValue;
       }
-      
+
+      curl_setopt($ch, CURLOPT_HTTPHEADER, $httpHeaders);
+
       curl_setopt($ch, CURLOPT_URL, $url);
       curl_setopt($ch, CURLOPT_HEADER, 0);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
       curl_setopt($ch, CURLOPT_TIMEOUT, 30);
       $output = curl_exec($ch);
       if (curl_errno($ch)) {
+        // FIXME: document is not guaranteed to be at Wayfair - log may be incorrect.
         $this->loggerContract
           ->error(
-            TranslationHelper::getLoggerKey('cannotCallWayfairAPI'), [
-              'additionalInfo' => ['url' => $url, 'accessToken' => $this->authService->getOAuthToken()],
+            TranslationHelper::getLoggerKey('cannotCallWayfairAPI'),
+            [
+              'additionalInfo' => ['url' => $url],
               'method' => __METHOD__
             ]
           );
@@ -86,10 +85,12 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
 
     $this->loggerContract
       ->debug(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_OBTAINING_TRACKING_NUMBER), [
+        TranslationHelper::getLoggerKey(self::LOG_KEY_OBTAINING_TRACKING_NUMBER),
+        [
           'additionalInfo' => [
             'poNumber' => $poNumber,
-            'query' => $query],
+            'query' => $query
+          ],
           'method' => __METHOD__
         ]
       );
@@ -101,28 +102,26 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
 
       $this->loggerContract
         ->info(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_TRACKING_RESPONSE), [
+          TranslationHelper::getLoggerKey(self::LOG_KEY_TRACKING_RESPONSE),
+          [
             'additionalInfo' => ['responseBody' => $responseBody],
             'method' => __METHOD__
           ]
         );
 
-      if ($response->hasErrors())
-      {
+      if ($response->hasErrors()) {
         throw new \Exception("Errors received from tracking number service: "
           . json_encode($response->getError()));
       }
 
       $dataElement = $responseBody['data'];
-      if (!isset($dataElement) || empty($dataElement))
-      {
+      if (!isset($dataElement) || empty($dataElement)) {
         throw new \Exception("No data element in tracking number response from Wayfair");
       }
 
       $labelGenerationEvents = $dataElement['labelGenerationEvents'];
 
-      if (!isset($labelGenerationEvents) || empty($labelGenerationEvents))
-      {
+      if (!isset($labelGenerationEvents) || empty($labelGenerationEvents)) {
         throw new \Exception("No label generation events in tracking number response from Wayfair");
       }
 
@@ -135,7 +134,8 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
     } catch (\Exception $e) {
       $this->loggerContract
         ->error(
-          TranslationHelper::getLoggerKey('unableToGetTrackingNumber'), [
+          TranslationHelper::getLoggerKey('unableToGetTrackingNumber'),
+          [
             'additionalInfo' => [
               'message' => $e->getMessage(),
               'responseBody' => $responseBody,
@@ -152,6 +152,7 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
 
   /**
    * Get the query text for fetching a tracking number
+   * TODO: move to a different module, as tracking numbers are not documents.
    * @param string $poNumber
    * @return string
    */
@@ -170,16 +171,4 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
       . '} '
       . '}';
   }
-
-  /**
-   * Check if the url is a call to a wayfair API
-   *
-   * @param string $url
-   * @return bool
-   */
-  private static function isWayfairAPI(string $url): bool
-  {
-    return stripos($url, URLHelper::BASE_URL) === 0;
-  }
-
 }

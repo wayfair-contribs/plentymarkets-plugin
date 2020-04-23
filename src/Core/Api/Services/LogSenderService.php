@@ -9,9 +9,9 @@ namespace Wayfair\Core\Api\Services;
 
 use Wayfair\Core\Contracts\AuthenticationContract;
 use Wayfair\Core\Contracts\ClientInterfaceContract;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Core\Contracts\LoggerContract;
-use Wayfair\Core\Helpers\URLHelper;
-use Wayfair\Helpers\ConfigHelper;
+use Wayfair\Core\Contracts\URLHelperContract;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Http\WayfairResponse;
 
@@ -28,14 +28,17 @@ class LogSenderService {
   private $authService;
 
   /**
-   * @var ConfigHelper
+   * @var ConfigHelperContract
    */
   private $configHelper;
 
-  public function __construct(ClientInterfaceContract $clientInterfaceContract, AuthenticationContract $authenticationContract, ConfigHelper $configHelper) {
+  public function __construct(ClientInterfaceContract $clientInterfaceContract, 
+  AuthenticationContract $authenticationContract, ConfigHelperContract $configHelper,
+  URLHelperContract $urlHelper) {
     $this->client = $clientInterfaceContract;
     $this->authService = $authenticationContract;
     $this->configHelper = $configHelper;
+    $this->urlHelper = $urlHelper;
   }
 
   public function execute(array $logs) {
@@ -52,9 +55,9 @@ class LogSenderService {
           $useVariables     .= ', ';
         }
         $declareVariables            .= '$l' . ($key + 1) . ': ExternalLogInput!';
-        $useVariables                .= 'log' . ($key + 1) . ': log(log: $l' . ($key + 1) . ', dryRun: ' . $this->configHelper->getDryRun() . ')';
+        $useVariables                .= 'log' . ($key + 1) . ': log(log: $l' . ($key + 1) . ')';
         $variables['l' . ($key + 1)] = [
-            'app'     => ConfigHelper::INTEGRATION_AGENT_NAME,
+            'app'     => ConfigHelperContract::INTEGRATION_AGENT_NAME,
             'level'   => $log['level'],
             'message' => $log['message'],
             'details' => $log['details'],
@@ -91,14 +94,21 @@ class LogSenderService {
    * @return WayfairResponse
    */
   public function query($query, $method = 'post', $variables = []) {
-    $this->authService->refresh();
+    $url = $this->urlHelper->getUrl(URLHelperContract::URL_ID_GRAPHQL);
+    $authHeaderVal = $this->authService->generateAuthHeader($url);
+    
+    if (!isset($authHeaderVal) or empty($authHeaderVal))
+    {
+      throw new \Exception("Unable to set credentials for calling Wayfair API");
+    }
+
     $headers = [];
-    $headers['Authorization'] = $this->authService->getOAuthToken();
+    $headers['Authorization'] = $authHeaderVal;
     $headers['Content-Type'] = ['application/json'];
-    $headers[ConfigHelper::WAYFAIR_INTEGRATION_HEADER] = $this->configHelper->getIntegrationAgentHeader();
+    $headers[ConfigHelperContract::WAYFAIR_INTEGRATION_HEADER] = $this->configHelper->getIntegrationAgentHeader();
 
     $arguments = [
-        URLHelper::getUrl(URLHelper::URL_GRAPHQL),
+        $url,
         [
             'json' => [
                 'query' => $query,

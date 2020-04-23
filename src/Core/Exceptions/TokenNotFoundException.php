@@ -1,10 +1,12 @@
 <?php
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Core\Exceptions;
 
-class TokenNotFoundException extends \Exception {
+use Wayfair\Core\Exceptions\AuthenticationException;
+
+class TokenNotFoundException extends AuthenticationException {
 
 }
