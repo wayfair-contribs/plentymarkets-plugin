@@ -106,7 +106,7 @@ class AuthService implements AuthenticationContract
     $client_id = $this->configHelperContract->getWayfairClientId();
     $client_secret = $this->configHelperContract->getWayfairClientSecret();
     $arguments = [
-      self->urlHelperContract->getWayfairAuthenticationUrl(),
+      $this->urlHelperContract->getWayfairAuthenticationUrl(),
       [
         'headers' => [
           'Content-Type' => 'application/json',
