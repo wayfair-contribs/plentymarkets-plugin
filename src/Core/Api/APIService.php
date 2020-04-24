@@ -117,6 +117,6 @@ class APIService
    */
   private function getUrl()
   {
-    return self->urlHelper->getUrl(URLHelperContract::URL_ID_GRAPHQL);
+    return $this->urlHelper->getUrl(URLHelperContract::URL_ID_GRAPHQL);
   }
 }
