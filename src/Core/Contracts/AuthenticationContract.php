@@ -17,14 +17,13 @@ interface AuthenticationContract {
   /**
    * Refresh the OAuth token stored for connections to the specified audience
    * @param string $audience
-   * @param bool $force 
    * @return void
    */
   public function refreshOAuthToken(string $audience);
 
   /**
    * Get an HTTP Authorization header value for the given url
-   * $param string $url
+   * @param string $url
    * @return string
    */
   public function generateAuthHeader(string $url);

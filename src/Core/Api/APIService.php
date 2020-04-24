@@ -52,6 +52,7 @@ class APIService
    * @param AuthenticationContract  $authenticationContract
    * @param ConfigHelperContract    $configHelper
    * @param LoggerContract          $loggerContract
+   * @param URLHelperContract       $urlHelper
    */
   public function __construct(
     ClientInterfaceContract $clientInterfaceContract,
@@ -110,6 +111,8 @@ class APIService
     } catch (\Exception $e) {
       $this->loggerContract->error(TranslationHelper::getLoggerKey(self::LOG_KEY_API_SERVICE_ERROR), ['additionalInfo' => ['message' => $e->getMessage()], 'method' => __METHOD__]);
     }
+
+    return null;
   }
 
   /**

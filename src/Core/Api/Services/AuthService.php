@@ -147,9 +147,6 @@ class AuthService implements AuthenticationContract
    */
   public function refreshOAuthToken(string $audience)
   {
-    $token = $this->getStoredTokenModel($audience);
-    // TODO: logging around token being set or expired
-
     $responseObject = $this->fetchNewToken($audience);
 
     if (!isset($responseObject) || empty($responseObject)) {
@@ -217,7 +214,7 @@ class AuthService implements AuthenticationContract
    * @return string
    * @throws TokenNotFoundException
    */
-  public function generateAuthHeader(string $url): ?string
+  public function generateAuthHeader(string $url): string
   {
 
     $wayfairAudience = $this->urlHelperContract->getWayfairAudience($url);
@@ -257,7 +254,7 @@ class AuthService implements AuthenticationContract
    * Get the key for storing and looking up the oauth key for the audience
    *
    * @param string $audience
-   * @return void
+   * @return string
    */
   private static function getKeyForToken(string $audience)
   {

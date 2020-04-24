@@ -34,7 +34,7 @@ class URLHelper implements URLHelperContract{
    *
    * @return string
    */
-  public function getUrl($key) {
+  public function getUrl($key): string {
     $base = self::getBaseUrl($key);
     // TODO: log about unknown URL path
     return $base . self::URL_PATH[$key];
