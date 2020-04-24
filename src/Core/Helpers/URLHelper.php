@@ -89,9 +89,9 @@ class URLHelper implements URLHelperContract{
   /**
    * Finds the Wayfair API audience (Production or Sandbox) for a URL
    * @param string $url the URL that is being checked
-   * @return ?string
+   * @return string
    */
-  public function getWayfairAudience(string $url): ?string {
+  public function getWayfairAudience(string $url) {
     // URL must START with one of the approved URLs.
     // otherwise, someone can put our URL into the query string and trick us into sending the auth header.
     foreach (self::URLS_USING_WAYFAIR_AUTH as $wayfair_authenticated_domain)

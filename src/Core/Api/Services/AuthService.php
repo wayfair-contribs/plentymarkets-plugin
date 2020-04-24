@@ -81,7 +81,7 @@ class AuthService implements AuthenticationContract
    * @param string $audience
    * @return WayfairResponse
    */
-  private function fetchNewToken(string $audience): ?WayfairResponse
+  private function fetchNewToken(string $audience): WayfairResponse
   {
 
     $wayfairAudience = $this->urlHelperContract->getWayfairAudience($audience);
@@ -97,7 +97,7 @@ class AuthService implements AuthenticationContract
   /**
    * Fetch a new auth token using the wayfair authentication service
    * @param string $audience
-   * @return WayfairresponseArray
+   * @return WayfairResponse
    */
   private function wayfairAuthenticate(string $audience)
   {

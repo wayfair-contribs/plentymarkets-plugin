@@ -38,14 +38,14 @@ class ConfigHelper implements ConfigHelperContract {
   /**
    * @return mixed
    */
-  public function getClientId() {
+  public function getWayfairClientId() {
     return $this->config->get(self::PLUGIN_NAME . '.global.container.clientId');
   }
 
   /**
    * @return mixed
    */
-  public function getClientSecret() {
+  public function getWayfairClientSecret() {
     return $this->config->get(self::PLUGIN_NAME . '.global.container.clientSecret');
   }
 

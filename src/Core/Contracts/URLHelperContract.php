@@ -20,9 +20,8 @@ interface URLHelperContract {
    * Get the URL for the given key
    * @param string $key
    *
-   * @return string
    */
-  abstract public function getUrl($key): ?string;
+  abstract public function getUrl($key): string;
 
   /**
    * Get the URL to contact for authentication tokens
@@ -41,7 +40,7 @@ interface URLHelperContract {
   /**
    * Finds the Wayfair API audience (Production or Sandbox) for a URL
    * @param string $url the URL that is being checked
-   * @return ?string
+   * @return string
    */
-  abstract public function getWayfairAudience(string $url): ?string;
+  abstract public function getWayfairAudience(string $url);
 }
