@@ -9,6 +9,7 @@ use Wayfair\Core\Api\APIService;
 use Wayfair\Core\Contracts\AuthenticationContract;
 use Wayfair\Core\Contracts\ClientInterfaceContract;
 use Wayfair\Core\Contracts\LoggerContract;
+use Wayfair\Core\Contracts\URLHelperContract;
 use Wayfair\Helpers\ConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Repositories\PendingOrdersRepository;
@@ -29,16 +30,18 @@ class AcceptOrderService extends APIService
    * @param ConfigHelper $configHelper
    * @param PendingOrdersRepository $pendingOrdersRepository
    * @param LoggerContract $loggerContract
+   * @param URLHelperContract $urlHelperContract;
    */
   public function __construct(
     ClientInterfaceContract $clientInterfaceContract,
     AuthenticationContract $authenticationContract,
     ConfigHelper $configHelper,
     PendingOrdersRepository $pendingOrdersRepository,
-    LoggerContract $loggerContract
+    LoggerContract $loggerContract,
+    URLHelperContract $urlHelperContract
   )
   {
-    parent::__construct($clientInterfaceContract, $authenticationContract, $configHelper, $loggerContract);
+    parent::__construct($clientInterfaceContract, $authenticationContract, $configHelper, $loggerContract, $urlHelperContract);
     $this->pendingOrdersRepository = $pendingOrdersRepository;
   }
 
