@@ -229,12 +229,13 @@ class AuthService implements AuthenticationContract
     return null;
   }
 
-  /**
-   * Get the store token value for the audience
-   *
-   * @param string $audience
-   * @return void
-   */
+    /**
+     * Get the store token value for the audience
+     *
+     * @param string $audience
+     * @return string
+     * @throws TokenNotFoundException
+     */
   public function getOAuthToken(string $audience)
   {
     // check for staleness and refresh

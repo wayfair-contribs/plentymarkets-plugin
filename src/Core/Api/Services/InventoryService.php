@@ -7,7 +7,6 @@ namespace Wayfair\Core\Api\Services;
 
 use Wayfair\Core\Api\APIService;
 use Wayfair\Core\Dto\Inventory\ResponseDTO;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Http\WayfairResponse;
 use Wayfair\Models\ExternalLogs;
@@ -86,10 +85,6 @@ class InventoryService extends APIService
    */
   public function buildQuery(array $listOfRequestDTOs, bool $fullInventory = false)
   {
-    /**
-     * @var AbstractConfigHelper $configHelper
-     */
-    $configHelper = pluginApp(AbstractConfigHelper::class);
     $fullData = [];
     foreach ($listOfRequestDTOs as $requestDTO) {
       $fullData[] = [

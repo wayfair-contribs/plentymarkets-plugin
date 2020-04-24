@@ -56,7 +56,7 @@ class URLHelper implements URLHelperContract{
    */
   private static function getBaseUrl($key = NULL): string {
 
-    if ($key === Self::URL_ID_AUTH)
+    if ($key === self::URL_ID_AUTH)
     {
       // prod and sandbox use the same auth service
       return self::BASE_URL_AUTH;
