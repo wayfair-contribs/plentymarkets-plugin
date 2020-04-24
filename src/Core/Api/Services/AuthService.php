@@ -36,16 +36,6 @@ class AuthService implements AuthenticationContract
   private $client;
 
   /**
-   * @var string
-   */
-  private $client_id;
-
-  /**
-   * @var string
-   */
-  private $client_secret;
-
-  /**
    * @var LoggerContract
    */
   private $loggerContract;
@@ -56,27 +46,31 @@ class AuthService implements AuthenticationContract
   private $urlHelperContract;
 
   /**
+   * @var ConfigHelperContract
+   */
+  private $configHelperContract;
+
+  /**
    * AuthService constructor.
    *
    * @param ClientInterfaceContract  $clientInterfaceContract
    * @param StorageInterfaceContract $storageInterfaceContract
-   * @param ConfigHelperContract     $configHelper
+   * @param ConfigHelperContract     $configHelperContract
    * @param LoggerContract           $loggerContract
    * @param URLHelperContract        $urlHelperContract
    */
   public function __construct(
     ClientInterfaceContract $clientInterfaceContract,
     StorageInterfaceContract $storageInterfaceContract,
-    ConfigHelperContract $configHelper,
+    ConfigHelperContract $configHelperContract,
     LoggerContract $loggerContract,
     URLHelperContract $urlHelperContract
   ) {
     $this->store = $storageInterfaceContract;
-    $this->client_id = $configHelper->getClientId();
-    $this->client_secret = $configHelper->getClientSecret();
     $this->client = $clientInterfaceContract;
     $this->loggerContract = $loggerContract;
     $this->urlHelperContract = $urlHelperContract;
+    $this->configHelperContract = $configHelperContract;
   }
 
   /**
@@ -106,6 +100,8 @@ class AuthService implements AuthenticationContract
   {
     // auth URL is the same for all Wayfair audiences.
     $method = 'post';
+    $client_id = $this->configHelperContract->getWayfairClientId();
+    $client_secret = $this->configHelperContract->getWayfairClientSecret();
     $arguments = [
       self->urlHelperContract->getWayfairAuthenticationUrl(),
       [
@@ -115,14 +111,16 @@ class AuthService implements AuthenticationContract
         ],
         'body' => json_encode(
           [
-            'client_id' => $this->client_id,
-            'client_secret' => $this->client_secret,
+            'client_id' => $client_id,
+            'client_secret' => $client_secret,
             'audience' => $audience,
             'grant_type' => 'client_credentials'
           ]
         )
       ]
     ];
+
+    // FIXME: need to mask the client ID and credentials in the log output!
     $this->loggerContract
       ->debug(TranslationHelper::getLoggerKey('attemptingAuthentication'), ['additionalInfo' => $arguments, 'method' => __METHOD__]);
 

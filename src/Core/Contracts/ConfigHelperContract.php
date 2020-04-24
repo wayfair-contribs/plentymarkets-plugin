@@ -42,14 +42,14 @@ interface ConfigHelperContract
    *
    * @return mixed
    */
-  public function getClientId();
+  public function getWayfairClientId();
 
   /**
    * Retrieve the configured client secret for connections to Wayfair's secure APIs
    *
    * @return mixed
    */
-  public function getClientSecret();
+  public function getWayfairClientSecret();
 
   /**
    * Returns the PlentyMarkets identifier for Wayfair's Order Referrer value
