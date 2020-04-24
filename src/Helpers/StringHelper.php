@@ -5,12 +5,12 @@
 
 namespace Wayfair\Helpers;
 
-const mask_template = '********';
-
 /**
  * Utilities for working with Strings
  */
 abstract class StringHelper {
+
+    const MASK_TEMPLATE = '********';
 
     /**
      * A quick string mask with a static output length.
@@ -26,7 +26,7 @@ abstract class StringHelper {
             return '';
         }
 
-        $masked = mask_template;
+        $masked = self::MASK_TEMPLATE;
         $lenMasked = strlen($masked);
 
         $lenInput = strlen($input);
