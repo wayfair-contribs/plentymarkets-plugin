@@ -14,6 +14,7 @@ use Wayfair\Core\Contracts\StorageInterfaceContract;
 use Wayfair\Core\Contracts\URLHelperContract;
 use Wayfair\Core\Exceptions\AuthenticationException;
 use Wayfair\Core\Exceptions\TokenNotFoundException;
+use Wayfair\Helpers\StringHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Http\WayfairResponse;
 
@@ -24,6 +25,8 @@ class AuthService implements AuthenticationContract
   const ACCESS_TOKEN = 'access_token';
   const STORE_TIME = 'store_time';
   const TOKEN = 'token';
+  const CLIENT_ID = 'client_id';
+  const CLIENT_SECRET = 'client_secret';
 
   /**
    * @var StorageInterfaceContract
@@ -111,8 +114,8 @@ class AuthService implements AuthenticationContract
         ],
         'body' => json_encode(
           [
-            'client_id' => $client_id,
-            'client_secret' => $client_secret,
+            self::CLIENT_ID => $client_id,
+            self::CLIENT_SECRET => $client_secret,
             'audience' => $audience,
             'grant_type' => 'client_credentials'
           ]
@@ -120,9 +123,18 @@ class AuthService implements AuthenticationContract
       ]
     ];
 
-    // FIXME: need to mask the client ID and credentials in the log output!
+    // php copies arrays
+    $args_for_logging = $arguments;
+    $needsMask = [self::CLIENT_ID, self::CLIENT_SECRET];
+    foreach($needsMask as $key)
+    {
+      if (array_key_exists($key, $args_for_logging))
+      {
+        $args_for_logging[$key] = StringHelper::mask($args_for_logging[$key]);
+      }
+    }
     $this->loggerContract
-      ->debug(TranslationHelper::getLoggerKey('attemptingAuthentication'), ['additionalInfo' => $arguments, 'method' => __METHOD__]);
+      ->debug(TranslationHelper::getLoggerKey('attemptingAuthentication'), ['additionalInfo' => $args_for_logging, 'method' => __METHOD__]);
 
     return $this->client->call($method, $arguments);
   }
