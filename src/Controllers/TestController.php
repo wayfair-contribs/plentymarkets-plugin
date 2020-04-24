@@ -10,7 +10,7 @@ use Plenty\Modules\Order\Shipping\Package\Contracts\OrderShippingPackageReposito
 use Plenty\Plugin\Controller;
 use Wayfair\Core\Api\Services\FetchOrderService;
 use Wayfair\Core\Api\Services\LogSenderService;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Helpers\ConfigHelper;
 use Wayfair\Models\ExternalLogs;
 use Wayfair\Repositories\KeyValueRepository;
@@ -126,7 +126,7 @@ class TestController extends Controller {
    * @throws \Exception
    */
   public function updateFullInventoryStatus(KeyValueRepository $keyValue) {
-    $keyValue->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_CRON_STATUS, AbstractConfigHelper::FULL_INVENTORY_CRON_IDLE);
+    $keyValue->putOrReplace(ConfigHelperContract::FULL_INVENTORY_CRON_STATUS, ConfigHelperContract::FULL_INVENTORY_CRON_IDLE);
     return 'Done';
   }
 }

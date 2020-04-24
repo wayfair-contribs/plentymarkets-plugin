@@ -7,7 +7,7 @@ namespace Wayfair\Mappers;
 
 use Plenty\Modules\Item\VariationStock\Contracts\VariationStockRepositoryContract;
 use Wayfair\Core\Dto\Inventory\RequestDTO;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Repositories\KeyValueRepository;
 use Wayfair\Repositories\WarehouseSupplierRepository;
 
@@ -68,9 +68,9 @@ class InventoryMapper {
    */
   public function getNetStock($variationStock) {
     /**
-     * @var AbstractConfigHelper $configHelper
+     * @var ConfigHelperContract $configHelper
      */
-    $configHelper = pluginApp(AbstractConfigHelper::class);
+    $configHelper = pluginApp(ConfigHelperContract::class);
     $stockBuffer = $configHelper->getStockBufferValue();
     if ($variationStock->netStock > $stockBuffer) {
       return $variationStock->netStock - $stockBuffer;
@@ -87,13 +87,13 @@ class InventoryMapper {
   public function map($data) {
     /** @var KeyValueRepository $keyValueRepository */
     $keyValueRepository = pluginApp(KeyValueRepository::class);
-    $itemMappingMethod = $keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD);
+    $itemMappingMethod = $keyValueRepository->get(ConfigHelperContract::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD);
 
     switch ($itemMappingMethod) {
-      case AbstractConfigHelper::ITEM_MAPPING_SKU:
+      case ConfigHelperContract::ITEM_MAPPING_SKU:
         $supplierPartNumber = $data['variationSkus'][0]['sku'];
         break;
-      case AbstractConfigHelper::ITEM_MAPPING_EAN:
+      case ConfigHelperContract::ITEM_MAPPING_EAN:
         $supplierPartNumber = $data['variationBarcodes'][0]['code'];
         break;
       default:

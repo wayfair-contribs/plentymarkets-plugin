@@ -7,7 +7,7 @@ namespace Wayfair\Services;
 
 use Wayfair\Core\Api\Services\LogSenderService;
 use Wayfair\Core\Contracts\LoggerContract;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Models\ExternalLogs;
 use Wayfair\Repositories\KeyValueRepository;
@@ -54,9 +54,9 @@ class FullInventoryService
         'method' => __METHOD__
       ]);
       $status = 'Sync did not run';
-      $cronStatus = $this->keyValueRepository->get(AbstractConfigHelper::FULL_INVENTORY_CRON_STATUS);
-      $lastRun = $this->keyValueRepository->get(AbstractConfigHelper::FULL_INVENTORY_STATUS_UPDATED_AT);
-      if ($cronStatus !== AbstractConfigHelper::FULL_INVENTORY_CRON_RUNNING) {
+      $cronStatus = $this->keyValueRepository->get(ConfigHelperContract::FULL_INVENTORY_CRON_STATUS);
+      $lastRun = $this->keyValueRepository->get(ConfigHelperContract::FULL_INVENTORY_STATUS_UPDATED_AT);
+      if ($cronStatus !== ConfigHelperContract::FULL_INVENTORY_CRON_RUNNING) {
         $externalLogs->addInfoLog("Starting " . ($manual ? "Manual " : "Automatic") . "full inventory sync.");
         $loggerContract->info(TranslationHelper::getLoggerKey(self::LOG_KEY_START), [
           'additionalInfo' => ['manual' => (string)$manual, 'lastRun' => $lastRun],
@@ -64,7 +64,7 @@ class FullInventoryService
         ]);
         $result = null;
         try {
-          $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_CRON_STATUS, AbstractConfigHelper::FULL_INVENTORY_CRON_RUNNING);
+          $this->keyValueRepository->putOrReplace(ConfigHelperContract::FULL_INVENTORY_CRON_STATUS, ConfigHelperContract::FULL_INVENTORY_CRON_RUNNING);
           $inventoryUpdateService = pluginApp(InventoryUpdateService::class);
           $result = $inventoryUpdateService->sync(true);
           $status = 'OK';
@@ -75,7 +75,7 @@ class FullInventoryService
           ]);
           $status = 'ERROR';
         } finally {
-          $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_CRON_STATUS, AbstractConfigHelper::FULL_INVENTORY_CRON_IDLE);
+          $this->keyValueRepository->putOrReplace(ConfigHelperContract::FULL_INVENTORY_CRON_STATUS, ConfigHelperContract::FULL_INVENTORY_CRON_IDLE);
 
           $loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_END), [
             'additionalInfo' => ['result' => $result],

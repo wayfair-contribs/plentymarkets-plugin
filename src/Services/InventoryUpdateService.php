@@ -10,7 +10,7 @@ use Wayfair\Core\Api\Services\InventoryService;
 use Wayfair\Core\Api\Services\LogSenderService;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\Inventory\RequestDTO;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Core\Helpers\TimeHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Mappers\InventoryMapper;
@@ -105,7 +105,7 @@ class InventoryUpdateService
     try {
       $fields = $this->getResultFields();
       /* Page size is tuned for a balance between memory usage (in plentymarkets) and number of transactions  */
-      $fields['itemsPerPage'] = AbstractConfigHelper::INVENTORY_ITEMS_PER_PAGE;
+      $fields['itemsPerPage'] = ConfigHelperContract::INVENTORY_ITEMS_PER_PAGE;
       $variationSearchRepository->setFilters($this->getFilters($fullInventory));
 
       do {
@@ -235,9 +235,9 @@ class InventoryUpdateService
   public function getFilters(bool $fullInventory): array
   {
     /**
-     * @var AbstractConfigHelper $configHelper
+     * @var ConfigHelperContract $configHelper
      */
-    $configHelper = pluginApp(AbstractConfigHelper::class);
+    $configHelper = pluginApp(ConfigHelperContract::class);
 
     $filter = [
       'isActive' => true
@@ -249,7 +249,7 @@ class InventoryUpdateService
 
     if (!$fullInventory) {
       $filter['updatedBetween'] = [
-        'timestampFrom' => time() - AbstractConfigHelper::SECONDS_INTERVAL_FOR_INVENTORY,
+        'timestampFrom' => time() - ConfigHelperContract::SECONDS_INTERVAL_FOR_INVENTORY,
         'timestampTo' => time(),
       ];
     }

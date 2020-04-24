@@ -8,7 +8,7 @@ namespace Wayfair\Services;
 use Plenty\Plugin\Log\Loggable;
 
 use Wayfair\Core\Contracts\LoggerContract;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 
 class LoggingService implements LoggerContract {
   use Loggable;
@@ -30,7 +30,7 @@ class LoggingService implements LoggerContract {
    * Initialize a logging service object
    */
   public function __construct() {
-    $configHelper = pluginApp(AbstractConfigHelper::class);
+    $configHelper = pluginApp(ConfigHelperContract::class);
     $this->version = $configHelper->getPluginVersion();
   }
 
@@ -143,9 +143,9 @@ class LoggingService implements LoggerContract {
    */
   private function canLogLowerThanError(): bool {
     /**
-     * @var AbstractConfigHelper $configHelper
+     * @var ConfigHelperContract $configHelper
      */
-    $configHelper = pluginApp(AbstractConfigHelper::class);
+    $configHelper = pluginApp(ConfigHelperContract::class);
     return $configHelper->hasBooted();
   }
 }

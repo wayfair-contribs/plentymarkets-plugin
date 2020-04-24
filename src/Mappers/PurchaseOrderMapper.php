@@ -10,7 +10,7 @@ use Wayfair\Core\Dto\PurchaseOrder\ResponseDTO;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Order\Models\OrderType;
 use Plenty\Plugin\Application;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Repositories\KeyValueRepository;
 
 class PurchaseOrderMapper {
@@ -101,7 +101,7 @@ class PurchaseOrderMapper {
       'referrerId' => $referrerId,
       'plentyId' => $this->app->getPlentyId(),
       'orderItems' => $orderItems,
-      'statusId' => (int)$this->keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_ORDER_STATUS_KEY) ?? self::ORDER_STATUS_WAITING_FOR_ACTIVATION,
+      'statusId' => (int)$this->keyValueRepository->get(ConfigHelperContract::SETTINGS_DEFAULT_ORDER_STATUS_KEY) ?? self::ORDER_STATUS_WAITING_FOR_ACTIVATION,
       'properties' => $properties,
       'addressRelations' => $addressRelations,
       'relations' => $relations

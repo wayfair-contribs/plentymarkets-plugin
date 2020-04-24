@@ -7,7 +7,7 @@ namespace Wayfair\Repositories;
 
 use Plenty\Exceptions\ValidationException;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Models\KeyValue;
 
@@ -85,9 +85,9 @@ class KeyValueRepository extends Repository {
       $this->put($key, $value);
     }
 
-    if ($key === AbstractConfigHelper::FULL_INVENTORY_CRON_STATUS) { 
+    if ($key === ConfigHelperContract::FULL_INVENTORY_CRON_STATUS) { 
       // TODO: move this to a separate class, or make the KeyValue table to have the updated_at column, or find a better way ...
-      $this->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_STATUS_UPDATED_AT, date('Y-m-d H:i:s.u P'));
+      $this->putOrReplace(ConfigHelperContract::FULL_INVENTORY_STATUS_UPDATED_AT, date('Y-m-d H:i:s.u P'));
     }
   }
 

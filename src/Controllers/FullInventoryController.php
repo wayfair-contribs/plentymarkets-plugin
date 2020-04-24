@@ -6,7 +6,7 @@
 namespace Wayfair\Controllers;
 
 use Plenty\Plugin\Controller;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Repositories\KeyValueRepository;
 use Wayfair\Services\FullInventoryService;
 use Wayfair\Services\InventoryUpdateService;
@@ -35,12 +35,12 @@ class FullInventoryController extends Controller
    */
   public function syncTest(Request $request, KeyValueRepository $keyValueRepository)
   {
-    $cronStatus = $keyValueRepository->get(AbstractConfigHelper::FULL_INVENTORY_CRON_STATUS);
-    if ($cronStatus !== AbstractConfigHelper::FULL_INVENTORY_CRON_RUNNING) {
-      $keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_CRON_STATUS, AbstractConfigHelper::FULL_INVENTORY_CRON_RUNNING);
+    $cronStatus = $keyValueRepository->get(ConfigHelperContract::FULL_INVENTORY_CRON_STATUS);
+    if ($cronStatus !== ConfigHelperContract::FULL_INVENTORY_CRON_RUNNING) {
+      $keyValueRepository->putOrReplace(ConfigHelperContract::FULL_INVENTORY_CRON_STATUS, ConfigHelperContract::FULL_INVENTORY_CRON_RUNNING);
       $inventoryUpdateService = pluginApp(InventoryUpdateService::class);
       $data = $inventoryUpdateService->sync(true);
-      $keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_CRON_STATUS, AbstractConfigHelper::FULL_INVENTORY_CRON_IDLE);
+      $keyValueRepository->putOrReplace(ConfigHelperContract::FULL_INVENTORY_CRON_STATUS, ConfigHelperContract::FULL_INVENTORY_CRON_IDLE);
 
       return $request->input('data') == 1 ? json_encode($data) : json_encode(['error' => 'Sync is running']);
     }
