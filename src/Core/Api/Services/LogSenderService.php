@@ -32,6 +32,11 @@ class LogSenderService {
    */
   private $configHelper;
 
+  /**
+   * @var URLHelperContract
+   */
+  private $urlHelper;
+
   public function __construct(ClientInterfaceContract $clientInterfaceContract, 
   AuthenticationContract $authenticationContract, ConfigHelperContract $configHelper,
   URLHelperContract $urlHelper) {
