@@ -45,7 +45,7 @@ class AuthService implements AuthenticationContract
 
   /**
    * @var URLHelperContract
-   */ 
+   */
   private $urlHelperContract;
 
   /**
@@ -126,14 +126,10 @@ class AuthService implements AuthenticationContract
     // php copies arrays
     $args_for_logging = $arguments;
     $needsMask = [self::CLIENT_ID, self::CLIENT_SECRET];
-    foreach($args_for_logging as $arg)
-    {
-      if (is_array($arg))
-      {
-        foreach($needsMask as $key)
-        {
-          if (array_key_exists($key, $args_for_logging))
-          {
+    foreach ($args_for_logging as $arg) {
+      if (is_array($arg)) {
+        foreach ($needsMask as $key) {
+          if (array_key_exists($key, $args_for_logging)) {
             $args_for_logging[$key] = StringHelper::mask($args_for_logging[$key]);
           }
         }
@@ -193,13 +189,25 @@ class AuthService implements AuthenticationContract
   public function isTokenExpired(string $audience)
   {
     $token = $this->getStoredTokenModel($audience);
-    if (isset($token) && isset($token[self::ACCESS_TOKEN]) && isset($token[self::STORE_TIME]) && isset($token[self::EXPIRES_IN])) {
-      if (($token[self::EXPIRES_IN] + $token[self::STORE_TIME]) > time()) {
-        return false;
-      }
-    }
 
-    return true;
+    $wayfairAudience = $this->urlHelperContract->getWayfairAudience($audience);
+
+    return self->isTokenDataExpired($token);
+  }
+
+  /**
+   * Check if the token data is missing or expired
+   *
+   * @param mixed $token
+   * @return bool
+   */
+  private function isTokenDataExpired($token)
+  {
+    return (!isset($token)  || empty($token)
+      || !isset($token[self::ACCESS_TOKEN]) || empty($token[self::ACCESS_TOKEN])
+      || !isset($token[self::STORE_TIME]) || empty($token[self::ACCESS_TOKEN])
+      || !isset($token[self::EXPIRES_IN]) || empty($token[self::EXPIRES_IN])
+      || ($token[self::EXPIRES_IN] + $token[self::STORE_TIME]) < time());
   }
 
   /**
@@ -235,13 +243,13 @@ class AuthService implements AuthenticationContract
     return null;
   }
 
-    /**
-     * Get the store token value for the audience
-     *
-     * @param string $audience
-     * @return string
-     * @throws TokenNotFoundException
-     */
+  /**
+   * Get the stored token value for the audience
+   *
+   * @param string $audience
+   * @return string
+   * @throws TokenNotFoundException
+   */
   public function getOAuthToken(string $audience)
   {
     // check for staleness and refresh
@@ -250,7 +258,7 @@ class AuthService implements AuthenticationContract
     }
 
     $tokenModel = $this->getStoredTokenModel($audience);
-    if (!isset($tokenModel)) {
+    if (!isset($tokenModel) || empty($tokenModel)) {
       throw new TokenNotFoundException("Token not found for " . $audience);
     }
 
@@ -266,5 +274,17 @@ class AuthService implements AuthenticationContract
   private static function getKeyForToken(string $audience)
   {
     return self::TOKEN . '_' . base64_encode(strtolower($audience));
+  }
+
+  /**
+   * Clear the token stored for the given audience
+   *
+   * @param string $audience
+   * @return void
+   */
+  public function deleteOAuthToken($audience)
+  {
+    $key = self::getKeyForToken($audience);
+    $this->store->remove($key);
   }
 }

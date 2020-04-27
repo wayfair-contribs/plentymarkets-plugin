@@ -161,4 +161,27 @@ class KeyValueRepository extends Repository {
 
     return $allModels;
   }
+
+  /**
+   * Delete the first stored model for the key
+   *
+   * @param mixed $key
+   * @return mixed
+   */
+  public function delete($key)
+  {
+     /**
+     * @var DataBase $database
+     */
+    $database = pluginApp(DataBase::class);
+
+    $model = $this->get($key);
+
+    if (isset($model))
+    {
+      $database->delete($model);
+    }
+
+    return $model;
+  }
 }

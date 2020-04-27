@@ -27,4 +27,12 @@ interface AuthenticationContract {
    * @return string
    */
   public function generateAuthHeader(string $url);
+
+   /**
+   * Clear the token stored for the given audience
+   *
+   * @param string $audience
+   * @return void
+   */
+  public function deleteOAuthToken(string $audience);
 }

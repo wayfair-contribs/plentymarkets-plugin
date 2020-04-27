@@ -129,8 +129,29 @@ class WayfairServiceProvider extends ServiceProvider
           ]
         );
       }
+
+      
+
     } finally {
+      // TODO: remove when "logging during boot" bug is fixed by PM
       ConfigHelper::setBootFlag();
     }
+  }
+
+  /**
+   * Clear old Wayfair OAuth tokens out of the DB
+   * To ensure that we authenticate on first use after boot
+   *
+   * @return void
+   */
+  private function clearAuthTokens()
+  {
+    /**
+     * @var AuthenticationContract $authContract
+     */
+    $authContract = PluginApp(AuthenticationContract::class);
+
+    $authContract->deleteOAuthToken(URLHelper::BASE_URL_API);
+    $authContract->deleteOAuthToken(URLHelper::BASE_URL_SANDBOX);
   }
 }
