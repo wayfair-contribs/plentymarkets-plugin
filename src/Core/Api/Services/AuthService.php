@@ -279,7 +279,7 @@ class AuthService implements AuthenticationContract
    * @param string $audience
    * @return void
    */
-  public function deleteOAuthToken($audience)
+  public function deleteOAuthToken(string $audience)
   {
     $key = self::getKeyForToken($audience);
     $this->store->remove($key);
