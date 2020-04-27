@@ -129,8 +129,8 @@ class AuthService implements AuthenticationContract
     foreach ($args_for_logging as $arg) {
       if (is_array($arg)) {
         foreach ($needsMask as $key) {
-          if (array_key_exists($key, $args_for_logging)) {
-            $args_for_logging[$key] = StringHelper::mask($args_for_logging[$key]);
+          if (array_key_exists($key, $arg)) {
+            $arg[$key] = StringHelper::mask($arg[$key]);
           }
         }
       }
