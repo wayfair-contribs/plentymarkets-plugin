@@ -6,6 +6,7 @@
 namespace Wayfair\Core\Helpers;
 
 use Wayfair\Core\Contracts\ConfigHelperContract;
+use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Contracts\URLHelperContract;
 
 class URLHelper implements URLHelperContract{
@@ -15,6 +16,9 @@ class URLHelper implements URLHelperContract{
   const BASE_URL_AUTH = 'https://sso.auth.wayfair.com/';
   const BASE_URL_API = 'https://api.wayfair.com/';
   const BASE_URL_SANDBOX = 'https://sandbox.api.wayfair.com/';
+
+  const LOG_KEY_TEST_MODE_OFF = 'testModeOff';
+  const LOG_KEY_TEST_MODE_ON = 'testModeOn';
   
   // paths to append to appropriate base URLs
   const URL_PATH = [
@@ -67,11 +71,18 @@ class URLHelper implements URLHelperContract{
      */
     $configHelper = pluginApp(ConfigHelperContract::class);
 
+    /**
+     * @var LoggerContract $logger
+     */
+    $logger = pluginApp(LoggerContract::class);
+    
     if ($configHelper->isTestingEnabled())
     {
+      $logger->debug(self::LOG_KEY_TEST_MODE_ON);
       return self::BASE_URL_SANDBOX;
     }
 
+    $logger->debug(self::LOG_KEY_TEST_MODE_OFF);
     return self::BASE_URL_API;
   }
 

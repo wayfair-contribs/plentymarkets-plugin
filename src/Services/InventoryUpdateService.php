@@ -53,6 +53,7 @@ class InventoryUpdateService
       return true;
     }
 
+    // TODO: add explicit log message about this validation failure
     $loggerContract
       ->error(
         TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_ERROR), [
