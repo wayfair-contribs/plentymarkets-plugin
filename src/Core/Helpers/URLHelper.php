@@ -8,6 +8,7 @@ namespace Wayfair\Core\Helpers;
 use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Contracts\URLHelperContract;
+use Wayfair\Helpers\TranslationHelper;
 
 class URLHelper implements URLHelperContract{
 
@@ -78,11 +79,11 @@ class URLHelper implements URLHelperContract{
     
     if ($configHelper->isTestingEnabled())
     {
-      $logger->debug(self::LOG_KEY_TEST_MODE_ON);
+      $logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_TEST_MODE_ON));
       return self::BASE_URL_SANDBOX;
     }
 
-    $logger->debug(self::LOG_KEY_TEST_MODE_OFF);
+    $logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_TEST_MODE_OFF));
     return self::BASE_URL_API;
   }
 
