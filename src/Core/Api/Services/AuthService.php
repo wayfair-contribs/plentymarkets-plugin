@@ -126,11 +126,17 @@ class AuthService implements AuthenticationContract
     // php copies arrays
     $args_for_logging = $arguments;
     $needsMask = [self::CLIENT_ID, self::CLIENT_SECRET];
-    foreach($needsMask as $key)
+    foreach($args_for_logging as $arg)
     {
-      if (array_key_exists($key, $args_for_logging))
+      if (is_array($arg))
       {
-        $args_for_logging[$key] = StringHelper::mask($args_for_logging[$key]);
+        foreach($needsMask as $key)
+        {
+          if (array_key_exists($key, $args_for_logging))
+          {
+            $args_for_logging[$key] = StringHelper::mask($args_for_logging[$key]);
+          }
+        }
       }
     }
     $this->loggerContract
