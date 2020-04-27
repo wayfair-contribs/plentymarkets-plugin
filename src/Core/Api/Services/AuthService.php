@@ -205,7 +205,7 @@ class AuthService implements AuthenticationContract
   {
     return (!isset($token)  || empty($token)
       || !isset($token[self::ACCESS_TOKEN]) || empty($token[self::ACCESS_TOKEN])
-      || !isset($token[self::STORE_TIME]) || empty($token[self::ACCESS_TOKEN])
+      || !isset($token[self::STORE_TIME]) || empty($token[self::STORE_TIME])
       || !isset($token[self::EXPIRES_IN]) || empty($token[self::EXPIRES_IN])
       || ($token[self::EXPIRES_IN] + $token[self::STORE_TIME]) < time());
   }
