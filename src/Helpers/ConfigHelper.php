@@ -173,7 +173,13 @@ class ConfigHelper implements ConfigHelperContract
      * @var LoggerContract $logger
      */
     $logger = pluginApp(LoggerContract::class);
-    $logger->info(TranslationHelper::getLoggerKey($log_key));
+    $logger->info(
+      TranslationHelper::getLoggerKey($log_key),
+      [
+        'additionalInfo' => [],
+        'method' => __METHOD__
+      ]
+    );
 
     return $result;
   }
