@@ -189,10 +189,7 @@ class AuthService implements AuthenticationContract
   public function isTokenExpired(string $audience)
   {
     $token = $this->getStoredTokenModel($audience);
-
-    $wayfairAudience = $this->urlHelperContract->getWayfairAudience($audience);
-
-    return self->isTokenDataExpired($token);
+    return self::isTokenDataExpired($token);
   }
 
   /**
@@ -201,7 +198,7 @@ class AuthService implements AuthenticationContract
    * @param mixed $token
    * @return bool
    */
-  private function isTokenDataExpired($token)
+  private static function isTokenDataExpired($token)
   {
     return (!isset($token)  || empty($token)
       || !isset($token[self::ACCESS_TOKEN]) || empty($token[self::ACCESS_TOKEN])

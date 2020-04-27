@@ -130,7 +130,7 @@ class WayfairServiceProvider extends ServiceProvider
         );
       }
 
-      
+      $this->clearAuthTokens();
 
     } finally {
       // TODO: remove when "logging during boot" bug is fixed by PM
@@ -149,7 +149,7 @@ class WayfairServiceProvider extends ServiceProvider
     /**
      * @var AuthenticationContract $authContract
      */
-    $authContract = PluginApp(AuthenticationContract::class);
+    $authContract = pluginApp(AuthenticationContract::class);
 
     $authContract->deleteOAuthToken(URLHelper::BASE_URL_API);
     $authContract->deleteOAuthToken(URLHelper::BASE_URL_SANDBOX);
