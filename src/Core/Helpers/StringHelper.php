@@ -18,15 +18,15 @@ class StringHelper {
    *
    * @return string
    */
-  public static function maskString($string, $start = 1, $length = -1 ) {
+  public static function maskString($string, $start = 1, $finish = -1 ) {
     $mask = preg_replace("/\S/", "*", $string);
 
     if (empty($string)){
       return '';
     }
 
-    $mask = substr ( $mask, $start, $length );
-    $str = substr_replace ( $string, $mask, $start, $length );
+    $mask = substr ( $mask, $start, $finish );
+    $str = substr_replace ( $string, $mask, $start, $finish );
     return $str;
   }
 }
