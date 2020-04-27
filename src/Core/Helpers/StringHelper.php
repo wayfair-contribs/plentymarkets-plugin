@@ -8,8 +8,7 @@
 namespace Wayfair\Helpers;
 
 class StringHelper {
-  const START = 1;
-  const END = -1;
+
   /**
    * Function that hides characters in a string, will default to the first and last characters being visible.
    *
