@@ -11,6 +11,7 @@ use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Helpers\URLHelper;
 use Wayfair\Helpers\ConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
+use Wayfair\Helpers\StringHelper;
 use Wayfair\Http\WayfairResponse;
 
 class APIService {
@@ -88,10 +89,20 @@ class APIService {
             'headers' => $headers
         ]
     ];
+
+    // php copies arrays
+    $args_for_logging = $arguments;
+    $needsMask = ['Authorization'];
+    foreach ($needsMask as $key) {
+      if (array_key_exists($key, $args_for_logging)) {
+        $args_for_logging[$key] = StringHelper::maskString($args_for_logging[$key]);
+      }
+    }
+
     $this->loggerContract
         ->debug(TranslationHelper::getLoggerKey('apiService'), ['additionalInfo' => [
           'url' => $url,
-          'arguments' => [$url, $arguments[1]['json']]
+          'arguments' => $args_for_logging
         ], 'method' => __METHOD__]);
 
     return $this->client->call($method, $arguments);

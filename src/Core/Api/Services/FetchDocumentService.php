@@ -11,6 +11,7 @@ use Wayfair\Core\Dto\ShippingLabel\ResponseDTO;
 use Wayfair\Core\Helpers\URLHelper;
 use Wayfair\Helpers\ConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
+use Wayfair\Helpers\StringHelper;
 
 /**
  * Class FetchShippingLabelService
@@ -58,7 +59,7 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
         $this->loggerContract
           ->error(
             TranslationHelper::getLoggerKey('cannotCallWayfairAPI'), [
-              'additionalInfo' => ['url' => $url],
+              'additionalInfo' => ['url' => $url, 'accessToken' => StringHelper::maskString($this->authService->getOAuthToken())],
               'method' => __METHOD__
             ]
           );
