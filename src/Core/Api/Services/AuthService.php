@@ -282,6 +282,11 @@ class AuthService implements AuthenticationContract
   public function deleteOAuthToken(string $audience)
   {
     $key = self::getKeyForToken($audience);
-    $this->store->remove($key);
+    if (isset($key) && !empty($key))
+    {
+      $this->loggerContract
+      ->debug(TranslationHelper::getLoggerKey('deletingToken'), ['audience' => $audience, 'method' => __METHOD__]);
+      $this->store->remove($key);
+    }
   }
 }

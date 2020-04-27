@@ -151,7 +151,21 @@ class WayfairServiceProvider extends ServiceProvider
      */
     $authContract = pluginApp(AuthenticationContract::class);
 
+    $this->getLogger(__METHOD__)->debug(
+      TranslationHelper::getLoggerKey('debugTokenFlush'),
+      [
+        'status'   => 'starting'
+      ]
+    );
+
     $authContract->deleteOAuthToken(URLHelper::BASE_URL_API);
     $authContract->deleteOAuthToken(URLHelper::BASE_URL_SANDBOX);
+
+    $this->getLogger(__METHOD__)->debug(
+      TranslationHelper::getLoggerKey('debugTokenFlush'),
+      [
+        'status'   => 'ended'
+      ]
+    );
   }
 }
