@@ -46,6 +46,7 @@ class WayfairServiceProvider extends ServiceProvider
 {
   use Loggable;
 
+  private static $tokensCleared = false; 
 
   /**
    * Register the service provider.
@@ -130,7 +131,12 @@ class WayfairServiceProvider extends ServiceProvider
         );
       }
 
-      $this->clearAuthTokens();
+      if (!self::$tokensCleared)
+      {
+        $this->clearAuthTokens();
+        self::$tokensCleared = true;
+      }
+      
 
     } finally {
       // TODO: remove when "logging during boot" bug is fixed by PM
