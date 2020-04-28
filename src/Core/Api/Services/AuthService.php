@@ -28,7 +28,7 @@ class AuthService implements AuthenticationContract
   const CLIENT_ID = 'client_id';
   const CLIENT_SECRET = 'client_secret';
 
-  private static final $private_info_keys = [self::CLIENT_ID, self::CLIENT_SECRET];
+  const PRIVATE_INFO_KEYS = [self::CLIENT_ID, self::CLIENT_SECRET];
 
   // stores information about authentications since boot, to avoid using tokens from before boot
   private static $authSinceBoot = [];
@@ -312,7 +312,7 @@ class AuthService implements AuthenticationContract
     $cleanedArgs = $originalArgs;
     foreach ($cleanedArgs as &$arg) {
       if (is_array($arg)) {
-        foreach (self::$private_info_keys as $key) {
+        foreach (self::PRIVATE_INFO_KEYS as $key) {
           if (array_key_exists($key, $arg)) {
             $arg[$key] = StringHelper::mask($arg[$key]);
           }
