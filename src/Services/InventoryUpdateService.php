@@ -185,27 +185,31 @@ class InventoryUpdateService
       // TODO: consider failing out of one item / one page instead of failing the whole sync
       $externalLogs->addInventoryLog('Inventory: ' . $e->getMessage(), 'inventoryFailed' . ($fullInventory ? 'Full' : ''), 1, 0, false);
 
+      $exceptionType = get_class($e);
       $msg = $e->getMessage();
       $stack = $e->getTrace();
       $lenStack = count($stack);
       $lenMsg = strlen($msg);
 
-      // if ($lenStack > 3)
-      // {
-      //   // truncate the stack to avoid PM saying the log message is too large
-      //   $stack = array_slice($stack, 0, 3);
-      //   $stack[] = '...';
-      // }
-
-      if ($lenMsg > 32)
+      if ($lenStack > 2)
       {
-        $msg = substr($msg, 0, 32);
+        // truncate the stack to avoid PM saying the log message is too large
+        $stack = array_slice($stack, 0, 2);
+        $stack[] = '...';
+      }
+
+      if ($lenMsg > 16)
+      {
+        // message is over 300k here!
+        $msg = substr($msg, 0, 16);
       }
 
       $loggerContract->error(
         TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_ERROR),
         [
           'additionalInfo' => [
+            'exceptionType' => $exceptionType,
+            'message' => $msg,
             'lenStack' => $lenStack,
             'lenMsg' => $lenMsg
           ],
