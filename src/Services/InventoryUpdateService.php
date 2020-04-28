@@ -196,9 +196,9 @@ class InventoryUpdateService
         $stack[] = '...';
       }
 
-      if ($lenMsg > 255)
+      if ($lenMsg > 32)
       {
-        $msg = substr($msg, 0, 255);
+        $msg = substr($msg, 0, 32);
       }
 
       $loggerContract->error(
@@ -206,7 +206,6 @@ class InventoryUpdateService
         [
           'additionalInfo' => [
             'message' => $msg,
-            'stackTrace' => $stack,
             'lenStack' => $lenStack,
             'lenMsg' => $lenMsg
           ],
