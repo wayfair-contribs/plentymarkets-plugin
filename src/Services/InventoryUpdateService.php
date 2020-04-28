@@ -188,7 +188,7 @@ class InventoryUpdateService
       $msg = $e->getMessage();
       $stack = $e->getTrace();
       $lenStack = count($stack);
-      $lenMsg = count($msg);
+      $lenMsg = strlen($msg);
 
       // if ($lenStack > 3)
       // {
@@ -197,10 +197,10 @@ class InventoryUpdateService
       //   $stack[] = '...';
       // }
 
-      // if ($lenMsg > 32)
-      // {
-      //   $msg = substr($msg, 0, 32);
-      // }
+      if ($lenMsg > 32)
+      {
+        $msg = substr($msg, 0, 32);
+      }
 
       $loggerContract->error(
         TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_ERROR),
