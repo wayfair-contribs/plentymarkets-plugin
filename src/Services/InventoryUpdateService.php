@@ -189,23 +189,23 @@ class InventoryUpdateService
       $stack = $e->getTrace();
       $lenStack = count($stack);
       $lenMsg = count($msg);
-      if ($lenStack > 3)
-      {
-        // truncate the stack to avoid PM saying the log message is too large
-        $stack = array_slice($stack, 0, 3);
-        $stack[] = '...';
-      }
 
-      if ($lenMsg > 32)
-      {
-        $msg = substr($msg, 0, 32);
-      }
+      // if ($lenStack > 3)
+      // {
+      //   // truncate the stack to avoid PM saying the log message is too large
+      //   $stack = array_slice($stack, 0, 3);
+      //   $stack[] = '...';
+      // }
+
+      // if ($lenMsg > 32)
+      // {
+      //   $msg = substr($msg, 0, 32);
+      // }
 
       $loggerContract->error(
         TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_ERROR),
         [
           'additionalInfo' => [
-            'message' => $msg,
             'lenStack' => $lenStack,
             'lenMsg' => $lenMsg
           ],
