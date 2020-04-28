@@ -110,31 +110,57 @@ class AuthService implements AuthenticationContract
     $method = 'post';
     $client_id = $this->configHelperContract->getWayfairClientId();
     $client_secret = $this->configHelperContract->getWayfairClientSecret();
+
+    $headersArray = [
+      'Content-Type' => 'application/json',
+      ConfigHelperContract::WAYFAIR_INTEGRATION_HEADER => ConfigHelperContract::INTEGRATION_AGENT_NAME
+    ];
+
+    $bodyArray =  [
+      self::CLIENT_ID => $client_id,
+      self::CLIENT_SECRET => $client_secret,
+      'audience' => $audience,
+      'grant_type' => 'client_credentials'
+    ];
+
     $arguments = [
       $this->urlHelperContract->getWayfairAuthenticationUrl(),
       [
-        'headers' => [
-          'Content-Type' => 'application/json',
-          ConfigHelperContract::WAYFAIR_INTEGRATION_HEADER => ConfigHelperContract::INTEGRATION_AGENT_NAME
-        ],
-        'body' => json_encode(
-          [
-            self::CLIENT_ID => $client_id,
-            self::CLIENT_SECRET => $client_secret,
-            'audience' => $audience,
-            'grant_type' => 'client_credentials'
-          ]
-        )
+        'headers' => $headersArray,
+        'body' => json_encode($bodyArray)
       ]
     ];
+    
+    // make sanitized versions for logging
+    $maskedHeaders = $headersArray;
+    $maskedBody = $bodyArray;
+    $maskedArrays = [$maskedBody, $maskedHeaders];
+    foreach (self::PRIVATE_INFO_KEYS as $pik)
+    {
+      foreach($maskedArrays as &$masked)
+      {
+        if (array_key_exists($pik, $masked))
+        {
+            $masked[$pik] = StringHelper::mask($masked[$pik]);
+        }
+      }
+    }
 
-    $args_for_logging = self::cleanAuthArgsForLogging($arguments);
     $this->loggerContract
-      ->debug(TranslationHelper::getLoggerKey('attemptingAuthentication'), ['additionalInfo' => $args_for_logging, 'method' => __METHOD__]);
+      ->debug(
+        TranslationHelper::getLoggerKey('attemptingAuthentication'),
+        [
+          'additionalInfo' =>
+          [
+            'headers' => $maskedHeaders,
+            'body' => $maskedBody
+          ],
+          'method' => __METHOD__
+        ]
+      );
 
     return $this->client->call($method, $arguments);
   }
-
 
   /**
    * @param string $audience
@@ -183,12 +209,10 @@ class AuthService implements AuthenticationContract
   public function isTokenExpired(string $audience)
   {
     $wayfairAudience = $this->urlHelperContract->getWayfairAudience($audience);
-    
-    if (isset($wayfairAudience) && !empty($wayfairAudience)) 
-    {
+
+    if (isset($wayfairAudience) && !empty($wayfairAudience)) {
       $testingSetting = $this->configHelperContract->isTestingEnabled();
-      if (! in_array($testingSetting, self::$authSinceBoot))
-      {
+      if (!in_array($testingSetting, self::$authSinceBoot)) {
         // haven't used a Wayfair token for this "mode" since boot
         // so don't use token stored in the DB!
 
@@ -291,36 +315,11 @@ class AuthService implements AuthenticationContract
   public function deleteOAuthToken(string $audience)
   {
     $key = self::getKeyForToken($audience);
-    if (isset($key) && !empty($key))
-    {
+    if (isset($key) && !empty($key)) {
       $this->loggerContract
-      ->debug(TranslationHelper::getLoggerKey('deletingToken'), ['audience' => $audience, 'method' => __METHOD__]);
+        ->debug(TranslationHelper::getLoggerKey('deletingToken'), ['audience' => $audience, 'method' => __METHOD__]);
       $this->store->remove($key);
     }
   }
-
-  /**
-   * Clean arguments up before putting them into logs,
-   * Recursively going into arrays if needed.
-   *
-   * @param mixed[] $originalArgs
-   * @return mixed[]
-   */
-  private static function cleanAuthArgsForLogging($originalArgs)
-  {
-    // copy original args
-    $cleanedArgs = $originalArgs;
-    foreach ($cleanedArgs as &$arg) {
-      if (is_array($arg)) {
-        foreach (self::PRIVATE_INFO_KEYS as $key) {
-          if (array_key_exists($key, $arg)) {
-            $arg[$key] = StringHelper::mask($arg[$key]);
-          }
-        }
-        // go into arrays within arrays
-        self::cleanAuthArgsForLogging($arg);
-      }
-    }
-    return $cleanedArgs;
-  }
 }
+
