@@ -187,11 +187,18 @@ class InventoryUpdateService
 
       $msg = $e->getMessage();
       $stack = $e->getTrace();
-      if (count($stack) > 3)
+      $lenStack = count($stack);
+      $lenMsg = count($msg);
+      if ($lenStack > 3)
       {
         // truncate the stack to avoid PM saying the log message is too large
         $stack = array_slice($stack, 0, 3);
         $stack[] = '...';
+      }
+
+      if ($lenMsg > 255)
+      {
+        $msg = substr($msg, 0, 255);
       }
 
       $loggerContract->error(
@@ -200,6 +207,8 @@ class InventoryUpdateService
           'additionalInfo' => [
             'message' => $msg,
             'stackTrace' => $stack,
+            'lenStack' => $lenStack,
+            'lenMsg' => $lenMsg;
           ],
           'method' => __METHOD__
         ]
