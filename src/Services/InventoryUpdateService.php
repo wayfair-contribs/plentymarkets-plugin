@@ -210,6 +210,7 @@ class InventoryUpdateService
           'additionalInfo' => [
             'exceptionType' => $exceptionType,
             'message' => $msg,
+            'stackTrace' => $stack,
             'lenStack' => $lenStack,
             'lenMsg' => $lenMsg
           ],
