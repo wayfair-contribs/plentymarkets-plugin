@@ -28,6 +28,8 @@ class AuthService implements AuthenticationContract
   const CLIENT_ID = 'client_id';
   const CLIENT_SECRET = 'client_secret';
 
+  private static final $private_info_keys = [self::CLIENT_ID, self::CLIENT_SECRET];
+
   // stores information about authentications since boot, to avoid using tokens from before boot
   private static $authSinceBoot = [];
 
@@ -126,18 +128,7 @@ class AuthService implements AuthenticationContract
       ]
     ];
 
-    // php copies arrays
-    $args_for_logging = $arguments;
-    $needsMask = [self::CLIENT_ID, self::CLIENT_SECRET];
-    foreach ($args_for_logging as &$arg) {
-      if (is_array($arg)) {
-        foreach ($needsMask as $key) {
-          if (array_key_exists($key, $arg)) {
-            $arg[$key] = StringHelper::mask($arg[$key]);
-          }
-        }
-      }
-    }
+    $args_for_logging = self::cleanAuthArgsForLogging($arguments);
     $this->loggerContract
       ->debug(TranslationHelper::getLoggerKey('attemptingAuthentication'), ['additionalInfo' => $args_for_logging, 'method' => __METHOD__]);
 
@@ -306,5 +297,30 @@ class AuthService implements AuthenticationContract
       ->debug(TranslationHelper::getLoggerKey('deletingToken'), ['audience' => $audience, 'method' => __METHOD__]);
       $this->store->remove($key);
     }
+  }
+
+  /**
+   * Clean arguments up before putting them into logs,
+   * Recursively going into arrays if needed.
+   *
+   * @param mixed[] $originalArgs
+   * @return mixed[]
+   */
+  private static function cleanAuthArgsForLogging($originalArgs)
+  {
+    // copy original args
+    $cleanedArgs = $originalArgs;
+    foreach ($cleanedArgs as &$arg) {
+      if (is_array($arg)) {
+        foreach (self::$private_info_keys as $key) {
+          if (array_key_exists($key, $arg)) {
+            $arg[$key] = StringHelper::mask($arg[$key]);
+          }
+        }
+        // go into arrays within arrays
+        self::cleanAuthArgsForLogging($arg);
+      }
+    }
+    return $cleanedArgs;
   }
 }
