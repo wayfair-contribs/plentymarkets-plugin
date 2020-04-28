@@ -20,6 +20,9 @@ use Wayfair\Http\WayfairResponse;
 
 class AuthService implements AuthenticationContract
 {
+  const LOG_KEY_ATTEMPTING_AUTH = 'attemptingAuthentication';
+  const LOG_KEY_DELETING_TOKEN = 'deletingToken';
+  const LOG_KEY_NON_WAYFAIR = 'cannotAuthenticateNonWayfair';
 
   const EXPIRES_IN = 'expires_in';
   const ACCESS_TOKEN = 'access_token';
@@ -30,8 +33,12 @@ class AuthService implements AuthenticationContract
 
   const PRIVATE_INFO_KEYS = [self::CLIENT_ID, self::CLIENT_SECRET];
 
-  // stores information about authentications since boot, to avoid using tokens from before boot
-  private static $authSinceBoot = [];
+  /**
+   * stores information about authentications since boot, to avoid using tokens from before boot
+   *
+   * @var mixed[]
+   */ 
+  private static $authSinceBoot = null;
 
   /**
    * @var StorageInterfaceContract
@@ -92,7 +99,17 @@ class AuthService implements AuthenticationContract
     $wayfairAudience = $this->urlHelperContract->getWayfairAudience($audience);
 
     if (!isset($wayfairAudience) || empty($wayfairAudience)) {
-      // TODO: log about this - we only handle wayfair API authentication
+      $this->loggerContract
+      ->warning(
+        TranslationHelper::getLoggerKey(self::LOG_KEY_NON_WAYFAIR),
+        [
+          'additionalInfo' =>
+          [
+            'audience' => $audience
+          ],
+          'method' => __METHOD__
+        ]
+      );
       return null;
     }
 
@@ -148,7 +165,7 @@ class AuthService implements AuthenticationContract
 
     $this->loggerContract
       ->debug(
-        TranslationHelper::getLoggerKey('attemptingAuthentication'),
+        TranslationHelper::getLoggerKey(self::LOG_KEY_ATTEMPTING_AUTH),
         [
           'additionalInfo' =>
           [
@@ -317,9 +334,8 @@ class AuthService implements AuthenticationContract
     $key = self::getKeyForToken($audience);
     if (isset($key) && !empty($key)) {
       $this->loggerContract
-        ->debug(TranslationHelper::getLoggerKey('deletingToken'), ['audience' => $audience, 'method' => __METHOD__]);
+        ->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_DELETING_TOKEN), ['audience' => $audience, 'method' => __METHOD__]);
       $this->store->remove($key);
     }
   }
 }
-
