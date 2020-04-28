@@ -208,7 +208,7 @@ class InventoryUpdateService
             'message' => $msg,
             'stackTrace' => $stack,
             'lenStack' => $lenStack,
-            'lenMsg' => $lenMsg;
+            'lenMsg' => $lenMsg
           ],
           'method' => __METHOD__
         ]
