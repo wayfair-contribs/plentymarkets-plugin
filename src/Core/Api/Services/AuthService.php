@@ -134,7 +134,7 @@ class AuthService implements AuthenticationContract
     // make sanitized versions for logging
     $maskedHeaders = $headersArray;
     $maskedBody = $bodyArray;
-    $maskedArrays = [$maskedBody, $maskedHeaders];
+    $maskedArrays = [&$maskedBody, &$maskedHeaders];
     foreach (self::PRIVATE_INFO_KEYS as $pik)
     {
       foreach($maskedArrays as &$masked)
