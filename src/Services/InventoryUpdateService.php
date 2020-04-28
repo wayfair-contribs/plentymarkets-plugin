@@ -187,7 +187,7 @@ class InventoryUpdateService
 
       $msg = $e->getMessage();
       $stack = $e->getTrace();
-      if (count($stack > 3))
+      if (count($stack) > 3)
       {
         // truncate the stack to avoid PM saying the log message is too large
         $stack = array_slice($stack, 0, 3);
