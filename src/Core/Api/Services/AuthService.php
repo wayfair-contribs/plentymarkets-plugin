@@ -28,6 +28,9 @@ class AuthService implements AuthenticationContract
   const CLIENT_ID = 'client_id';
   const CLIENT_SECRET = 'client_secret';
 
+  // stores information about authentications since boot, to avoid using tokens from before boot
+  private static $authSinceBoot = [];
+
   /**
    * @var StorageInterfaceContract
    */
@@ -188,6 +191,21 @@ class AuthService implements AuthenticationContract
    */
   public function isTokenExpired(string $audience)
   {
+    $wayfairAudience = $this->urlHelperContract->getWayfairAudience($audience);
+    
+    if (isset($wayfairAudience) && !empty($wayfairAudience)) 
+    {
+      $testingSetting = $this->configHelperContract->isTestingEnabled();
+      if (! in_array($testingSetting, self::$authSinceBoot))
+      {
+        // haven't used a Wayfair token for this "mode" since boot
+        // so don't use token stored in the DB!
+
+        self::$authSinceBoot[] = $testingSetting;
+        return true;
+      }
+    }
+
     $token = $this->getStoredTokenModel($audience);
     return self::isTokenDataExpired($token);
   }

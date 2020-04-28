@@ -129,7 +129,8 @@ class WayfairServiceProvider extends ServiceProvider
         );
       }
 
-     // FIXME: stopped calling clearAuthTokens here because it was being run constantly!
+     // TODO: find a way to clear cached auth tokens on deploy
+     // putting the code for that in here makes it run MANY times / constantly!
 
     } finally {
       // TODO: remove when "logging during boot" bug is fixed by PM
@@ -137,34 +138,4 @@ class WayfairServiceProvider extends ServiceProvider
     }
   }
 
-  /**
-   * Clear old Wayfair OAuth tokens out of the DB
-   * To ensure that we authenticate on first use after boot
-   *
-   * @return void
-   */
-  private function clearAuthTokens()
-  {
-    /**
-     * @var AuthenticationContract $authContract
-     */
-    $authContract = pluginApp(AuthenticationContract::class);
-
-    $this->getLogger(__METHOD__)->debug(
-      TranslationHelper::getLoggerKey('debugTokenFlush'),
-      [
-        'status'   => 'starting'
-      ]
-    );
-
-    $authContract->deleteOAuthToken(URLHelper::BASE_URL_API);
-    $authContract->deleteOAuthToken(URLHelper::BASE_URL_SANDBOX);
-
-    $this->getLogger(__METHOD__)->debug(
-      TranslationHelper::getLoggerKey('debugTokenFlush'),
-      [
-        'status'   => 'ended'
-      ]
-    );
-  }
 }
