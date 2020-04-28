@@ -15,7 +15,7 @@ use Wayfair\Repositories\KeyValueRepository;
 class FullInventoryService
 {
   const LOG_KEY_DEBUG = 'debugInventoryUpdate';
-  const LOG_KEY_INVENTORY_UPDATE_ERROR = 'inventoryUpdateError';
+  const LOG_KEY_FULL_INVENTORY_UPDATE_ERROR = 'fullInventoryUpdateError';
   const LOG_KEY_SKIPPED = 'fullInventorySkipped';
   const LOG_KEY_START = 'fullInventoryStart';
   const LOG_KEY_END = 'fullInventoryEnd';
@@ -69,7 +69,7 @@ class FullInventoryService
           $result = $inventoryUpdateService->sync(true);
           $status = 'OK';
         } catch (\Exception $e) {
-          $loggerContract->error(TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_ERROR), [
+          $loggerContract->error(TranslationHelper::getLoggerKey(self::LOG_KEY_FULL_INVENTORY_UPDATE_ERROR), [
             'additionalInfo' => ['manual' => (string)$manual, 'message' => $e->getMessage()],
             'method' => __METHOD__
           ]);

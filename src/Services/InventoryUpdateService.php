@@ -19,6 +19,7 @@ use Wayfair\Models\ExternalLogs;
 class InventoryUpdateService
 {
   const LOG_KEY_DEBUG = 'debugInventoryUpdate';
+  const LOG_KEY_INVALID_INVENTORY_UPDATE = 'invalidInventoryUpdate';
   const LOG_KEY_INVENTORY_UPDATE_END = 'inventoryUpdateEnd';
   const LOG_KEY_INVENTORY_UPDATE_ERROR = 'inventoryUpdateError';
   const LOG_KEY_INVENTORY_UPDATE_START = 'inventoryUpdateStart';
@@ -53,10 +54,9 @@ class InventoryUpdateService
       return true;
     }
 
-    // TODO: add explicit log message about this validation failure
     $loggerContract
       ->error(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_ERROR), [
+        TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_INVENTORY_UPDATE), [
           'additionalInfo' => [
             'message' => 'inventory request data is invalid',
             'data' => $inventoryRequestDTO->toArray(),
@@ -185,13 +185,21 @@ class InventoryUpdateService
       // TODO: consider failing out of one item / one page instead of failing the whole sync
       $externalLogs->addInventoryLog('Inventory: ' . $e->getMessage(), 'inventoryFailed' . ($fullInventory ? 'Full' : ''), 1, 0, false);
 
+      $msg = $e->getMessage();
+      $stack = $e->getTrace();
+      if (count($stack > 3))
+      {
+        // truncate the stack to avoid PM saying the log message is too large
+        $stack = array_slice($stack, 0, 3);
+        $stack[] = '...';
+      }
+
       $loggerContract->error(
         TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_ERROR),
         [
           'additionalInfo' => [
-            'exception' => $e,
-            'message' => $e->getMessage(),
-            'stackTrace' => $e->getTrace(),
+            'message' => $msg,
+            'stackTrace' => $stack,
           ],
           'method' => __METHOD__
         ]
