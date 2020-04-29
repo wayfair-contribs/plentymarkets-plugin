@@ -21,6 +21,11 @@ class InventoryService extends APIService
   const LOG_KEY_INVENTORY_QUERY_ERROR = 'inventoryQueryError';
   const LOG_KEY_INVENTORY_QUERY_DEBUG = 'debugInventoryQuery';
 
+  const RESPONSE_KEY_ERRORS = 'errors';
+  const RESPONSE_KEY_DATA = 'data';
+  const RESPONSE_DATA_KEY_INVENTORY = 'inventory';
+  const RESPONSE_INVENTORY_KEY_SAVE = 'save';
+
   /**
    *
    * @return WayfairResponse
@@ -138,33 +143,35 @@ class InventoryService extends APIService
       $response = $this->query($queryData['query'], 'post', $queryData['variables']);
 
       $responseBody = $response->getBodyAsArray();
+      $reponseErrors = $responseBody[self::RESPONSE_KEY_ERRORS];
 
-      if (isset($responseBody['errors'])) {
+      if (isset($reponseErrors)) {
         throw new \Exception("Unable to update inventory due to errors." .
-          " Response from  Wayfair: " . \json_encode($responseBody));
+          " Response from  Wayfair: " . \json_encode($reponseErrors));
       }
 
-      if (!isset($responseBody['data'])) {
-        throw new \Exception("Unable to update inventory - no data in response. " .
-          " Response from  Wayfair: " . \json_encode($responseBody));
+      $response_data_array = $responseBody[self::RESPONSE_KEY_DATA];
+
+      if (!isset($response_data_array)) {
+        throw new \Exception("Unable to update inventory - no data element in response. " .
+          " Errors from  Wayfair: " . \json_encode($responseBody));
       }
 
-      $response_data_array = $responseBody['data'];
+      $inventory = $response_data_array[self::RESPONSE_DATA_KEY_INVENTORY];
 
-      if (!isset($response_data_array['inventory'])) {
+      if (!isset($inventory)) {
         throw new \Exception("Unable to update inventory - no inventory data in response. " .
           " Response from  Wayfair: " . \json_encode($responseBody));
       }
 
-      $inventory = $response_data_array['inventory'];
+      $inventorySave = $inventory[self::RESPONSE_INVENTORY_KEY_SAVE];
 
-      if (!isset($inventory['save'])) {
+      if (!isset($inventorySave)) {
         throw new \Exception("Unable to update inventory - no save data in inventory area of response. " .
           " Response from  Wayfair: " . \json_encode($responseBody));
       }
 
-
-      return ResponseDTO::createFromArray($inventory['save']);
+      return ResponseDTO::createFromArray($inventorySave);
     } finally {
       if (count($externalLogs->getLogs())) {
         /** @var LogSenderService $logSenderService */

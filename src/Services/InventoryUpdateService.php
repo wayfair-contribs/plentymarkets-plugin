@@ -198,10 +198,10 @@ class InventoryUpdateService
         $stack[] = '...';
       }
 
-      if ($lenMsg > 16)
+      if ($lenMsg > 64)
       {
         // message is over 300k here!
-        $msg = substr($msg, 0, 16);
+        $msg = substr($msg, 0, 64);
       }
 
       $loggerContract->error(
