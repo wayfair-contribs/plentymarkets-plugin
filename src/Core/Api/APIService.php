@@ -91,18 +91,26 @@ class APIService {
     ];
 
     // php copies arrays
-    $args_for_logging = $arguments;
+    $header_for_logging = $headers;
+
     $needsMask = ['Authorization'];
     foreach ($needsMask as $key) {
-      if (array_key_exists($key, $args_for_logging)) {
-        $args_for_logging[$key] = StringHelper::maskString($args_for_logging[$key]);
+      if (array_key_exists($key, $header_for_logging)) {
+        $header_for_logging[$key] = StringHelper::maskString($header_for_logging[$key]);
       }
     }
 
+    // Array containing log relevant information
+    $body_for_logging = [
+      'query' => $query,
+      'variables' => $variables
+    ];
+
     $this->loggerContract
         ->debug(TranslationHelper::getLoggerKey('apiService'), ['additionalInfo' => [
-          'url' => $url,
-          'arguments' => $args_for_logging
+          'URL' => $url,
+          'Header' => $header_for_logging,
+          'Body' => $body_for_logging
         ], 'method' => __METHOD__]);
 
     return $this->client->call($method, $arguments);
