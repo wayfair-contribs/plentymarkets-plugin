@@ -1,6 +1,6 @@
 ﻿# Versionshinweise für Wayfair
 
-## v1.1.2 (2020-02-04)
+## v1.1.2 (2020-05-15)
 - Unterstützung für die Synchronisierung paginierter Bestände hinzufügen
 - Das Herunterladen leerer Dokumente auf Plentymärkte wurde behoben
 - Erhöhte Protokollierung
