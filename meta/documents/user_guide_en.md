@@ -280,3 +280,12 @@ In order to update the inventory data in Wayfair's system, you need to map the w
 
 The final settings result should look similar to this:
 ![Add Procedure Result](https://i.ibb.co/GJPF3ZV/asn-06.png "Add Procedure Result")
+
+## Tips and tricks
+
+### Protecting your credentials
+The credentials that your Plentymarkets system uses for communication with Wayfair should not be shared with anyone. You should take care to avoid doing these things:
+
+* Forwarding Wayfair emails
+* Sharing screenshots of the Global Settings for the Wayfair plugin
+* Exporting the settings of a Plugin Set that contains the Wayfair plugin

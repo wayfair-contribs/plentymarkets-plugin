@@ -1,5 +1,4 @@
-﻿
-# Wayfair Plugin Benutzerhandbuch
+﻿# Wayfair Plugin Benutzerhandbuch
 <div class="container-toc"></div>
 
 ## 1 Registrierung bei Wayfair
@@ -243,3 +242,12 @@ Um die Bestandsdaten im Wayfair-System zu aktualisieren, müssen Sie die Lagern 
 
 Die Einstellungen sollten am Ende so aussehen:
 ![Add Procedure Result](https://i.ibb.co/GJPF3ZV/asn-06.png "Add Procedure Result")
+
+## Tipps und Tricks
+
+### Schutz Ihrer Anmeldeinformationen
+Die Anmeldeinformationen, die Ihr Plentymarkets-System für die Kommunikation mit Wayfair verwendet, sollten nicht an Dritte weitergegeben werden. Sie sollten darauf achten, diese Dinge nicht zu tun:
+
+* Weiterleiten von Wayfair-E-Mails
+* Freigeben von Screenshots der globalen Einstellungen für das Wayfair Plugin
+* Exportieren der Einstellungen eines Plugin-Sets mit dem Wayfair Plugin
