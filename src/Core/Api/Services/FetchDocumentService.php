@@ -53,6 +53,7 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
       $output = curl_exec($ch);
       if (curl_errno($ch)) {
         // FIXME: document is not guaranteed to be at Wayfair - log may be incorrect.
+        // TODO: put anonymous token in log
         $this->loggerContract
           ->error(
             TranslationHelper::getLoggerKey('cannotCallWayfairAPI'),
