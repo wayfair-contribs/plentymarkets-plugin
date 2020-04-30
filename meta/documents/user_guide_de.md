@@ -21,9 +21,9 @@ Die Installation des Wayfair-Plugins ermöglicht die folgenden automatischen Pro
 
 ## 2 Rufen Sie Ihre Anmeldeinformationen ab
 
-Um Wayfair mit plentymarkets zu verbinden, müssen Sie API-Anmeldeinformationen eingeben. Um diese zu erhalten, müssen Sie zuerst eine E-Mail an ERPSupport@wayfair.com senden und die folgenden Informationen angeben:
+Um Wayfair mit Plentymarkets zu verbinden, müssen Sie API-Anmeldeinformationen eingeben. Um diese zu erhalten, müssen Sie zuerst eine E-Mail an ERPSupport@wayfair.com senden und die folgenden Informationen angeben:
 
-- Betreff : Zugang zum plentymarkets Plugin / "Name Ihres Unternehmens" (SuID)
+- Betreff : Zugang zum Plentymarkets Plugin / "Name Ihres Unternehmens" (SuID)
 - Ansprechpartner
 - Die Funktionalitäten, die Sie verwenden möchten.
 
@@ -34,13 +34,13 @@ Bewegen Sie den Cursor über den Tab "Developer" und klicken Sie auf "Applicatio
 Klicken Sie auf "Save". Anschlie§end sollten Ihnen eine ClientID und ein Client Secret angezeigt werden. Dies sind Ihre Anmeldeinformationen, die Sie für das Wayfair-Plugin brauchen. Bewahren Sie diese an einem sicheren Ort auf, insbesondere das Client Secret, da Sie es nur einmal sehen können.
 
 
-## 3 Installierung des Wayfair-Plugins in plentymarkets
+## 3 Installierung des Wayfair-Plugins in Plentymarkets
 
 Nachdem Sie das Wayfair-Plugin vom plentyMarketplace heruntergeladet haben, installieren Sie das Plugin im Menü **Plugins >> Plugin-Übersicht**.
 
 ### Authentifizierung
 
-Führen Sie nach der Installation des Plugins in Ihrem plentymarkets-Konto die Authentifizierung aus, um den Zugriff auf die Schnittstelle zu ermöglichen.
+Führen Sie nach der Installation des Plugins in Ihrem Plentymarkets-Konto die Authentifizierung aus, um den Zugriff auf die Schnittstelle zu ermöglichen.
 
 #### Aktivierung des Zugriffs auf die Schnittstelle
 
@@ -79,7 +79,7 @@ Artikel, die Sie auf der Wayfair-Website verkaufen möchten, müssen für Wayfai
 3. Klicken Sie auf den Tab **Verfügbarkeit**.
 
 4. Klicken Sie in das Auswahlfeld im Abschnitt **Märkte**. Eine Liste mit allen verfügbaren Märkten wird angezeigt.
-
+g
 5. Setzen Sie ein Häkchen neben der Option **Wayfair**.
 
 6. Klicken Sie auf **Märkte Wählen**. Der Markt ist jetzt hinzugefügt.
@@ -87,9 +87,9 @@ Artikel, die Sie auf der Wayfair-Website verkaufen möchten, müssen für Wayfai
 7. Klicken Sie auf **Speichern**. Der Artikel ist jetzt für Wayfair verfügbar.
 
 
-### Übereinstimmen einer eingehenden Bestellung mit Ihren Artikeln in plentymarkets:
+### Übereinstimmen einer eingehenden Bestellung mit Ihren Artikeln in Plentymarkets:
 
-Um einen Artikel in der Wayfair-Datenbank, der durch die von Wayfair zur Verfügung gestellte Supplier Item Number definiert ist, mit Ihren Artikeln in plentymarkets abzugleichen, müssen Sie konfigurieren, mit welchem ​​plentymarkets-Feld die Wayfair Supplier Item Number übereinstimmen soll.
+Um einen Artikel in der Wayfair-Datenbank, der durch die von Wayfair zur Verfügung gestellte Supplier Item Number definiert ist, mit Ihren Artikeln in Plentymarkets abzugleichen, müssen Sie konfigurieren, mit welchem ​​Plentymarkets-Feld die Wayfair Supplier Item Number übereinstimmen soll.
 
 Folgen Sie dazu den Anweisungen unten:
 
@@ -97,10 +97,10 @@ Folgen Sie dazu den Anweisungen unten:
 
 2. Wenn die Startseite des Plugins geladen ist, klicken Sie auf ** Einstellungen **.
 
-3. Wählen Sie unter ** Artikelzuordnungsmethode ** das Feld in Ihrem plentymarkets System aus, von dem die Supplier Item Number stammt, die Sie für Wayfair angegeben haben. Sie können aus diesen drei Feldern wählen:
+3. Wählen Sie unter ** Artikelzuordnungsmethode ** das Feld in Ihrem Plentymarkets System aus, von dem die Supplier Item Number stammt, die Sie für Wayfair angegeben haben. Sie können aus diesen drei Feldern wählen:
            ** a. ** * Variationsnummer *
            **b.** *EAN*
-           ** c. ** * Marktplatzspezifische SKU *: Wählen Sie diese Option nur, wenn keines der beiden oben genannten plentymarkets-Felder mit der für Wayfair angegebenen Supplier Item Number übereinstimmt. Wenn Sie sich für diese Option entscheiden, befolgen Sie bitte die nachstehenden Anweisungen (Anpassen einer eingehenden Bestellung mithilfe der marktplatzspezifischen SKU).
+           ** c. ** * Marktplatzspezifische SKU *: Wählen Sie diese Option nur, wenn keines der beiden oben genannten Plentymarkets-Felder mit der für Wayfair angegebenen Supplier Item Number übereinstimmt. Wenn Sie sich für diese Option entscheiden, befolgen Sie bitte die nachstehenden Anweisungen (Anpassen einer eingehenden Bestellung mithilfe der marktplatzspezifischen SKU).
 
 4. Klicken Sie auf ** Speichern **.
 
@@ -190,7 +190,7 @@ Für die automatisierte Auftragsabwicklung mit dem Wayfair-Plugin müssen **Vers
 
 ## 7 Konfigurierung der Lager-Zuordnung
 
-Um die Bestandsdaten im Wayfair-System zu aktualisieren, müssen Sie die Lagern Ihres plentymarkets-Systems der Warehouse-ID im Wayfair-System zuordnen.
+Um die Bestandsdaten im Wayfair-System zu aktualisieren, müssen Sie die Lagern Ihres Plentymarkets-Systems der Warehouse-ID im Wayfair-System zuordnen.
 
 1. Gehen Sie zu **System >> Märkte >> Wayfair >> Home >> Tab: Lager**
 

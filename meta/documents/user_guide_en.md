@@ -1,5 +1,4 @@
-﻿﻿
-# Wayfair plugin user guide
+﻿﻿# Wayfair plugin user guide
 <div class="container-toc"></div>
 
 ## 1. Registering with Wayfair
@@ -21,7 +20,7 @@ The installation of the Wayfair plugin allows for the following automatic proces
 
 In order to connect Wayfair to Plentymarkets, you need to enter API credentials. To receive them, you must first send an email to ERPSupport@wayfair.com and provide the following information:
 
-- Subject : Access to plentymarkets plugin / "Name of your company" (SuID)
+- Subject : Access to Plentymarkets plugin / "Name of your company" (SuID)
 - Information contact
 - Which functionalities you plan to use.
 
@@ -129,8 +128,8 @@ Items that you want to sell on the Wayfair website have to be active and availab
 
 7. Click on **Save**. The item is now available for Wayfair.
 
-### 6. Matching an incoming order with your items in plentymarkets:
-In order to match an item in Wayfair's database, which is defined by the Supplier Part Number you have provided to Wayfair, with your items in plentymarkets, you need to configure which plentymarkets field the Wayfair Supplier Part Number should match with.
+### 6. Matching an incoming order with your items in Plentymarkets:
+In order to match an item in Wayfair's database, which is defined by the Supplier Part Number you have provided to Wayfair, with your items in Plentymarkets, you need to configure which Plentymarkets field the Wayfair Supplier Part Number should match with.
 
 To do so, follow the instructions below:
 
@@ -138,10 +137,10 @@ To do so, follow the instructions below:
 
 2. Once the homepage of the plugin has loaded, click on **Settings**.
 
-3. Under **Item Mapping Method**, choose plentymarkets field from which the Supplier Part Number you provided to Wayfair comes from. You can choose from these three fields:
+3. Under **Item Mapping Method**, choose Plentymarkets field from which the Supplier Part Number you provided to Wayfair comes from. You can choose from these three fields:
            **a.** *Variation No.*
            **b.**  *EAN*
-           **c.** *Marketplace-specific SKU*: choose this option only if none of the two plentymarkets fields above match with the Supplier Part Number you provided to Wayfair. If you choose this option, please follow the instructions below (Matching an incoming order using the marketplace-specific SKU).
+           **c.** *Marketplace-specific SKU*: choose this option only if none of the two Plentymarkets fields above match with the Supplier Part Number you provided to Wayfair. If you choose this option, please follow the instructions below (Matching an incoming order using the marketplace-specific SKU).
 
 4. Click **Save**.
 
@@ -229,7 +228,7 @@ A working order fulfillment with the Wayfair plugin requires to set up **Shippin
 
 ## 7. Configuring the warehouse mapping.
 
-In order to update the inventory data in Wayfair's system, you need to map the warehouse ID's in your plentymarkets system to the warehouse ID in Wayfair's system.
+In order to update the inventory data in Wayfair's system, you need to map the warehouse ID's in your Plentymarkets system to the warehouse ID in Wayfair's system.
 
 1. Go to **System >> Markets >> Wayfair >> Home >> Tab: Warehouses**
 
