@@ -11,9 +11,12 @@ use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Helpers\URLHelper;
 use Wayfair\Helpers\ConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
+use Wayfair\Helpers\StringHelper;
 use Wayfair\Http\WayfairResponse;
 
 class APIService {
+
+  const LOK_KEY_API_SERVICE = 'apiService';
 
   /**
    * @var AuthenticationContract
@@ -58,7 +61,7 @@ class APIService {
       return $this->authService->getOAuthToken();
     } catch (\Exception $e) {
       $this->loggerContract
-          ->error(TranslationHelper::getLoggerKey('apiService'), ['additionalInfo' => ['message' => $e->getMessage()], 'method' => __METHOD__]);
+          ->error(TranslationHelper::getLoggerKey(self::LOG_KEY_API_SERVICE), ['additionalInfo' => ['message' => $e->getMessage()], 'method' => __METHOD__]);
     }
   }
 
@@ -88,10 +91,28 @@ class APIService {
             'headers' => $headers
         ]
     ];
+
+    // php copies arrays
+    $header_for_logging = $headers;
+
+    $needsMask = ['Authorization'];
+    foreach ($needsMask as $key) {
+      if (array_key_exists($key, $header_for_logging)) {
+        $header_for_logging[$key] = StringHelper::mask($header_for_logging[$key]);
+      }
+    }
+
+    // Array containing log relevant information
+    $body_for_logging = [
+      'query' => $query,
+      'variables' => $variables
+    ];
+
     $this->loggerContract
-        ->debug(TranslationHelper::getLoggerKey('apiService'), ['additionalInfo' => [
-          'url' => $url,
-          'arguments' => $arguments
+        ->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_API_SERVICE), ['additionalInfo' => [
+          'URL' => $url,
+          'Header' => $header_for_logging,
+          'Body' => $body_for_logging
         ], 'method' => __METHOD__]);
 
     return $this->client->call($method, $arguments);

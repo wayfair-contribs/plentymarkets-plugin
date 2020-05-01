@@ -11,6 +11,7 @@ use Wayfair\Core\Dto\ShippingLabel\ResponseDTO;
 use Wayfair\Core\Helpers\URLHelper;
 use Wayfair\Helpers\ConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
+use Wayfair\Helpers\StringHelper;
 
 /**
  * Class FetchShippingLabelService
@@ -21,6 +22,7 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
 {
   const LOG_KEY_OBTAINING_TRACKING_NUMBER = 'obtainingTrackingNumber';
   const LOG_KEY_TRACKING_RESPONSE = 'trackingNumberServiceResponse';
+  const LOG_KEY_FAILED_WAYFAIR_API_CALL = 'cannotCallWayfairAPI';
 
   /**
    * Fetch shipping label file from WF server and put it in a ResponseDTO object.
@@ -48,7 +50,7 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
           ]
         );
       }
-      
+
       curl_setopt($ch, CURLOPT_URL, $url);
       curl_setopt($ch, CURLOPT_HEADER, 0);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -57,8 +59,8 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
       if (curl_errno($ch)) {
         $this->loggerContract
           ->error(
-            TranslationHelper::getLoggerKey('cannotCallWayfairAPI'), [
-              'additionalInfo' => ['url' => $url, 'accessToken' => $this->authService->getOAuthToken()],
+            TranslationHelper::getLoggerKey(self::LOG_KEY_FAILED_WAYFAIR_API_CALL), [
+              'additionalInfo' => ['url' => $url, 'accessToken' => StringHelper::mask($this->authService->getOAuthToken())],
               'method' => __METHOD__
             ]
           );
