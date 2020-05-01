@@ -16,7 +16,7 @@ use Wayfair\Http\WayfairResponse;
 
 class APIService {
 
-  const API_SERVICE = 'apiService';
+  const LOK_KEY_API_SERVICE = 'apiService';
 
   /**
    * @var AuthenticationContract
@@ -61,7 +61,7 @@ class APIService {
       return $this->authService->getOAuthToken();
     } catch (\Exception $e) {
       $this->loggerContract
-          ->error(TranslationHelper::getLoggerKey(self::API_SERVICE), ['additionalInfo' => ['message' => $e->getMessage()], 'method' => __METHOD__]);
+          ->error(TranslationHelper::getLoggerKey(self::LOG_KEY_API_SERVICE), ['additionalInfo' => ['message' => $e->getMessage()], 'method' => __METHOD__]);
     }
   }
 
@@ -109,7 +109,7 @@ class APIService {
     ];
 
     $this->loggerContract
-        ->debug(TranslationHelper::getLoggerKey(self::API_SERVICE), ['additionalInfo' => [
+        ->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_API_SERVICE), ['additionalInfo' => [
           'URL' => $url,
           'Header' => $header_for_logging,
           'Body' => $body_for_logging
