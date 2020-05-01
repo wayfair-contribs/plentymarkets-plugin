@@ -59,7 +59,7 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
         $this->loggerContract
           ->error(
             TranslationHelper::getLoggerKey('cannotCallWayfairAPI'), [
-              'additionalInfo' => ['url' => $url, 'accessToken' => StringHelper::maskString($this->authService->getOAuthToken())],
+              'additionalInfo' => ['url' => $url, 'accessToken' => StringHelper::mask($this->authService->getOAuthToken())],
               'method' => __METHOD__
             ]
           );

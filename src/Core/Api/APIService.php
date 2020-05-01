@@ -96,7 +96,7 @@ class APIService {
     $needsMask = ['Authorization'];
     foreach ($needsMask as $key) {
       if (array_key_exists($key, $header_for_logging)) {
-        $header_for_logging[$key] = StringHelper::maskString($header_for_logging[$key]);
+        $header_for_logging[$key] = StringHelper::mask($header_for_logging[$key]);
       }
     }
 
