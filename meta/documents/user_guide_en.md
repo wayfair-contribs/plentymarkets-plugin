@@ -288,4 +288,4 @@ The credentials that your Plentymarkets system uses for communication with Wayfa
 
 * Forwarding Wayfair emails
 * Sharing screenshots of the Global Settings for the Wayfair plugin
-* Exporting the settings of a Plugin Set that contains the Wayfair plugin
+* Exporting the configuration of a Plugin Set that contains the Wayfair plugin

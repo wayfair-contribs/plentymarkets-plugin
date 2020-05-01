@@ -250,4 +250,4 @@ Die Anmeldeinformationen, die Ihr Plentymarkets-System für die Kommunikation mi
 
 * Weiterleiten von Wayfair-E-Mails
 * Freigeben von Screenshots der globalen Einstellungen für das Wayfair Plugin
-* Exportieren der Einstellungen eines Plugin-Sets mit dem Wayfair Plugin
+* Exportieren der Konfiguration eines Plugin-Sets mit dem Wayfair Plugin
