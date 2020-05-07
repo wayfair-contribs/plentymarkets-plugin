@@ -34,34 +34,6 @@ class InventoryMapper {
   }
 
   /**
-   * @param $stockList
-   *
-   * @return array
-   */
-  private function getStockFromWarehouse($stockList) {
-    /**
-     * @var WarehouseSupplierRepository $warehouseSupplierRepository
-     */
-    $warehouseSupplierRepository = pluginApp(WarehouseSupplierRepository::class);
-    $supplierId = null;
-    $warehouseId = null;
-    foreach ($stockList as $stock) {
-      $warehouseId = $stock['warehouseId'];
-      if (isset($warehouseId)) {
-        $warehouseSupplierMapping = $warehouseSupplierRepository->findByWarehouseId($warehouseId);
-        $supplierId = isset($warehouseSupplierMapping) ? $warehouseSupplierMapping->supplierId : null;
-        if (isset($supplierId)) {
-          $stock['supplierId'] = $supplierId;
-
-          return $stock;
-        }
-      }
-    }
-
-    return [];
-  }
-
-  /**
    * @param mixed $variationStock
    *
    * @return int|mixed
@@ -80,39 +52,98 @@ class InventoryMapper {
   }
 
   /**
-   * @param $data
+   * Create an Inventory DTO for each Warehouse in the Variation data
+   * @param $variationData
    *
-   * @return RequestDTO
+   * @return RequestDTO[]
    */
-  public function map($data) {
-    /** @var KeyValueRepository $keyValueRepository */
-    $keyValueRepository = pluginApp(KeyValueRepository::class);
-    $itemMappingMethod = $keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD);
+  public function createInventoryDTOsFromVariation($variationData) {
 
-    switch ($itemMappingMethod) {
-      case AbstractConfigHelper::ITEM_MAPPING_SKU:
-        $supplierPartNumber = $data['variationSkus'][0]['sku'];
-        break;
-      case AbstractConfigHelper::ITEM_MAPPING_EAN:
-        $supplierPartNumber = $data['variationBarcodes'][0]['code'];
-        break;
-      default:
-        $supplierPartNumber = $data['number'];
-        break;
+    /** @var RequestDTO[] $inventoryDTOs */
+    $inventoryDTOs = [];
+
+    $supplierPartNumber = $this->getSupplierPartNumberFromVariation($variationData);
+
+    $mainVariationId = $variationData['id'];
+    $nextAvailableDate = $this->getAvailableDate($mainVariationId); // Pending. Need Item
+
+    $stockList = $variationData['stock'];
+    foreach ($stockList as $stock) {
+      $warehouseId = $stock['warehouseId'];
+      if (!isset($warehouseId)) 
+      {
+        // we don't know the warehouse, so we can't figure out the supplier ID. Not an error.
+        // TODO: add a log
+        continue;
+      }
+
+      $supplierId = $this->getSupplierIDForWarehouseID($warehouseId);
+
+      if (!isset($supplierId) || $supplierId <= 0)
+      {
+        // no supplier assigned to this warehouse - NOT an error.
+        // TODO: add a log
+        continue;
+      }
+
+      $dtoData = [
+          'supplierId' => $supplierId,
+          'supplierPartNumber' => $supplierPartNumber,
+          'quantityOnHand' => isset($stock['netStock']) ? $stock['netStock'] : null, // Avl Immediately. Net Stock.
+          'quantityOnOrder' => isset($stock['reservedStock']) ? $stock['reservedStock'] : null, // Already Ordered items.
+          'itemNextAvailabilityDate' => $nextAvailableDate,
+          'productNameAndOptions' => $variationData['name']
+      ];
+
+      $inventoryDTOs[] = RequestDTO::createFromArray($dtoData);
     }
 
-    $mainVariationId = $data['id'];
-    $nextAvailableDate = $this->getAvailableDate($mainVariationId); // Pending. Need Item
-    $stock = $this->getStockFromWarehouse($data['stock']);
-    $dtoData = [
-        'supplierId' => isset($stock['supplierId']) ? $stock['supplierId'] : null,
-        'supplierPartNumber' => $supplierPartNumber,
-        'quantityOnHand' => isset($stock['netStock']) ? $stock['netStock'] : null, // Avl Immediately. Net Stock.
-        'quantityOnOrder' => isset($stock['reservedStock']) ? $stock['reservedStock'] : null, // Already Ordered items.
-        'itemNextAvailabilityDate' => $nextAvailableDate,
-        'productNameAndOptions' => $data['name']
-    ];
+    return $inventoryDTOs;
+  }
 
-    return RequestDTO::createFromArray($dtoData);
+  /**
+   * Get the Wayfair Supplier ID for a Warehouse, by ID
+   *
+   * @param int $warehouseId
+   * @return int|null
+   */
+  private function getSupplierIDForWarehouseID($warehouseId)
+  {
+    /**
+     * @var WarehouseSupplierRepository $warehouseSupplierRepository
+     */
+    $warehouseSupplierRepository = pluginApp(WarehouseSupplierRepository::class);
+
+    $warehouseSupplierMapping = $warehouseSupplierRepository->findByWarehouseId($warehouseId);
+
+    if (isset($warehouseSupplierMapping))
+    {
+      return $warehouseSupplierMapping->supplierId;
+    }
+
+    return null;
+  }
+
+  /**
+   * Get the supplier's part number from Plentymarkets Variation data
+   *
+   * @param array $variationData
+   * @return mixed
+   */
+  private function getSupplierPartNumberFromVariation($variationData)
+  {
+     /** @var KeyValueRepository $keyValueRepository */
+     $keyValueRepository = pluginApp(KeyValueRepository::class);
+     $itemMappingMethod = $keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD);
+ 
+     switch ($itemMappingMethod) {
+       case AbstractConfigHelper::ITEM_MAPPING_SKU:
+        return $variationData['variationSkus'][0]['sku'];
+       case AbstractConfigHelper::ITEM_MAPPING_EAN:
+        return $variationData['variationBarcodes'][0]['code'];
+       case AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER:
+       default:
+         return $variationData['number'];
+     }
   }
 }

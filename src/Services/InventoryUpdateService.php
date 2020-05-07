@@ -32,10 +32,11 @@ class InventoryUpdateService
    */
   private function validateInventoryRequestData($inventoryRequestDTO, $loggerContract): bool
   {
-
     if (!isset($inventoryRequestDTO)) {
       return false;
     }
+
+    $issues = [];
 
     if ($inventoryRequestDTO->getQuantityOnHand() < 0) {
       $loggerContract->debug(
@@ -49,7 +50,21 @@ class InventoryUpdateService
     }
 
     $supplierId = $inventoryRequestDTO->getSupplierId();
-    if (isset($supplierId) && !empty($inventoryRequestDTO->getSupplierPartNumber())) {
+
+    if (!isset($supplierId) || $supplierId <= 0)
+    {
+      $issues[] = "Supplier ID is missing or invalid";
+    }
+
+    $partNum = $inventoryRequestDTO->getSupplierPartNumber();
+
+    if (!isset($partNum) || empty($partNum))
+    {
+      $issues[] = "Supplier Part number is missing";
+    }
+
+    if (!isset($issues) || empty($issues))
+    {
       return true;
     }
 
@@ -58,6 +73,7 @@ class InventoryUpdateService
         TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_ERROR), [
           'additionalInfo' => [
             'message' => 'inventory request data is invalid',
+            'issues' => json_encode($issues),
             'data' => $inventoryRequestDTO->toArray(),
           ],
           'method' => __METHOD__
@@ -117,14 +133,16 @@ class InventoryUpdateService
         $variationSearchRepository->setSearchParams($fields);
         $response = $variationSearchRepository->search();
 
-        foreach ($response->getResult() as $variationsWithStock) {
+        foreach ($response->getResult() as $variationWithStock) {
           /**
-           * @var RequestDTO $inventoryRequestDTO
+           * @var RequestDTO[] $inventoryRequestDTOs
            */
-          $inventoryRequestDTO = $inventoryMapper->map($variationsWithStock);
-
-          if ($this->validateInventoryRequestData($inventoryRequestDTO, $loggerContract)) {
-            array_push($listOfItemsToBeUpdated, $inventoryRequestDTO);
+          $inventoryRequestDTOs = $inventoryMapper->createInventoryDTOsFromVariation($variationWithStock);
+          foreach ($inventoryRequestDTOs as $dto)
+          {
+            if ($this->validateInventoryRequestData($dto, $loggerContract)) {
+              array_push($listOfItemsToBeUpdated, $dto);
+            }
           }
         }
 
