@@ -126,27 +126,29 @@ class InventoryUpdateService
       $variationSearchRepository->setFilters($this->getFilters($fullInventory));
 
       do {
-
         $msAtPageStart = TimeHelper::getMilliseconds();
 
-        $listOfItemsToBeUpdated = [];
+        /** @var RequestDTO[] $normalizedInventoryRequestDTOs collection of DTOs to include in a bulk update*/
+        $normalizedInventoryRequestDTOs = [];
         $fields['page'] = (string) $page;
         $variationSearchRepository->setSearchParams($fields);
         $response = $variationSearchRepository->search();
 
+        /** @var array $variationWithStock information about a single Variation, including stock for each Warehouse */
         foreach ($response->getResult() as $variationWithStock) {
-          /**
-           * @var RequestDTO[] $inventoryRequestDTOs
-           */
-          $inventoryRequestDTOs = $inventoryMapper->createInventoryDTOsFromVariation($variationWithStock);
-          foreach ($inventoryRequestDTOs as $dto) {
+          /** @var RequeestDTO[] $rawInventoryRequestDTOs non-normalized candidates for inclusion in bulk update */
+          $rawInventoryRequestDTOs = $inventoryMapper->createInventoryDTOsFromVariation($variationWithStock);
+          foreach ($rawInventoryRequestDTOs as $dto) {
+            // validation method will output logs on failure
             if ($this->validateInventoryRequestData($dto, $loggerContract)) {
-              array_push($listOfItemsToBeUpdated, $dto);
+              $normalizedInventoryRequestDTOs[] = $dto;
             }
           }
         }
 
-        if (count($listOfItemsToBeUpdated) == 0) {
+        $amt_to_update = count($normalizedInventoryRequestDTOs);
+
+        if ($amt_to_update <= 0) {
           $loggerContract
             ->debug(
               TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
@@ -158,8 +160,6 @@ class InventoryUpdateService
 
           $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': No items to update');
         } else {
-          $amt_to_update = count($listOfItemsToBeUpdated);
-
           $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': ' . (string) $amt_to_update . ' items to update');
 
           $loggerContract->debug(
@@ -173,11 +173,11 @@ class InventoryUpdateService
           $saveInventoryDuration += TimeHelper::getMilliseconds() - $msAtPageStart;
           $msBeforeUpdate = TimeHelper::getMilliseconds();
 
-          $dto = $inventoryService->updateBulk($listOfItemsToBeUpdated, $fullInventory);
+          $dto = $inventoryService->updateBulk($normalizedInventoryRequestDTOs, $fullInventory);
 
           $savedInventoryDuration += TimeHelper::getMilliseconds() - $msBeforeUpdate;
-          $inventorySaveTotal += count($listOfItemsToBeUpdated);
-          $inventorySaveSuccess += count($listOfItemsToBeUpdated) - count($dto->getErrors());
+          $inventorySaveTotal += count($normalizedInventoryRequestDTOs);
+          $inventorySaveSuccess += count($normalizedInventoryRequestDTOs) - count($dto->getErrors());
           $inventorySaveFail += count($dto->getErrors());
 
           $syncResultObjects[] = $dto->toArray();
@@ -229,6 +229,7 @@ class InventoryUpdateService
       $logSenderService->execute($externalLogs->getLogs());
     }
 
+    // TODO: refactor to return information on failures so that users / cron jobs can react to them
     return $syncResultObjects;
   }
 
