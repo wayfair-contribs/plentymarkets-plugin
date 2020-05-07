@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright 2019 Wayfair LLC - All rights reserved
  */
@@ -11,14 +12,16 @@ use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Repositories\KeyValueRepository;
 use Wayfair\Repositories\WarehouseSupplierRepository;
 
-class InventoryMapper {
+class InventoryMapper
+{
 
   /**
    * @param $mainVariationId
    *
    * @return mixed
    */
-  public function getAvailableDate($mainVariationId) {
+  public function getAvailableDate($mainVariationId)
+  {
     /**
      * @var VariationStockRepositoryContract $variationStockRepositoryContract
      */
@@ -38,7 +41,8 @@ class InventoryMapper {
    *
    * @return int|mixed
    */
-  public function getNetStock($variationStock) {
+  public function getNetStock($variationStock)
+  {
     /**
      * @var AbstractConfigHelper $configHelper
      */
@@ -57,7 +61,8 @@ class InventoryMapper {
    *
    * @return RequestDTO[]
    */
-  public function createInventoryDTOsFromVariation($variationData) {
+  public function createInventoryDTOsFromVariation($variationData)
+  {
 
     /** @var RequestDTO[] $inventoryDTOs */
     $inventoryDTOs = [];
@@ -70,8 +75,7 @@ class InventoryMapper {
     $stockList = $variationData['stock'];
     foreach ($stockList as $stock) {
       $warehouseId = $stock['warehouseId'];
-      if (!isset($warehouseId)) 
-      {
+      if (!isset($warehouseId)) {
         // we don't know the warehouse, so we can't figure out the supplier ID. Not an error.
         // TODO: add a log
         continue;
@@ -79,20 +83,19 @@ class InventoryMapper {
 
       $supplierId = $this->getSupplierIDForWarehouseID($warehouseId);
 
-      if (!isset($supplierId) || $supplierId <= 0)
-      {
+      if (!isset($supplierId) || $supplierId <= 0) {
         // no supplier assigned to this warehouse - NOT an error.
         // TODO: add a log
         continue;
       }
 
       $dtoData = [
-          'supplierId' => $supplierId,
-          'supplierPartNumber' => $supplierPartNumber,
-          'quantityOnHand' => isset($stock['netStock']) ? $stock['netStock'] : null, // Avl Immediately. Net Stock.
-          'quantityOnOrder' => isset($stock['reservedStock']) ? $stock['reservedStock'] : null, // Already Ordered items.
-          'itemNextAvailabilityDate' => $nextAvailableDate,
-          'productNameAndOptions' => $variationData['name']
+        'supplierId' => $supplierId,
+        'supplierPartNumber' => $supplierPartNumber,
+        'quantityOnHand' => isset($stock['netStock']) ? $stock['netStock'] : null, // Avl Immediately. Net Stock.
+        'quantityOnOrder' => isset($stock['reservedStock']) ? $stock['reservedStock'] : null, // Already Ordered items.
+        'itemNextAvailabilityDate' => $nextAvailableDate,
+        'productNameAndOptions' => $variationData['name']
       ];
 
       $inventoryDTOs[] = RequestDTO::createFromArray($dtoData);
@@ -116,8 +119,7 @@ class InventoryMapper {
 
     $warehouseSupplierMapping = $warehouseSupplierRepository->findByWarehouseId($warehouseId);
 
-    if (isset($warehouseSupplierMapping))
-    {
+    if (isset($warehouseSupplierMapping)) {
       return $warehouseSupplierMapping->supplierId;
     }
 
@@ -132,18 +134,18 @@ class InventoryMapper {
    */
   private function getSupplierPartNumberFromVariation($variationData)
   {
-     /** @var KeyValueRepository $keyValueRepository */
-     $keyValueRepository = pluginApp(KeyValueRepository::class);
-     $itemMappingMethod = $keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD);
- 
-     switch ($itemMappingMethod) {
-       case AbstractConfigHelper::ITEM_MAPPING_SKU:
+    /** @var KeyValueRepository $keyValueRepository */
+    $keyValueRepository = pluginApp(KeyValueRepository::class);
+    $itemMappingMethod = $keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD);
+
+    switch ($itemMappingMethod) {
+      case AbstractConfigHelper::ITEM_MAPPING_SKU:
         return $variationData['variationSkus'][0]['sku'];
-       case AbstractConfigHelper::ITEM_MAPPING_EAN:
+      case AbstractConfigHelper::ITEM_MAPPING_EAN:
         return $variationData['variationBarcodes'][0]['code'];
-       case AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER:
-       default:
-         return $variationData['number'];
-     }
+      case AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER:
+      default:
+        return $variationData['number'];
+    }
   }
 }

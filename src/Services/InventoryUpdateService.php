@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright 2020 Wayfair LLC - All rights reserved
  */
@@ -40,7 +41,8 @@ class InventoryUpdateService
 
     if ($inventoryRequestDTO->getQuantityOnHand() < 0) {
       $loggerContract->debug(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_NEGATIVE_INVENTORY), [
+        TranslationHelper::getLoggerKey(self::LOG_KEY_NEGATIVE_INVENTORY),
+        [
           'additionalInfo' => ['data' => $inventoryRequestDTO->toArray()],
           'method' => __METHOD__
         ]
@@ -51,26 +53,24 @@ class InventoryUpdateService
 
     $supplierId = $inventoryRequestDTO->getSupplierId();
 
-    if (!isset($supplierId) || $supplierId <= 0)
-    {
+    if (!isset($supplierId) || $supplierId <= 0) {
       $issues[] = "Supplier ID is missing or invalid";
     }
 
     $partNum = $inventoryRequestDTO->getSupplierPartNumber();
 
-    if (!isset($partNum) || empty($partNum))
-    {
+    if (!isset($partNum) || empty($partNum)) {
       $issues[] = "Supplier Part number is missing";
     }
 
-    if (!isset($issues) || empty($issues))
-    {
+    if (!isset($issues) || empty($issues)) {
       return true;
     }
 
     $loggerContract
       ->error(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_ERROR), [
+        TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_ERROR),
+        [
           'additionalInfo' => [
             'message' => 'inventory request data is invalid',
             'issues' => json_encode($issues),
@@ -104,8 +104,9 @@ class InventoryUpdateService
     $syncResultObjects = [];
 
     $loggerContract->debug(
-      TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_START), [
-        'additionalInfo' => ['fullInventory' => (string)$fullInventory],
+      TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_START),
+      [
+        'additionalInfo' => ['fullInventory' => (string) $fullInventory],
         'method' => __METHOD__
       ]
     );
@@ -129,7 +130,7 @@ class InventoryUpdateService
         $msAtPageStart = TimeHelper::getMilliseconds();
 
         $listOfItemsToBeUpdated = [];
-        $fields['page'] = (string)$page;
+        $fields['page'] = (string) $page;
         $variationSearchRepository->setSearchParams($fields);
         $response = $variationSearchRepository->search();
 
@@ -138,8 +139,7 @@ class InventoryUpdateService
            * @var RequestDTO[] $inventoryRequestDTOs
            */
           $inventoryRequestDTOs = $inventoryMapper->createInventoryDTOsFromVariation($variationWithStock);
-          foreach ($inventoryRequestDTOs as $dto)
-          {
+          foreach ($inventoryRequestDTOs as $dto) {
             if ($this->validateInventoryRequestData($dto, $loggerContract)) {
               array_push($listOfItemsToBeUpdated, $dto);
             }
@@ -149,7 +149,8 @@ class InventoryUpdateService
         if (count($listOfItemsToBeUpdated) == 0) {
           $loggerContract
             ->debug(
-              TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG), [
+              TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
+              [
                 'additionalInfo' => ['info' => 'No items to update'],
                 'method' => __METHOD__
               ]
@@ -159,11 +160,12 @@ class InventoryUpdateService
         } else {
           $amt_to_update = count($listOfItemsToBeUpdated);
 
-          $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': ' . (string)$amt_to_update . ' items to update');
+          $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': ' . (string) $amt_to_update . ' items to update');
 
           $loggerContract->debug(
-            TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG), [
-              'additionalInfo' => ['info' => (string)$amt_to_update . ' items to update'],
+            TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
+            [
+              'additionalInfo' => ['info' => (string) $amt_to_update . ' items to update'],
               'method' => __METHOD__
             ]
           );
@@ -182,8 +184,9 @@ class InventoryUpdateService
         }
 
         $loggerContract->debug(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG), [
-            'additionalInfo' => ['fullInventory' => (string)$fullInventory, 'page_num' => (string)$page, 'info' => 'page done'],
+          TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
+          [
+            'additionalInfo' => ['fullInventory' => (string) $fullInventory, 'page_num' => (string) $page, 'info' => 'page done'],
             'method' => __METHOD__
           ]
         );
@@ -192,12 +195,12 @@ class InventoryUpdateService
       } while (!$response->isLastPage());
 
       $loggerContract->debug(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_END), [
-          'additionalInfo' => ['fullInventory' => (string)$fullInventory],
+        TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_END),
+        [
+          'additionalInfo' => ['fullInventory' => (string) $fullInventory],
           'method' => __METHOD__
         ]
       );
-
     } catch (\Exception $e) {
       // TODO: consider failing out of one item / one page instead of failing the whole sync
       $externalLogs->addInventoryLog('Inventory: ' . $e->getMessage(), 'inventoryFailed' . ($fullInventory ? 'Full' : ''), 1, 0, false);
@@ -213,7 +216,6 @@ class InventoryUpdateService
           'method' => __METHOD__
         ]
       );
-
     } finally {
       // FIXME: the 'inventorySave' and 'inventorySaved' log types are too similar
       // TODO: determine if changing the types will impact kibana / graphana / influxDB before changing
