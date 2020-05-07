@@ -1,4 +1,4 @@
-﻿﻿# Wayfair plugin user guide
+# Wayfair plugin user guide
 <div class="container-toc"></div>
 
 ## 1. Registering with Wayfair
