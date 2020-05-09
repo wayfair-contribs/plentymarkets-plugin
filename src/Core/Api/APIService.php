@@ -16,7 +16,7 @@ use Wayfair\Http\WayfairResponse;
 
 class APIService {
 
-  const LOK_KEY_API_SERVICE = 'apiService';
+  const LOG_KEY_API_SERVICE = 'apiService';
 
   /**
    * @var AuthenticationContract
