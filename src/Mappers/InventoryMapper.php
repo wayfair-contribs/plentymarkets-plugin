@@ -7,6 +7,7 @@
 namespace Wayfair\Mappers;
 
 use Plenty\Modules\Item\VariationStock\Contracts\VariationStockRepositoryContract;
+use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\Inventory\RequestDTO;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
