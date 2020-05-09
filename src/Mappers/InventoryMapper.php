@@ -9,11 +9,14 @@ namespace Wayfair\Mappers;
 use Plenty\Modules\Item\VariationStock\Contracts\VariationStockRepositoryContract;
 use Wayfair\Core\Dto\Inventory\RequestDTO;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Repositories\KeyValueRepository;
 use Wayfair\Repositories\WarehouseSupplierRepository;
 
 class InventoryMapper
 {
+  const LOG_KEY_STOCK_MISSING_WAREHOUSE = 'stockMissingWarehouse';
+  const LOG_KEY_NO_SUPPLIER_ID_ASSIGNED_TO_WAREHOUSE = 'noSupplierIDForWarehouse';
 
   /**
    * @param $mainVariationId
@@ -63,6 +66,8 @@ class InventoryMapper
    */
   public function createInventoryDTOsFromVariation($variationData)
   {
+    /** @var LoggerContract $loggerContract */
+    $loggerContract = pluginApp(LoggerContract::class);
 
     /** @var RequestDTO[] $inventoryDTOs */
     $inventoryDTOs = [];
@@ -76,16 +81,30 @@ class InventoryMapper
     foreach ($stockList as $stock) {
       $warehouseId = $stock['warehouseId'];
       if (!isset($warehouseId)) {
-        // we don't know the warehouse, so we can't figure out the supplier ID. Not an error.
-        // TODO: add a log
+        // we don't know the warehouse, so we can't figure out the supplier ID.
+        // Not an error, but unexpected.
+        $loggerContract->warn(
+          TranslationHelper::getLoggerKey(self::LOG_KEY_STOCK_MISSING_WAREHOUSE),
+          [
+            'additionalInfo' => ['variationID' => $mainVariationId,],
+            'method' => __METHOD__
+          ]
+        );
         continue;
       }
 
+      // this is a 'mixed' value - might be null.
       $supplierId = $this->getSupplierIDForWarehouseID($warehouseId);
 
-      if (!isset($supplierId) || $supplierId <= 0) {
-        // no supplier assigned to this warehouse - NOT an error.
-        // TODO: add a log
+      if (!isset($supplierId) || $supplierId === 0 || $supplierId === '0') {
+        // no supplier assigned to this warehouse - NOT an error - we should NOT sync it
+        $loggerContract->debug(
+          TranslationHelper::getLoggerKey(self::LOG_KEY_NO_SUPPLIER_ID_ASSIGNED_TO_WAREHOUSE),
+          [
+            'additionalInfo' => ['warehouseID' => $warehouseId, 'variationID' => $mainVariationId,],
+            'method' => __METHOD__
+          ]
+        );
         continue;
       }
 
@@ -108,7 +127,7 @@ class InventoryMapper
    * Get the Wayfair Supplier ID for a Warehouse, by ID
    *
    * @param int $warehouseId
-   * @return int|null
+   * @return mixed
    */
   private function getSupplierIDForWarehouseID($warehouseId)
   {
