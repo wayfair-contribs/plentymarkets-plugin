@@ -84,7 +84,7 @@ class InventoryMapper
       if (!isset($warehouseId)) {
         // we don't know the warehouse, so we can't figure out the supplier ID.
         // Not an error, but unexpected.
-        $loggerContract->warn(
+        $loggerContract->warning(
           TranslationHelper::getLoggerKey(self::LOG_KEY_STOCK_MISSING_WAREHOUSE),
           [
             'additionalInfo' => ['variationID' => $mainVariationId,],
