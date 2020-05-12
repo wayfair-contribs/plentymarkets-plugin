@@ -17,6 +17,9 @@ use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Mappers\InventoryMapper;
 use Wayfair\Models\ExternalLogs;
 
+/**
+ * Service module for sending inventory updates to Wayfair
+ */
 class InventoryUpdateService
 {
   const LOG_KEY_DEBUG = 'debugInventoryUpdate';
@@ -39,7 +42,7 @@ class InventoryUpdateService
 
     $issues = [];
 
-    if ($inventoryRequestDTO->getQuantityOnHand() < 0) {
+    if ($inventoryRequestDTO->getQuantityOnHand() < -1) {
       $loggerContract->debug(
         TranslationHelper::getLoggerKey(self::LOG_KEY_NEGATIVE_INVENTORY),
         [
@@ -48,6 +51,9 @@ class InventoryUpdateService
         ]
       );
 
+      // the Wayfair Inventory system allows for a 'quantity on hand' value of -1,
+      // which may indicate a discontinued product or an unknown quantity.
+      // Any values lower than -1 are considered invalid and are being normalized to 0 here.
       $inventoryRequestDTO->setQuantityOnHand(0);
     }
 
