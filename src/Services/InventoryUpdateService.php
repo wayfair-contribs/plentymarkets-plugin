@@ -152,9 +152,9 @@ class InventoryUpdateService
           }
         }
 
-        $amt_to_update = count($normalizedInventoryRequestDTOs);
+        $amtToUpdate = count($normalizedInventoryRequestDTOs);
 
-        if ($amt_to_update <= 0) {
+        if ($amtToUpdate <= 0) {
           $loggerContract
             ->debug(
               TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
@@ -166,12 +166,12 @@ class InventoryUpdateService
 
           $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': No items to update');
         } else {
-          $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': ' . (string) $amt_to_update . ' items to update');
+          $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': ' . (string) $amtToUpdate . ' items to update');
 
           $loggerContract->debug(
             TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
             [
-              'additionalInfo' => ['info' => (string) $amt_to_update . ' items to update'],
+              'additionalInfo' => ['info' => (string) $amtToUpdate . ' items to update'],
               'method' => __METHOD__
             ]
           );

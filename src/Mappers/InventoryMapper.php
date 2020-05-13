@@ -26,6 +26,7 @@ class InventoryMapper
    */
   public function getAvailableDate($mainVariationId)
   {
+    // TODO: verify behavior and add function description
     /**
      * @var VariationStockRepositoryContract $variationStockRepositoryContract
      */
