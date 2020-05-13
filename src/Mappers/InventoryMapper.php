@@ -1,24 +1,32 @@
 <?php
+
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Mappers;
 
 use Plenty\Modules\Item\VariationStock\Contracts\VariationStockRepositoryContract;
+use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\Inventory\RequestDTO;
 use Wayfair\Core\Contracts\ConfigHelperContract;
+use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Repositories\KeyValueRepository;
 use Wayfair\Repositories\WarehouseSupplierRepository;
 
-class InventoryMapper {
+class InventoryMapper
+{
+  const LOG_KEY_STOCK_MISSING_WAREHOUSE = 'stockMissingWarehouse';
+  const LOG_KEY_NO_SUPPLIER_ID_ASSIGNED_TO_WAREHOUSE = 'noSupplierIDForWarehouse';
 
   /**
    * @param $mainVariationId
    *
    * @return mixed
    */
-  public function getAvailableDate($mainVariationId) {
+  public function getAvailableDate($mainVariationId)
+  {
+    // TODO: verify behavior and add function description
     /**
      * @var VariationStockRepositoryContract $variationStockRepositoryContract
      */
@@ -34,43 +42,16 @@ class InventoryMapper {
   }
 
   /**
-   * @param $stockList
-   *
-   * @return array
-   */
-  private function getStockFromWarehouse($stockList) {
-    /**
-     * @var WarehouseSupplierRepository $warehouseSupplierRepository
-     */
-    $warehouseSupplierRepository = pluginApp(WarehouseSupplierRepository::class);
-    $supplierId = null;
-    $warehouseId = null;
-    foreach ($stockList as $stock) {
-      $warehouseId = $stock['warehouseId'];
-      if (isset($warehouseId)) {
-        $warehouseSupplierMapping = $warehouseSupplierRepository->findByWarehouseId($warehouseId);
-        $supplierId = isset($warehouseSupplierMapping) ? $warehouseSupplierMapping->supplierId : null;
-        if (isset($supplierId)) {
-          $stock['supplierId'] = $supplierId;
-
-          return $stock;
-        }
-      }
-    }
-
-    return [];
-  }
-
-  /**
    * @param mixed $variationStock
    *
    * @return int|mixed
    */
-  public function getNetStock($variationStock) {
+  public function getNetStock($variationStock)
+  {
     /**
-     * @var ConfigHelperContract $configHelper
+     * @var AbstractConfigHelper $configHelper
      */
-    $configHelper = pluginApp(ConfigHelperContract::class);
+    $configHelper = pluginApp(AbstractConfigHelper::class);
     $stockBuffer = $configHelper->getStockBufferValue();
     if ($variationStock->netStock > $stockBuffer) {
       return $variationStock->netStock - $stockBuffer;
@@ -80,39 +61,114 @@ class InventoryMapper {
   }
 
   /**
-   * @param $data
+   * Create an Inventory DTO for each Warehouse in the Variation data
+   * @param $variationData
    *
-   * @return RequestDTO
+   * @return RequestDTO[]
    */
-  public function map($data) {
+  public function createInventoryDTOsFromVariation($variationData)
+  {
+    /** @var LoggerContract $loggerContract */
+    $loggerContract = pluginApp(LoggerContract::class);
+
+    /** @var RequestDTO[] $inventoryDTOs */
+    $inventoryDTOs = [];
+
+    $supplierPartNumber = $this->getSupplierPartNumberFromVariation($variationData);
+
+    $mainVariationId = $variationData['id'];
+    $nextAvailableDate = $this->getAvailableDate($mainVariationId); // Pending. Need Item
+
+    $stockList = $variationData['stock'];
+    foreach ($stockList as $stock) {
+      $warehouseId = $stock['warehouseId'];
+      if (!isset($warehouseId)) {
+        // we don't know the warehouse, so we can't figure out the supplier ID.
+        // Not an error, but unexpected.
+        $loggerContract->warning(
+          TranslationHelper::getLoggerKey(self::LOG_KEY_STOCK_MISSING_WAREHOUSE),
+          [
+            'additionalInfo' => ['variationID' => $mainVariationId,],
+            'method' => __METHOD__
+          ]
+        );
+        continue;
+      }
+
+      // this is a 'mixed' value - might be null.
+      $supplierId = $this->getSupplierIDForWarehouseID($warehouseId);
+
+      if (!isset($supplierId) || $supplierId === 0 || $supplierId === '0') {
+        // no supplier assigned to this warehouse - NOT an error - we should NOT sync it
+        $loggerContract->debug(
+          TranslationHelper::getLoggerKey(self::LOG_KEY_NO_SUPPLIER_ID_ASSIGNED_TO_WAREHOUSE),
+          [
+            'additionalInfo' => ['warehouseID' => $warehouseId, 'variationID' => $mainVariationId,],
+            'method' => __METHOD__
+          ]
+        );
+        continue;
+      }
+
+      $dtoData = [
+        'supplierId' => $supplierId,
+        'supplierPartNumber' => $supplierPartNumber,
+        'quantityOnHand' => isset($stock['netStock']) ? $stock['netStock'] : null, // Avl Immediately. Net Stock.
+        'quantityOnOrder' => isset($stock['reservedStock']) ? $stock['reservedStock'] : null, // Already Ordered items.
+        'itemNextAvailabilityDate' => $nextAvailableDate,
+        'productNameAndOptions' => $variationData['name']
+      ];
+
+      $inventoryDTOs[] = RequestDTO::createFromArray($dtoData);
+    }
+
+    return $inventoryDTOs;
+  }
+
+  /**
+   * Get the Wayfair Supplier ID for a Warehouse, by ID
+   *
+   * @param int $warehouseId
+   * @return mixed
+   */
+  private function getSupplierIDForWarehouseID($warehouseId)
+  {
+    /**
+     * @var WarehouseSupplierRepository $warehouseSupplierRepository
+     */
+    $warehouseSupplierRepository = pluginApp(WarehouseSupplierRepository::class);
+
+    $warehouseSupplierMapping = $warehouseSupplierRepository->findByWarehouseId($warehouseId);
+
+    if (isset($warehouseSupplierMapping)) {
+      return $warehouseSupplierMapping->supplierId;
+    }
+
+    return null;
+  }
+
+  /**
+   * Get the supplier's part number from Plentymarkets Variation data
+   *
+   * @param array $variationData
+   * @return mixed
+   */
+  private function getSupplierPartNumberFromVariation($variationData)
+  {
     /** @var KeyValueRepository $keyValueRepository */
     $keyValueRepository = pluginApp(KeyValueRepository::class);
     $itemMappingMethod = $keyValueRepository->get(ConfigHelperContract::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD);
 
     switch ($itemMappingMethod) {
       case ConfigHelperContract::ITEM_MAPPING_SKU:
-        $supplierPartNumber = $data['variationSkus'][0]['sku'];
+        $supplierPartNumber = $variationData['variationSkus'][0]['sku'];
         break;
       case ConfigHelperContract::ITEM_MAPPING_EAN:
-        $supplierPartNumber = $data['variationBarcodes'][0]['code'];
+        $supplierPartNumber = $variationData['variationBarcodes'][0]['code'];
         break;
+      case ConfigHelperContract::ITEM_MAPPING_VARIATION_NUMBER:
       default:
-        $supplierPartNumber = $data['number'];
-        break;
+        return $variationData['number'];
     }
-
-    $mainVariationId = $data['id'];
-    $nextAvailableDate = $this->getAvailableDate($mainVariationId); // Pending. Need Item
-    $stock = $this->getStockFromWarehouse($data['stock']);
-    $dtoData = [
-        'supplierId' => isset($stock['supplierId']) ? $stock['supplierId'] : null,
-        'supplierPartNumber' => $supplierPartNumber,
-        'quantityOnHand' => isset($stock['netStock']) ? $stock['netStock'] : null, // Avl Immediately. Net Stock.
-        'quantityOnOrder' => isset($stock['reservedStock']) ? $stock['reservedStock'] : null, // Already Ordered items.
-        'itemNextAvailabilityDate' => $nextAvailableDate,
-        'productNameAndOptions' => $data['name']
-    ];
-
-    return RequestDTO::createFromArray($dtoData);
   }
 }
