@@ -129,6 +129,8 @@ class LoggingService implements LoggerContract {
     $referenceValue = (int) $loggingInfo['referenceValue'] ?? null;
     $additionalInfo[self::WAYFAIR_PLUGIN_VERSION] = $this->version;
 
+    // FIXME: large amounts of data in additionalInfo are overloading plentymarkets logs
+    // the maximum amount of characters allowed in the log is 32k
     return array($additionalInfo, $method, $referenceType, $referenceValue);
   }
 

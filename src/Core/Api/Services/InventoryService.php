@@ -9,7 +9,6 @@ use Wayfair\Core\Api\APIService;
 use Wayfair\Core\Dto\Inventory\ResponseDTO;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Http\WayfairResponse;
-use Wayfair\Models\ExternalLogs;
 
 /**
  * Class InventoryService
@@ -20,6 +19,7 @@ class InventoryService extends APIService
 {
   const LOG_KEY_INVENTORY_QUERY_ERROR = 'inventoryQueryError';
   const LOG_KEY_INVENTORY_QUERY_DEBUG = 'debugInventoryQuery';
+  const LOG_KEY_INVENTORY_QUERY_BULK_ERROR = 'inventoryQueryBulkError';
 
   const RESPONSE_KEY_ERRORS = 'errors';
   const RESPONSE_KEY_DATA = 'data';
@@ -133,11 +133,7 @@ class InventoryService extends APIService
    */
   public function updateBulk(array $listOfRequestDto, bool $fullInventory = false)
   {
-    /** @var ExternalLogs $externalLogs */
-    $externalLogs = pluginApp(ExternalLogs::class);
-
     try {
-
       $queryData = $this->buildQuery($listOfRequestDto, $fullInventory);
 
       $response = $this->query($queryData['query'], 'post', $queryData['variables']);
@@ -147,37 +143,43 @@ class InventoryService extends APIService
 
       if (isset($reponseErrors)) {
         throw new \Exception("Unable to update inventory due to errors." .
-          " Response from  Wayfair: " . \json_encode($reponseErrors));
+          " Errors from  Wayfair: " . \json_encode($reponseErrors));
       }
 
       $response_data_array = $responseBody[self::RESPONSE_KEY_DATA];
 
       if (!isset($response_data_array)) {
-        throw new \Exception("Unable to update inventory - no data element in response. " .
-          " Errors from  Wayfair: " . \json_encode($responseBody));
+        throw new \Exception("Unable to update inventory - no data element in response.");
       }
 
       $inventory = $response_data_array[self::RESPONSE_DATA_KEY_INVENTORY];
 
       if (!isset($inventory)) {
-        throw new \Exception("Unable to update inventory - no inventory data in response. " .
-          " Response from  Wayfair: " . \json_encode($responseBody));
+        throw new \Exception("Unable to update inventory - no inventory data in response.");
       }
 
       $inventorySave = $inventory[self::RESPONSE_INVENTORY_KEY_SAVE];
 
       if (!isset($inventorySave)) {
-        throw new \Exception("Unable to update inventory - no save data in inventory area of response. " .
-          " Response from  Wayfair: " . \json_encode($responseBody));
+        throw new \Exception("Unable to update inventory - no save data in inventory area of response.");
       }
 
       return ResponseDTO::createFromArray($inventorySave);
-    } finally {
-      if (count($externalLogs->getLogs())) {
-        /** @var LogSenderService $logSenderService */
-        $logSenderService = pluginApp(LogSenderService::class);
-        $logSenderService->execute($externalLogs->getLogs());
-      }
+    } catch (\Exception $e)
+    {
+      // put the Wayfair response into the debug log as a SEPARATE message when there was an issue
+      // this log may be too large. See ticket 'EM-100' about resolving that.
+      $this->loggerContract->debug(
+        TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_QUERY_BULK_ERROR),
+        [
+          'additionalInfo' => [
+            'bulkInventoryResponse' => $response
+          ],
+          'method' => __METHOD__
+        ]
+      );
+
+      throw $e;
     }
   }
 }

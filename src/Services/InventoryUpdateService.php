@@ -219,15 +219,10 @@ class InventoryUpdateService
 
       if ($lenStack > 2)
       {
-        // truncate the stack to avoid PM saying the log message is too large
+        // truncate the stack to avoid PM saying the log message is too large for display
+        // TODO: remove this if/when this is handled in the logger modules (see ticket 'EM-100')
         $stack = array_slice($stack, 0, 2);
         $stack[] = '...';
-      }
-
-      if ($lenMsg > 64)
-      {
-        // message is over 300k here!
-        $msg = substr($msg, 0, 64);
       }
 
       $loggerContract->error(
