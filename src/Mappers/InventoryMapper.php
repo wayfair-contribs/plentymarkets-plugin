@@ -49,9 +49,9 @@ class InventoryMapper
   public function getNetStock($variationStock)
   {
     /**
-     * @var AbstractConfigHelper $configHelper
+     * @var ConfigHelperContract $configHelper
      */
-    $configHelper = pluginApp(AbstractConfigHelper::class);
+    $configHelper = pluginApp(ConfigHelperContract::class);
     $stockBuffer = $configHelper->getStockBufferValue();
     if ($variationStock->netStock > $stockBuffer) {
       return $variationStock->netStock - $stockBuffer;
