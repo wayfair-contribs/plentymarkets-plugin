@@ -198,7 +198,7 @@ class AuthService implements AuthenticationContract
       throw new AuthenticationException("Unable to authenticate user: no token data for " . $audience);
     }
 
-    if (isset($responseArray['errors'])) {
+    if (isset($responseArray['error'])) {
       throw new AuthenticationException("Unable to authenticate user: " . $responseArray['error']);
     }
 
