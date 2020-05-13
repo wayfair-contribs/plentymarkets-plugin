@@ -24,6 +24,8 @@ class AuthService implements AuthenticationContract
   const LOG_KEY_DELETING_TOKEN = 'deletingToken';
   const LOG_KEY_NON_WAYFAIR = 'cannotAuthenticateNonWayfair';
 
+  const HEADER_KEY_CONTENT_TYPE = "Content-Type";
+
   const EXPIRES_IN = 'expires_in';
   const ACCESS_TOKEN = 'access_token';
   const STORE_TIME = 'store_time';
@@ -129,7 +131,7 @@ class AuthService implements AuthenticationContract
     $client_secret = $this->configHelperContract->getWayfairClientSecret();
 
     $headersArray = [
-      'Content-Type' => 'application/json',
+      self::HEADER_KEY_CONTENT_TYPE => 'application/json',
       ConfigHelperContract::WAYFAIR_INTEGRATION_HEADER => ConfigHelperContract::INTEGRATION_AGENT_NAME
     ];
 
