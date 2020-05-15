@@ -5,7 +5,8 @@
 
 namespace Wayfair\Core\Dto\General;
 
-class ShippingLabelDTO {
+class ShippingLabelDTO
+{
   /**
    * @var string
    */

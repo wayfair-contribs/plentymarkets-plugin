@@ -19,7 +19,8 @@ use Wayfair\Services\OrderService;
 use Plenty\Plugin\Http\Request;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 
-class TestController extends Controller {
+class TestController extends Controller
+{
 
   /**
    * @param OrderService     $orderService

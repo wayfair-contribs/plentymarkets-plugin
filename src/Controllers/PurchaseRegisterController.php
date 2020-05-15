@@ -13,7 +13,8 @@ use Wayfair\Core\Dto\RegisterPurchaseOrder\RequestDTO;
  *
  * @package Wayfair\Controllers
  */
-class PurchaseRegisterController {
+class PurchaseRegisterController
+{
 
   /**
    * @param RegisterPurchaseOrderService $registerPurchaseOrderService

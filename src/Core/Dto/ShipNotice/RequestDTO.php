@@ -11,7 +11,8 @@ namespace Wayfair\Core\Dto\ShipNotice;
  *
  * @package Wayfair\Core\Dto\ShipNotice
  */
-class RequestDTO {
+class RequestDTO
+{
   /**
    * @var string
    */

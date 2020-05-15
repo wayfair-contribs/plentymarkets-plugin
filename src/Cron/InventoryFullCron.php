@@ -10,7 +10,8 @@ use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Services\FullInventoryService;
 
-class InventoryFullCron extends Cron {
+class InventoryFullCron extends Cron
+{
 
   /**
    * @var FullInventoryService

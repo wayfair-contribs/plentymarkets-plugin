@@ -11,7 +11,8 @@ use Plenty\Plugin\Http\Response;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Repositories\KeyValueRepository;
 
-class SettingsController {
+class SettingsController
+{
 
   /**
    * @var KeyValueRepository
@@ -79,13 +80,13 @@ class SettingsController {
 
     if (empty($data[AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD])
       || !in_array(
-            $data[AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD],
-            [
-              AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER,
-              AbstractConfigHelper::ITEM_MAPPING_EAN,
-              AbstractConfigHelper::ITEM_MAPPING_SKU
-            ]
-        )
+        $data[AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD],
+        [
+          AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER,
+          AbstractConfigHelper::ITEM_MAPPING_EAN,
+          AbstractConfigHelper::ITEM_MAPPING_SKU
+        ]
+      )
     ) {
       return $response->json(['error' => 'Item mapping must be from the selection only'], Response::HTTP_BAD_REQUEST);
     }
@@ -117,14 +118,14 @@ class SettingsController {
       $this->keyValueRepository->putOrReplace(AbstractConfigHelper::SETTINGS_SEND_ALL_ITEMS_KEY, $isAllInventorySyncEnabled);
 
       return $response->json(
-          [
-            AbstractConfigHelper::SETTINGS_STOCK_BUFFER_KEY => $inputStockBuffer,
-            AbstractConfigHelper::SETTINGS_DEFAULT_SHIPPING_PROVIDER_KEY => $inputDefaultShippingProvider,
-            AbstractConfigHelper::SETTINGS_DEFAULT_ORDER_STATUS_KEY => $inputDefaultOrderStatus,
-            AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD => $inputDefaultItemMapping,
-            AbstractConfigHelper::IMPORT_ORDER_SINCE => $importOrderSince,
-            AbstractConfigHelper::SETTINGS_SEND_ALL_ITEMS_KEY => $isAllInventorySyncEnabled,
-          ]
+        [
+          AbstractConfigHelper::SETTINGS_STOCK_BUFFER_KEY => $inputStockBuffer,
+          AbstractConfigHelper::SETTINGS_DEFAULT_SHIPPING_PROVIDER_KEY => $inputDefaultShippingProvider,
+          AbstractConfigHelper::SETTINGS_DEFAULT_ORDER_STATUS_KEY => $inputDefaultOrderStatus,
+          AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD => $inputDefaultItemMapping,
+          AbstractConfigHelper::IMPORT_ORDER_SINCE => $importOrderSince,
+          AbstractConfigHelper::SETTINGS_SEND_ALL_ITEMS_KEY => $isAllInventorySyncEnabled,
+        ]
       );
     } catch (ValidationException $e) {
       return $response->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);

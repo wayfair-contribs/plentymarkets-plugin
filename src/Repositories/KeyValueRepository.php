@@ -11,7 +11,8 @@ use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Models\KeyValue;
 
-class KeyValueRepository extends Repository {
+class KeyValueRepository extends Repository
+{
 
   const LOG_KEY_QUERY_FAILED = "keyValueQueryFailed";
 

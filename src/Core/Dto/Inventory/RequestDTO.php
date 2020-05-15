@@ -5,7 +5,8 @@
 
 namespace Wayfair\Core\Dto\Inventory;
 
-class RequestDTO {
+class RequestDTO
+{
   /**
    * @var int
    */

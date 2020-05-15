@@ -22,7 +22,8 @@ use Wayfair\Repositories\KeyValueRepository;
  *
  * @package Wayfair\Services
  */
-class AddressService {
+class AddressService
+{
   /**
    * @var KeyValueRepository
    */
@@ -124,13 +125,13 @@ class AddressService {
     $address = $contactAddressRepo->createAddress($address, $contactId, $typeId);
     $addressContactRelationRepo = pluginApp(AddressContactRelationRepositoryContract::class);
     $addressContactRelationRepo->createAddressContactRelation(
+      [
         [
-          [
-            'contactId' => $contactId,
-            'addressId' => $address->id,
-            'typeId' => $typeId,
-          ]
+          'contactId' => $contactId,
+          'addressId' => $address->id,
+          'typeId' => $typeId,
         ]
+      ]
     );
 
     return $address->id;

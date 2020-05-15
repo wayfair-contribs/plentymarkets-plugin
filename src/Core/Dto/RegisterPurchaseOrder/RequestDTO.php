@@ -7,7 +7,8 @@ namespace Wayfair\Core\Dto\RegisterPurchaseOrder;
 
 use Wayfair\Core\Dto\General\ShippingUnitDTO;
 
-class RequestDTO {
+class RequestDTO
+{
 
   /**
    * @var string

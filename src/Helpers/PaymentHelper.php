@@ -8,7 +8,8 @@ namespace Wayfair\Helpers;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 
-class PaymentHelper {
+class PaymentHelper
+{
 
   /**
    * @var PaymentMethodRepositoryContract

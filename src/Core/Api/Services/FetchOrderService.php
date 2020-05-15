@@ -10,7 +10,8 @@ use Wayfair\Core\Dto\PurchaseOrder\ResponseDTO;
 use Wayfair\Core\Exceptions\GraphQLQueryException;
 use Wayfair\Helpers\TranslationHelper;
 
-class FetchOrderService extends APIService {
+class FetchOrderService extends APIService
+{
   const FETCH_LIMIT = 50;
 
   /**
@@ -121,5 +122,4 @@ class FetchOrderService extends APIService {
     . '}';
     return $query;
   }
-
 }

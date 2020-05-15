@@ -5,7 +5,8 @@
 
 namespace Wayfair\Core\Dto\General;
 
-class BillOfLadingDTO {
+class BillOfLadingDTO
+{
   /**
    * @var string
    */

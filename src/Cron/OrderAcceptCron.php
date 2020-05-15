@@ -12,7 +12,8 @@ use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Models\ExternalLogs;
 use Wayfair\Services\OrderService;
 
-class OrderAcceptCron extends Cron {
+class OrderAcceptCron extends Cron
+{
 
   /**
    * @var OrderService

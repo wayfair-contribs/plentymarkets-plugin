@@ -13,7 +13,8 @@ use Wayfair\Core\Exceptions\TokenNotFoundException;
  *
  * @package Wayfair\Core\Contracts
  */
-interface FetchDocumentContract {
+interface FetchDocumentContract
+{
   /**
    * @param string $url
    *

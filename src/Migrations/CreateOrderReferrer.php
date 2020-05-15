@@ -9,7 +9,8 @@ use Plenty\Modules\Order\Referrer\Contracts\OrderReferrerRepositoryContract;
 use Wayfair\Helpers\ConfigHelper;
 use Wayfair\Repositories\KeyValueRepository;
 
-class CreateOrderReferrer {
+class CreateOrderReferrer
+{
 
   /**
    * @var KeyValueRepository
@@ -33,14 +34,13 @@ class CreateOrderReferrer {
   public function run(OrderReferrerRepositoryContract $orderReferrerRepository)
   {
     $orderReferrer = $orderReferrerRepository->create(
-        [
-          'isEditable' => false,
-          'backendName' => 'Wayfair',
-          'name' => 'Wayfair',
-          'origin' => 'Wayfair',
-        ]
+      [
+        'isEditable' => false,
+        'backendName' => 'Wayfair',
+        'name' => 'Wayfair',
+        'origin' => 'Wayfair',
+      ]
     );
     $this->keyValueRepository->putOrReplace(ConfigHelper::SETTINGS_ORDER_REFERRER_KEY, $orderReferrer->id);
   }
-
 }

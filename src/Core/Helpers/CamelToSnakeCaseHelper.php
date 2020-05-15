@@ -4,7 +4,8 @@
  */
 namespace Wayfair\Core\Helpers;
 
-class CamelToSnakeCaseHelper {
+class CamelToSnakeCaseHelper
+{
   /**
    * Function to convert CamelCase to SnakeCase e.g supplierId to supplier_id
    *

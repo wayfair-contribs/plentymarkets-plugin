@@ -8,7 +8,8 @@ namespace Wayfair\Cron;
 use Plenty\Modules\Cron\Contracts\CronHandler as Cron;
 use Wayfair\Services\SendLogsService;
 
-class SendLogsCron extends Cron {
+class SendLogsCron extends Cron
+{
 
   /**
    * @var SendLogsService

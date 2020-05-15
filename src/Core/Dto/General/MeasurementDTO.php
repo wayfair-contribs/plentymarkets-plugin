@@ -5,7 +5,8 @@
 
 namespace Wayfair\Core\Dto\General;
 
-class MeasurementDTO {
+class MeasurementDTO
+{
   /**
    * @var float
    */

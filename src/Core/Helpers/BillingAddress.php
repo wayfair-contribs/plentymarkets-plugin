@@ -5,7 +5,8 @@
 
 namespace Wayfair\Core\Helpers;
 
-class BillingAddress {
+class BillingAddress
+{
   const NAME = 'Wayfair Stores Ltd';
   const ADDRESS = 'Wayfair House, Tuam Road';
   const CITY = 'Galway';

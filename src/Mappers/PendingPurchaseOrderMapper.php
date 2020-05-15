@@ -7,7 +7,8 @@ namespace Wayfair\Mappers;
 
 use Wayfair\Core\Dto\PurchaseOrder\ResponseDTO;
 
-class PendingPurchaseOrderMapper {
+class PendingPurchaseOrderMapper
+{
 
   /**
    * @param ResponseDTO $dto

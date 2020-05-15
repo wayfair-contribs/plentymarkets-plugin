@@ -265,7 +265,12 @@ class CreateOrderService
       }
 
       $orderData = $this->purchaseOrderMapper->map(
-        $dto, $billing['addressId'], $billing['contactId'], $delivery['addressId'], $referrerId, $warehouseId,
+        $dto,
+        $billing['addressId'],
+        $billing['contactId'],
+        $delivery['addressId'],
+        $referrerId,
+        $warehouseId,
         (string)AbstractConfigHelper::PAYMENT_METHOD_INVOICE
       );
 
@@ -359,5 +364,4 @@ class CreateOrderService
 
     return $this->paymentRepositoryContract->createPayment($data);
   }
-
 }

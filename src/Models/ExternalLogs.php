@@ -7,7 +7,8 @@ namespace Wayfair\Models;
 
 use Wayfair\Core\Helpers\TimeHelper;
 
-class ExternalLogs {
+class ExternalLogs
+{
 
   /**
    * @var array

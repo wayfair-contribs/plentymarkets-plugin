@@ -20,7 +20,8 @@ use Wayfair\Services\AddressService;
  *
  * @package Wayfair\Migrations
  */
-class ReUpdateWFAddress {
+class ReUpdateWFAddress
+{
   /**
    * @var AddressService
    */

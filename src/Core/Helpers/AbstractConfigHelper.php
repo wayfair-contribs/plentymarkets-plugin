@@ -5,7 +5,8 @@
 
 namespace Wayfair\Core\Helpers;
 
-abstract class AbstractConfigHelper {
+abstract class AbstractConfigHelper
+{
   const PLUGIN_NAME = 'Wayfair';
   const SHIPPING_PROVIDER_NAME = 'WayfairShipping';
   const SETTINGS_ORDER_REFERRER_KEY = 'orderReferrer';
@@ -85,5 +86,4 @@ abstract class AbstractConfigHelper {
    * @return string
    */
   abstract public function getPluginVersion(): string;
-
 }

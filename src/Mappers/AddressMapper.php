@@ -8,7 +8,8 @@ namespace Wayfair\Mappers;
 use Wayfair\Core\Dto\General\AddressDTO;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 
-class AddressMapper {
+class AddressMapper
+{
   /**
    * @var CountryRepositoryContract
    */

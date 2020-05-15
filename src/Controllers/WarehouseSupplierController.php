@@ -8,7 +8,8 @@ use Plenty\Plugin\Http\Request;
 use Wayfair\Repositories\WarehouseSupplierRepository;
 use Plenty\Exceptions\ValidationException;
 
-class WarehouseSupplierController {
+class WarehouseSupplierController
+{
 
   /**
    * @var WarehouseSupplierRepository

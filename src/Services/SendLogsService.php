@@ -8,7 +8,8 @@ namespace Wayfair\Services;
 use Wayfair\Core\Api\Services\LogSenderService;
 use Wayfair\Repositories\PendingLogsRepository;
 
-class SendLogsService {
+class SendLogsService
+{
 
   /**
    * @var PendingLogsRepository

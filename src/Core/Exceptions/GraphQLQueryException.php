@@ -5,6 +5,7 @@
 
 namespace Wayfair\Core\Exceptions;
 
-class GraphQLQueryException extends \Exception {
+class GraphQLQueryException extends \Exception
+{
 
 }

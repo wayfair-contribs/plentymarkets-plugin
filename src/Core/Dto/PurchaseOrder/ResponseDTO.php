@@ -10,7 +10,8 @@ use Wayfair\Core\Dto\General\WarehouseDTO;
 use Wayfair\Core\Dto\General\ProductDTO;
 use Wayfair\Core\Dto\General\AddressDTO;
 
-class ResponseDTO {
+class ResponseDTO
+{
   /**
    * @var string
    */

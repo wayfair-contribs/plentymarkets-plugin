@@ -14,7 +14,8 @@ use Wayfair\Helpers\TranslationHelper;
  *
  * @package Wayfair\Core\Api\Services
  */
-class PurchaseOrderService extends APIService {
+class PurchaseOrderService extends APIService
+{
   const UNABLE_TO_GET_PURCHASE = 'unableToGetPurchaseOrderData';
 
   /**
@@ -60,10 +61,11 @@ class PurchaseOrderService extends APIService {
 
     $this->loggerContract
         ->info(
-            TranslationHelper::getLoggerKey('sendingPurchaseOrderQuery'), [
-              'additionalInfo' => ['query' => $query],
-              'method' => __METHOD__
-            ]
+          TranslationHelper::getLoggerKey('sendingPurchaseOrderQuery'),
+          [
+            'additionalInfo' => ['query' => $query],
+            'method' => __METHOD__
+          ]
         );
 
     try {
@@ -71,18 +73,20 @@ class PurchaseOrderService extends APIService {
       $responseBody = $response->getBodyAsArray();
       $this->loggerContract
           ->info(
-              TranslationHelper::getLoggerKey('purchaseOrderResponseData'), [
-                'additionalInfo' => ['purchaseOrder' => $responseBody],
-                'method' => __METHOD__
-              ]
+            TranslationHelper::getLoggerKey('purchaseOrderResponseData'),
+            [
+              'additionalInfo' => ['purchaseOrder' => $responseBody],
+              'method' => __METHOD__
+            ]
           );
       if (isset($responseBody['errors']) || empty($responseBody['data']['purchaseOrders'][0])) {
         $this->loggerContract
             ->error(
-                TranslationHelper::getLoggerKey(self::UNABLE_TO_GET_PURCHASE), [
-                  'additionalInfo' => ['purchaseOrder' => $responseBody],
-                  'method' => __METHOD__
-                ]
+              TranslationHelper::getLoggerKey(self::UNABLE_TO_GET_PURCHASE),
+              [
+                'additionalInfo' => ['purchaseOrder' => $responseBody],
+                'method' => __METHOD__
+              ]
             );
         throw new \Exception(TranslationHelper::getLoggerMessage(self::UNABLE_TO_GET_PURCHASE));
       }
@@ -91,13 +95,13 @@ class PurchaseOrderService extends APIService {
     } catch (\Exception $exception) {
       $this->loggerContract
           ->error(
-              TranslationHelper::getLoggerKey(self::UNABLE_TO_GET_PURCHASE), [
-                'additionalInfo' => ['message' => $exception->getMessage()],
-                'method' => __METHOD__
-              ]
+            TranslationHelper::getLoggerKey(self::UNABLE_TO_GET_PURCHASE),
+            [
+              'additionalInfo' => ['message' => $exception->getMessage()],
+              'method' => __METHOD__
+            ]
           );
       throw $exception;
     }
   }
-
 }

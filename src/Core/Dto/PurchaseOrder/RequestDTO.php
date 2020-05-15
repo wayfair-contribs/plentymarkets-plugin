@@ -5,6 +5,7 @@
 
 namespace Wayfair\Core\Dto\PurchaseOrder;
 
-class RequestDTO {
+class RequestDTO
+{
 
 }

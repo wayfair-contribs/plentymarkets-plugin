@@ -182,7 +182,8 @@ class ShipmentNotificationService
       } catch (\Exception $exception) {
         $this->loggerContract
           ->error(
-            TranslationHelper::getLoggerKey(self::LOG_KEY_CANNOT_CREATE_ASN_REQUEST_BODY), [
+            TranslationHelper::getLoggerKey(self::LOG_KEY_CANNOT_CREATE_ASN_REQUEST_BODY),
+            [
               'additionalInfo' => [
                 'exception' => $exception,
                 'message' => $exception->getMessage(),
@@ -202,7 +203,8 @@ class ShipmentNotificationService
       if (!isset($requestDto) || empty($requestDto)) {
         $this->loggerContract
           ->error(
-            TranslationHelper::getLoggerKey(self::LOG_KEY_CANNOT_CREATE_ASN_REQUEST_BODY), [
+            TranslationHelper::getLoggerKey(self::LOG_KEY_CANNOT_CREATE_ASN_REQUEST_BODY),
+            [
               'additionalInfo' => [
                 'order' => $order
               ],
@@ -221,7 +223,8 @@ class ShipmentNotificationService
       } catch (\Exception $exception) {
         $this->loggerContract
           ->error(
-            TranslationHelper::getLoggerKey(self::LOG_KEY_CANNOT_SEND_ASN), [
+            TranslationHelper::getLoggerKey(self::LOG_KEY_CANNOT_SEND_ASN),
+            [
               'additionalInfo' => [
                 'exception' => $exception,
                 'message' => $exception->getMessage(),
@@ -237,15 +240,20 @@ class ShipmentNotificationService
       }
 
       if ($sent) {
-        $externalLogs->addASNLog('ASN success', 'asnSuccess', 1,
-          TimeHelper::getMilliseconds() - $timestampBeforeSend);
+        $externalLogs->addASNLog(
+          'ASN success',
+          'asnSuccess',
+          1,
+          TimeHelper::getMilliseconds() - $timestampBeforeSend
+        );
         $this->logASNSentRecord($order);
         return true;
       }
 
       $this->loggerContract
         ->error(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_CANNOT_SEND_ASN), [
+          TranslationHelper::getLoggerKey(self::LOG_KEY_CANNOT_SEND_ASN),
+          [
             'additionalInfo' => [
               'order' => $order
             ],
@@ -253,8 +261,12 @@ class ShipmentNotificationService
           ]
         );
 
-      $externalLogs->addASNLog('ASN failed', 'asnFailed', 1,
-        TimeHelper::getMilliseconds() - $timestampBeforeSend);
+      $externalLogs->addASNLog(
+        'ASN failed',
+        'asnFailed',
+        1,
+        TimeHelper::getMilliseconds() - $timestampBeforeSend
+      );
       $externalLogs->addErrorLog('Failed to send ASN, PO:' . $requestDto->getPoNumber());
 
 
@@ -299,7 +311,8 @@ class ShipmentNotificationService
       if (!isset($purchaseOrderInfo) || empty($purchaseOrderInfo)) {
         $this->loggerContract
           ->error(
-            TranslationHelper::getLoggerKey(self::LOG_KEY_SHIPPING_CANNOT_GET_PO_DATA), [
+            TranslationHelper::getLoggerKey(self::LOG_KEY_SHIPPING_CANNOT_GET_PO_DATA),
+            [
               'additionalInfo' => ['orderId' => $orderId],
               'method' => __METHOD__,
               'referenceType' => 'purchaseOrder',
@@ -317,7 +330,8 @@ class ShipmentNotificationService
       if (!isset($wayfairShippingInformation) || empty($wayfairShippingInformation)) {
         $this->loggerContract
           ->error(
-            TranslationHelper::getLoggerKey(self::LOG_KEY_WAYFAIR_MISSING_SHIPPING_INFO), [
+            TranslationHelper::getLoggerKey(self::LOG_KEY_WAYFAIR_MISSING_SHIPPING_INFO),
+            [
               'additionalInfo' => ['orderId' => $orderId],
               'method' => __METHOD__,
               'referenceType' => 'purchaseOrder',
@@ -334,7 +348,8 @@ class ShipmentNotificationService
       if (!isset($plentymarketsShippingInformation) || empty($plentymarketsShippingInformation)) {
         $this->loggerContract
           ->error(
-            TranslationHelper::getLoggerKey(self::LOG_KEY_PM_MISSING_SHIPPING_INFO), [
+            TranslationHelper::getLoggerKey(self::LOG_KEY_PM_MISSING_SHIPPING_INFO),
+            [
               'additionalInfo' => [
                 'orderId' => $orderId,
                 'poNumber' => $poNumber
@@ -351,7 +366,8 @@ class ShipmentNotificationService
       }
 
       $this->loggerContract->debug(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG_ORDER_PURCHASE_ORDER_AND_SHIPPING_INFO), [
+        TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG_ORDER_PURCHASE_ORDER_AND_SHIPPING_INFO),
+        [
           'additionalInfo' => [
             'order' => $order,
             'po' => $purchaseOrderInfo,
@@ -370,7 +386,8 @@ class ShipmentNotificationService
       if ($this->shipmentProviderService->isShippingWithWayfair() || empty($plentymarketsShippingInformation->shippingServiceProvider)) {
         // shipping on wayfair account
         $this->loggerContract->info(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_SHIPPING_ON_WAYFAIR), [
+          TranslationHelper::getLoggerKey(self::LOG_KEY_SHIPPING_ON_WAYFAIR),
+          [
             'additionalInfo' => [
               'PoNumber' => $poNumber,
               'order' => $order
@@ -390,7 +407,8 @@ class ShipmentNotificationService
           // because the lack of tracking information is not a fatal issue for ASNs,
           // and there are legitimate reasons to send an ASN without the tracking info.
           $this->loggerContract->error(
-            TranslationHelper::getLoggerKey(self::LOG_KEY_TRACKING_NUMBER_EMPTY_BUT_NOT_REQUIRED_FOR_ASN), [
+            TranslationHelper::getLoggerKey(self::LOG_KEY_TRACKING_NUMBER_EMPTY_BUT_NOT_REQUIRED_FOR_ASN),
+            [
               'additionalInfo' => [
                 'PoNumber' => $poNumber,
                 'order' => $order,
@@ -417,7 +435,8 @@ class ShipmentNotificationService
           // because the lack of tracking information is not a fatal issue for ASNs,
           // and there are legitimate reasons to send an ASN without the tracking info.
           $this->loggerContract->error(
-            TranslationHelper::getLoggerKey(self::LOG_KEY_TRACKING_NUMBER_EMPTY_BUT_NOT_REQUIRED_FOR_ASN), [
+            TranslationHelper::getLoggerKey(self::LOG_KEY_TRACKING_NUMBER_EMPTY_BUT_NOT_REQUIRED_FOR_ASN),
+            [
               'additionalInfo' => [
                 'PoNumber' => $poNumber,
                 'order' => $order
@@ -476,7 +495,8 @@ class ShipmentNotificationService
       } else {
         //Ship on own account info, get data from PM.
         $this->loggerContract->info(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_SHIPPING_ON_OWN_ACCOUNT), [
+          TranslationHelper::getLoggerKey(self::LOG_KEY_SHIPPING_ON_OWN_ACCOUNT),
+          [
             'additionalInfo' => [
               'PoNumber' => $poNumber,
               'order' => $order
@@ -542,7 +562,8 @@ class ShipmentNotificationService
       $plentyBillingAddress = $order->billingAddress;
       if (!isset($plentyBillingAddress)) {
         $this->loggerContract->error(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_PM_MISSING_BILLING_INFO), [
+          TranslationHelper::getLoggerKey(self::LOG_KEY_PM_MISSING_BILLING_INFO),
+          [
             'additionalInfo' => [
               'PoNumber' => $poNumber,
               'order' => $order
@@ -571,7 +592,8 @@ class ShipmentNotificationService
       $plentyDeliveryAddress = $order->deliveryAddress;
       if (!isset($plentyDeliveryAddress)) {
         $this->loggerContract->error(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_PM_MISSING_DELIVERY_ADDRESS), [
+          TranslationHelper::getLoggerKey(self::LOG_KEY_PM_MISSING_DELIVERY_ADDRESS),
+          [
             'additionalInfo' => [
               'PoNumber' => $poNumber,
               'order' => $order
@@ -589,7 +611,8 @@ class ShipmentNotificationService
       $requestDto->setDestinationAddress($wayfairDestinationAddress);
 
       $this->loggerContract->info(
-        TranslationHelper::getLoggerKey('finishedPreparedDto'), [
+        TranslationHelper::getLoggerKey('finishedPreparedDto'),
+        [
           'additionalInfo' => $requestDto,
           'method' => __METHOD__
         ]
@@ -630,7 +653,8 @@ class ShipmentNotificationService
 
     $this->loggerContract
       ->debug(
-        TranslationHelper::getLoggerKey('checkIfASNSent'), [
+        TranslationHelper::getLoggerKey('checkIfASNSent'),
+        [
           'additionalInfo' => ['orderId' => $order->id, 'record' => $record],
           'method' => __METHOD__
         ]

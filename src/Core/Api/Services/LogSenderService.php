@@ -15,7 +15,8 @@ use Wayfair\Helpers\ConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Http\WayfairResponse;
 
-class LogSenderService {
+class LogSenderService
+{
 
   /**
    * @var ClientInterfaceContract

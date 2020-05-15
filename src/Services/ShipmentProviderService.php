@@ -19,7 +19,8 @@ use Wayfair\Repositories\KeyValueRepository;
  *
  * @package Wayfair\Services
  */
-class ShipmentProviderService {
+class ShipmentProviderService
+{
   /**
    * @var ShippingServiceProviderRepositoryContract
    */
@@ -131,5 +132,4 @@ class ShipmentProviderService {
 
     return $this->getCarrierScacMapping();
   }
-
 }

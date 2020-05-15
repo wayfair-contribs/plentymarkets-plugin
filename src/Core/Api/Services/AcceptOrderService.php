@@ -55,7 +55,8 @@ class AcceptOrderService extends APIService
     } catch (\Exception $e) {
       $this->loggerContract
         ->error(
-          TranslationHelper::getLoggerKey('acceptPurchaseOrderError'), [
+          TranslationHelper::getLoggerKey('acceptPurchaseOrderError'),
+          [
             'additionalInfo' => ['message' => $e->getMessage()],
             'method' => __METHOD__
           ]
@@ -67,7 +68,8 @@ class AcceptOrderService extends APIService
       // FIXME: finding status code of '0' in plentymarkets logs implying that the response is not populated
       $this->loggerContract
         ->error(
-          TranslationHelper::getLoggerKey('acceptPurchaseOrderResponseError'), [
+          TranslationHelper::getLoggerKey('acceptPurchaseOrderResponseError'),
+          [
             'additionalInfo' => ['body' => $body],
             'method' => __METHOD__,
             'referenceType' => 'statusCode',

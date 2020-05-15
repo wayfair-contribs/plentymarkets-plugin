@@ -5,7 +5,8 @@
 
 namespace Wayfair\Core\Dto\Inventory;
 
-class ResponseDTO {
+class ResponseDTO
+{
   /**
    * @var int
    */

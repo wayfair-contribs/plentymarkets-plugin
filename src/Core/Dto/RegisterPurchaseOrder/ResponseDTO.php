@@ -9,7 +9,8 @@ use Wayfair\Core\Dto\General\BillOfLadingDTO;
 use Wayfair\Core\Dto\General\ShippingLabelDTO;
 use Wayfair\Core\Dto\General\GeneratedShippingLabelDTO;
 
-class ResponseDTO {
+class ResponseDTO
+{
 
   /**
    * @var string

@@ -16,7 +16,8 @@ use Wayfair\Helpers\TranslationHelper;
  *
  * @package Wayfair\Core\Api\Services
  */
-class RegisterPurchaseOrderService extends APIService implements RegisterPurchaseOrderContract {
+class RegisterPurchaseOrderService extends APIService implements RegisterPurchaseOrderContract
+{
   const LOG_KEY_UNABLE_TO_REGISTER_ORDER = 'unableToRegisterOrder';
 
   /**
@@ -48,12 +49,13 @@ class RegisterPurchaseOrderService extends APIService implements RegisterPurchas
       if (isset($responseBody['errors']) || empty($responseBody['data']['purchaseOrders']['register'])) {
         $this->loggerContract
             ->error(
-                TranslationHelper::getLoggerKey(self::LOG_KEY_UNABLE_TO_REGISTER_ORDER), [
-                  'additionalInfo' => ['error' => $responseBody['errors']],
-                  'method' => __METHOD__,
-                  'referenceType' => 'poNumber',
-                  'referenceValue' => $requestDTO->getPoNumber()
-                ]
+              TranslationHelper::getLoggerKey(self::LOG_KEY_UNABLE_TO_REGISTER_ORDER),
+              [
+                'additionalInfo' => ['error' => $responseBody['errors']],
+                'method' => __METHOD__,
+                'referenceType' => 'poNumber',
+                'referenceValue' => $requestDTO->getPoNumber()
+              ]
             );
         throw new \Exception(TranslationHelper::getLoggerMessage(self::LOG_KEY_UNABLE_TO_REGISTER_ORDER));
       }
@@ -63,11 +65,12 @@ class RegisterPurchaseOrderService extends APIService implements RegisterPurchas
     } catch (\Exception $e) {
       $this->loggerContract
           ->error(
-              TranslationHelper::getLoggerKey(self::LOG_KEY_UNABLE_TO_REGISTER_ORDER), [
-                'additionalInfo' => ['message' => $e->getMessage()],
-                'referenceType' => 'poNumber',
-                'referenceValue' => $requestDTO->getPoNumber()
-              ]
+            TranslationHelper::getLoggerKey(self::LOG_KEY_UNABLE_TO_REGISTER_ORDER),
+            [
+              'additionalInfo' => ['message' => $e->getMessage()],
+              'referenceType' => 'poNumber',
+              'referenceValue' => $requestDTO->getPoNumber()
+            ]
           );
       throw $e;
     }

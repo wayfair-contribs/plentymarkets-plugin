@@ -13,7 +13,8 @@ use Plenty\Plugin\Application;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Repositories\KeyValueRepository;
 
-class PurchaseOrderMapper {
+class PurchaseOrderMapper
+{
   const ORDER_STATUS_WAITING_FOR_ACTIVATION = 2;
   const ORDER_STATUS_CANCELED = 8;
   /**

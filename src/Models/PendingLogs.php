@@ -7,7 +7,8 @@ namespace Wayfair\Models;
 
 use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 
-class PendingLogs extends Model {
+class PendingLogs extends Model
+{
 
   /**
    * @var      int

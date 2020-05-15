@@ -14,7 +14,8 @@ use Wayfair\Models\OrderASN;
  *
  * @package Wayfair\Migrations
  */
-class CreateOrderASNTable {
+class CreateOrderASNTable
+{
   /**
    * @param Migrate $migrate
    *

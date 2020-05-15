@@ -16,7 +16,8 @@ use Wayfair\Services\ShipmentRegisterService;
  *
  * @package Wayfair\Controllers
  */
-class ShippingController extends Controller {
+class ShippingController extends Controller
+{
   /**
    * @var ShipmentRegisterService
    */
@@ -52,10 +53,11 @@ class ShippingController extends Controller {
     $orderIds = $this->processOrderIds($request, $orderIds);
     $this->loggerContract
         ->info(
-            TranslationHelper::getLoggerKey('registerShipmentForOrders'), [
-              'additionalInfo' => ['orderIds' => $orderIds],
-              'method' => __METHOD__
-            ]
+          TranslationHelper::getLoggerKey('registerShipmentForOrders'),
+          [
+            'additionalInfo' => ['orderIds' => $orderIds],
+            'method' => __METHOD__
+          ]
         );
 
     return $this->shipmentRegisterService->register($orderIds);
@@ -74,10 +76,11 @@ class ShippingController extends Controller {
     $orderIds = $this->processOrderIds($request, $orderIds);
     $this->loggerContract
         ->info(
-            TranslationHelper::getLoggerKey('getGeneratedLabels'), [
-              'additionalInfo' => ['orderIds' => $orderIds],
-              'method' => __METHOD__
-            ]
+          TranslationHelper::getLoggerKey('getGeneratedLabels'),
+          [
+            'additionalInfo' => ['orderIds' => $orderIds],
+            'method' => __METHOD__
+          ]
         );
 
     return $this->shipmentRegisterService->getGeneratedLabels($orderIds);
@@ -96,10 +99,11 @@ class ShippingController extends Controller {
     $orderIds = $this->processOrderIds($request, $orderIds);
     $this->loggerContract
         ->info(
-            TranslationHelper::getLoggerKey('deleteShipmentForOrders'), [
-              'additionalInfo' => ['orderIds' => $orderIds],
-              'method' => __METHOD__
-            ]
+          TranslationHelper::getLoggerKey('deleteShipmentForOrders'),
+          [
+            'additionalInfo' => ['orderIds' => $orderIds],
+            'method' => __METHOD__
+          ]
         );
 
     return $this->shipmentRegisterService->unregister($orderIds);
@@ -121,5 +125,4 @@ class ShippingController extends Controller {
 
     return $orderIds;
   }
-
 }

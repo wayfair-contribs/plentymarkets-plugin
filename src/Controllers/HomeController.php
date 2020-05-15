@@ -13,7 +13,8 @@ use Plenty\Plugin\Templates\Twig;
  *
  * @package Wayfair\Controllers
  */
-class HomeController extends Controller {
+class HomeController extends Controller
+{
 
   /**
    * @param Twig $twig
@@ -24,5 +25,4 @@ class HomeController extends Controller {
   {
     return $twig->render('Wayfair::content.home');
   }
-
 }

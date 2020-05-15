@@ -11,7 +11,8 @@ use Plenty\Plugin\ConfigRepository;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Repositories\KeyValueRepository;
 
-class ConfigHelper extends AbstractConfigHelper {
+class ConfigHelper extends AbstractConfigHelper
+{
 
   const CACHING_MINUTES = 360;
   const INTEGRATION_AGENT_NAME = 'PlentyMarket';

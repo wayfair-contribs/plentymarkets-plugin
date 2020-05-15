@@ -5,7 +5,8 @@
 
 namespace Wayfair\Core\Dto\General;
 
-class WarehouseDTO {
+class WarehouseDTO
+{
   /**
    * @var string
    */

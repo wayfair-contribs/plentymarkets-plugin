@@ -15,7 +15,8 @@ use Wayfair\Services\ShipmentProviderService;
  *
  * @package Wayfair\Controllers
  */
-class CarrierScacController {
+class CarrierScacController
+{
 
   const INPUT_DATA = 'data';
 
@@ -90,5 +91,4 @@ class CarrierScacController {
 
     return json_encode(['name' => $this->shipmentProviderService->updateShippingMethod($input)]);
   }
-
 }

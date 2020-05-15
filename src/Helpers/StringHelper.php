@@ -8,7 +8,8 @@ namespace Wayfair\Helpers;
 /**
  * Utilities for working with Strings
  */
-abstract class StringHelper {
+abstract class StringHelper
+{
 
     const MASK_TEMPLATE = '********';
 
@@ -39,5 +40,4 @@ abstract class StringHelper {
 
       return $masked;
   }
-
 }

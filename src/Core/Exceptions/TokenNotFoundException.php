@@ -5,6 +5,7 @@
 
 namespace Wayfair\Core\Exceptions;
 
-class TokenNotFoundException extends \Exception {
+class TokenNotFoundException extends \Exception
+{
 
 }

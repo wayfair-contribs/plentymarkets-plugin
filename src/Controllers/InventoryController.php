@@ -12,7 +12,8 @@ use Plenty\Plugin\Http\Request;
 use Wayfair\Core\Api\Services\InventoryService;
 use Wayfair\Services\InventoryUpdateService;
 
-class InventoryController {
+class InventoryController
+{
 
   /**
    * @param InventoryService $inventoryService
@@ -42,16 +43,16 @@ class InventoryController {
      */
     $variationSearchRepositoryContract = pluginApp(VariationSearchRepositoryContract::class);
     $variationSearchRepositoryContract->setFilters(
-        [
-          'referrerId' => $data,
-        ]
+      [
+        'referrerId' => $data,
+      ]
     );
     $variationSearchRepositoryContract->setSearchParams(
-        [
-          'with' => [
-            'item' => null
-          ]
+      [
+        'with' => [
+          'item' => null
         ]
+      ]
     );
     $result = $variationSearchRepositoryContract->search();
 
@@ -114,9 +115,9 @@ class InventoryController {
     $result2 = $itemDataLayerRepository->search($resultFields, $filters);
 
     return json_encode(
-        [
-          'result' => $result2->toArray()
-        ]
+      [
+        'result' => $result2->toArray()
+      ]
     );
   }
 

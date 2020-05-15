@@ -5,7 +5,8 @@
 
 namespace Wayfair\Core\Helpers;
 
-class TimeHelper {
+class TimeHelper
+{
 
   /**
    * @return int

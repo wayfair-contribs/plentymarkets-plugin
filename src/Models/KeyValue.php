@@ -7,7 +7,8 @@ namespace Wayfair\Models;
 
 use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 
-class KeyValue extends Model {
+class KeyValue extends Model
+{
 
   /**
    * @var string

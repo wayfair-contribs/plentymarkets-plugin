@@ -7,7 +7,8 @@ namespace Wayfair\Migrations;
 
 use Wayfair\Helpers\PaymentHelper;
 
-class CreatePaymentMethod {
+class CreatePaymentMethod
+{
 
   /**
    * @var PaymentHelper $paymentHelper

@@ -5,6 +5,7 @@
 
 namespace Wayfair\Core\Dto\ShippingLabelInfo;
 
-class RequestDTO {
+class RequestDTO
+{
 
 }

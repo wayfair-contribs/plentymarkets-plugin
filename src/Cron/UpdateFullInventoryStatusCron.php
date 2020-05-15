@@ -11,7 +11,8 @@ use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Repositories\KeyValueRepository;
 
-class UpdateFullInventoryStatusCron extends Cron {
+class UpdateFullInventoryStatusCron extends Cron
+{
 
   /**
    * @var KeyValueRepository

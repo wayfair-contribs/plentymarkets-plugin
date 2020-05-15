@@ -81,7 +81,8 @@ class OrderShipmentNotifyProcedure
       }
 
       $this->loggerContract->info(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_RUN_ORDER_STATUS_CHANGE_EVENT), [
+        TranslationHelper::getLoggerKey(self::LOG_KEY_RUN_ORDER_STATUS_CHANGE_EVENT),
+        [
           'additionalInfo' => ['order' => $order],
           'method' => __METHOD__
         ]
@@ -90,7 +91,8 @@ class OrderShipmentNotifyProcedure
       if ($this->shipmentNotificationService->isOrderSentASN($order)) {
         // we believe the ASN was already sent - another will NOT be sent.
         $this->loggerContract->info(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_ASN_ALREADY_SENT), [
+          TranslationHelper::getLoggerKey(self::LOG_KEY_ASN_ALREADY_SENT),
+          [
             'additionalInfo' => ['order' => $order],
             'method' => __METHOD__
           ]
@@ -99,7 +101,8 @@ class OrderShipmentNotifyProcedure
         $externalLogs->addInfoLog("ASN already sent for order with ID " . $order->id . " so another will NOT be sent.");
       } else {
         $this->loggerContract->debug(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_SENDING_NEW_SHIPMENT_NOTIFICATION), [
+          TranslationHelper::getLoggerKey(self::LOG_KEY_SENDING_NEW_SHIPMENT_NOTIFICATION),
+          [
             'additionalInfo' => ['order' => $order],
             'method' => __METHOD__
           ]
@@ -108,7 +111,8 @@ class OrderShipmentNotifyProcedure
         $this->shipmentNotificationService->notifyShipment($order);
 
         $this->loggerContract->debug(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_FINISHED_SENDING_NEW_SHIPMENT_NOTIFICATION), [
+          TranslationHelper::getLoggerKey(self::LOG_KEY_FINISHED_SENDING_NEW_SHIPMENT_NOTIFICATION),
+          [
             'additionalInfo' => ['order' => $order],
             'method' => __METHOD__
           ]

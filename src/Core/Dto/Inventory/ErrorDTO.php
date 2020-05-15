@@ -5,7 +5,8 @@
 
 namespace Wayfair\Core\Dto\Inventory;
 
-class ErrorDTO {
+class ErrorDTO
+{
   /**
    * @var string
    */

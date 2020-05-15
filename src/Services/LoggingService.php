@@ -10,7 +10,8 @@ use Plenty\Plugin\Log\Loggable;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 
-class LoggingService implements LoggerContract {
+class LoggingService implements LoggerContract
+{
   use Loggable;
 
   const DEBUG = 'DEBUG';

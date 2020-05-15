@@ -5,7 +5,8 @@
 
 namespace Wayfair\Core\Dto\ShippingLabel;
 
-class ResponseDTO {
+class ResponseDTO
+{
 
   /**
    * ResponseDTO constructor.

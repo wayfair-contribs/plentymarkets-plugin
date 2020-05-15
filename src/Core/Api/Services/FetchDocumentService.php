@@ -44,7 +44,9 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
         $this->authService->refresh();
         // getOAuthToken() currently returns 'Bearer MyToken' NOT the bare token.
         curl_setopt(
-          $ch, CURLOPT_HTTPHEADER, [
+          $ch,
+          CURLOPT_HTTPHEADER,
+          [
             'Authorization: ' . $this->authService->getOAuthToken(),
             ConfigHelper::WAYFAIR_INTEGRATION_HEADER . ': ' . $this->configHelper->getIntegrationAgentHeader()
           ]
@@ -59,7 +61,8 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
       if (curl_errno($ch)) {
         $this->loggerContract
           ->error(
-            TranslationHelper::getLoggerKey(self::LOG_KEY_FAILED_WAYFAIR_API_CALL), [
+            TranslationHelper::getLoggerKey(self::LOG_KEY_FAILED_WAYFAIR_API_CALL),
+            [
               'additionalInfo' => ['url' => $url, 'accessToken' => StringHelper::mask($this->authService->getOAuthToken())],
               'method' => __METHOD__
             ]
@@ -88,7 +91,8 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
 
     $this->loggerContract
       ->debug(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_OBTAINING_TRACKING_NUMBER), [
+        TranslationHelper::getLoggerKey(self::LOG_KEY_OBTAINING_TRACKING_NUMBER),
+        [
           'additionalInfo' => [
             'poNumber' => $poNumber,
             'query' => $query
@@ -104,7 +108,8 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
 
       $this->loggerContract
         ->info(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_TRACKING_RESPONSE), [
+          TranslationHelper::getLoggerKey(self::LOG_KEY_TRACKING_RESPONSE),
+          [
             'additionalInfo' => ['responseBody' => $responseBody],
             'method' => __METHOD__
           ]
@@ -135,7 +140,8 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
     } catch (\Exception $e) {
       $this->loggerContract
         ->error(
-          TranslationHelper::getLoggerKey('unableToGetTrackingNumber'), [
+          TranslationHelper::getLoggerKey('unableToGetTrackingNumber'),
+          [
             'additionalInfo' => [
               'message' => $e->getMessage(),
               'responseBody' => $responseBody,
@@ -181,5 +187,4 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
   {
     return stripos($url, URLHelper::BASE_URL) === 0;
   }
-
 }

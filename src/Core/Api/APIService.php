@@ -14,7 +14,8 @@ use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Helpers\StringHelper;
 use Wayfair\Http\WayfairResponse;
 
-class APIService {
+class APIService
+{
 
   const LOG_KEY_API_SERVICE = 'apiService';
 

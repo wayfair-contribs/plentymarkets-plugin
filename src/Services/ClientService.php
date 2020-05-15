@@ -10,7 +10,8 @@ use Wayfair\Core\Contracts\ClientInterfaceContract;
 use Wayfair\Helpers\ConfigHelper;
 use Wayfair\Http\WayfairResponse;
 
-class ClientService implements ClientInterfaceContract {
+class ClientService implements ClientInterfaceContract
+{
 
   /**
    * @var LibraryCallContract
@@ -34,11 +35,11 @@ class ClientService implements ClientInterfaceContract {
   public function call($method, $arguments)
   {
     $response = $this->library->call(
-        ConfigHelper::PLUGIN_NAME . '::guzzle',
-        [
-          'method'    => $method,
-          'arguments' => $arguments
-        ]
+      ConfigHelper::PLUGIN_NAME . '::guzzle',
+      [
+        'method'    => $method,
+        'arguments' => $arguments
+      ]
     );
     return pluginApp(WayfairResponse::class, [$response]);
   }

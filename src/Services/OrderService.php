@@ -13,7 +13,8 @@ use Wayfair\Core\Helpers\TimeHelper;
 use Wayfair\Models\ExternalLogs;
 use Wayfair\Repositories\PendingOrdersRepository;
 
-class OrderService {
+class OrderService
+{
   /**
    * @var FetchOrderService
    */

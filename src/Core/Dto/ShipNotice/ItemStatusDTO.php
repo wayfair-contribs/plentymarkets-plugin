@@ -10,7 +10,8 @@ namespace Wayfair\Core\Dto\ShipNotice;
  *
  * @package Wayfair\Core\Dto\ShipNotice
  */
-class ItemStatusDTO {
+class ItemStatusDTO
+{
   /**
    * @var string
    */

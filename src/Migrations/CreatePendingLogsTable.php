@@ -8,7 +8,8 @@ namespace Wayfair\Migrations;
 use Plenty\Modules\Plugin\DataBase\Contracts\Migrate;
 use Wayfair\Models\PendingLogs;
 
-class CreatePendingLogsTable {
+class CreatePendingLogsTable
+{
 
   /**
    * @param Migrate $migrate

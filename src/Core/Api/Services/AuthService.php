@@ -16,7 +16,8 @@ use Wayfair\Helpers\ConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Http\WayfairResponse;
 
-class AuthService implements AuthenticationContract {
+class AuthService implements AuthenticationContract
+{
   /**
    * @var StorageInterfaceContract
    */
@@ -75,13 +76,13 @@ class AuthService implements AuthenticationContract {
           ConfigHelper::WAYFAIR_INTEGRATION_HEADER => ConfigHelper::INTEGRATION_AGENT_NAME
         ],
         'body' => json_encode(
-                [
-                  'client_id' => $this->client_id,
-                  'client_secret' => $this->client_secret,
-                  'audience' => URLHelper::getBaseUrl(),
-                  'grant_type' => 'client_credentials'
-                ]
-            )
+          [
+            'client_id' => $this->client_id,
+            'client_secret' => $this->client_secret,
+            'audience' => URLHelper::getBaseUrl(),
+            'grant_type' => 'client_credentials'
+          ]
+        )
       ]
     ];
     $this->loggerContract

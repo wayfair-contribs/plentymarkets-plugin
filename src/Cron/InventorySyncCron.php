@@ -10,7 +10,8 @@ use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Services\InventoryUpdateService;
 
-class InventorySyncCron extends Cron {
+class InventorySyncCron extends Cron
+{
 
   /**
    * @throws \Exception

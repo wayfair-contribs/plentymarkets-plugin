@@ -9,7 +9,8 @@ use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Models\PendingOrders;
 
-class PendingOrdersRepository extends Repository {
+class PendingOrdersRepository extends Repository
+{
   const MAX_ATTEMPTS = 5;
   const GET_LIMIT = 50;
 

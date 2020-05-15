@@ -14,7 +14,8 @@ use Wayfair\Repositories\KeyValueRepository;
  *
  * @package Wayfair\Migrations
  */
-class CreateDefaultItemMapping {
+class CreateDefaultItemMapping
+{
   /**
    * @var KeyValueRepository
    */
@@ -41,5 +42,4 @@ class CreateDefaultItemMapping {
       $this->keyValueRepository->putOrReplace(AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD, AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER);
     }
   }
-
 }

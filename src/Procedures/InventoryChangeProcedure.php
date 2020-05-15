@@ -8,7 +8,8 @@ namespace Wayfair\Procedures;
 use Plenty\Modules\EventProcedures\Events\EventProceduresTriggered;
 use Wayfair\Core\Api\Services\InventoryService;
 
-class InventoryChangeProcedure {
+class InventoryChangeProcedure
+{
 
   /**
    * @var InventoryService

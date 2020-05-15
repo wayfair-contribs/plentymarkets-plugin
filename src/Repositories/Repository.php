@@ -8,7 +8,8 @@ namespace Wayfair\Repositories;
 use Plenty\Modules\Frontend\Services\AccountService;
 use Wayfair\Core\Contracts\LoggerContract;
 
-class Repository {
+class Repository
+{
   /**
    * @var AccountService
    */
@@ -37,5 +38,4 @@ class Repository {
   {
     return $this->accountService->getAccountContactId();
   }
-
 }

@@ -5,7 +5,8 @@
 
 namespace Wayfair\Core\Dto;
 
-class Constants {
+class Constants
+{
   const UNIT_TYPE_CARTON = 'CARTON';
   const UNIT_TYPE_BAG = 'BAG';
   const UNIT_TYPE_ROLL = 'ROLL';
@@ -76,5 +77,4 @@ class Constants {
 
   const SUPPLIER_SHIPPED_ASN = 'SHIPPED_ASN';
   const SHIPPING_WITH_WF = 'wayfair_shipping';
-
 }

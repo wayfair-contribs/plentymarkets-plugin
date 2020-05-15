@@ -8,7 +8,8 @@ namespace Wayfair\Core\Contracts;
 use Wayfair\Core\Dto\RegisterPurchaseOrder\RequestDTO;
 use Wayfair\Core\Dto\RegisterPurchaseOrder\ResponseDTO;
 
-interface RegisterPurchaseOrderContract {
+interface RegisterPurchaseOrderContract
+{
 
   /**
    * Register for a purchase order shipping label.

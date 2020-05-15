@@ -16,7 +16,8 @@ use Wayfair\Models\WarehouseSupplier;
  *
  * @package Wayfair\Repositories
  */
-class WarehouseSupplierRepository extends Repository {
+class WarehouseSupplierRepository extends Repository
+{
 
   const LOG_KEY_QUERY_FAILED = 'warehouseSupplierQueryFailed';
 
@@ -173,14 +174,16 @@ class WarehouseSupplierRepository extends Repository {
   public function saveMappings($data = [])
   {
     $removedData = array_filter(
-        $data, function ($datum) {
+      $data,
+      function ($datum) {
           return isset($datum['removed']);
-        }
+      }
     );
     $createdData = array_filter(
-        $data, function ($datum) {
+      $data,
+      function ($datum) {
           return !isset($datum['removed']);
-        }
+      }
     );
     $data = array_merge($removedData, $createdData);
     foreach ($data as $datum) {

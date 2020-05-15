@@ -17,7 +17,8 @@ use Wayfair\Models\OrderASN;
  *
  * @package Wayfair\Repositories
  */
-class OrderASNRepository extends Repository {
+class OrderASNRepository extends Repository
+{
 
   const LOG_KEY_QUERY_FAILED = 'asnQueryFailed';
 
@@ -86,10 +87,11 @@ class OrderASNRepository extends Repository {
     $loggerContract = pluginApp(LoggerContract::class);
     $loggerContract
         ->info(
-            TranslationHelper::getLoggerKey('addOrderToSentASNList'), [
-              'additionalInfo' => ['order' => $data],
-              'method' => __METHOD__
-            ]
+          TranslationHelper::getLoggerKey('addOrderToSentASNList'),
+          [
+            'additionalInfo' => ['order' => $data],
+            'method' => __METHOD__
+          ]
         );
 
     if ($data['orderId']) {

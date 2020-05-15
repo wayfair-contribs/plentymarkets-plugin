@@ -5,7 +5,8 @@
 
 namespace Wayfair\Http;
 
-class WayfairResponse {
+class WayfairResponse
+{
 
   /**
    * @var mixed

@@ -5,7 +5,8 @@
 
 namespace Wayfair\Core\Dto\ShippingLabelInfo;
 
-class ResponseDTO {
+class ResponseDTO
+{
   /**
    * @var string
    */

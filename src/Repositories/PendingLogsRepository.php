@@ -9,7 +9,8 @@ use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Models\PendingLogs;
 
-class PendingLogsRepository extends Repository {
+class PendingLogsRepository extends Repository
+{
 
   const LOG_KEY_QUERY_FAILED = 'pendingLogsQueryFailed';
 

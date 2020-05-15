@@ -16,7 +16,8 @@ use Wayfair\Repositories\WarehouseSupplierRepository;
  *
  * @package Wayfair\Controllers
  */
-class WarehouseController extends Controller {
+class WarehouseController extends Controller
+{
 
   /**
    * @param Twig $twig

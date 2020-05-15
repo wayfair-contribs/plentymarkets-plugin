@@ -12,7 +12,8 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Model;
  *
  * @package Wayfair\Models
  */
-class OrderASN extends Model {
+class OrderASN extends Model
+{
   /**
    * @var      int
    * @property int

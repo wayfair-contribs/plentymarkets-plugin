@@ -8,7 +8,8 @@ namespace Wayfair\Migrations;
 use Wayfair\Helpers\ConfigHelper;
 use Wayfair\Repositories\KeyValueRepository;
 
-class CreateOrderImportDate {
+class CreateOrderImportDate
+{
 
   /**
    * @var KeyValueRepository
@@ -32,5 +33,4 @@ class CreateOrderImportDate {
       $this->keyValueRepository->putOrReplace(ConfigHelper::IMPORT_ORDER_SINCE, date('Y-m-d'));
     }
   }
-
 }

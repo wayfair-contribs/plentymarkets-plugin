@@ -12,7 +12,8 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Model;
  *
  * @package Wayfair\Models
  */
-class CarrierScac extends Model {
+class CarrierScac extends Model
+{
   /**
    * @var      int
    * @property int

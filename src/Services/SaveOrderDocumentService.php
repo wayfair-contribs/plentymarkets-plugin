@@ -104,7 +104,8 @@ class SaveOrderDocumentService
     if (empty($label_url)) {
       $this->loggerContract
         ->error(
-          TranslationHelper::getLoggerKey('emptyLabelUrl'), [
+          TranslationHelper::getLoggerKey('emptyLabelUrl'),
+          [
             'additionalInfo' => [
               'responseDto' => $responseDTO,
               'PO' => $poNumberWithPrefix,
@@ -143,14 +144,17 @@ class SaveOrderDocumentService
   {
     $this->loggerContract
       ->info(
-        TranslationHelper::getLoggerKey('saveFileSThree'), [
+        TranslationHelper::getLoggerKey('saveFileSThree'),
+        [
           'additionalInfo' => ['key' => $fileName, 'data' => base64_encode($fileData)],
           'method' => __METHOD__
         ]
       );
 
     return $this->storageRepositoryContract->uploadObject(
-      AbstractConfigHelper::PLUGIN_NAME, $fileName, $fileData
+      AbstractConfigHelper::PLUGIN_NAME,
+      $fileName,
+      $fileData
     );
   }
 

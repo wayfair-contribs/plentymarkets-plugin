@@ -5,7 +5,8 @@
 
 namespace Wayfair\Core\Helpers;
 
-class URLHelper {
+class URLHelper
+{
   // Production Base URLs
   const BASE_URL = 'https://api.wayfair.com/';
   const BASE_AUTH_URL = 'https://sso.auth.wayfair.com/';
@@ -56,5 +57,4 @@ class URLHelper {
   {
     return self::BASE_URL . 'v1/packing_slip/' . $poNumber;
   }
-
 }

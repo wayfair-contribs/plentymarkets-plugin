@@ -13,7 +13,8 @@ use Wayfair\Core\Helpers\AbstractConfigHelper;
  *
  * @package Wayfair\Helpers
  */
-class TranslationHelper {
+class TranslationHelper
+{
   /**
    * @var Translator $translator
    */

@@ -14,7 +14,8 @@ use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Repositories\KeyValueRepository;
 
-class ProductMapper {
+class ProductMapper
+{
   /**
    * @var VariationSearchRepositoryContract
    */
@@ -120,12 +121,13 @@ class ProductMapper {
     $loggerContract = pluginApp(LoggerContract::class);
     $loggerContract
         ->warning(
-            TranslationHelper::getLoggerKey('variationNotFound'), [
-              'additionalInfo' => ['partNumber' => $partNumber],
-              'referenceType' => 'poNumber',
-              'referenceValue' => $poNumber,
-              'method' => __METHOD__
-            ]
+          TranslationHelper::getLoggerKey('variationNotFound'),
+          [
+            'additionalInfo' => ['partNumber' => $partNumber],
+            'referenceType' => 'poNumber',
+            'referenceValue' => $poNumber,
+            'method' => __METHOD__
+          ]
         );
 
     return 0;

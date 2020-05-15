@@ -5,7 +5,8 @@
 
 namespace Wayfair\Core\Dto\General;
 
-class WeightDTO {
+class WeightDTO
+{
   /**
    * @var float
    */

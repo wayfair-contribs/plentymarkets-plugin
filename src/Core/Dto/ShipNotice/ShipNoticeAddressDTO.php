@@ -13,7 +13,8 @@ use Wayfair\Core\Dto\General\AddressDTO;
  *
  * @package Wayfair\Core\Dto\ShipNotice
  */
-class ShipNoticeAddressDTO extends AddressDTO {
+class ShipNoticeAddressDTO extends AddressDTO
+{
 
   /**
    * @var string

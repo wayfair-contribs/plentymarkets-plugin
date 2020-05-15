@@ -8,7 +8,8 @@ namespace Wayfair\Services;
 use Wayfair\Core\Contracts\StorageInterfaceContract;
 use Wayfair\Repositories\KeyValueRepository;
 
-class StorageService implements StorageInterfaceContract {
+class StorageService implements StorageInterfaceContract
+{
 
   /**
    * @var KeyValueRepository

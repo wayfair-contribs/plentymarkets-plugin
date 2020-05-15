@@ -10,7 +10,8 @@ use Plenty\Plugin\Http\Request;
 use Wayfair\Repositories\PendingLogsRepository;
 use Wayfair\Services\SendLogsService;
 
-class PendingLogsController extends Controller {
+class PendingLogsController extends Controller
+{
 
   /**
    * @return array

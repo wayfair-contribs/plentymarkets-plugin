@@ -7,7 +7,8 @@ namespace Wayfair\Validators;
 
 use Plenty\Validation\Validator;
 
-class WarehouseSupplierValidator extends Validator {
+class WarehouseSupplierValidator extends Validator
+{
 
   /**
    * @return array

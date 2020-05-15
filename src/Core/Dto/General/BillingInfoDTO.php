@@ -5,7 +5,8 @@
 
 namespace Wayfair\Core\Dto\General;
 
-class BillingInfoDTO {
+class BillingInfoDTO
+{
   /**
    * @var string
    */

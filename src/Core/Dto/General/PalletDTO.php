@@ -5,7 +5,8 @@
 
 namespace Wayfair\Core\Dto\General;
 
-class PalletDTO {
+class PalletDTO
+{
   /**
    * @var WeightDTO
    */

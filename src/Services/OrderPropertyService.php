@@ -18,7 +18,8 @@ use Wayfair\Repositories\WarehouseSupplierRepository;
  *
  * @package Wayfair\Services
  */
-class OrderPropertyService {
+class OrderPropertyService
+{
 
   const LOG_KEY_CANNOT_OBTAIN_PO_NUMBER = 'obtainPoNumber';
   const LOG_KEY_WAREHOUSE_ID_NOT_FOUND = 'warehouseIdNotFound';
@@ -76,11 +77,12 @@ class OrderPropertyService {
     if (empty($orderProperties) || empty($orderProperties[0]->value)) {
       $this->loggerContract
           ->error(
-              TranslationHelper::getLoggerKey(self::LOG_KEY_CANNOT_OBTAIN_PO_NUMBER), [
-                'method' => __METHOD__,
-                'referenceType' => 'orderId',
-                'referenceValue' => $orderId
-              ]
+            TranslationHelper::getLoggerKey(self::LOG_KEY_CANNOT_OBTAIN_PO_NUMBER),
+            [
+              'method' => __METHOD__,
+              'referenceType' => 'orderId',
+              'referenceValue' => $orderId
+            ]
           );
 
       return '';
@@ -102,14 +104,15 @@ class OrderPropertyService {
     if (empty($orderProperties) || empty($orderProperties[0]->value)) {
       $this->loggerContract
           ->error(
-              TranslationHelper::getLoggerKey(self::LOG_KEY_WAREHOUSE_ID_NOT_FOUND), [
-                'additionalInfo' => [
-                  'orderId' => $orderId
-                ],
-                'method' => __METHOD__,
-                'referenceType' => 'orderId',
-                'referenceValue' => $orderId
-              ]
+            TranslationHelper::getLoggerKey(self::LOG_KEY_WAREHOUSE_ID_NOT_FOUND),
+            [
+              'additionalInfo' => [
+                'orderId' => $orderId
+              ],
+              'method' => __METHOD__,
+              'referenceType' => 'orderId',
+              'referenceValue' => $orderId
+            ]
           );
 
       return '';
@@ -120,7 +123,8 @@ class OrderPropertyService {
     if (! isset($mapping) || empty($mapping->supplierId)) {
       $this->loggerContract
         ->error(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_NO_SUPPLIER_ID_FOR_WAREHOUSE), [
+          TranslationHelper::getLoggerKey(self::LOG_KEY_NO_SUPPLIER_ID_FOR_WAREHOUSE),
+          [
             'method' => __METHOD__,
             'referenceType' => 'warehouseId',
             'referenceValue' => $warehouseId
@@ -145,6 +149,4 @@ class OrderPropertyService {
 
     return $orderProperties;
   }
-
-
 }

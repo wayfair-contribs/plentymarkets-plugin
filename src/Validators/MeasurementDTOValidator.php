@@ -8,7 +8,8 @@ namespace Wayfair\Validators;
 use Wayfair\Core\Dto\Constants;
 use Plenty\Validation\Validator;
 
-class MeasurementDTOValidator extends Validator {
+class MeasurementDTOValidator extends Validator
+{
 
   /**
    * @return void

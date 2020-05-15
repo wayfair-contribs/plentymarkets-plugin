@@ -5,7 +5,8 @@
 
 namespace Wayfair\Core\Contracts;
 
-interface AuthenticationContract {
+interface AuthenticationContract
+{
   /**
    * @return string
    */

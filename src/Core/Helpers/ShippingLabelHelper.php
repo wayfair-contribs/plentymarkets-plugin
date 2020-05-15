@@ -10,7 +10,8 @@ namespace Wayfair\Core\Helpers;
  *
  * @package Wayfair\Core\Helpers
  */
-class ShippingLabelHelper {
+class ShippingLabelHelper
+{
   /**
    * Generate file name for shipping label, default to PDF file.
    *
