@@ -41,10 +41,10 @@ class ShipmentProviderService {
   private $keyValueRepository;
 
   public function __construct(
-      ShippingServiceProviderRepositoryContract $shippingServiceProviderRepositoryContract,
-      OrderStatusRepositoryContract $orderStatusRepositoryContract,
-      CarrierScacRepository $carrierScacRepository,
-      KeyValueRepository $keyValueRepository
+    ShippingServiceProviderRepositoryContract $shippingServiceProviderRepositoryContract,
+    OrderStatusRepositoryContract $orderStatusRepositoryContract,
+    CarrierScacRepository $carrierScacRepository,
+    KeyValueRepository $keyValueRepository
   ) {
     $this->shippingServiceProviderRepositoryContract = $shippingServiceProviderRepositoryContract;
     $this->carrierScacRepository                     = $carrierScacRepository;
@@ -60,7 +60,8 @@ class ShipmentProviderService {
    * @return string
    * @throws ValidationException
    */
-  public function updateShippingMethod(string $data) {
+  public function updateShippingMethod(string $data)
+  {
     $this->keyValueRepository->putOrReplace(AbstractConfigHelper::SHIPPING_METHOD, $data);
 
     return $data;
@@ -71,7 +72,8 @@ class ShipmentProviderService {
    *
    * @return string
    */
-  public function getShippingMethod() {
+  public function getShippingMethod()
+  {
     return $this->keyValueRepository->get(AbstractConfigHelper::SHIPPING_METHOD);
   }
 
@@ -80,7 +82,8 @@ class ShipmentProviderService {
    *
    * @return bool
    */
-  public function isShippingWithWayfair(): bool {
+  public function isShippingWithWayfair(): bool
+  {
     $shippingMethod = $this->keyValueRepository->get(AbstractConfigHelper::SHIPPING_METHOD);
 
     return ($shippingMethod === Constants::SHIPPING_WITH_WF);
@@ -91,7 +94,8 @@ class ShipmentProviderService {
    *
    * @return array
    */
-  public function getShippingProviders() {
+  public function getShippingProviders()
+  {
     return $this->shippingServiceProviderRepositoryContract->all(['*']);
   }
 
@@ -100,7 +104,8 @@ class ShipmentProviderService {
    *
    * @return array
    */
-  public function getCarrierScacMapping(): array {
+  public function getCarrierScacMapping(): array
+  {
     $formatted = [];
     $models    = $this->carrierScacRepository->findAll();
     /** @var CarrierScac $model */
@@ -118,7 +123,8 @@ class ShipmentProviderService {
    *
    * @return array
    */
-  public function saveCarrierScacMapping(array $data): array {
+  public function saveCarrierScacMapping(array $data): array
+  {
     if (!empty($data) && is_array($data)) {
       $this->carrierScacRepository->save($data);
     }

@@ -14,7 +14,8 @@ class ErrorDTO {
   /**
    * @return string
    */
-  public function getKey() {
+  public function getKey()
+  {
     return $this->key;
   }
 
@@ -23,7 +24,8 @@ class ErrorDTO {
    *
    * @return void
    */
-  public function setKey($key) {
+  public function setKey($key)
+  {
     $this->key = $key;
   }
 
@@ -34,7 +36,8 @@ class ErrorDTO {
    *
    * @return self
    */
-  public static function createFromArray(array $params): self {
+  public static function createFromArray(array $params): self
+  {
     $dto = pluginApp(ErrorDTO::class);
     $dto->setKey($params['key'] ?? null);
     return $dto;
@@ -43,7 +46,8 @@ class ErrorDTO {
   /**
    * @return array
    */
-  public function toArray() {
+  public function toArray()
+  {
     $data = [];
     $data['key'] = $this->getKey();
     return $data;

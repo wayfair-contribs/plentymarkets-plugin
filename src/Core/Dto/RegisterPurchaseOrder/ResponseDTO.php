@@ -54,7 +54,8 @@ class ResponseDTO {
   /**
    * @return string
    */
-  public function getId() {
+  public function getId()
+  {
     return $this->id;
   }
 
@@ -63,14 +64,16 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setId($id) {
+  public function setId($id)
+  {
     $this->id = $id;
   }
 
   /**
    * @return string
    */
-  public function getEventDate() {
+  public function getEventDate()
+  {
     return $this->eventDate;
   }
 
@@ -79,14 +82,16 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setEventDate($eventDate) {
+  public function setEventDate($eventDate)
+  {
     $this->eventDate = $eventDate;
   }
 
   /**
    * @return string
    */
-  public function getPickupDate() {
+  public function getPickupDate()
+  {
     return $this->pickupDate;
   }
 
@@ -95,14 +100,16 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setPickupDate($pickupDate) {
+  public function setPickupDate($pickupDate)
+  {
     $this->pickupDate = $pickupDate;
   }
 
   /**
    * @return int
    */
-  public function getPoNumber() {
+  public function getPoNumber()
+  {
     return $this->poNumber;
   }
 
@@ -111,14 +118,16 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setPoNumber($poNumber) {
+  public function setPoNumber($poNumber)
+  {
     $this->poNumber = $poNumber;
   }
 
   /**
    * @return BillOfLadingDTO
    */
-  public function getBillOfLading() {
+  public function getBillOfLading()
+  {
     return $this->billOfLading;
   }
 
@@ -127,14 +136,16 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setBillOfLading($billOfLading) {
+  public function setBillOfLading($billOfLading)
+  {
     $this->billOfLading = BillOfLadingDTO::createFromArray($billOfLading);
   }
 
   /**
    * @return ShippingLabelDTO
    */
-  public function getConsolidatedShippingLabel() {
+  public function getConsolidatedShippingLabel()
+  {
     return $this->consolidatedShippingLabel;
   }
 
@@ -143,14 +154,17 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setConsolidatedShippingLabel($consolidatedShippingLabel) {
-    $this->consolidatedShippingLabel = ShippingLabelDTO::createFromArray($consolidatedShippingLabel);;
+  public function setConsolidatedShippingLabel($consolidatedShippingLabel)
+  {
+    $this->consolidatedShippingLabel = ShippingLabelDTO::createFromArray($consolidatedShippingLabel);
+    ;
   }
 
   /**
    * @return array
    */
-  public function getGeneratedShippingLabels() {
+  public function getGeneratedShippingLabels()
+  {
     return $this->generatedShippingLabels;
   }
 
@@ -159,7 +173,8 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setGeneratedShippingLabels($generatedShippingLabels) {
+  public function setGeneratedShippingLabels($generatedShippingLabels)
+  {
     $this->generatedShippingLabels = [];
     foreach ($generatedShippingLabels as $generatedShippingLabel) {
       $this->generatedShippingLabels[] = GeneratedShippingLabelDTO::createFromArray($generatedShippingLabel);
@@ -169,7 +184,8 @@ class ResponseDTO {
   /**
    * @return \Wayfair\Core\Dto\PurchaseOrder\ResponseDTO
    */
-  public function getPurchaseOrder(): \Wayfair\Core\Dto\PurchaseOrder\ResponseDTO {
+  public function getPurchaseOrder(): \Wayfair\Core\Dto\PurchaseOrder\ResponseDTO
+  {
     return $this->purchaseOrder;
   }
 
@@ -178,7 +194,8 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setPurchaseOrder($purchaseOrder) {
+  public function setPurchaseOrder($purchaseOrder)
+  {
     $this->purchaseOrder = \Wayfair\Core\Dto\PurchaseOrder\ResponseDTO::createFromArray($purchaseOrder);
   }
 
@@ -189,7 +206,8 @@ class ResponseDTO {
    *
    * @return self
    */
-  public static function createFromArray(array $params): self {
+  public static function createFromArray(array $params): self
+  {
     /**
      * @var ResponseDTO $dto
      */

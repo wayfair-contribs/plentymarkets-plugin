@@ -39,7 +39,8 @@ class GeneratedShippingLabelDTO {
   /**
    * @return int
    */
-  public function getPoNumber() {
+  public function getPoNumber()
+  {
     return $this->poNumber;
   }
 
@@ -48,14 +49,16 @@ class GeneratedShippingLabelDTO {
    *
    * @return void
    */
-  public function setPoNumber($poNumber) {
+  public function setPoNumber($poNumber)
+  {
     $this->poNumber = $poNumber;
   }
 
   /**
    * @return string
    */
-  public function getFullPoNumber() {
+  public function getFullPoNumber()
+  {
     return $this->fullPoNumber;
   }
 
@@ -64,14 +67,16 @@ class GeneratedShippingLabelDTO {
    *
    * @return void
    */
-  public function setFullPoNumber($fullPoNumber) {
+  public function setFullPoNumber($fullPoNumber)
+  {
     $this->fullPoNumber = $fullPoNumber;
   }
 
   /**
    * @return int
    */
-  public function getNumberOfLabels() {
+  public function getNumberOfLabels()
+  {
     return $this->numberOfLabels;
   }
 
@@ -80,14 +85,16 @@ class GeneratedShippingLabelDTO {
    *
    * @return void
    */
-  public function setNumberOfLabels($numberOfLabels) {
+  public function setNumberOfLabels($numberOfLabels)
+  {
     $this->numberOfLabels = $numberOfLabels;
   }
 
   /**
    * @return string
    */
-  public function getCarrier() {
+  public function getCarrier()
+  {
     return $this->carrier;
   }
 
@@ -96,14 +103,16 @@ class GeneratedShippingLabelDTO {
    *
    * @return void
    */
-  public function setCarrier($carrier) {
+  public function setCarrier($carrier)
+  {
     $this->carrier = $carrier;
   }
 
   /**
    * @return string
    */
-  public function getCarrierCode() {
+  public function getCarrierCode()
+  {
     return $this->carrierCode;
   }
 
@@ -112,14 +121,16 @@ class GeneratedShippingLabelDTO {
    *
    * @return void
    */
-  public function setCarrierCode($carrierCode) {
+  public function setCarrierCode($carrierCode)
+  {
     $this->carrierCode = $carrierCode;
   }
 
   /**
    * @return string
    */
-  public function getTrackingNumber() {
+  public function getTrackingNumber()
+  {
     return $this->trackingNumber;
   }
 
@@ -128,7 +139,8 @@ class GeneratedShippingLabelDTO {
    *
    * @return void
    */
-  public function setTrackingNumber($trackingNumber) {
+  public function setTrackingNumber($trackingNumber)
+  {
     $this->trackingNumber = $trackingNumber;
   }
 
@@ -139,7 +151,8 @@ class GeneratedShippingLabelDTO {
    *
    * @return self
    */
-  public static function createFromArray(array $params): self {
+  public static function createFromArray(array $params): self
+  {
     $dto = pluginApp(GeneratedShippingLabelDTO::class);
     $dto->setPoNumber($params['poNumber'] ?? null);
     $dto->setFullPoNumber($params['fullPoNumber'] ?? null);

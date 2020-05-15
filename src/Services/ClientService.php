@@ -20,7 +20,8 @@ class ClientService implements ClientInterfaceContract {
   /**
    * @param LibraryCallContract $libraryCallContract
    */
-  public function __construct(LibraryCallContract $libraryCallContract) {
+  public function __construct(LibraryCallContract $libraryCallContract)
+  {
     $this->library = $libraryCallContract;
   }
 
@@ -30,12 +31,13 @@ class ClientService implements ClientInterfaceContract {
    *
    * @return WayfairResponse
    */
-  public function call($method, $arguments) {
+  public function call($method, $arguments)
+  {
     $response = $this->library->call(
         ConfigHelper::PLUGIN_NAME . '::guzzle',
         [
-            'method'    => $method,
-            'arguments' => $arguments
+          'method'    => $method,
+          'arguments' => $arguments
         ]
     );
     return pluginApp(WayfairResponse::class, [$response]);

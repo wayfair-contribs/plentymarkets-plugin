@@ -5,7 +5,6 @@
 
 namespace Wayfair\Services;
 
-
 use Plenty\Modules\Document\Contracts\DocumentRepositoryContract;
 use Plenty\Modules\Document\Models\Document;
 use Wayfair\Core\Api\Services\LogSenderService;
@@ -56,8 +55,7 @@ class SavePackingSlipService
     DocumentRepositoryContract $documentRepositoryContract,
     FetchDocumentContract $fetchDocumentContract,
     LoggerContract $loggerContract
-  )
-  {
+  ) {
     $this->documentRepositoryContract = $documentRepositoryContract;
     $this->fetchDocumentContract = $fetchDocumentContract;
     $this->loggerContract = $loggerContract;
@@ -74,17 +72,13 @@ class SavePackingSlipService
 
     $packingSlipUrl = URLHelper::getPackingSlipUrl($poNumber);
 
-    try
-    {
+    try {
       $packingSlipDTO = $this->fetchDocumentContract->fetch($packingSlipUrl);
-    }
-    catch(\Exception $e)
-    {
+    } catch (\Exception $e) {
       throw new \Exception("Packing Slip fetch failed : " . $e);
     }
 
     if (isset($packingSlipDTO) && !empty($packingSlipDTO->getFileContent())) {
-
       return $packingSlipDTO->getBase64EncodedContent();
     }
 
@@ -217,7 +211,6 @@ class SavePackingSlipService
         . json_encode($upload_result));
 
       return $upload_result;
-
     } catch (\Exception $exception) {
       $this->loggerContract->error(
         TranslationHelper::getLoggerKey(self::LOG_KEY_SAVE_ERROR),
@@ -237,7 +230,6 @@ class SavePackingSlipService
         get_class($exception) . ": " . $exception->getMessage());
 
       return [];
-
     } finally {
       if (count($externalLogs->getLogs())) {
         /** @var LogSenderService $logSenderService */

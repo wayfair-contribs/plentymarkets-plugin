@@ -91,7 +91,8 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
         TranslationHelper::getLoggerKey(self::LOG_KEY_OBTAINING_TRACKING_NUMBER), [
           'additionalInfo' => [
             'poNumber' => $poNumber,
-            'query' => $query],
+            'query' => $query
+          ],
           'method' => __METHOD__
         ]
       );
@@ -109,22 +110,19 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
           ]
         );
 
-      if ($response->hasErrors())
-      {
+      if ($response->hasErrors()) {
         throw new \Exception("Errors received from tracking number service: "
           . json_encode($response->getError()));
       }
 
       $dataElement = $responseBody['data'];
-      if (!isset($dataElement) || empty($dataElement))
-      {
+      if (!isset($dataElement) || empty($dataElement)) {
         throw new \Exception("No data element in tracking number response from Wayfair");
       }
 
       $labelGenerationEvents = $dataElement['labelGenerationEvents'];
 
-      if (!isset($labelGenerationEvents) || empty($labelGenerationEvents))
-      {
+      if (!isset($labelGenerationEvents) || empty($labelGenerationEvents)) {
         throw new \Exception("No label generation events in tracking number response from Wayfair");
       }
 

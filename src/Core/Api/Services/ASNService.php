@@ -30,7 +30,8 @@ class ASNService extends APIService {
    * @return bool
    * @throws \Exception
    */
-  public function sendASN(RequestDTO $requestDTO): bool {
+  public function sendASN(RequestDTO $requestDTO): bool
+  {
 
     /** @var ExternalLogs $externalLogs */
     $externalLogs = pluginApp(ExternalLogs::class);

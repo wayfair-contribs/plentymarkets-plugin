@@ -25,7 +25,8 @@ class WarehouseSupplierRepository extends Repository {
    *
    * @return WarehouseSupplier
    */
-  public function createMapping($data = []) {
+  public function createMapping($data = [])
+  {
     /**
      * @var DataBase $database
      */
@@ -44,19 +45,18 @@ class WarehouseSupplierRepository extends Repository {
    *
    * @return mixed
    */
-  public function updateMapping($data = []) {
+  public function updateMapping($data = [])
+  {
     
     $mappingData = [];
 
-    try
-    {
+    try {
       /**
        * @var DataBase $database
        */
       $database                  = pluginApp(DataBase::class);
       $mappingData               = $database->query(WarehouseSupplier::class)->where('id', '=', $data['id'])->get();
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
       $this->loggerContract
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
@@ -88,19 +88,18 @@ class WarehouseSupplierRepository extends Repository {
    *
    * @return mixed|null
    */
-  public function findByWarehouseId($warehouseId) {
+  public function findByWarehouseId($warehouseId)
+  {
     
     $mappingData = [];
 
-    try
-    {
+    try {
       /**
        * @var DataBase $database
        */
       $database    = pluginApp(DataBase::class);
       $mappingData = $database->query(WarehouseSupplier::class)->where('warehouseId', '=', $warehouseId)->get();
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
       $this->loggerContract
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
@@ -131,20 +130,19 @@ class WarehouseSupplierRepository extends Repository {
    *
    * @return void
    */
-  public function deleteMapping($data = []) {
+  public function deleteMapping($data = [])
+  {
 
     if (isset($data['id'])) {
       $mappingData = [];
 
-      try
-      {
+      try {
         /**
          * @var DataBase $database
          */
         $database                  = pluginApp(DataBase::class);
         $mappingData               = $database->query(WarehouseSupplier::class)->where('id', '=', $data['id'])->get();
-      }
-      catch (\Exception $e) {
+      } catch (\Exception $e) {
         $this->loggerContract
           ->error(
             TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
@@ -172,7 +170,8 @@ class WarehouseSupplierRepository extends Repository {
    *
    * @return array
    */
-  public function saveMappings($data = []) {
+  public function saveMappings($data = [])
+  {
     $removedData = array_filter(
         $data, function ($datum) {
           return isset($datum['removed']);
@@ -202,17 +201,16 @@ class WarehouseSupplierRepository extends Repository {
   /**
    * @return mixed
    */
-  public function getAllMappings() {
+  public function getAllMappings()
+  {
     
-    try
-    {
+    try {
       /**
        * @var DataBase $database
        */
       $database = pluginApp(DataBase::class);
       return $database->query(WarehouseSupplier::class)->get();
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
       $this->loggerContract
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
@@ -235,19 +233,18 @@ class WarehouseSupplierRepository extends Repository {
    *
    * @return string
    */
-  public function findBySupplierId(string $supplierId) {
+  public function findBySupplierId(string $supplierId)
+  {
 
     $mappingData = [];
 
-    try
-    {
+    try {
       /**
        * @var DataBase $database
        */
       $database    = pluginApp(DataBase::class);
       $mappingData = $database->query(WarehouseSupplier::class)->where('supplierId', '=', $supplierId)->get();
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
       $this->loggerContract
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
@@ -264,11 +261,10 @@ class WarehouseSupplierRepository extends Repository {
         );
     }
 
-    if (isset($mappingData) && !empty($mappingData) && isset($mappingData[0]))
-    {
+    if (isset($mappingData) && !empty($mappingData) && isset($mappingData[0])) {
       return $mappingData[0]->warehouseId;
     }
 
-   return '';
+    return '';
   }
 }

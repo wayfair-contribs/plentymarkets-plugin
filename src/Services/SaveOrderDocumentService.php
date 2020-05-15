@@ -58,8 +58,7 @@ class SaveOrderDocumentService
     OrderRepositoryContract $orderRepositoryContract,
     FetchDocumentContract $fetchShippingLabelContract,
     LoggerContract $loggerContract
-  )
-  {
+  ) {
     $this->storageRepositoryContract = $storageRepositoryContract;
     $this->orderRepositoryContract = $orderRepositoryContract;
     $this->fetchShippingLabelContract = $fetchShippingLabelContract;
@@ -119,12 +118,9 @@ class SaveOrderDocumentService
         $poNumberWithPrefix . ": Shipping label URL is empty." . " Order: " . $pm_order_id);
     }
 
-    try
-    {
+    try {
       $labelFile = $this->fetchShippingLabelContract->fetch($label_url);
-    }
-    catch(\Exception $e)
-    {
+    } catch (\Exception $e) {
       throw new \Exception("Shipping label fetch failed : " . $e);
     }
 

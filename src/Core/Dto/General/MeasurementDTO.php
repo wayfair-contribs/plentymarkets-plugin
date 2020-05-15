@@ -19,7 +19,8 @@ class MeasurementDTO {
   /**
    * @return float
    */
-  public function getValue() {
+  public function getValue()
+  {
     return $this->value;
   }
 
@@ -28,14 +29,16 @@ class MeasurementDTO {
    *
    * @return void
    */
-  public function setValue($value) {
+  public function setValue($value)
+  {
     $this->value = $value;
   }
 
   /**
    * @return string
    */
-  public function getUnit() {
+  public function getUnit()
+  {
     return $this->unit;
   }
 
@@ -44,7 +47,8 @@ class MeasurementDTO {
    *
    * @return void
    */
-  public function setUnit($unit) {
+  public function setUnit($unit)
+  {
     $this->unit = $unit; // should be in Constants::AVAILABLE_LENGTH_UNITS
   }
 
@@ -55,7 +59,8 @@ class MeasurementDTO {
    *
    * @return self
    */
-  public static function createFromArray(array $params): self {
+  public static function createFromArray(array $params): self
+  {
     $dto = pluginApp(MeasurementDTO::class);
     $dto->setValue($params['value'] ?? null);
     $dto->setUnit($params['unit'] ?? null);

@@ -28,28 +28,32 @@ class ShipNoticeAddressDTO extends AddressDTO {
   /**
    * @return string
    */
-  public function getStreetAddress1() {
+  public function getStreetAddress1()
+  {
     return $this->streetAddress1;
   }
 
   /**
    * @param string $streetAddress1
    */
-  public function setStreetAddress1($streetAddress1) {
+  public function setStreetAddress1($streetAddress1)
+  {
     $this->streetAddress1 = $streetAddress1;
   }
 
   /**
    * @return string
    */
-  public function getStreetAddress2() {
+  public function getStreetAddress2()
+  {
     return $this->streetAddress2;
   }
 
   /**
    * @param string $streetAddress2
    */
-  public function setStreetAddress2($streetAddress2) {
+  public function setStreetAddress2($streetAddress2)
+  {
     $this->streetAddress2 = $streetAddress2;
   }
 
@@ -58,15 +62,16 @@ class ShipNoticeAddressDTO extends AddressDTO {
    *
    * @return array
    */
-  public function toArray(): array {
+  public function toArray(): array
+  {
     return [
-        'name'           => $this->getName(),
-        'streetAddress1' => $this->getStreetAddress1(),
-        'streetAddress2' => $this->getStreetAddress2(),
-        'city'           => $this->getCity(),
-        'state'          => $this->getState(),
-        'postalCode'     => $this->getPostalCode(),
-        'country'        => $this->getCountry()
+      'name'           => $this->getName(),
+      'streetAddress1' => $this->getStreetAddress1(),
+      'streetAddress2' => $this->getStreetAddress2(),
+      'city'           => $this->getCity(),
+      'state'          => $this->getState(),
+      'postalCode'     => $this->getPostalCode(),
+      'country'        => $this->getCountry()
     ];
   }
 }

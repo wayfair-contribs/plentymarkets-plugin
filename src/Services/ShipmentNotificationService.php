@@ -147,8 +147,7 @@ class ShipmentNotificationService
     FetchDocumentContract $fetchShippingLabelContract,
     OrderRepositoryContract $orderRepositoryContract,
     LoggerContract $loggerContract
-  )
-  {
+  ) {
     $this->asnService = $asnService;
     $this->orderPropertyService = $orderPropertyService;
     $this->shippingInformationRepositoryContract = $shippingInformationRepositoryContract;
@@ -405,7 +404,6 @@ class ShipmentNotificationService
 
           $externalLogs->addWarningLog($messageForMissingTrackingNumber . ' - '
             . get_class($exception) . ': ' . $exception->getMessage());
-
         }
 
         // TODO: if/when FetchDocumentService is changed to return tracking numbers instead of Label_Generation_Event_Type, update this logic
@@ -432,7 +430,6 @@ class ShipmentNotificationService
         }
 
         foreach ($products as $index => $product) {
-
           $trackingNum = null;
           if ($haveTrackingNumbers) {
             // TODO: verify that the assumption from v1.1.1 is correct: fetchedTrackingNumbers[$index] is for products[$index]
@@ -476,9 +473,7 @@ class ShipmentNotificationService
         }
 
         $requestDto->setPackageCount(is_array($products) ? count($products) : 1);
-
-      } // end of shipping on Wayfair account
-      else {
+      } else {
         //Ship on own account info, get data from PM.
         $this->loggerContract->info(
           TranslationHelper::getLoggerKey(self::LOG_KEY_SHIPPING_ON_OWN_ACCOUNT), [
@@ -503,8 +498,9 @@ class ShipmentNotificationService
 
           $trackingNum = $orderShippingPackage->packageNumber;
 
-          if ((!isset($trackingNum) || empty($trackingNum)) &&
-            (isset($orderTrackingNumbers) && !empty($orderTrackingNumbers))) {
+          if ((!isset($trackingNum) || empty($trackingNum))
+            && (isset($orderTrackingNumbers) && !empty($orderTrackingNumbers))
+          ) {
             // need to try getting tracking numbers from the order itself instead of the package(s).
 
             $externalLogs->addInfoLog('When sending ASN to Wayfair and shipping on own account,' .

@@ -49,7 +49,8 @@ class ShippingUnitDTO {
   /**
    * @return string
    */
-  public function getPartNumber() {
+  public function getPartNumber()
+  {
     return $this->partNumber;
   }
 
@@ -58,14 +59,16 @@ class ShippingUnitDTO {
    *
    * @return void
    */
-  public function setPartNumber($partNumber) {
+  public function setPartNumber($partNumber)
+  {
     $this->partNumber = $partNumber;
   }
 
   /**
    * @return string
    */
-  public function getUnitType() {
+  public function getUnitType()
+  {
     return $this->unitType;
   }
 
@@ -74,14 +77,16 @@ class ShippingUnitDTO {
    *
    * @return void
    */
-  public function setUnitType($unitType) {
+  public function setUnitType($unitType)
+  {
     $this->unitType = $unitType; // should be in Constants::AVAILABLE_UNIT_TYPES
   }
 
   /**
    * @return WeightDTO
    */
-  public function getWeight() {
+  public function getWeight()
+  {
     return $this->weight;
   }
 
@@ -90,14 +95,16 @@ class ShippingUnitDTO {
    *
    * @return void
    */
-  public function setWeight($weight) {
+  public function setWeight($weight)
+  {
     $this->weight = WeightDTO::createFromArray($weight);
   }
 
   /**
    * @return DimensionDTO
    */
-  public function getDimensions() {
+  public function getDimensions()
+  {
     return $this->dimensions;
   }
 
@@ -106,14 +113,16 @@ class ShippingUnitDTO {
    *
    * @return void
    */
-  public function setDimensions($dimensions) {
+  public function setDimensions($dimensions)
+  {
     $this->dimensions = DimensionDTO::createFromArray($dimensions);
   }
 
   /**
    * @return string
    */
-  public function getFreightClass() {
+  public function getFreightClass()
+  {
     return $this->freightClass;
   }
 
@@ -122,14 +131,16 @@ class ShippingUnitDTO {
    *
    * @return void
    */
-  public function setFreightClass($freightClass) {
+  public function setFreightClass($freightClass)
+  {
     $this->freightClass = $freightClass; // should be in Constants::AVAILABLE_FREIGHT_CLASSES
   }
 
   /**
    * @return PalletDTO
    */
-  public function getPalletInfo() {
+  public function getPalletInfo()
+  {
     return $this->palletInfo;
   }
 
@@ -138,14 +149,16 @@ class ShippingUnitDTO {
    *
    * @return void
    */
-  public function setPalletInfo($palletInfo) {
+  public function setPalletInfo($palletInfo)
+  {
     $this->palletInfo = PalletDTO::createFromArray($palletInfo);
   }
 
   /**
    * @return int
    */
-  public function getGroupIdentifier() {
+  public function getGroupIdentifier()
+  {
     return $this->groupIdentifier;
   }
 
@@ -154,14 +167,16 @@ class ShippingUnitDTO {
    *
    * @return void
    */
-  public function setGroupIdentifier($groupIdentifier) {
+  public function setGroupIdentifier($groupIdentifier)
+  {
     $this->groupIdentifier = $groupIdentifier;
   }
 
   /**
    * @return int
    */
-  public function getSequenceIdentifier() {
+  public function getSequenceIdentifier()
+  {
     return $this->sequenceIdentifier;
   }
 
@@ -170,7 +185,8 @@ class ShippingUnitDTO {
    *
    * @return void
    */
-  public function setSequenceIdentifier($sequenceIdentifier) {
+  public function setSequenceIdentifier($sequenceIdentifier)
+  {
     $this->sequenceIdentifier = $sequenceIdentifier;
   }
 
@@ -181,7 +197,8 @@ class ShippingUnitDTO {
    *
    * @return self
    */
-  public static function createFromArray(array $params): self {
+  public static function createFromArray(array $params): self
+  {
     $dto = pluginApp(ShippingUnitDTO::class);
     $dto->setPartNumber($params['partNumber'] ?? null);
     $dto->setUnitType($params['unitType'] ?? null);

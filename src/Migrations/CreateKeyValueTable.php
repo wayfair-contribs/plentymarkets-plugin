@@ -15,7 +15,8 @@ class CreateKeyValueTable {
    *
    * @return void
    */
-  public function run(Migrate $migrate) {
+  public function run(Migrate $migrate)
+  {
     $migrate->createTable(KeyValue::class);
   }
 }

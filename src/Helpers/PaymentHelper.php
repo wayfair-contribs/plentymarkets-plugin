@@ -20,16 +20,18 @@ class PaymentHelper {
    *
    * @param PaymentMethodRepositoryContract $paymentMethodRepository
    */
-  public function __construct(PaymentMethodRepositoryContract $paymentMethodRepository) {
+  public function __construct(PaymentMethodRepositoryContract $paymentMethodRepository)
+  {
     $this->paymentMethodRepository = $paymentMethodRepository;
   }
 
   /**
    * @return int
    */
-  public function getPaymentMethodId(): int {
+  public function getPaymentMethodId(): int
+  {
     $paymentMethods = $this->paymentMethodRepository->allForPlugin(AbstractConfigHelper::PLUGIN_NAME);
-    foreach($paymentMethods as $paymentMethod) {
+    foreach ($paymentMethods as $paymentMethod) {
       return $paymentMethod->id;
     }
     return $this->createPaymentMethodAndGetId(true);
@@ -40,7 +42,8 @@ class PaymentHelper {
    *
    * @return int
    */
-  public function createPaymentMethodAndGetId(bool $skipChecking = false): int {
+  public function createPaymentMethodAndGetId(bool $skipChecking = false): int
+  {
     if (!$skipChecking) {
       $paymentMethodId = $this->getPaymentMethodId();
       if ($paymentMethodId) {

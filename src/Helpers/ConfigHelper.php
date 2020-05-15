@@ -32,28 +32,32 @@ class ConfigHelper extends AbstractConfigHelper {
    *
    * @param ConfigRepository $config
    */
-  public function __construct(ConfigRepository $config) {
+  public function __construct(ConfigRepository $config)
+  {
     $this->config = $config;
   }
 
   /**
    * @return mixed
    */
-  public function getClientId() {
+  public function getClientId()
+  {
     return $this->config->get(self::PLUGIN_NAME . '.global.container.clientId');
   }
 
   /**
    * @return mixed
    */
-  public function getClientSecret() {
+  public function getClientSecret()
+  {
     return $this->config->get(self::PLUGIN_NAME . '.global.container.clientSecret');
   }
 
   /**
    * @return int
    */
-  public function getOrderReferrerValue(): int {
+  public function getOrderReferrerValue(): int
+  {
     /**
      * @var KeyValueRepository $keyValueRepository
      */
@@ -73,7 +77,8 @@ class ConfigHelper extends AbstractConfigHelper {
   /**
    * @return int|mixed
    */
-  public function getStockBufferValue() {
+  public function getStockBufferValue()
+  {
     /**
      * @var KeyValueRepository $keyValueRepository
      */
@@ -85,11 +90,13 @@ class ConfigHelper extends AbstractConfigHelper {
   /**
    * @return string
    */
-  public function getDryRun(): string {
+  public function getDryRun(): string
+  {
     return $this->config->get(self::PLUGIN_NAME . '.global.container.dryRunMode');
   }
 
-  public function isAllItemsActive(): bool {
+  public function isAllItemsActive(): bool
+  {
     /**
      * @var KeyValueRepository $keyValueRepository
      */
@@ -101,7 +108,8 @@ class ConfigHelper extends AbstractConfigHelper {
   /**
    * @return string
    */
-  public function getImportOrderSince() {
+  public function getImportOrderSince()
+  {
     /**
      * @var KeyValueRepository $keyValueRepository
      */
@@ -113,7 +121,8 @@ class ConfigHelper extends AbstractConfigHelper {
   /**
    * @return string
    */
-  public function getPluginVersion(): string {
+  public function getPluginVersion(): string
+  {
     $pluginRepo = pluginApp(PluginRepositoryContract::class);
     $plugin = $pluginRepo->getPluginByName(AbstractConfigHelper::PLUGIN_NAME);
     $plugin = $pluginRepo->decoratePlugin($plugin);
@@ -123,7 +132,8 @@ class ConfigHelper extends AbstractConfigHelper {
   /**
    * @return string
    */
-  public function getIntegrationAgentHeader() {
+  public function getIntegrationAgentHeader()
+  {
     return self::INTEGRATION_AGENT_NAME . ' - v:' . $this->getPluginVersion();
   }
 
@@ -142,7 +152,8 @@ class ConfigHelper extends AbstractConfigHelper {
    *
    * @return bool
    */
-  public function hasBooted(): bool {
+  public function hasBooted(): bool
+  {
     return self::$bootFlag;
   }
 }

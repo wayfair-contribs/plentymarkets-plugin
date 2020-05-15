@@ -15,7 +15,8 @@ class CreateWarehouseSupplierTable {
    *
    * @return null
    */
-  public function run(Migrate $migrate) {
+  public function run(Migrate $migrate)
+  {
     $migrate->createTable(WarehouseSupplier::class);
   }
 }

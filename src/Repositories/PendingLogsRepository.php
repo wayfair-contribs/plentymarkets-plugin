@@ -16,16 +16,15 @@ class PendingLogsRepository extends Repository {
   /**
    * @return PendingLogs[]
    */
-  public function getAll(): array {
-    try
-    {
+  public function getAll(): array
+  {
+    try {
       $database = pluginApp(DataBase::class);
         return $database->query(PendingLogs::class)
           ->offset(0)
           ->limit(800)
           ->get();
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
       $this->loggerContract
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
@@ -48,13 +47,12 @@ class PendingLogsRepository extends Repository {
    *
    * @return bool
    */
-  public function delete(array $ids): bool {
-    try
-    {
+  public function delete(array $ids): bool
+  {
+    try {
       $database = pluginApp(DataBase::class);
       return $database->query(PendingLogs::class)->whereIn('id', $ids)->delete();
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
       $this->loggerContract
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
@@ -76,13 +74,12 @@ class PendingLogsRepository extends Repository {
   /**
    * @return bool
    */
-  public function deleteAll(): bool {
-    try
-    {
+  public function deleteAll(): bool
+  {
+    try {
       $database = pluginApp(DataBase::class);
       return $database->query(PendingLogs::class)->delete();
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
       $this->loggerContract
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
@@ -96,6 +93,5 @@ class PendingLogsRepository extends Repository {
           ]
         );
     }
-
   }
 }

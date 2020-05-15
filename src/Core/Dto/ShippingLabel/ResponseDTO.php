@@ -12,7 +12,8 @@ class ResponseDTO {
    *
    * @param array $data
    */
-  public function __construct($data = []) {
+  public function __construct($data = [])
+  {
     $this->setFileContent($data['fileContent'] ?? '');
   }
 
@@ -21,7 +22,8 @@ class ResponseDTO {
    *
    * @return string
    */
-  public function getBase64EncodedContent() {
+  public function getBase64EncodedContent()
+  {
     if (!empty($this->fileContent)) {
       return base64_encode($this->fileContent);
     }
@@ -37,7 +39,8 @@ class ResponseDTO {
   /**
    * @return string
    */
-  public function getFileContent() {
+  public function getFileContent()
+  {
     return $this->fileContent;
   }
 
@@ -46,7 +49,8 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setFileContent($fileContent) {
+  public function setFileContent($fileContent)
+  {
     $this->fileContent = $fileContent;
   }
 
@@ -57,7 +61,8 @@ class ResponseDTO {
    *
    * @return self
    */
-  public static function createFromArray(array $params): self {
+  public static function createFromArray(array $params): self
+  {
     $dto = pluginApp(ResponseDTO::class);
     $dto->setFileContent($params['fileContent'] ?? null);
     return $dto;

@@ -28,7 +28,7 @@ class CreateShippingServiceProvider {
    * @param ShippingServiceProviderRepositoryContract $shippingServiceProviderRepository
    */
   public function __construct(
-      ShippingServiceProviderRepositoryContract $shippingServiceProviderRepository
+    ShippingServiceProviderRepositoryContract $shippingServiceProviderRepository
   ) {
     $this->shippingServiceProviderRepository = $shippingServiceProviderRepository;
   }
@@ -38,7 +38,8 @@ class CreateShippingServiceProvider {
    *
    * @return void
    */
-  public function run(KeyValueRepository $keyValueRepository) {
+  public function run(KeyValueRepository $keyValueRepository)
+  {
     try {
       $shippingServiceProvider = $this->shippingServiceProviderRepository->saveShippingServiceProvider(
           AbstractConfigHelper::PLUGIN_NAME,
@@ -46,9 +47,7 @@ class CreateShippingServiceProvider {
       );
 
       $keyValueRepository->putOrReplace(AbstractConfigHelper::SHIPPING_PROVIDER_ID, $shippingServiceProvider->id);
-
     } catch (\Exception $exception) {
-      
     }
   }
 }

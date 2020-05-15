@@ -14,7 +14,8 @@ class PalletDTO {
   /**
    * @return WeightDTO
    */
-  public function getWeight() {
+  public function getWeight()
+  {
     return $this->weight;
   }
 
@@ -23,7 +24,8 @@ class PalletDTO {
    *
    * @return void
    */
-  public function setWeight($weight) {
+  public function setWeight($weight)
+  {
     $this->weight = WeightDTO::createFromArray($weight);
   }
 
@@ -34,7 +36,8 @@ class PalletDTO {
    *
    * @return self
    */
-  public static function createFromArray(array $params): self {
+  public static function createFromArray(array $params): self
+  {
     $dto = pluginApp(PalletDTO::class);
     $dto->setWeight($params['weight'] ?? null);
     return $dto;

@@ -25,7 +25,8 @@ class RegisterPurchaseOrderService extends APIService implements RegisterPurchas
    * @return ResponseDTO
    * @throws \Exception
    */
-  public function register(RequestDTO $requestDTO): ResponseDTO {
+  public function register(RequestDTO $requestDTO): ResponseDTO
+  {
 
     $query = 'mutation purchaseOrders { '
              . 'purchaseOrders { '
@@ -48,10 +49,10 @@ class RegisterPurchaseOrderService extends APIService implements RegisterPurchas
         $this->loggerContract
             ->error(
                 TranslationHelper::getLoggerKey(self::LOG_KEY_UNABLE_TO_REGISTER_ORDER), [
-                'additionalInfo' => ['error' => $responseBody['errors']],
-                'method' => __METHOD__,
-                'referenceType' => 'poNumber',
-                'referenceValue' => $requestDTO->getPoNumber()
+                  'additionalInfo' => ['error' => $responseBody['errors']],
+                  'method' => __METHOD__,
+                  'referenceType' => 'poNumber',
+                  'referenceValue' => $requestDTO->getPoNumber()
                 ]
             );
         throw new \Exception(TranslationHelper::getLoggerMessage(self::LOG_KEY_UNABLE_TO_REGISTER_ORDER));
@@ -63,9 +64,9 @@ class RegisterPurchaseOrderService extends APIService implements RegisterPurchas
       $this->loggerContract
           ->error(
               TranslationHelper::getLoggerKey(self::LOG_KEY_UNABLE_TO_REGISTER_ORDER), [
-              'additionalInfo' => ['message' => $e->getMessage()],
-              'referenceType' => 'poNumber',
-              'referenceValue' => $requestDTO->getPoNumber()
+                'additionalInfo' => ['message' => $e->getMessage()],
+                'referenceType' => 'poNumber',
+                'referenceValue' => $requestDTO->getPoNumber()
               ]
           );
       throw $e;

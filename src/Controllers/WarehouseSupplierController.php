@@ -20,7 +20,8 @@ class WarehouseSupplierController {
    *
    * @param WarehouseSupplierRepository $warehouseSupplierRepository
    */
-  public function __construct(WarehouseSupplierRepository $warehouseSupplierRepository) {
+  public function __construct(WarehouseSupplierRepository $warehouseSupplierRepository)
+  {
     $this->warehouseSupplierRepository = $warehouseSupplierRepository;
   }
 
@@ -31,7 +32,8 @@ class WarehouseSupplierController {
    *
    * @return false|string
    */
-  public function saveMappings(Request $request) {
+  public function saveMappings(Request $request)
+  {
     $data = $request->input('data');
     try {
       if (is_array($data[0])) {
@@ -47,7 +49,8 @@ class WarehouseSupplierController {
   /**
    * @return false|string
    */
-  public function getMappings() {
+  public function getMappings()
+  {
     return json_encode($this->warehouseSupplierRepository->getAllMappings());
   }
 }

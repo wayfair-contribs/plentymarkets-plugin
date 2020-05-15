@@ -44,7 +44,8 @@ class APIService {
    * @param ConfigHelper            $configHelper
    * @param LoggerContract          $loggerContract
    */
-  public function __construct(ClientInterfaceContract $clientInterfaceContract, AuthenticationContract $authenticationContract, ConfigHelper $configHelper, LoggerContract $loggerContract) {
+  public function __construct(ClientInterfaceContract $clientInterfaceContract, AuthenticationContract $authenticationContract, ConfigHelper $configHelper, LoggerContract $loggerContract)
+  {
     $this->client = $clientInterfaceContract;
     $this->authService = $authenticationContract;
     $this->configHelper = $configHelper;
@@ -54,7 +55,8 @@ class APIService {
   /**
    * @return string
    */
-  public function getAuthenticationToken() {
+  public function getAuthenticationToken()
+  {
     try {
       $this->authService->refresh();
 
@@ -73,7 +75,8 @@ class APIService {
    * @throws \Exception
    * @return WayfairResponse
    */
-  public function query($query, $method = 'post', $variables = []) {
+  public function query($query, $method = 'post', $variables = [])
+  {
     $headers = [];
     $headers['Authorization'] = $this->getAuthenticationToken();
     $headers['Content-Type'] = ['application/json'];
@@ -82,14 +85,14 @@ class APIService {
     $url = $this->getUrl();
 
     $arguments = [
-        $url ,
-        [
-            'json' => [
-                'query' => $query,
-                'variables' => $variables
-            ],
-            'headers' => $headers
-        ]
+      $url ,
+      [
+        'json' => [
+          'query' => $query,
+          'variables' => $variables
+        ],
+        'headers' => $headers
+      ]
     ];
 
     // php copies arrays
@@ -113,7 +116,8 @@ class APIService {
           'URL' => $url,
           'Header' => $header_for_logging,
           'Body' => $body_for_logging
-        ], 'method' => __METHOD__]);
+        ], 'method' => __METHOD__
+        ]);
 
     return $this->client->call($method, $arguments);
   }
@@ -121,7 +125,8 @@ class APIService {
   /**
    * @return string
    */
-  public function getUrl() {
+  public function getUrl()
+  {
     return URLHelper::getUrl(URLHelper::URL_GRAPHQL);
   }
 }

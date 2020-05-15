@@ -19,7 +19,8 @@ class WeightDTO {
   /**
    * @return float
    */
-  public function getValue() {
+  public function getValue()
+  {
     return $this->value;
   }
 
@@ -28,14 +29,16 @@ class WeightDTO {
    *
    * @return void
    */
-  public function setValue($value) {
+  public function setValue($value)
+  {
     $this->value = $value;
   }
 
   /**
    * @return string
    */
-  public function getUnit() {
+  public function getUnit()
+  {
     return $this->unit;
   }
 
@@ -44,7 +47,8 @@ class WeightDTO {
    *
    * @return void
    */
-  public function setUnit($unit) {
+  public function setUnit($unit)
+  {
     $this->unit = $unit; // should be in Constants::AVAILABLE_WEIGHT_UNITS
   }
 
@@ -55,7 +59,8 @@ class WeightDTO {
    *
    * @return self
    */
-  public static function createFromArray(array $params): self {
+  public static function createFromArray(array $params): self
+  {
     $dto = pluginApp(WeightDTO::class);
     $dto->setValue($params['value'] ?? null);
     $dto->setUnit($params['unit'] ?? null);

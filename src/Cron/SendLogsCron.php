@@ -20,7 +20,8 @@ class SendLogsCron extends Cron {
    *
    * @param SendLogsService $sendLogsService
    */
-  public function __construct(SendLogsService $sendLogsService) {
+  public function __construct(SendLogsService $sendLogsService)
+  {
     $this->sendLogsService = $sendLogsService;
   }
 
@@ -29,7 +30,8 @@ class SendLogsCron extends Cron {
    *
    * @return void
    */
-  public function handle() {
+  public function handle()
+  {
     $this->sendLogsService->process();
   }
 }

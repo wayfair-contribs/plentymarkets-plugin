@@ -24,7 +24,8 @@ class Repository {
    *
    * @param AccountService $accountService
    */
-  public function __construct(AccountService $accountService) {
+  public function __construct(AccountService $accountService)
+  {
     $this->accountService = $accountService;
     $this->loggerContract = pluginApp(LoggerContract::class);
   }
@@ -32,7 +33,8 @@ class Repository {
   /**
    * @return int
    */
-  public function getLoggedInUserId() {
+  public function getLoggedInUserId()
+  {
     return $this->accountService->getAccountContactId();
   }
 

@@ -19,10 +19,10 @@ class InventoryController {
    *
    * @return mixed
    */
-  public function fetch(InventoryService $inventoryService) {
+  public function fetch(InventoryService $inventoryService)
+  {
     $fetched = $inventoryService->fetch();
-    if (isset($fetched))
-    {
+    if (isset($fetched)) {
       return $fetched->getBody();
     }
 
@@ -34,7 +34,8 @@ class InventoryController {
    *
    * @return false|string
    */
-  public function filtered(Request $request) {
+  public function filtered(Request $request)
+  {
     $data = $request->input('data');
     /**
      * @var VariationSearchRepositoryContract $variationSearchRepositoryContract
@@ -42,14 +43,14 @@ class InventoryController {
     $variationSearchRepositoryContract = pluginApp(VariationSearchRepositoryContract::class);
     $variationSearchRepositoryContract->setFilters(
         [
-            'referrerId' => $data,
+          'referrerId' => $data,
         ]
     );
     $variationSearchRepositoryContract->setSearchParams(
         [
-            'with' => [
-                'item' => null
-            ]
+          'with' => [
+            'item' => null
+          ]
         ]
     );
     $result = $variationSearchRepositoryContract->search();
@@ -63,57 +64,58 @@ class InventoryController {
    *
    * @return false|string
    */
-  public function filtered1(Request $request) {
+  public function filtered1(Request $request)
+  {
     $data = $request->input('data');
     /**
      * @var ItemDataLayerRepositoryContract $itemDataLayerRepository
      */
     $itemDataLayerRepository = pluginApp(ItemDataLayerRepositoryContract::class);
     $resultFields = [
-        'itemBase' => [
-            'id'
-        ],
-        'variationBase' => [
-            'id',
-            'customNumber'
-        ],
+      'itemBase' => [
+        'id'
+      ],
+      'variationBase' => [
+        'id',
+        'customNumber'
+      ],
 
-        'variationStock' => [
-            'params' => [
-                'type' => 'physical'
-            ],
-            'fields' => [
-                'stockNet',
-                'reservedStock',
-                'warehouseId'
-            ]
+      'variationStock' => [
+        'params' => [
+          'type' => 'physical'
         ],
-        'variationLinkMarketplace' => [
-            'marketplaceId'
-        ],
-        'variationWarehouseList' => [
-            'variationId',
-            'warehouseId',
-        ],
-        'itemDescription' => [
-            'name1'
+        'fields' => [
+          'stockNet',
+          'reservedStock',
+          'warehouseId'
         ]
+      ],
+      'variationLinkMarketplace' => [
+        'marketplaceId'
+      ],
+      'variationWarehouseList' => [
+        'variationId',
+        'warehouseId',
+      ],
+      'itemDescription' => [
+        'name1'
+      ]
     ];
     $filters = [
-        'variationStock.wasUpdatedBetween' => [
-            'timestampFrom' => time() - 4800,
-            'timestampTo' => time(),
-        ],
-        'variationVisibility.isVisibleForMarketplace' => [
-            'mandatoryAllMarketplace' => [$data],
-            'mandatoryOneMarketplace' => []
-        ]
+      'variationStock.wasUpdatedBetween' => [
+        'timestampFrom' => time() - 4800,
+        'timestampTo' => time(),
+      ],
+      'variationVisibility.isVisibleForMarketplace' => [
+        'mandatoryAllMarketplace' => [$data],
+        'mandatoryOneMarketplace' => []
+      ]
     ];
     $result2 = $itemDataLayerRepository->search($resultFields, $filters);
 
     return json_encode(
         [
-            'result' => $result2->toArray()
+          'result' => $result2->toArray()
         ]
     );
   }
@@ -123,7 +125,8 @@ class InventoryController {
    *
    * @return false|string
    */
-  public function getItem(Request $request) {
+  public function getItem(Request $request)
+  {
     $data = $request->input('data');
     /**
      * @var ItemRepositoryContract $itemRepositoryContract
@@ -138,7 +141,8 @@ class InventoryController {
    * @return false|string
    * @throws \Exception
    */
-  public function sync() {
+  public function sync()
+  {
     /**
      * @var InventoryUpdateService $inventoryUpdateService
      */

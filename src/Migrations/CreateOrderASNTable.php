@@ -20,7 +20,8 @@ class CreateOrderASNTable {
    *
    * @return void
    */
-  public function run(Migrate $migrate) {
+  public function run(Migrate $migrate)
+  {
     $migrate->createTable(OrderASN::class);
   }
 }

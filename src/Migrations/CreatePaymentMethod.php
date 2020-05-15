@@ -19,14 +19,16 @@ class CreatePaymentMethod {
    *
    * @param PaymentHelper $paymentHelper
    */
-  public function __construct(PaymentHelper $paymentHelper) {
+  public function __construct(PaymentHelper $paymentHelper)
+  {
     $this->paymentHelper = $paymentHelper;
   }
 
   /**
    * @return void
    */
-  public function run() {
+  public function run()
+  {
     $this->paymentHelper->createPaymentMethodAndGetId();
   }
 }

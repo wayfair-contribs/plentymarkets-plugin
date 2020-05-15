@@ -15,7 +15,8 @@ class UpdatePendingLogsTable {
    *
    * @return void
    */
-  public function run(Migrate $migrate) {
+  public function run(Migrate $migrate)
+  {
     $migrate->updateTable(PendingLogs::class);
   }
 }

@@ -29,7 +29,8 @@ class LoggingService implements LoggerContract {
   /**
    * Initialize a logging service object
    */
-  public function __construct() {
+  public function __construct()
+  {
     $configHelper = pluginApp(AbstractConfigHelper::class);
     $this->version = $configHelper->getPluginVersion();
   }
@@ -40,10 +41,10 @@ class LoggingService implements LoggerContract {
    * @param string $code
    * @param null   $loggingInfo
    */
-  public function debug(string $code, $loggingInfo = null) {
+  public function debug(string $code, $loggingInfo = null)
+  {
 
-    if (! $this->canLogLowerThanError())
-    {
+    if (! $this->canLogLowerThanError()) {
       return;
     }
 
@@ -57,10 +58,10 @@ class LoggingService implements LoggerContract {
    * @param string $code
    * @param null   $loggingInfo
    */
-  public function info(string $code, $loggingInfo = null) {
+  public function info(string $code, $loggingInfo = null)
+  {
 
-    if (! $this->canLogLowerThanError())
-    {
+    if (! $this->canLogLowerThanError()) {
       return;
     }
 
@@ -74,7 +75,8 @@ class LoggingService implements LoggerContract {
    * @param string $code
    * @param null   $loggingInfo
    */
-  public function error(string $code, $loggingInfo = null) {
+  public function error(string $code, $loggingInfo = null)
+  {
     list($additionalInfo, $method, $referenceType, $referenceValue) = $this->extractVars($loggingInfo);
     $this->getPlentyMarketLoggerInstance($method, $referenceType, $referenceValue)->error($code, $additionalInfo);
   }
@@ -85,10 +87,10 @@ class LoggingService implements LoggerContract {
    * @param string $code
    * @param null   $loggingInfo
    */
-  public function warning(string $code, $loggingInfo = null) {
+  public function warning(string $code, $loggingInfo = null)
+  {
 
-    if (! $this->canLogLowerThanError())
-    {
+    if (! $this->canLogLowerThanError()) {
       return;
     }
 
@@ -103,7 +105,8 @@ class LoggingService implements LoggerContract {
    *
    * @return \Plenty\Log\Contracts\LoggerContract
    */
-  private function getPlentyMarketLoggerInstance(string $method, string $referenceType = null, int $referenceValue = null) {
+  private function getPlentyMarketLoggerInstance(string $method, string $referenceType = null, int $referenceValue = null)
+  {
     $pmLoggerInstance = $this->getLogger($method);
     if (isset($referenceValue)) {
       $pmLoggerInstance = $pmLoggerInstance->setReferenceValue($referenceValue);
@@ -122,7 +125,8 @@ class LoggingService implements LoggerContract {
    *
    * @return array
    */
-  public function extractVars($loggingInfo): array {
+  public function extractVars($loggingInfo): array
+  {
     $additionalInfo = $loggingInfo['additionalInfo'] ?? [];
     $method = $loggingInfo['method'] ?? null;
     $referenceType = $loggingInfo['referenceType'] ?? null;
@@ -141,7 +145,8 @@ class LoggingService implements LoggerContract {
    *
    * @return boolean
    */
-  private function canLogLowerThanError(): bool {
+  private function canLogLowerThanError(): bool
+  {
     /**
      * @var AbstractConfigHelper $configHelper
      */

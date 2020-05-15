@@ -15,7 +15,8 @@ class CreatePendingOrdersTable {
    *
    * @return void
    */
-  public function run(Migrate $migrate) {
+  public function run(Migrate $migrate)
+  {
     $migrate->createTable(PendingOrders::class);
   }
 }

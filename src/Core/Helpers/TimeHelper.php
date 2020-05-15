@@ -10,7 +10,8 @@ class TimeHelper {
   /**
    * @return int
    */
-  public static function getMilliseconds(): int {
+  public static function getMilliseconds(): int
+  {
     return round(microtime(true) * 1000, 0);
   }
 }

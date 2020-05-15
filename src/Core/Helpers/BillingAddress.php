@@ -11,7 +11,7 @@ class BillingAddress {
   const CITY = 'Galway';
   const POSTCODE = 'H91 W260';
   const COUNTRY = 'IE';
-  const BillingAddressAsArray = [
+  const BILLING_ADDRESS_AS_ARRAY = [
     'name' => self::NAME,
     'address1' => self::ADDRESS,
     'city' => self::CITY,

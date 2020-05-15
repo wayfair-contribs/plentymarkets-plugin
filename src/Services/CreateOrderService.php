@@ -127,8 +127,7 @@ class CreateOrderService
     PendingOrdersRepository $pendingOrdersRepository,
     SavePackingSlipService $savePackingSlipService,
     AddressService $addressService
-  )
-  {
+  ) {
     $this->purchaseOrderMapper = $purchaseOrderMapper;
     $this->addressMapper = $addressMapper;
     $this->orderRepositoryContract = $orderRepositoryContract;
@@ -213,7 +212,7 @@ class CreateOrderService
 
       // Get payment method id
       // Create billing address and delivery address
-      $addressDTO = AddressDTO::createFromArray(BillingAddress::BillingAddressAsArray);
+      $addressDTO = AddressDTO::createFromArray(BillingAddress::BILLING_ADDRESS_AS_ARRAY);
 
       $billing = null;
       $billingInfoFromDTO = $dto->getBillingInfo();
@@ -301,8 +300,7 @@ class CreateOrderService
 
       // Create order payment relation
       $paymentRelation = $this->paymentOrderRelationRepositoryContract->createOrderRelation($payment, $order);
-      if (!isset($paymentRelation) || !$paymentRelation->id)
-      {
+      if (!isset($paymentRelation) || !$paymentRelation->id) {
         throw new \Exception("Unable to relate payment " . $paymentID . " with order " . $orderId);
       }
 

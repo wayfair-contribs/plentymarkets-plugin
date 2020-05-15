@@ -32,7 +32,8 @@ class RequestDTO {
   /**
    * @return string
    */
-  public function getPoNumber() {
+  public function getPoNumber()
+  {
     return $this->poNumber;
   }
 
@@ -41,14 +42,16 @@ class RequestDTO {
    *
    * @return void
    */
-  public function setPoNumber($poNumber) {
+  public function setPoNumber($poNumber)
+  {
     $this->poNumber = $poNumber;
   }
 
   /**
    * @return int
    */
-  public function getWarehouseId() {
+  public function getWarehouseId()
+  {
     return $this->warehouseId;
   }
 
@@ -57,14 +60,16 @@ class RequestDTO {
    *
    * @return void
    */
-  public function setWarehouseId($warehouseId) {
+  public function setWarehouseId($warehouseId)
+  {
     $this->warehouseId = $warehouseId;
   }
 
   /**
    * @return string
    */
-  public function getRequestForPickupDate() {
+  public function getRequestForPickupDate()
+  {
     return $this->requestForPickupDate;
   }
 
@@ -73,14 +78,16 @@ class RequestDTO {
    *
    * @return void
    */
-  public function setRequestForPickupDate($requestForPickupDate) {
+  public function setRequestForPickupDate($requestForPickupDate)
+  {
     $this->requestForPickupDate = $requestForPickupDate;
   }
 
   /**
    * @return array
    */
-  public function getShippingUnits() {
+  public function getShippingUnits()
+  {
     return $this->shippingUnits;
   }
 
@@ -89,7 +96,8 @@ class RequestDTO {
    *
    * @return void
    */
-  public function setShippingUnits($shippingUnits) {
+  public function setShippingUnits($shippingUnits)
+  {
     $this->shippingUnits = [];
     foreach ($shippingUnits as $shippingUnit) {
       $this->shippingUnits[] = ShippingUnitDTO::createFromArray($shippingUnit);
@@ -103,7 +111,8 @@ class RequestDTO {
    *
    * @return self
    */
-  public static function createFromArray(array $params): self {
+  public static function createFromArray(array $params): self
+  {
     $dto = pluginApp(RequestDTO::class);
     $dto->setPoNumber($params['poNumber'] ?? null);
     $dto->setWarehouseId($params['warehouseId'] ?? null);

@@ -20,7 +20,8 @@ class ShippingLabelHelper {
    *
    * @return string
    */
-  public static function generateLabelFileName(string $poNumber, $packageId, $extension = 'pdf'): string {
+  public static function generateLabelFileName(string $poNumber, $packageId, $extension = 'pdf'): string
+  {
     return self::generateShipmentNumber($poNumber, $packageId) . ".{$extension}";
   }
 
@@ -30,7 +31,8 @@ class ShippingLabelHelper {
    *
    * @return string
    */
-  public static function generateShipmentNumber(string $poNumber, $packageId): string {
+  public static function generateShipmentNumber(string $poNumber, $packageId): string
+  {
     return "{$poNumber}_{$packageId}";
   }
 
@@ -41,7 +43,8 @@ class ShippingLabelHelper {
    *
    * @return int
    */
-  public static function removePoNumberPrefix(string $poNumber): int {
+  public static function removePoNumberPrefix(string $poNumber): int
+  {
     return (int)substr($poNumber, 2);
   }
 }

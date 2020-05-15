@@ -20,7 +20,8 @@ class PendingOrdersRepository extends Repository {
    *
    * @return bool
    */
-  public function insert(array $data): bool {
+  public function insert(array $data): bool
+  {
     if (!isset($data['poNum']) || empty($data['poNum']) || !isset($data['items']) || !count($data['items'])) {
       return false;
     }
@@ -36,17 +37,16 @@ class PendingOrdersRepository extends Repository {
   /**
    * @param string $poNum
    */
-  public function incrementAttempts(string $poNum) {
+  public function incrementAttempts(string $poNum)
+  {
     $data = [];
 
-    try
-    {
+    try {
       $database = pluginApp(DataBase::class);
       $data = $database->query(PendingOrders::class)->where('poNum', '=', $poNum)
           ->limit(1)
           ->get();
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
       $this->loggerContract
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
@@ -63,8 +63,7 @@ class PendingOrdersRepository extends Repository {
         );
     }
 
-    if (empty($data))
-    {
+    if (empty($data)) {
       return;
     }
 
@@ -84,21 +83,19 @@ class PendingOrdersRepository extends Repository {
    *
    * @return array|null
    */
-  public function get(string $poNum) {
+  public function get(string $poNum)
+  {
     
-    try
-    {
+    try {
       $database = pluginApp(DataBase::class);
       $model = $database->query(PendingOrders::class)->where('poNum', '=', $poNum)
           ->limit(1)
           ->get();
 
-      if (isset($model) && !empty($model) && isset($model[0]))
-      {
+      if (isset($model) && !empty($model) && isset($model[0])) {
         return $model[0];
       }
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
       $this->loggerContract
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
@@ -122,16 +119,15 @@ class PendingOrdersRepository extends Repository {
    *
    * @return PendingOrders[]
    */
-  public function getAll(int $circle): array {
-    try
-    {
+  public function getAll(int $circle): array
+  {
+    try {
       $database = pluginApp(DataBase::class);
       return $database->query(PendingOrders::class)
           ->offset(self::GET_LIMIT * ($circle - 1))
           ->limit(self::GET_LIMIT)
           ->get();
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
       $this->loggerContract
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
@@ -154,13 +150,12 @@ class PendingOrdersRepository extends Repository {
    *
    * @return bool
    */
-  public function delete(array $poNums): bool {
-    try
-    {
+  public function delete(array $poNums): bool
+  {
+    try {
       $database = pluginApp(DataBase::class);
       return $database->query(PendingOrders::class)->whereIn('poNum', $poNums)->delete();
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
       $this->loggerContract
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
@@ -182,13 +177,12 @@ class PendingOrdersRepository extends Repository {
   /**
    * @return bool
    */
-  public function deleteAll() {
-    try
-    {
+  public function deleteAll()
+  {
+    try {
       $database = pluginApp(DataBase::class);
       return $database->query(PendingOrders::class)->delete();
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
       $this->loggerContract
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),

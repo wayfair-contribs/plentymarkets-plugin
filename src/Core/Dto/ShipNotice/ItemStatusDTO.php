@@ -24,28 +24,32 @@ class ItemStatusDTO {
   /**
    * @return string
    */
-  public function getKey(): string {
+  public function getKey(): string
+  {
     return $this->key;
   }
 
   /**
    * @param string $key
    */
-  public function setKey(string $key): void {
+  public function setKey(string $key): void
+  {
     $this->key = $key;
   }
 
   /**
    * @return string
    */
-  public function getMessage(): string {
+  public function getMessage(): string
+  {
     return $this->message;
   }
 
   /**
    * @param string $message
    */
-  public function setMessage(string $message): void {
+  public function setMessage(string $message): void
+  {
     $this->message = $message;
   }
 
@@ -54,7 +58,8 @@ class ItemStatusDTO {
    *
    * @return ItemStatusDTO
    */
-  public static function createFromArray(array $input): self {
+  public static function createFromArray(array $input): self
+  {
     /** @var ItemStatusDTO $dto */
     $dto = pluginApp(ItemStatusDTO::class);
     $dto->setKey($input['key'] ?? null);

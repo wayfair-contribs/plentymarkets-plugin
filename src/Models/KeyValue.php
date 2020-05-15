@@ -35,7 +35,8 @@ class KeyValue extends Model {
   /**
    * @return string
    */
-  public function getTableName(): string {
+  public function getTableName(): string
+  {
     return 'Wayfair::KeyValue';
   }
 

@@ -13,14 +13,15 @@ class MeasurementDTOValidator extends Validator {
   /**
    * @return void
    */
-  public function buildCustomMessages() {
-
+  public function buildCustomMessages()
+  {
   }
 
   /**
    * @return void
    */
-  protected function defineAttributes() {
+  protected function defineAttributes()
+  {
     $this->addNumeric('value', true);
     $this->addString('unit', true)->in(Constants::AVAILABLE_LENGTH_UNITS);
   }

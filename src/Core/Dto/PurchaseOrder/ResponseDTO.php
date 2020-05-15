@@ -104,7 +104,8 @@ class ResponseDTO {
   /**
    * @return string
    */
-  public function getStorePrefix() {
+  public function getStorePrefix()
+  {
     return $this->storePrefix;
   }
 
@@ -113,14 +114,16 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setStorePrefix($storePrefix) {
+  public function setStorePrefix($storePrefix)
+  {
     $this->storePrefix = $storePrefix;
   }
 
   /**
    * @return string
    */
-  public function getPoNumber() {
+  public function getPoNumber()
+  {
     return $this->poNumber;
   }
 
@@ -129,14 +132,16 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setPoNumber($poNumber) {
+  public function setPoNumber($poNumber)
+  {
     $this->poNumber = $poNumber;
   }
 
   /**
    * @return string
    */
-  public function getPoDate() {
+  public function getPoDate()
+  {
     return $this->poDate;
   }
 
@@ -145,14 +150,16 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setPoDate($poDate) {
+  public function setPoDate($poDate)
+  {
     $this->poDate = $poDate;
   }
 
   /**
    * @return string
    */
-  public function getEstimatedShipDate() {
+  public function getEstimatedShipDate()
+  {
     return $this->estimatedShipDate;
   }
 
@@ -161,14 +168,16 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setEstimatedShipDate($estimatedShipDate) {
+  public function setEstimatedShipDate($estimatedShipDate)
+  {
     $this->estimatedShipDate = $estimatedShipDate;
   }
 
   /**
    * @return string
    */
-  public function getDeliveryMethodCode() {
+  public function getDeliveryMethodCode()
+  {
     return $this->deliveryMethodCode;
   }
 
@@ -177,14 +186,16 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setDeliveryMethodCode($deliveryMethodCode) {
+  public function setDeliveryMethodCode($deliveryMethodCode)
+  {
     $this->deliveryMethodCode = $deliveryMethodCode;
   }
 
   /**
    * @return string
    */
-  public function getCustomerName() {
+  public function getCustomerName()
+  {
     return $this->customerName;
   }
 
@@ -193,14 +204,16 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setCustomerName($customerName) {
+  public function setCustomerName($customerName)
+  {
     $this->customerName = $customerName;
   }
 
   /**
    * @return string
    */
-  public function getCustomerAddress1() {
+  public function getCustomerAddress1()
+  {
     return $this->customerAddress1;
   }
 
@@ -209,14 +222,16 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setCustomerAddress1($customerAddress1) {
+  public function setCustomerAddress1($customerAddress1)
+  {
     $this->customerAddress1 = $customerAddress1;
   }
 
   /**
    * @return string
    */
-  public function getCustomerAddress2() {
+  public function getCustomerAddress2()
+  {
     return $this->customerAddress2;
   }
 
@@ -225,14 +240,16 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setCustomerAddress2($customerAddress2) {
+  public function setCustomerAddress2($customerAddress2)
+  {
     $this->customerAddress2 = $customerAddress2;
   }
 
   /**
    * @return string
    */
-  public function getCustomerCity() {
+  public function getCustomerCity()
+  {
     return $this->customerCity;
   }
 
@@ -241,14 +258,16 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setCustomerCity($customerCity) {
+  public function setCustomerCity($customerCity)
+  {
     $this->customerCity = $customerCity;
   }
 
   /**
    * @return string
    */
-  public function getCustomerState() {
+  public function getCustomerState()
+  {
     return $this->customerState;
   }
 
@@ -257,14 +276,16 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setCustomerState($customerState) {
+  public function setCustomerState($customerState)
+  {
     $this->customerState = $customerState;
   }
 
   /**
    * @return string
    */
-  public function getCustomerPostalCode() {
+  public function getCustomerPostalCode()
+  {
     return $this->customerPostalCode;
   }
 
@@ -273,14 +294,16 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setCustomerPostalCode($customerPostalCode) {
+  public function setCustomerPostalCode($customerPostalCode)
+  {
     $this->customerPostalCode = $customerPostalCode;
   }
 
   /**
    * @return string
    */
-  public function getSalesChannelName() {
+  public function getSalesChannelName()
+  {
     return $this->salesChannelName;
   }
 
@@ -289,14 +312,16 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setSalesChannelName($salesChannelName) {
+  public function setSalesChannelName($salesChannelName)
+  {
     $this->salesChannelName = $salesChannelName;
   }
 
   /**
    * @return string
    */
-  public function getOrderType() {
+  public function getOrderType()
+  {
     return $this->orderType;
   }
 
@@ -305,14 +330,16 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setOrderType($orderType) {
+  public function setOrderType($orderType)
+  {
     $this->orderType = $orderType;
   }
 
   /**
    * @return string
    */
-  public function getPackingSlipUrl() {
+  public function getPackingSlipUrl()
+  {
     return $this->packingSlipUrl;
   }
 
@@ -321,14 +348,16 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setPackingSlipUrl($packingSlipUrl) {
+  public function setPackingSlipUrl($packingSlipUrl)
+  {
     $this->packingSlipUrl = $packingSlipUrl;
   }
 
   /**
    * @return WarehouseDTO
    */
-  public function getWarehouse() {
+  public function getWarehouse()
+  {
     return $this->warehouse;
   }
 
@@ -337,14 +366,16 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setWarehouse($warehouse) {
+  public function setWarehouse($warehouse)
+  {
     $this->warehouse = WarehouseDTO::createFromArray($warehouse);
   }
 
   /**
    * @return array
    */
-  public function getProducts() {
+  public function getProducts()
+  {
     return $this->products;
   }
 
@@ -353,7 +384,8 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setProducts($products) {
+  public function setProducts($products)
+  {
     $this->products = [];
     foreach ($products as $key => $product) {
       $this->products[] = ProductDTO::createFromArray($product);
@@ -363,7 +395,8 @@ class ResponseDTO {
   /**
    * @return AddressDTO
    */
-  public function getShipTo() {
+  public function getShipTo()
+  {
     return $this->shipTo;
   }
 
@@ -372,14 +405,16 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setShipTo($shipTo) {
+  public function setShipTo($shipTo)
+  {
     $this->shipTo = AddressDTO::createFromArray($shipTo);
   }
 
   /**
    * @return BillingInfoDTO
    */
-  public function getBillingInfo() {
+  public function getBillingInfo()
+  {
     return $this->billingInfo;
   }
 
@@ -388,7 +423,8 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setBillingInfo($billingInfo) {
+  public function setBillingInfo($billingInfo)
+  {
     $this->billingInfo = BillingInfoDTO::createFromArray($billingInfo);
   }
 
@@ -399,7 +435,8 @@ class ResponseDTO {
    *
    * @return self
    */
-  public static function createFromArray(array $params): self {
+  public static function createFromArray(array $params): self
+  {
     $dto = pluginApp(ResponseDTO::class);
     $dto->setStorePrefix($params['storePrefix'] ?? null);
     $dto->setPoNumber($params['poNumber'] ?? null);

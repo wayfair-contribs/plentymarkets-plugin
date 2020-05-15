@@ -15,7 +15,8 @@ class CreatePendingLogsTable {
    *
    * @return void
    */
-  public function run(Migrate $migrate) {
+  public function run(Migrate $migrate)
+  {
     $migrate->createTable(PendingLogs::class);
   }
 }

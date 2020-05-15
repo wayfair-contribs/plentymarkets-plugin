@@ -22,7 +22,8 @@ class KeyValueRepository extends Repository {
    * @return KeyValue
    * @throws \Exception
    */
-  public function put($key, $value) {
+  public function put($key, $value)
+  {
     if (empty($key) or empty($value)) {
       throw new ValidationException("Key or Value cannot be empty.");
     }
@@ -47,21 +48,19 @@ class KeyValueRepository extends Repository {
    *
    * @return void
    */
-  public function putOrReplace($key, $value) {
+  public function putOrReplace($key, $value)
+  {
     $firstModelForKey = null;
-    try
-    {
+    try {
       /**
        * @var DataBase $database
        */
       $database = pluginApp(DataBase::class);
       $modelsForKey = $database->query(KeyValue::class)->where('key', '=', $key)->get();
-      if (isset($modelsForKey) && !empty($modelsForKey))
-      {
+      if (isset($modelsForKey) && !empty($modelsForKey)) {
         $firstModelForKey = $modelsForKey[0];
       }
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
       $this->loggerContract
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
@@ -85,7 +84,7 @@ class KeyValueRepository extends Repository {
       $this->put($key, $value);
     }
 
-    if ($key === AbstractConfigHelper::FULL_INVENTORY_CRON_STATUS) { 
+    if ($key === AbstractConfigHelper::FULL_INVENTORY_CRON_STATUS) {
       // TODO: move this to a separate class, or make the KeyValue table to have the updated_at column, or find a better way ...
       $this->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_STATUS_UPDATED_AT, date('Y-m-d H:i:s.u P'));
     }
@@ -96,17 +95,17 @@ class KeyValueRepository extends Repository {
    *
    * @return string|null
    */
-  public function get($key) {
+  public function get($key)
+  {
     
     $modelsForKey = [];
-    try{
+    try {
       /**
      * @var DataBase $database
      */
       $database      = pluginApp(DataBase::class);
       $modelsForKey = $database->query(KeyValue::class)->where('key', '=', $key)->get();
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
       $this->loggerContract
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
@@ -133,18 +132,17 @@ class KeyValueRepository extends Repository {
   /**
    * @return array
    */
-  public function getAll() {
+  public function getAll()
+  {
     /**
      * @var DataBase $database
      */
     $allModels = [];
 
-    try
-    {
+    try {
       $database  = pluginApp(DataBase::class);
       $allModels = $database->query(KeyValue::class)->get();
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
       $this->loggerContract
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),

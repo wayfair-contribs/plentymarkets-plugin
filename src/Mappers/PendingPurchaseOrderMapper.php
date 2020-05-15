@@ -14,7 +14,8 @@ class PendingPurchaseOrderMapper {
    *
    * @return array
    */
-  public function map(ResponseDTO $dto): array {
+  public function map(ResponseDTO $dto): array
+  {
     $items = [];
     $estimatedShipDate = $dto->getEstimatedShipDate() ?: date('Y-m-d H:i:s.u P');
     foreach ($dto->getProducts() as $product) {

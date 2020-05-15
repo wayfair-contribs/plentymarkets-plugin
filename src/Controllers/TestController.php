@@ -28,7 +28,8 @@ class TestController extends Controller {
    * @return string
    * @throws \Exception
    */
-  public function fetchAndCreateOrders(OrderService $orderService, LogSenderService $logSenderService) {
+  public function fetchAndCreateOrders(OrderService $orderService, LogSenderService $logSenderService)
+  {
     $externalLogs = pluginApp(ExternalLogs::class);
     $orderService->process($externalLogs, 1);
     if (count($externalLogs->getLogs())) {
@@ -70,7 +71,8 @@ class TestController extends Controller {
    *
    * @return array
    */
-  public function showKeyValueAll(KeyValueRepository $keyValue, ConfigHelper $config) {
+  public function showKeyValueAll(KeyValueRepository $keyValue, ConfigHelper $config)
+  {
     return $keyValue->getAll();
   }
 
@@ -79,7 +81,8 @@ class TestController extends Controller {
    *
    * @return array
    */
-  public function showPendingOrders(Request $request) {
+  public function showPendingOrders(Request $request)
+  {
     $circle = $request->input('circle');
     $pendingOrdersRepository = pluginApp(PendingOrdersRepository::class);
     return $pendingOrdersRepository->getAll($circle);
@@ -90,7 +93,8 @@ class TestController extends Controller {
    *
    * @return array
    */
-  public function deletePendingOrders(Request $request) {
+  public function deletePendingOrders(Request $request)
+  {
     $pendingOrdersRepository = pluginApp(PendingOrdersRepository::class);
     return $pendingOrdersRepository->deleteAll();
   }
@@ -101,7 +105,8 @@ class TestController extends Controller {
    * @return string
    * @throws \Exception
    */
-  public function acceptOrders(Request $request) {
+  public function acceptOrders(Request $request)
+  {
     $circle = $request->input('circle');
     $orderService = pluginApp(OrderService::class);
     $externalLogs = pluginApp(ExternalLogs::class);
@@ -115,7 +120,8 @@ class TestController extends Controller {
    * @return array
    * @throws \Exception
    */
-  public function paymentMethods(PaymentMethodRepositoryContract $paymentMethodRepository) {
+  public function paymentMethods(PaymentMethodRepositoryContract $paymentMethodRepository)
+  {
     return $paymentMethodRepository->all();
   }
 
@@ -125,7 +131,8 @@ class TestController extends Controller {
    * @return string
    * @throws \Exception
    */
-  public function updateFullInventoryStatus(KeyValueRepository $keyValue) {
+  public function updateFullInventoryStatus(KeyValueRepository $keyValue)
+  {
     $keyValue->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_CRON_STATUS, AbstractConfigHelper::FULL_INVENTORY_CRON_IDLE);
     return 'Done';
   }

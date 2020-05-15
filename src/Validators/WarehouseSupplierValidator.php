@@ -12,7 +12,8 @@ class WarehouseSupplierValidator extends Validator {
   /**
    * @return array
    */
-  public function buildCustomMessages() {
+  public function buildCustomMessages()
+  {
     // @FIXME Implementation of this method is unknown. Verify what needs to be done in this function.
     return [
       'supplierId' => 'The :attribute is required',
@@ -25,7 +26,8 @@ class WarehouseSupplierValidator extends Validator {
    *
    * @return null
    */
-  protected function defineAttributes() {
+  protected function defineAttributes()
+  {
     $this->addString('supplierId', true);
     $this->addString('warehouseId', true);
   }

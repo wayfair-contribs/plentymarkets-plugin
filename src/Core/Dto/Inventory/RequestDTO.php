@@ -49,7 +49,8 @@ class RequestDTO {
   /**
    * @return int
    */
-  public function getSupplierId() {
+  public function getSupplierId()
+  {
     return $this->supplierId;
   }
 
@@ -58,14 +59,16 @@ class RequestDTO {
    *
    * @return void
    */
-  public function setSupplierId($supplierId) {
+  public function setSupplierId($supplierId)
+  {
     $this->supplierId = $supplierId;
   }
 
   /**
    * @return string
    */
-  public function getSupplierPartNumber() {
+  public function getSupplierPartNumber()
+  {
     return $this->supplierPartNumber;
   }
 
@@ -74,14 +77,16 @@ class RequestDTO {
    *
    * @return void
    */
-  public function setSupplierPartNumber($supplierPartNumber) {
+  public function setSupplierPartNumber($supplierPartNumber)
+  {
     $this->supplierPartNumber = $supplierPartNumber;
   }
 
   /**
    * @return int|null
    */
-  public function getQuantityOnHand() {
+  public function getQuantityOnHand()
+  {
     return $this->quantityOnHand;
   }
 
@@ -90,14 +95,16 @@ class RequestDTO {
    *
    * @return void
    */
-  public function setQuantityOnHand($quantityOnHand) {
+  public function setQuantityOnHand($quantityOnHand)
+  {
     $this->quantityOnHand = $quantityOnHand;
   }
 
   /**
    * @return int|null
    */
-  public function getQuantityBackorder() {
+  public function getQuantityBackorder()
+  {
     return $this->quantityBackorder;
   }
 
@@ -106,14 +113,16 @@ class RequestDTO {
    *
    * @return void
    */
-  public function setQuantityBackorder($quantityBackorder) {
+  public function setQuantityBackorder($quantityBackorder)
+  {
     $this->quantityBackorder = $quantityBackorder;
   }
 
   /**
    * @return int|null
    */
-  public function getQuantityOnOrder() {
+  public function getQuantityOnOrder()
+  {
     return $this->quantityOnOrder;
   }
 
@@ -122,14 +131,16 @@ class RequestDTO {
    *
    * @return void
    */
-  public function setQuantityOnOrder($quantityOnOrder) {
+  public function setQuantityOnOrder($quantityOnOrder)
+  {
     $this->quantityOnOrder = $quantityOnOrder;
   }
 
   /**
    * @return string
    */
-  public function getItemNextAvailabilityDate() {
+  public function getItemNextAvailabilityDate()
+  {
     return $this->itemNextAvailabilityDate;
   }
 
@@ -138,14 +149,16 @@ class RequestDTO {
    *
    * @return void
    */
-  public function setItemNextAvailabilityDate($itemNextAvailabilityDate) {
+  public function setItemNextAvailabilityDate($itemNextAvailabilityDate)
+  {
     $this->itemNextAvailabilityDate = $itemNextAvailabilityDate;
   }
 
   /**
    * @return string
    */
-  public function getProductNameAndOptions() {
+  public function getProductNameAndOptions()
+  {
     return $this->productNameAndOptions;
   }
 
@@ -154,14 +167,16 @@ class RequestDTO {
    *
    * @return void
    */
-  public function setProductNameAndOptions($productNameAndOptions) {
+  public function setProductNameAndOptions($productNameAndOptions)
+  {
     $this->productNameAndOptions = $productNameAndOptions;
   }
 
   /**
    * @return bool
    */
-  public function isDiscontinued() {
+  public function isDiscontinued()
+  {
     return $this->discontinued;
   }
 
@@ -170,7 +185,8 @@ class RequestDTO {
    *
    * @return void
    */
-  public function setDiscontinued($discontinued) {
+  public function setDiscontinued($discontinued)
+  {
     $this->discontinued = $discontinued;
   }
 
@@ -181,7 +197,8 @@ class RequestDTO {
    *
    * @return self
    */
-  public static function createFromArray(array $params): self {
+  public static function createFromArray(array $params): self
+  {
     /**
      * @var RequestDTO $dto
      */
@@ -200,7 +217,8 @@ class RequestDTO {
   /**
    * @return array
    */
-  public function toArray() {
+  public function toArray()
+  {
     $data = [];
     $data['supplierId'] = $this->getSupplierId();
     $data['supplierPartNumber'] = $this->getSupplierPartNumber();

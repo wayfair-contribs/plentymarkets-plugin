@@ -35,7 +35,8 @@ class OrderImportCron extends Cron {
    * @param LoggerContract   $loggerContract
    * @param LogSenderService $logSenderService
    */
-  public function __construct(OrderService $orderService, LoggerContract $loggerContract, LogSenderService $logSenderService) {
+  public function __construct(OrderService $orderService, LoggerContract $loggerContract, LogSenderService $logSenderService)
+  {
     $this->orderService = $orderService;
     $this->loggerContract = $loggerContract;
     $this->logSenderService = $logSenderService;
@@ -46,13 +47,13 @@ class OrderImportCron extends Cron {
    *
    * @return void
    */
-  public function handle() {
+  public function handle()
+  {
     $externalLogs = pluginApp(ExternalLogs::class);
     try {
       $this->loggerContract->debug(TranslationHelper::getLoggerKey('cronStartedMessage'), ['method' => __METHOD__]);
       $this->orderService->process($externalLogs, 1);
-    }
-    finally {
+    } finally {
       if (count($externalLogs->getLogs())) {
         $this->logSenderService->execute($externalLogs->getLogs());
       }

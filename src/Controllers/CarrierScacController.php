@@ -29,7 +29,8 @@ class CarrierScacController {
    *
    * @param ShipmentProviderService $shipmentProviderService
    */
-  public function __construct(ShipmentProviderService $shipmentProviderService) {
+  public function __construct(ShipmentProviderService $shipmentProviderService)
+  {
     $this->shipmentProviderService = $shipmentProviderService;
   }
 
@@ -38,7 +39,8 @@ class CarrierScacController {
    *
    * @return mixed
    */
-  public function getCarriers() {
+  public function getCarriers()
+  {
     return json_encode($this->shipmentProviderService->getShippingProviders());
   }
 
@@ -47,7 +49,8 @@ class CarrierScacController {
    *
    * @return mixed
    */
-  public function getMapping() {
+  public function getMapping()
+  {
     return json_encode($this->shipmentProviderService->getCarrierScacMapping());
   }
 
@@ -56,7 +59,8 @@ class CarrierScacController {
    *
    * @return false|string
    */
-  public function post(Request $request) {
+  public function post(Request $request)
+  {
     $input = $request->get(self::INPUT_DATA);
 
     return json_encode($this->shipmentProviderService->saveCarrierScacMapping($input));
@@ -67,7 +71,8 @@ class CarrierScacController {
    *
    * @return false|string
    */
-  public function getShippingMethod() {
+  public function getShippingMethod()
+  {
     return json_encode(['name' => $this->shipmentProviderService->getShippingMethod()]);
   }
 
@@ -79,7 +84,8 @@ class CarrierScacController {
    * @return false|string
    * @throws ValidationException
    */
-  public function postShippingMethod(Request $request) {
+  public function postShippingMethod(Request $request)
+  {
     $input = $request->get(self::INPUT_DATA);
 
     return json_encode(['name' => $this->shipmentProviderService->updateShippingMethod($input)]);

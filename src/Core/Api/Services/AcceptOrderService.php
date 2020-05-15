@@ -36,8 +36,7 @@ class AcceptOrderService extends APIService
     ConfigHelper $configHelper,
     PendingOrdersRepository $pendingOrdersRepository,
     LoggerContract $loggerContract
-  )
-  {
+  ) {
     parent::__construct($clientInterfaceContract, $authenticationContract, $configHelper, $loggerContract);
     $this->pendingOrdersRepository = $pendingOrdersRepository;
   }

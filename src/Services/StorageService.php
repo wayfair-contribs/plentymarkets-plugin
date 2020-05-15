@@ -20,7 +20,8 @@ class StorageService implements StorageInterfaceContract {
    *
    * @param KeyValueRepository $keyValueRepository
    */
-  public function __construct(KeyValueRepository $keyValueRepository) {
+  public function __construct(KeyValueRepository $keyValueRepository)
+  {
     $this->keyValueRepository = $keyValueRepository;
   }
 
@@ -29,7 +30,8 @@ class StorageService implements StorageInterfaceContract {
    *
    * @return mixed
    */
-  public function get($key) {
+  public function get($key)
+  {
     return $this->keyValueRepository->get($key);
   }
 
@@ -40,7 +42,8 @@ class StorageService implements StorageInterfaceContract {
    * @throws \Plenty\Exceptions\ValidationException
    * @return void
    */
-  public function set($key, $value) {
+  public function set($key, $value)
+  {
     $this->keyValueRepository->put($key, $value);
   }
 }

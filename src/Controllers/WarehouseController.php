@@ -23,7 +23,8 @@ class WarehouseController extends Controller {
    *
    * @return string
    */
-  public function index(Twig $twig): string {
+  public function index(Twig $twig): string
+  {
     $warehouses = '{a:1}';
 
     return $twig->render('Wayfair::content.warehouse', ['warehouses' => $warehouses]);
@@ -35,7 +36,8 @@ class WarehouseController extends Controller {
    *
    * @return string
    */
-  public function show(Twig $twig, WarehouseRepositoryContract $warehouseRepositoryContract): string {
+  public function show(Twig $twig, WarehouseRepositoryContract $warehouseRepositoryContract): string
+  {
     $warehouses = json_encode($warehouseRepositoryContract->all());
     return $twig->render('Wayfair::content.warehouse', ['warehouses' => $warehouses]);
   }
@@ -45,7 +47,8 @@ class WarehouseController extends Controller {
    *
    * @return string
    */
-  public function fetch(WarehouseRepositoryContract $warehouseRepositoryContract): string {
+  public function fetch(WarehouseRepositoryContract $warehouseRepositoryContract): string
+  {
     return json_encode($warehouseRepositoryContract->all());
   }
 }

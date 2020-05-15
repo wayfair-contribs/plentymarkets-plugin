@@ -20,7 +20,8 @@ class HomeController extends Controller {
    *
    * @return string
    */
-  public function index(Twig $twig): string {
+  public function index(Twig $twig): string
+  {
     return $twig->render('Wayfair::content.home');
   }
 

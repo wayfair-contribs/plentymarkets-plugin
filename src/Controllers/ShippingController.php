@@ -32,7 +32,8 @@ class ShippingController extends Controller {
    *
    * @param ShipmentRegisterService $shipmentRegisterService
    */
-  public function __construct(ShipmentRegisterService $shipmentRegisterService, LoggerContract $loggerContract) {
+  public function __construct(ShipmentRegisterService $shipmentRegisterService, LoggerContract $loggerContract)
+  {
     $this->shipmentRegisterService = $shipmentRegisterService;
     $this->loggerContract = $loggerContract;
   }
@@ -46,13 +47,14 @@ class ShippingController extends Controller {
    * @return array
    * @throws \Exception
    */
-  public function registerShipments(Request $request, array $orderIds): array {
+  public function registerShipments(Request $request, array $orderIds): array
+  {
     $orderIds = $this->processOrderIds($request, $orderIds);
     $this->loggerContract
         ->info(
             TranslationHelper::getLoggerKey('registerShipmentForOrders'), [
-            'additionalInfo' => ['orderIds' => $orderIds],
-            'method' => __METHOD__
+              'additionalInfo' => ['orderIds' => $orderIds],
+              'method' => __METHOD__
             ]
         );
 
@@ -67,13 +69,14 @@ class ShippingController extends Controller {
    *
    * @return array
    */
-  public function getLabels(Request $request, $orderIds): array {
+  public function getLabels(Request $request, $orderIds): array
+  {
     $orderIds = $this->processOrderIds($request, $orderIds);
     $this->loggerContract
         ->info(
             TranslationHelper::getLoggerKey('getGeneratedLabels'), [
-            'additionalInfo' => ['orderIds' => $orderIds],
-            'method' => __METHOD__
+              'additionalInfo' => ['orderIds' => $orderIds],
+              'method' => __METHOD__
             ]
         );
 
@@ -88,13 +91,14 @@ class ShippingController extends Controller {
    *
    * @return array
    */
-  public function deleteShipments(Request $request, array $orderIds): array {
+  public function deleteShipments(Request $request, array $orderIds): array
+  {
     $orderIds = $this->processOrderIds($request, $orderIds);
     $this->loggerContract
         ->info(
             TranslationHelper::getLoggerKey('deleteShipmentForOrders'), [
-            'additionalInfo' => ['orderIds' => $orderIds],
-            'method' => __METHOD__
+              'additionalInfo' => ['orderIds' => $orderIds],
+              'method' => __METHOD__
             ]
         );
 
@@ -107,7 +111,8 @@ class ShippingController extends Controller {
    *
    * @return array
    */
-  private function processOrderIds(Request $request, $orderIds): array {
+  private function processOrderIds(Request $request, $orderIds): array
+  {
     if (is_numeric($orderIds)) {
       $orderIds = [$orderIds];
     } elseif (!is_array($orderIds)) {

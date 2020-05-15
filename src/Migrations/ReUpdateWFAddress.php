@@ -31,11 +31,13 @@ class ReUpdateWFAddress {
    *
    * @param AddressService $addressService
    */
-  public function __construct(AddressService $addressService) {
+  public function __construct(AddressService $addressService)
+  {
     $this->addressService = $addressService;
   }
 
-  public function run() {
+  public function run()
+  {
     $this->addressService->checkAndUpdate();
   }
 }

@@ -38,7 +38,8 @@ class PurchaseOrderMapper {
    * @param ProductMapper      $productMapper
    * @param KeyValueRepository $keyValueRepository
    */
-  public function __construct(Application $app, ProductMapper $productMapper, KeyValueRepository $keyValueRepository) {
+  public function __construct(Application $app, ProductMapper $productMapper, KeyValueRepository $keyValueRepository)
+  {
     $this->app = $app;
     $this->productMapper = $productMapper;
     $this->keyValueRepository = $keyValueRepository;
@@ -55,7 +56,8 @@ class PurchaseOrderMapper {
    *
    * @return array
    */
-  public function map(ResponseDTO $dto, int $billingAddressId, int $billingContactId, int $deliveryAddressId, int $referrerId, string $warehouseId, string $paymentMethodId): array {
+  public function map(ResponseDTO $dto, int $billingAddressId, int $billingContactId, int $deliveryAddressId, int $referrerId, string $warehouseId, string $paymentMethodId): array
+  {
     $orderItems = [];
     foreach ($dto->getProducts() as $product) {
       $orderItems[] = $this->productMapper->map($product, $referrerId, $warehouseId, $dto->getPoNumber());

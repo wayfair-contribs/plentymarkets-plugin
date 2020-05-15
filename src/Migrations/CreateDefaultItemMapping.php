@@ -25,7 +25,8 @@ class CreateDefaultItemMapping {
    *
    * @param KeyValueRepository $keyValueRepository
    */
-  public function __construct(KeyValueRepository $keyValueRepository) {
+  public function __construct(KeyValueRepository $keyValueRepository)
+  {
     $this->keyValueRepository = $keyValueRepository;
   }
 
@@ -34,7 +35,8 @@ class CreateDefaultItemMapping {
    * @throws \Plenty\Exceptions\ValidationException
    * @return void
    */
-  public function run() {
+  public function run()
+  {
     if (empty($this->keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD))) {
       $this->keyValueRepository->putOrReplace(AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD, AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER);
     }

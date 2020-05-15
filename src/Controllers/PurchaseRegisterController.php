@@ -21,7 +21,8 @@ class PurchaseRegisterController {
    * @return false|string
    * @throws \Exception
    */
-  public function test(RegisterPurchaseOrderService $registerPurchaseOrderService) {
+  public function test(RegisterPurchaseOrderService $registerPurchaseOrderService)
+  {
     $requestDto = RequestDTO::createFromArray(['poNumber' => 'UK148092932']);
     $result     = $registerPurchaseOrderService->register($requestDto);
 
