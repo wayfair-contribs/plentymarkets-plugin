@@ -14,6 +14,10 @@ NON_WEB_DIR="tests/non-web"
 SNIFF_ERROR_REGEX=".* ([0-9]+) (err|ERR).*"
 SNIFF_WARNING_REGEX=".* ([0-9]+) (warn|WARN).*"
 
+SNIFF_STANDARD="./sniffRuleset.xml"
+
+ANALYSIS_LEVEL=7
+
 ###
 # Sum an array of numbers; Echo the sum of all items in the array
 #
@@ -90,7 +94,7 @@ run_phpstan() {
   fi
 
   print_header "RUNNING PHPStan"
-  $(get_script_dir)/vendor/bin/phpstan analyze --level 7 -c ${NON_WEB_DIR}/phpstan/phpstan.neon ${files}
+  $(get_script_dir)/vendor/bin/phpstan analyze --level ${ANALYSIS_LEVEL} ${files}
 }
 
 run_codesniffer() {
@@ -103,7 +107,7 @@ run_codesniffer() {
 
   print_header "RUNNING CODESNIFFER"
 
-  sniff_command="$(get_script_dir)/vendor/bin/phpcs --standard=$(get_script_dir)/${NON_WEB_DIR}/codesniffer/standards/CSNStores --colors ${files}"
+  sniff_command="$(get_script_dir)/vendor/bin/phpcs --standard=${SNIFF_STANDARD} --colors ${files}"
    # sniff! this is a bit hacky so that it doesn't exit when errors
   # are found because command will have exit code of 1
   SNIFF_OUTPUT="$(${sniff_command} || true)"
@@ -165,7 +169,7 @@ run_autofixsniff() {
   fi
 
   print_header "RUNNING AUTOFIX SNIFFS"
-  $(get_script_dir)/vendor/bin/phpcbf --standard=$(get_script_dir)/${NON_WEB_DIR}/codesniffer/standards/CSNStores --colors --report=full ${files}
+  $(get_script_dir)/vendor/bin/phpcbf --standard=${SNIFF_STANDARD} --colors --report=full ${files}
 }
 
 run_all() {
