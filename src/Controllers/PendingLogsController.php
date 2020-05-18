@@ -10,15 +10,13 @@ use Plenty\Plugin\Http\Request;
 use Wayfair\Repositories\PendingLogsRepository;
 use Wayfair\Services\SendLogsService;
 
-class PendingLogsController extends Controller
-{
+class PendingLogsController extends Controller {
 
   /**
    * @return array
    * @throws \Exception
    */
-  public function showAll()
-  {
+  public function showAll() {
     $pendingLogsRepository = pluginApp(PendingLogsRepository::class);
     return $pendingLogsRepository->getAll();
   }
@@ -28,8 +26,7 @@ class PendingLogsController extends Controller
    *
    * @return string
    */
-  public function delete(Request $request)
-  {
+  public function delete(Request $request) {
     $ids = $request->input('ids');
     $pendingLogsRepository = pluginApp(PendingLogsRepository::class);
     return $pendingLogsRepository->delete($ids) ? 'Done' : 'Error';
@@ -40,8 +37,7 @@ class PendingLogsController extends Controller
    *
    * @return string
    */
-  public function deleteAll(Request $request)
-  {
+  public function deleteAll(Request $request) {
     $pendingLogsRepository = pluginApp(PendingLogsRepository::class);
     $pendingLogsRepository->deleteAll();
     return 'Done';
@@ -50,16 +46,14 @@ class PendingLogsController extends Controller
   /**
    * @return string
    */
-  public function insert()
-  {
+  public function insert() {
     return 'Done';
   }
 
   /**
    * @return string
    */
-  public function sendLogs()
-  {
+  public function sendLogs() {
     $sendLogsService = pluginApp(SendLogsService::class);
     $sendLogsService->process();
     return 'Done';

@@ -8,8 +8,7 @@ namespace Wayfair\Services;
 use Wayfair\Core\Api\Services\LogSenderService;
 use Wayfair\Repositories\PendingLogsRepository;
 
-class SendLogsService
-{
+class SendLogsService {
 
   /**
    * @var PendingLogsRepository
@@ -27,8 +26,7 @@ class SendLogsService
    * @param PendingLogsRepository $pendingLogsRepository
    * @param LogSenderService      $logSenderService
    */
-  public function __construct(PendingLogsRepository $pendingLogsRepository, LogSenderService $logSenderService)
-  {
+  public function __construct(PendingLogsRepository $pendingLogsRepository, LogSenderService $logSenderService) {
     $this->pendingLogsRepository = $pendingLogsRepository;
     $this->logSenderService = $logSenderService;
   }
@@ -38,8 +36,7 @@ class SendLogsService
    *
    * @return void
    */
-  public function process()
-  {
+  public function process() {
     $logs = $this->pendingLogsRepository->getAll();
     if (count($logs)) {
       $ids = $this->logSenderService->execute($logs);

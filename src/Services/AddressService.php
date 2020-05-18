@@ -5,6 +5,7 @@
 
 namespace Wayfair\Services;
 
+
 use Plenty\Modules\Account\Address\Contracts\AddressContactRelationRepositoryContract;
 use Plenty\Modules\Account\Address\Models\AddressOption;
 use Plenty\Modules\Account\Address\Models\AddressRelationType;
@@ -22,8 +23,7 @@ use Wayfair\Repositories\KeyValueRepository;
  *
  * @package Wayfair\Services
  */
-class AddressService
-{
+class AddressService {
   /**
    * @var KeyValueRepository
    */
@@ -45,9 +45,9 @@ class AddressService
    * @param AddressMapper                    $addressMapper
    */
   public function __construct(
-    KeyValueRepository $keyValueRepository,
-    ContactAddressRepositoryContract $contactAddressRepository,
-    AddressMapper $addressMapper
+      KeyValueRepository $keyValueRepository,
+      ContactAddressRepositoryContract $contactAddressRepository,
+      AddressMapper $addressMapper
   ) {
     $this->keyValueRepository = $keyValueRepository;
     $this->contactAddressRepository = $contactAddressRepository;
@@ -57,11 +57,10 @@ class AddressService
   /**
    * Update existing Wayfair address using ContactAddressRepositoryContract.
    */
-  public function checkAndUpdate()
-  {
+  public function checkAndUpdate() {
     $billingSetting = \json_decode($this->keyValueRepository->get(AbstractConfigHelper::BILLING_CONTACT), true);
     if (!empty($billingSetting['addressId']) && !empty($billingSetting['contactId'])) { // Billing address already exist -> update it.
-      $addressDTO = AddressDTO::createFromArray(BillingAddress::BILLING_ADDRESS_AS_ARRAY);
+      $addressDTO = AddressDTO::createFromArray(BillingAddress::BillingAddressAsArray);
       $addressData = $this->addressMapper->map($addressDTO);
       $this->contactAddressRepository->updateAddress($addressData, $billingSetting['addressId'], $billingSetting['contactId'], AddressRelationType::BILLING_ADDRESS);
     }
@@ -76,8 +75,7 @@ class AddressService
    *
    * @return array
    */
-  public function createContactAndAddress(AddressDTO $dto, BillingInfoDTO $billingInfoDto, int $referrerId, int $contactType, int $addressRelationType): array
-  {
+  public function createContactAndAddress(AddressDTO $dto, BillingInfoDTO $billingInfoDto, int $referrerId, int $contactType, int $addressRelationType): array {
     $addressData = $this->addressMapper->map($dto);
     $contactId = $this->createContact($addressData, $referrerId, $contactType);
     $addressId = $this->createAddress($addressData, $contactId, $addressRelationType, $billingInfoDto);
@@ -92,8 +90,7 @@ class AddressService
    *
    * @return int
    */
-  public function createContact(array $address, int $referrerId, int $typeId): int
-  {
+  public function createContact(array $address, int $referrerId, int $typeId): int {
     $address['typeId'] = $typeId;
     $address['referrerId'] = $referrerId;
     $contactRepo = pluginApp(ContactRepositoryContract::class);
@@ -110,14 +107,13 @@ class AddressService
    *
    * @return int
    */
-  public function createAddress(array $address, int $contactId, int $typeId, BillingInfoDTO $billingInfoDto): int
-  {
+  public function createAddress(array $address, int $contactId, int $typeId, BillingInfoDTO $billingInfoDto): int {
     if ($typeId === AddressRelationType::DELIVERY_ADDRESS) {
       $address['options'] = [
-        [
-          'typeId' => AddressOption::TYPE_VAT_NUMBER,
-          'value' => $billingInfoDto->getVatNumber(),
-        ]
+          [
+              'typeId' => AddressOption::TYPE_VAT_NUMBER,
+              'value' => $billingInfoDto->getVatNumber(),
+          ]
       ];
     }
     /** @var ContactAddressRepositoryContract $contactAddressRepo */
@@ -125,13 +121,13 @@ class AddressService
     $address = $contactAddressRepo->createAddress($address, $contactId, $typeId);
     $addressContactRelationRepo = pluginApp(AddressContactRelationRepositoryContract::class);
     $addressContactRelationRepo->createAddressContactRelation(
-      [
         [
-          'contactId' => $contactId,
-          'addressId' => $address->id,
-          'typeId' => $typeId,
+            [
+                'contactId' => $contactId,
+                'addressId' => $address->id,
+                'typeId' => $typeId,
+            ]
         ]
-      ]
     );
 
     return $address->id;

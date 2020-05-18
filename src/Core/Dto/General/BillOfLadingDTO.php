@@ -5,8 +5,7 @@
 
 namespace Wayfair\Core\Dto\General;
 
-class BillOfLadingDTO
-{
+class BillOfLadingDTO {
   /**
    * @var string
    */
@@ -15,8 +14,7 @@ class BillOfLadingDTO
   /**
    * @return string
    */
-  public function getUrl()
-  {
+  public function getUrl() {
     return $this->url;
   }
 
@@ -25,8 +23,7 @@ class BillOfLadingDTO
    *
    * @return void
    */
-  public function setUrl($url)
-  {
+  public function setUrl($url) {
     $this->url = $url;
   }
 
@@ -37,8 +34,7 @@ class BillOfLadingDTO
    *
    * @return self
    */
-  public static function createFromArray(array $params): self
-  {
+  public static function createFromArray(array $params): self {
     $dto = pluginApp(BillOfLadingDTO::class);
     $dto->setUrl($params['$url'] ?? null);
     return $dto;

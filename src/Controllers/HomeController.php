@@ -13,16 +13,15 @@ use Plenty\Plugin\Templates\Twig;
  *
  * @package Wayfair\Controllers
  */
-class HomeController extends Controller
-{
+class HomeController extends Controller {
 
   /**
    * @param Twig $twig
    *
    * @return string
    */
-  public function index(Twig $twig): string
-  {
+  public function index(Twig $twig): string {
     return $twig->render('Wayfair::content.home');
   }
+
 }

@@ -15,8 +15,7 @@ use Wayfair\Models\ExternalLogs;
  *
  * @package Wayfair\Core\Api\Services
  */
-class ASNService extends APIService
-{
+class ASNService extends APIService {
   const LOG_KEY_DEBUG_ASN_SENDING = 'debugASNSending';
   const LOG_KEY_ERROR_OCCUR_WHEN_SENDING_ASN = 'errorOccurWhenSendingASN';
   const LOG_KEY_RESPONSE_MISSING_DATA = 'asnResponseMissingData';
@@ -31,8 +30,7 @@ class ASNService extends APIService
    * @return bool
    * @throws \Exception
    */
-  public function sendASN(RequestDTO $requestDTO): bool
-  {
+  public function sendASN(RequestDTO $requestDTO): bool {
 
     /** @var ExternalLogs $externalLogs */
     $externalLogs = pluginApp(ExternalLogs::class);
@@ -43,8 +41,7 @@ class ASNService extends APIService
       $params = ['notice' => $requestDTO->toArray()];
       $this->loggerContract
         ->info(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG_ASN_SENDING),
-          [
+          TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG_ASN_SENDING), [
             'additionalInfo' => ['query' => $query, 'params' => json_encode($params)],
             'method' => __METHOD__
           ]
@@ -55,8 +52,7 @@ class ASNService extends APIService
       if ($response->hasErrors()) {
         $this->loggerContract
           ->error(
-            TranslationHelper::getLoggerKey(self::LOG_KEY_ERROR_OCCUR_WHEN_SENDING_ASN),
-            [
+            TranslationHelper::getLoggerKey(self::LOG_KEY_ERROR_OCCUR_WHEN_SENDING_ASN), [
               'additionalInfo' => [
                 'poNumber' => $poNumber,
                 'error' => $response->getError()
@@ -76,8 +72,7 @@ class ASNService extends APIService
       if (!isset($dataFromResponse) || !is_array($dataFromResponse) || empty($dataFromResponse)) {
         $this->loggerContract
           ->error(
-            TranslationHelper::getLoggerKey(self::LOG_KEY_RESPONSE_MISSING_DATA),
-            [
+            TranslationHelper::getLoggerKey(self::LOG_KEY_RESPONSE_MISSING_DATA), [
               'additionalInfo' => [
                 'poNumber' => $poNumber
               ],
@@ -94,8 +89,7 @@ class ASNService extends APIService
       if (!isset($purchaseOrdersFromData) || !is_array($purchaseOrdersFromData) || empty($purchaseOrdersFromData)) {
         $this->loggerContract
           ->error(
-            TranslationHelper::getLoggerKey(self::LOG_KEY_RESPONSE_MISSING_PO),
-            [
+            TranslationHelper::getLoggerKey(self::LOG_KEY_RESPONSE_MISSING_PO), [
               'additionalInfo' => [
                 'poNumber' => $poNumber
               ],
@@ -111,8 +105,7 @@ class ASNService extends APIService
       if (!isset($shipmentFromPurchaseOrders) || empty($shipmentFromPurchaseOrders)) {
         $this->loggerContract
           ->error(
-            TranslationHelper::getLoggerKey(self::LOG_KEY_RESPONSE_MISSING_SHIPPING),
-            [
+            TranslationHelper::getLoggerKey(self::LOG_KEY_RESPONSE_MISSING_SHIPPING), [
               'additionalInfo' => [
                 'poNumber' => $poNumber
               ],

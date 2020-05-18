@@ -5,8 +5,7 @@
 
 namespace Wayfair\Core\Contracts;
 
-interface LoggerContract
-{
+interface LoggerContract {
 
   /**
    * Detailed debug information.
@@ -39,4 +38,5 @@ interface LoggerContract
    * @param null   $loggingInfo
    */
   public function warning(string $code, $loggingInfo = null);
+
 }

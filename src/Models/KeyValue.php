@@ -7,8 +7,7 @@ namespace Wayfair\Models;
 
 use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 
-class KeyValue extends Model
-{
+class KeyValue extends Model {
 
   /**
    * @var string
@@ -36,8 +35,7 @@ class KeyValue extends Model
   /**
    * @return string
    */
-  public function getTableName(): string
-  {
+  public function getTableName(): string {
     return 'Wayfair::KeyValue';
   }
 

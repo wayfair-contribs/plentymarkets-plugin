@@ -10,8 +10,7 @@ use Wayfair\Core\Dto\PurchaseOrder\ResponseDTO;
 use Wayfair\Core\Exceptions\GraphQLQueryException;
 use Wayfair\Helpers\TranslationHelper;
 
-class FetchOrderService extends APIService
-{
+class FetchOrderService extends APIService {
   const FETCH_LIMIT = 50;
 
   /**
@@ -22,8 +21,7 @@ class FetchOrderService extends APIService
    * @throws GraphQLQueryException
    * @throws \Exception
    */
-  public function fetch(int $circle): array
-  {
+  public function fetch(int $circle): array {
     $query = $this->getQuery($circle);
     try {
       $response = $this->query($query);
@@ -48,8 +46,7 @@ class FetchOrderService extends APIService
    *
    * @return string
    */
-  private function getQuery(int $circle): string
-  {
+  private function getQuery(int $circle): string {
     $dateFilter = '';
     $importOrdersSince = $this->configHelper->getImportOrderSince();
     if ($importOrdersSince) {
@@ -122,4 +119,5 @@ class FetchOrderService extends APIService
     . '}';
     return $query;
   }
+
 }

@@ -35,6 +35,7 @@ class InventoryService extends APIService
       . '}'
       . '}';
     try {
+
       $response = $this->query($query);
 
       if (!isset($response) or empty($response)) {
@@ -58,7 +59,9 @@ class InventoryService extends APIService
       }
 
       return $response;
+
     } catch (\Exception $e) {
+
       $this->loggerContract->error(
         TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_QUERY_ERROR),
         [
@@ -135,6 +138,7 @@ class InventoryService extends APIService
     $externalLogs = pluginApp(ExternalLogs::class);
 
     try {
+
       $queryData = $this->buildQuery($listOfRequestDto, $fullInventory);
 
       $response = $this->query($queryData['query'], 'post', $queryData['variables']);

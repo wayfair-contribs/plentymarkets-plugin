@@ -7,16 +7,14 @@ namespace Wayfair\Mappers;
 
 use Wayfair\Core\Dto\PurchaseOrder\ResponseDTO;
 
-class PendingPurchaseOrderMapper
-{
+class PendingPurchaseOrderMapper {
 
   /**
    * @param ResponseDTO $dto
    *
    * @return array
    */
-  public function map(ResponseDTO $dto): array
-  {
+  public function map(ResponseDTO $dto): array {
     $items = [];
     $estimatedShipDate = $dto->getEstimatedShipDate() ?: date('Y-m-d H:i:s.u P');
     foreach ($dto->getProducts() as $product) {

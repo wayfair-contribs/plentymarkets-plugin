@@ -13,8 +13,7 @@ use Wayfair\Core\Helpers\AbstractConfigHelper;
  *
  * @package Wayfair\Helpers
  */
-class TranslationHelper
-{
+class TranslationHelper {
   /**
    * @var Translator $translator
    */
@@ -23,8 +22,7 @@ class TranslationHelper
   /**
    * @return Translator
    */
-  private static function getTranslator()
-  {
+  private static function getTranslator() {
     if (self::$translator === null) {
       self::$translator = pluginApp(Translator::class);
     }
@@ -40,8 +38,7 @@ class TranslationHelper
    *
    * @return mixed
    */
-  public static function translate(string $key, string $file = 'template')
-  {
+  public static function translate(string $key, string $file = 'template') {
     $fullLangKey = AbstractConfigHelper::PLUGIN_NAME . "::{$file}.{$key}";
 
     return self::getTranslator()->trans($fullLangKey);
@@ -53,8 +50,7 @@ class TranslationHelper
    *
    * @return string
    */
-  public static function getLoggerKey(string $key): string
-  {
+  public static function getLoggerKey(string $key): string {
     return AbstractConfigHelper::PLUGIN_NAME . '::logger.' . $key;
   }
 
@@ -65,8 +61,7 @@ class TranslationHelper
    *
    * @return string
    */
-  public static function getLoggerMessage(string $key): string
-  {
+  public static function getLoggerMessage(string $key): string {
     $fullLangKey = self::getLoggerKey($key);
 
     return self::getTranslator()->trans($fullLangKey);

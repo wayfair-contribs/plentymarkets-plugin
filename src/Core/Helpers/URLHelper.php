@@ -5,8 +5,7 @@
 
 namespace Wayfair\Core\Helpers;
 
-class URLHelper
-{
+class URLHelper {
   // Production Base URLs
   const BASE_URL = 'https://api.wayfair.com/';
   const BASE_AUTH_URL = 'https://sso.auth.wayfair.com/';
@@ -15,8 +14,8 @@ class URLHelper
   const URL_GRAPHQL = 'graphql';
   const URL_AUTH = 'auth';
   const URLS = [
-    self::URL_GRAPHQL => 'v1/graphql',
-    self::URL_AUTH    => 'oauth/token'
+      self::URL_GRAPHQL => 'v1/graphql',
+      self::URL_AUTH    => 'oauth/token'
   ];
 
   /**
@@ -24,8 +23,7 @@ class URLHelper
    *
    * @return string
    */
-  public static function getUrl($key)
-  {
+  public static function getUrl($key) {
     $base = self::getBaseUrl();
     return $base . self::URLS[$key];
   }
@@ -33,16 +31,14 @@ class URLHelper
   /**
    * @return string
    */
-  public static function getAuthUrl()
-  {
+  public static function getAuthUrl() {
     return self::BASE_AUTH_URL . self::URLS[self::URL_AUTH];
   }
 
   /**
    * @return string
    */
-  public static function getBaseUrl()
-  {
+  public static function getBaseUrl() {
     return self::BASE_URL;
   }
 
@@ -53,8 +49,8 @@ class URLHelper
    *
    * @return string
    */
-  public static function getPackingSlipUrl(string $poNumber)
-  {
+  public static function getPackingSlipUrl(string $poNumber) {
     return self::BASE_URL . 'v1/packing_slip/' . $poNumber;
   }
+
 }

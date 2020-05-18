@@ -5,8 +5,7 @@
 
 namespace Wayfair\Core\Dto\General;
 
-class BillingInfoDTO
-{
+class BillingInfoDTO {
   /**
    * @var string
    */
@@ -15,8 +14,7 @@ class BillingInfoDTO
   /**
    * @return string
    */
-  public function getVatNumber()
-  {
+  public function getVatNumber() {
     return $this->vatNumber;
   }
 
@@ -25,8 +23,7 @@ class BillingInfoDTO
    *
    * @return void
    */
-  public function setVatNumber($vatNumber)
-  {
+  public function setVatNumber($vatNumber) {
     $this->vatNumber = $vatNumber;
   }
 
@@ -37,8 +34,7 @@ class BillingInfoDTO
    *
    * @return self
    */
-  public static function createFromArray(array $params): self
-  {
+  public static function createFromArray(array $params): self {
     $dto = pluginApp(BillingInfoDTO::class);
     $dto->setVatNumber($params['vatNumber'] ?? null);
     return $dto;

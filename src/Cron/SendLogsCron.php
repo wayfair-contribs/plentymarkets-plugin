@@ -8,8 +8,7 @@ namespace Wayfair\Cron;
 use Plenty\Modules\Cron\Contracts\CronHandler as Cron;
 use Wayfair\Services\SendLogsService;
 
-class SendLogsCron extends Cron
-{
+class SendLogsCron extends Cron {
 
   /**
    * @var SendLogsService
@@ -21,8 +20,7 @@ class SendLogsCron extends Cron
    *
    * @param SendLogsService $sendLogsService
    */
-  public function __construct(SendLogsService $sendLogsService)
-  {
+  public function __construct(SendLogsService $sendLogsService) {
     $this->sendLogsService = $sendLogsService;
   }
 
@@ -31,8 +29,7 @@ class SendLogsCron extends Cron
    *
    * @return void
    */
-  public function handle()
-  {
+  public function handle() {
     $this->sendLogsService->process();
   }
 }

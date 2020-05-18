@@ -5,8 +5,7 @@
 
 namespace Wayfair\Data;
 
-interface KeyValueStore
-{
+interface KeyValueStore {
 
   /**
    * @param string $key

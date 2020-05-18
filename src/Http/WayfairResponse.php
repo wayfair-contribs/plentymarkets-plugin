@@ -5,8 +5,7 @@
 
 namespace Wayfair\Http;
 
-class WayfairResponse
-{
+class WayfairResponse {
 
   /**
    * @var mixed
@@ -38,8 +37,7 @@ class WayfairResponse
    *
    * @param array $data
    */
-  public function __construct($data = [])
-  {
+  public function __construct($data = []) {
     $this->error        = $data['error'];
     $this->statusCode   = $data['statusCode'];
     $this->reasonPhrase = $data['reasonPhrase'];
@@ -50,8 +48,7 @@ class WayfairResponse
   /**
    * @return bool
    */
-  public function hasErrors()
-  {
+  public function hasErrors() {
     $bodyAsArray = $this->getBodyAsArray();
     return !empty($this->error) or !empty($this->getErrorFromArray());
   }
@@ -59,17 +56,16 @@ class WayfairResponse
   /**
    * @return mixed
    */
-  public function getHeaders()
-  {
+  public function getHeaders() {
     return $this->headers;
   }
 
   /**
    * @return mixed
    */
-  public function getError()
-  {
-    if (!empty($this->error)) {
+  public function getError() {
+    if (!empty($this->error))
+    {
       return $this->error;
     }
 
@@ -79,43 +75,39 @@ class WayfairResponse
   /**
    * @return mixed
    */
-  public function getBody()
-  {
+  public function getBody() {
     return $this->body;
   }
 
   /**
    * @return array
    */
-  public function getBodyAsArray()
-  {
+  public function getBodyAsArray() {
     return json_decode($this->body, true);
   }
   /**
    * @return mixed
    */
-  public function getStatusCode()
-  {
+  public function getStatusCode() {
     return $this->statusCode;
   }
 
   /**
    * @return mixed
    */
-  public function getReasonPhrase()
-  {
+  public function getReasonPhrase() {
     return $this->reasonPhrase;
   }
 
   /**
    * @return mixed
    */
-  private function getErrorFromArray()
-  {
+  private function getErrorFromArray() {
     // some modules were looking for an 'error' element
     // whilst others were looking for an 'errors' element.
     $bodyAsArray = $this->getBodyAsArray();
-    if (array_key_exists('error', $bodyAsArray)) {
+    if (array_key_exists('error', $bodyAsArray))
+    {
       return $bodyAsArray['error'];
     }
 

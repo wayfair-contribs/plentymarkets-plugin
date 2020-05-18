@@ -13,16 +13,14 @@ use Wayfair\Models\CarrierScac;
  *
  * @package Wayfair\Migrations
  */
-class CreateCarrierScacTable
-{
+class CreateCarrierScacTable {
 
   /**
    * @param Migrate $migrate
    *
    * @return void
    */
-  public function run(Migrate $migrate)
-  {
+  public function run(Migrate $migrate) {
     $migrate->createTable(CarrierScac::class);
   }
 }

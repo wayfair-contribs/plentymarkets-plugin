@@ -16,8 +16,7 @@ use Wayfair\Helpers\ConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Http\WayfairResponse;
 
-class AuthService implements AuthenticationContract
-{
+class AuthService implements AuthenticationContract {
   /**
    * @var StorageInterfaceContract
    */
@@ -49,10 +48,10 @@ class AuthService implements AuthenticationContract
    * @param LoggerContract           $loggerContract
    */
   public function __construct(
-    ClientInterfaceContract $clientInterfaceContract,
-    StorageInterfaceContract $storageInterfaceContract,
-    AbstractConfigHelper $abstractConfigHelper,
-    LoggerContract $loggerContract
+      ClientInterfaceContract $clientInterfaceContract,
+      StorageInterfaceContract $storageInterfaceContract,
+      AbstractConfigHelper $abstractConfigHelper,
+      LoggerContract $loggerContract
   ) {
     $this->store = $storageInterfaceContract;
     $this->client_id = $abstractConfigHelper->getClientId();
@@ -64,26 +63,25 @@ class AuthService implements AuthenticationContract
   /**
    * @return WayfairResponse
    */
-  public function authenticate()
-  {
+  public function authenticate() {
     $targetURL = URLHelper::getAuthUrl();
     $method = 'post';
     $arguments = [
-      $targetURL,
-      [
-        'headers' => [
-          'Content-Type' => 'application/json',
-          ConfigHelper::WAYFAIR_INTEGRATION_HEADER => ConfigHelper::INTEGRATION_AGENT_NAME
-        ],
-        'body' => json_encode(
-          [
-            'client_id' => $this->client_id,
-            'client_secret' => $this->client_secret,
-            'audience' => URLHelper::getBaseUrl(),
-            'grant_type' => 'client_credentials'
-          ]
-        )
-      ]
+        $targetURL,
+        [
+            'headers' => [
+                'Content-Type' => 'application/json',
+                ConfigHelper::WAYFAIR_INTEGRATION_HEADER => ConfigHelper::INTEGRATION_AGENT_NAME
+            ],
+            'body' => json_encode(
+                [
+                    'client_id' => $this->client_id,
+                    'client_secret' => $this->client_secret,
+                    'audience' => URLHelper::getBaseUrl(),
+                    'grant_type' => 'client_credentials'
+                ]
+            )
+        ]
     ];
     $this->loggerContract
         ->debug(TranslationHelper::getLoggerKey('attemptingAuthentication'), ['additionalInfo' => $arguments, 'method' => __METHOD__]);
@@ -97,8 +95,7 @@ class AuthService implements AuthenticationContract
    * @return void
    * @throws \Exception
    */
-  public function refresh()
-  {
+  public function refresh() {
     $token = $this->getToken();
     if (!isset($token) or $this->isTokenExpired()) {
       $response = $this->authenticate()->getBodyAsArray();
@@ -114,8 +111,7 @@ class AuthService implements AuthenticationContract
    *
    * @return void
    */
-  public function saveToken($token)
-  {
+  public function saveToken($token) {
     $token['store_time'] = time();
     $this->store->set('token', json_encode($token));
   }
@@ -123,8 +119,7 @@ class AuthService implements AuthenticationContract
   /**
    * @return bool
    */
-  public function isTokenExpired()
-  {
+  public function isTokenExpired() {
     $token = $this->getToken();
     if (isset($token) && isset($token['access_token']) && isset($token['store_time'])) {
       if (($token['expires_in'] + $token['store_time']) > time()) {
@@ -138,8 +133,7 @@ class AuthService implements AuthenticationContract
   /**
    * @return mixed
    */
-  public function getToken()
-  {
+  public function getToken() {
     return json_decode($this->store->get('token'), true);
   }
 
@@ -147,8 +141,7 @@ class AuthService implements AuthenticationContract
    * @return string
    * @throws TokenNotFoundException
    */
-  public function getOAuthToken()
-  {
+  public function getOAuthToken() {
     $token = $this->getToken();
     if (!isset($token)) {
       throw new TokenNotFoundException("Token not found.");

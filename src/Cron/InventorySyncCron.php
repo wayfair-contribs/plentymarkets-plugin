@@ -10,16 +10,14 @@ use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Services\InventoryUpdateService;
 
-class InventorySyncCron extends Cron
-{
+class InventorySyncCron extends Cron {
 
   /**
    * @throws \Exception
    *
    * @return void
    */
-  public function handle()
-  {
+  public function handle() {
     /**
      * @var LoggerContract $loggerContract
      */
@@ -31,7 +29,8 @@ class InventorySyncCron extends Cron
     $inventoryUpdateService = pluginApp(InventoryUpdateService::class);
     try {
       $inventoryUpdateService->sync();
-    } finally {
+    }
+    finally {
       $loggerContract->debug(TranslationHelper::getLoggerKey('cronFinishedMessage'), ['method' => __METHOD__]);
     }
   }

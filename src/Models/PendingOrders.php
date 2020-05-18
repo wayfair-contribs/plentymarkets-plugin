@@ -7,8 +7,7 @@ namespace Wayfair\Models;
 
 use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 
-class PendingOrders extends Model
-{
+class PendingOrders extends Model {
 
   /**
    * @var      int
@@ -33,8 +32,7 @@ class PendingOrders extends Model
   /**
    * @return string
    */
-  public function getTableName(): string
-  {
+  public function getTableName(): string {
     return 'Wayfair::PendingOrders';
   }
 

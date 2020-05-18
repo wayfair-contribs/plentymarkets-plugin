@@ -5,8 +5,7 @@
 
 namespace Wayfair\Core\Dto\General;
 
-class ProductDTO
-{
+class ProductDTO {
   /**
    * @var string
    */
@@ -80,8 +79,7 @@ class ProductDTO
   /**
    * @return string
    */
-  public function getPartNumber()
-  {
+  public function getPartNumber() {
     return $this->partNumber;
   }
 
@@ -90,16 +88,14 @@ class ProductDTO
    *
    * @return void
    */
-  public function setPartNumber($partNumber)
-  {
+  public function setPartNumber($partNumber) {
     $this->partNumber = $partNumber;
   }
 
   /**
    * @return string
    */
-  public function getQuantity()
-  {
+  public function getQuantity() {
     return $this->quantity;
   }
 
@@ -108,16 +104,14 @@ class ProductDTO
    *
    * @return void
    */
-  public function setQuantity($quantity)
-  {
+  public function setQuantity($quantity) {
     $this->quantity = $quantity;
   }
 
   /**
    * @return float
    */
-  public function getPrice()
-  {
+  public function getPrice() {
     return $this->price;
   }
 
@@ -126,16 +120,14 @@ class ProductDTO
    *
    * @return void
    */
-  public function setPrice($price)
-  {
+  public function setPrice($price) {
     $this->price = $price;
   }
 
   /**
    * @return int
    */
-  public function getPieceCount()
-  {
+  public function getPieceCount() {
     return $this->pieceCount;
   }
 
@@ -144,16 +136,14 @@ class ProductDTO
    *
    * @return void
    */
-  public function setPieceCount($pieceCount)
-  {
+  public function setPieceCount($pieceCount) {
     $this->pieceCount = $pieceCount;
   }
 
   /**
    * @return float
    */
-  public function getTotalCost()
-  {
+  public function getTotalCost() {
     return $this->totalCost;
   }
 
@@ -162,16 +152,14 @@ class ProductDTO
    *
    * @return void
    */
-  public function setTotalCost($totalCost)
-  {
+  public function setTotalCost($totalCost) {
     $this->totalCost = $totalCost;
   }
 
   /**
    * @return string
    */
-  public function getName()
-  {
+  public function getName() {
     return $this->name;
   }
 
@@ -180,16 +168,14 @@ class ProductDTO
    *
    * @return void
    */
-  public function setName($name)
-  {
+  public function setName($name) {
     $this->name = $name;
   }
 
   /**
    * @return float
    */
-  public function getWeight()
-  {
+  public function getWeight() {
     return $this->weight;
   }
 
@@ -198,16 +184,14 @@ class ProductDTO
    *
    * @return void
    */
-  public function setWeight($weight)
-  {
+  public function setWeight($weight) {
     $this->weight = $weight;
   }
 
   /**
    * @return float
    */
-  public function getTotalWeight()
-  {
+  public function getTotalWeight() {
     return $this->totalWeight;
   }
 
@@ -216,16 +200,14 @@ class ProductDTO
    *
    * @return void
    */
-  public function setTotalWeight($totalWeight)
-  {
+  public function setTotalWeight($totalWeight) {
     $this->totalWeight = $totalWeight;
   }
 
   /**
    * @return string
    */
-  public function getEstShipDate()
-  {
+  public function getEstShipDate() {
     return $this->estShipDate;
   }
 
@@ -234,16 +216,14 @@ class ProductDTO
    *
    * @return void
    */
-  public function setEstShipDate($estShipDate)
-  {
+  public function setEstShipDate($estShipDate) {
     $this->estShipDate = $estShipDate;
   }
 
   /**
    * @return string
    */
-  public function getFillDate()
-  {
+  public function getFillDate() {
     return $this->fillDate;
   }
 
@@ -252,16 +232,14 @@ class ProductDTO
    *
    * @return void
    */
-  public function setFillDate($fillDate)
-  {
+  public function setFillDate($fillDate) {
     $this->fillDate = $fillDate;
   }
 
   /**
    * @return string
    */
-  public function getSku()
-  {
+  public function getSku() {
     return $this->sku;
   }
 
@@ -270,16 +248,14 @@ class ProductDTO
    *
    * @return void
    */
-  public function setSku($sku)
-  {
+  public function setSku($sku) {
     $this->sku = $sku;
   }
 
   /**
    * @return bool
    */
-  public function getIsCancelled()
-  {
+  public function getIsCancelled() {
     return $this->isCancelled;
   }
 
@@ -288,16 +264,14 @@ class ProductDTO
    *
    * @return void
    */
-  public function setIsCancelled($isCancelled)
-  {
+  public function setIsCancelled($isCancelled) {
     $this->isCancelled = $isCancelled;
   }
 
   /**
    * @return string
    */
-  public function getTwoDayGuaranteeDeliveryDeadline()
-  {
+  public function getTwoDayGuaranteeDeliveryDeadline() {
     return $this->twoDayGuaranteeDeliveryDeadline;
   }
 
@@ -306,16 +280,14 @@ class ProductDTO
    *
    * @return void
    */
-  public function setTwoDayGuaranteeDeliveryDeadline($twoDayGuaranteeDeliveryDeadline)
-  {
+  public function setTwoDayGuaranteeDeliveryDeadline($twoDayGuaranteeDeliveryDeadline) {
     $this->twoDayGuaranteeDeliveryDeadline = $twoDayGuaranteeDeliveryDeadline;
   }
 
   /**
    * @return string
    */
-  public function getCustomComment()
-  {
+  public function getCustomComment() {
     return $this->customComment;
   }
 
@@ -324,8 +296,7 @@ class ProductDTO
    *
    * @return void
    */
-  public function setCustomComment($customComment)
-  {
+  public function setCustomComment($customComment) {
     $this->customComment = $customComment;
   }
 
@@ -336,8 +307,7 @@ class ProductDTO
    *
    * @return self
    */
-  public static function createFromArray(array $params): self
-  {
+  public static function createFromArray(array $params): self {
     $dto = pluginApp(ProductDTO::class);
     $dto->setPartNumber($params['partNumber'] ?? null);
     $dto->setQuantity($params['quantity'] ?? null);

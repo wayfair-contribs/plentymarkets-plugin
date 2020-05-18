@@ -7,8 +7,7 @@ namespace Wayfair\Core\Contracts;
 
 use Wayfair\Http\WayfairResponse;
 
-interface ClientInterfaceContract
-{
+interface ClientInterfaceContract {
 
   /**
    * @param string $method

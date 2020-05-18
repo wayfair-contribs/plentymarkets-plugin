@@ -12,8 +12,7 @@ use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Models\ExternalLogs;
 use Wayfair\Services\OrderService;
 
-class OrderAcceptCron extends Cron
-{
+class OrderAcceptCron extends Cron {
 
   /**
    * @var OrderService
@@ -31,8 +30,7 @@ class OrderAcceptCron extends Cron
    * @param OrderService     $orderService
    * @param LogSenderService $logSenderService
    */
-  public function __construct(OrderService $orderService, LogSenderService $logSenderService)
-  {
+  public function __construct(OrderService $orderService, LogSenderService $logSenderService) {
     $this->orderService = $orderService;
     $this->logSenderService = $logSenderService;
   }
@@ -42,17 +40,17 @@ class OrderAcceptCron extends Cron
    *
    * @return void
    */
-  public function handle()
-  {
+  public function handle() {
     $externalLogs = pluginApp(ExternalLogs::class);
     /**
      * @var LoggerContract $loggerContract
      */
     $loggerContract = pluginApp(LoggerContract::class);
     $loggerContract->debug(TranslationHelper::getLoggerKey('cronStartedMessage'), ['method' => __METHOD__]);
-    try {
+    try{
       $this->orderService->accept($externalLogs, 1);
-    } finally {
+    }
+    finally {
       if (count($externalLogs->getLogs())) {
         $this->logSenderService->execute($externalLogs->getLogs());
       }

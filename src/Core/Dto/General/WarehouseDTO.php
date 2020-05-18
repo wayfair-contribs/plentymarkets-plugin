@@ -5,8 +5,7 @@
 
 namespace Wayfair\Core\Dto\General;
 
-class WarehouseDTO
-{
+class WarehouseDTO {
   /**
    * @var string
    */
@@ -20,8 +19,7 @@ class WarehouseDTO
   /**
    * @return string
    */
-  public function getId()
-  {
+  public function getId() {
     return $this->id;
   }
 
@@ -30,16 +28,14 @@ class WarehouseDTO
    *
    * @return void
    */
-  public function setId($id)
-  {
+  public function setId($id) {
     $this->id = $id;
   }
 
   /**
    * @return string
    */
-  public function getName()
-  {
+  public function getName() {
     return $this->name;
   }
 
@@ -48,8 +44,7 @@ class WarehouseDTO
    *
    * @return void
    */
-  public function setName($name)
-  {
+  public function setName($name) {
     $this->name = $name;
   }
 
@@ -60,8 +55,7 @@ class WarehouseDTO
    *
    * @return self
    */
-  public static function createFromArray(array $params): self
-  {
+  public static function createFromArray(array $params): self {
     $dto = pluginApp(WarehouseDTO::class);
     $dto->setId($params['id'] ?? null);
     $dto->setName($params['name'] ?? null);

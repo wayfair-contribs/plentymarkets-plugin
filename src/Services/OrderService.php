@@ -13,8 +13,7 @@ use Wayfair\Core\Helpers\TimeHelper;
 use Wayfair\Models\ExternalLogs;
 use Wayfair\Repositories\PendingOrdersRepository;
 
-class OrderService
-{
+class OrderService {
   /**
    * @var FetchOrderService
    */
@@ -50,11 +49,11 @@ class OrderService
    * @param LoggerContract          $loggerContract
    */
   public function __construct(
-    FetchOrderService $fetchOrderService,
-    CreateOrderService $createOrderService,
-    AcceptOrderService $acceptOrderService,
-    PendingOrdersRepository $pendingOrdersRepository,
-    LoggerContract $loggerContract
+      FetchOrderService $fetchOrderService,
+      CreateOrderService $createOrderService,
+      AcceptOrderService $acceptOrderService,
+      PendingOrdersRepository $pendingOrdersRepository,
+      LoggerContract $loggerContract
   ) {
     $this->fetchOrderService = $fetchOrderService;
     $this->createOrderService = $createOrderService;
@@ -71,17 +70,16 @@ class OrderService
    *
    * @return void
    */
-  public function process(ExternalLogs $externalLogs, int $circle)
-  {
+  public function process(ExternalLogs $externalLogs, int $circle) {
     $ms = TimeHelper::getMilliseconds();
     try {
       $orders = $this->fetchOrderService->fetch($circle);
       $receivedOrdersDuration = TimeHelper::getMilliseconds() - $ms;
-      $externalLogs->addPurchaseOrderLog('PO fetching', 'poReceived', count($orders), $receivedOrdersDuration);
+      $externalLogs->addPurchaseOrderLog('PO fetching','poReceived', count($orders), $receivedOrdersDuration);
     } catch (\Exception $e) {
       $receiveFailedOrdersDuration = TimeHelper::getMilliseconds() - $ms;
       $externalLogs->addErrorLog($e->getMessage());
-      $externalLogs->addPurchaseOrderLog('PO fetching failed', 'poReceiveFailed', 0, $receiveFailedOrdersDuration);
+      $externalLogs->addPurchaseOrderLog('PO fetching failed','poReceiveFailed', 0, $receiveFailedOrdersDuration);
       return;
     }
     $ms = TimeHelper::getMilliseconds();
@@ -102,8 +100,8 @@ class OrderService
       }
     }
     $createdOrdersDuration = TimeHelper::getMilliseconds() - $ms;
-    $externalLogs->addPurchaseOrderLog('PO creating', 'poCreated', $createdOrdersCount, $createdOrdersDuration);
-    $externalLogs->addPurchaseOrderLog('PO creating', 'poFailed', $failedOrdersCount, $createdOrdersDuration);
+    $externalLogs->addPurchaseOrderLog('PO creating','poCreated', $createdOrdersCount, $createdOrdersDuration);
+    $externalLogs->addPurchaseOrderLog('PO creating','poFailed', $failedOrdersCount, $createdOrdersDuration);
     if (count($orders)) {
       $this->process($externalLogs, $circle + 1);
     }
@@ -117,12 +115,11 @@ class OrderService
    *
    * @return void
    */
-  public function accept(ExternalLogs $externalLogs, int $circle)
-  {
+  public function accept(ExternalLogs $externalLogs, int $circle) {
     $ms = TimeHelper::getMilliseconds();
     $pendingOrders = $this->pendingOrdersRepository->getAll($circle);
     $poAcceptDuration = TimeHelper::getMilliseconds() - $ms;
-    $externalLogs->addPurchaseOrderLog('PO accepting', 'poAccept', count($pendingOrders), $poAcceptDuration);
+    $externalLogs->addPurchaseOrderLog('PO accepting','poAccept', count($pendingOrders), $poAcceptDuration);
     $ms = TimeHelper::getMilliseconds();
     $acceptedOrders = [];
     foreach ($pendingOrders as $pendingOrder) {
@@ -131,14 +128,14 @@ class OrderService
       if ($this->acceptOrderService->accept($poNum, $items)) {
         $acceptedOrders[] = $poNum;
       } else {
-        $externalLogs->addPurchaseOrderLog('PO accept failed', 'poAcceptFailed', 1, TimeHelper::getMilliseconds() - $ms);
+        $externalLogs->addPurchaseOrderLog('PO accept failed','poAcceptFailed', 1, TimeHelper::getMilliseconds() - $ms);
         $externalLogs->addErrorLog('Failed to accept PO: ' . $poNum);
         $this->pendingOrdersRepository->incrementAttempts($poNum);
       }
     }
     $poAcceptedDuration = TimeHelper::getMilliseconds() - $ms;
     if (count($pendingOrders)) {
-      $externalLogs->addPurchaseOrderLog('PO accepted', 'poAccepted', count($acceptedOrders), $poAcceptedDuration);
+      $externalLogs->addPurchaseOrderLog('PO accepted','poAccepted', count($acceptedOrders), $poAcceptedDuration);
     }
     if (count($acceptedOrders)) {
       $this->pendingOrdersRepository->delete($acceptedOrders);

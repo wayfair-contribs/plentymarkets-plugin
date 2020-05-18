@@ -8,8 +8,7 @@ namespace Wayfair\Procedures;
 use Plenty\Modules\EventProcedures\Events\EventProceduresTriggered;
 use Wayfair\Core\Api\Services\InventoryService;
 
-class InventoryChangeProcedure
-{
+class InventoryChangeProcedure {
 
   /**
    * @var InventoryService
@@ -19,8 +18,7 @@ class InventoryChangeProcedure
   /**
    * @param InventoryService $inventoryService
    */
-  public function __construct(InventoryService $inventoryService)
-  {
+  public function __construct(InventoryService $inventoryService) {
     $this->inventoryService = $inventoryService;
   }
 
@@ -29,8 +27,7 @@ class InventoryChangeProcedure
    *
    * @return void
    */
-  public function run(EventProceduresTriggered $eventProceduresTriggered)
-  {
+  public function run(EventProceduresTriggered $eventProceduresTriggered) {
     // TODO: Need a way get inventory to be updated.
     $eventProceduresTriggered->getOrder();
   }

@@ -18,8 +18,7 @@ use Wayfair\Repositories\WarehouseSupplierRepository;
  *
  * @package Wayfair\Services
  */
-class OrderPropertyService
-{
+class OrderPropertyService {
 
   const LOG_KEY_CANNOT_OBTAIN_PO_NUMBER = 'obtainPoNumber';
   const LOG_KEY_WAREHOUSE_ID_NOT_FOUND = 'warehouseIdNotFound';
@@ -53,10 +52,10 @@ class OrderPropertyService
    * @param LoggerContract                        $loggerContract
    */
   public function __construct(
-    OrderPropertyRepositoryContract $orderPropertyRepositoryContract,
-    WarehouseSupplierRepository $warehouseSupplierRepository,
-    ShippingInformationRepositoryContract $shippingInformationRepositoryContract,
-    LoggerContract $loggerContract
+      OrderPropertyRepositoryContract $orderPropertyRepositoryContract,
+      WarehouseSupplierRepository $warehouseSupplierRepository,
+      ShippingInformationRepositoryContract $shippingInformationRepositoryContract,
+      LoggerContract $loggerContract
   ) {
     $this->orderPropertyRepositoryContract = $orderPropertyRepositoryContract;
     $this->warehouseSupplierRepository = $warehouseSupplierRepository;
@@ -71,18 +70,16 @@ class OrderPropertyService
    *
    * @return string
    */
-  public function getCheckedPoNumber(int $orderId): string
-  {
+  public function getCheckedPoNumber(int $orderId): string {
     $orderProperties = $this->orderPropertyRepositoryContract->findByOrderId($orderId, OrderPropertyType::EXTERNAL_ORDER_ID);
     if (empty($orderProperties) || empty($orderProperties[0]->value)) {
       $this->loggerContract
           ->error(
-            TranslationHelper::getLoggerKey(self::LOG_KEY_CANNOT_OBTAIN_PO_NUMBER),
-            [
+              TranslationHelper::getLoggerKey(self::LOG_KEY_CANNOT_OBTAIN_PO_NUMBER), [
               'method' => __METHOD__,
               'referenceType' => 'orderId',
               'referenceValue' => $orderId
-            ]
+              ]
           );
 
       return '';
@@ -98,21 +95,19 @@ class OrderPropertyService
    *
    * @return string
    */
-  public function getWarehouseId(int $orderId): string
-  {
+  public function getWarehouseId(int $orderId): string {
     $orderProperties = $this->orderPropertyRepositoryContract->findByOrderId($orderId, OrderPropertyType::WAREHOUSE);
     if (empty($orderProperties) || empty($orderProperties[0]->value)) {
       $this->loggerContract
           ->error(
-            TranslationHelper::getLoggerKey(self::LOG_KEY_WAREHOUSE_ID_NOT_FOUND),
-            [
+              TranslationHelper::getLoggerKey(self::LOG_KEY_WAREHOUSE_ID_NOT_FOUND), [
               'additionalInfo' => [
                 'orderId' => $orderId
               ],
               'method' => __METHOD__,
               'referenceType' => 'orderId',
               'referenceValue' => $orderId
-            ]
+              ]
           );
 
       return '';
@@ -123,8 +118,7 @@ class OrderPropertyService
     if (! isset($mapping) || empty($mapping->supplierId)) {
       $this->loggerContract
         ->error(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_NO_SUPPLIER_ID_FOR_WAREHOUSE),
-          [
+          TranslationHelper::getLoggerKey(self::LOG_KEY_NO_SUPPLIER_ID_FOR_WAREHOUSE), [
             'method' => __METHOD__,
             'referenceType' => 'warehouseId',
             'referenceValue' => $warehouseId
@@ -143,10 +137,11 @@ class OrderPropertyService
    *
    * @return array
    */
-  public function getAllOrderProperties(int $orderId): array
-  {
+  public function getAllOrderProperties(int $orderId): array {
     $orderProperties = $this->orderPropertyRepositoryContract->findByOrderId($orderId);
 
     return $orderProperties;
   }
+
+
 }

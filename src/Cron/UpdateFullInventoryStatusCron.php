@@ -11,8 +11,7 @@ use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Repositories\KeyValueRepository;
 
-class UpdateFullInventoryStatusCron extends Cron
-{
+class UpdateFullInventoryStatusCron extends Cron {
 
   /**
    * @var KeyValueRepository
@@ -24,8 +23,7 @@ class UpdateFullInventoryStatusCron extends Cron
    *
    * @param KeyValueRepository $keyValueRepository
    */
-  public function __construct(KeyValueRepository $keyValueRepository)
-  {
+  public function __construct(KeyValueRepository $keyValueRepository) {
     $this->keyValueRepository = $keyValueRepository;
   }
 
@@ -34,8 +32,7 @@ class UpdateFullInventoryStatusCron extends Cron
    *
    * @return void
    */
-  public function handle()
-  {
+  public function handle() {
     /**
      * @var LoggerContract $loggerContract
      */
@@ -47,7 +44,8 @@ class UpdateFullInventoryStatusCron extends Cron
       if (!$dt || (\time() - \strtotime($dt)) > 7200) {
         $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_CRON_STATUS, AbstractConfigHelper::FULL_INVENTORY_CRON_IDLE);
       }
-    } finally {
+    }
+    finally {
       $loggerContract->debug(TranslationHelper::getLoggerKey('cronFinishedMessage'), ['method' => __METHOD__]);
     }
   }

@@ -58,7 +58,8 @@ class SaveOrderDocumentService
     OrderRepositoryContract $orderRepositoryContract,
     FetchDocumentContract $fetchShippingLabelContract,
     LoggerContract $loggerContract
-  ) {
+  )
+  {
     $this->storageRepositoryContract = $storageRepositoryContract;
     $this->orderRepositoryContract = $orderRepositoryContract;
     $this->fetchShippingLabelContract = $fetchShippingLabelContract;
@@ -104,8 +105,7 @@ class SaveOrderDocumentService
     if (empty($label_url)) {
       $this->loggerContract
         ->error(
-          TranslationHelper::getLoggerKey('emptyLabelUrl'),
-          [
+          TranslationHelper::getLoggerKey('emptyLabelUrl'), [
             'additionalInfo' => [
               'responseDto' => $responseDTO,
               'PO' => $poNumberWithPrefix,
@@ -119,9 +119,12 @@ class SaveOrderDocumentService
         $poNumberWithPrefix . ": Shipping label URL is empty." . " Order: " . $pm_order_id);
     }
 
-    try {
+    try
+    {
       $labelFile = $this->fetchShippingLabelContract->fetch($label_url);
-    } catch (\Exception $e) {
+    }
+    catch(\Exception $e)
+    {
       throw new \Exception("Shipping label fetch failed : " . $e);
     }
 
@@ -144,17 +147,14 @@ class SaveOrderDocumentService
   {
     $this->loggerContract
       ->info(
-        TranslationHelper::getLoggerKey('saveFileSThree'),
-        [
+        TranslationHelper::getLoggerKey('saveFileSThree'), [
           'additionalInfo' => ['key' => $fileName, 'data' => base64_encode($fileData)],
           'method' => __METHOD__
         ]
       );
 
     return $this->storageRepositoryContract->uploadObject(
-      AbstractConfigHelper::PLUGIN_NAME,
-      $fileName,
-      $fileData
+      AbstractConfigHelper::PLUGIN_NAME, $fileName, $fileData
     );
   }
 

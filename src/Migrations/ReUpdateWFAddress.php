@@ -20,8 +20,7 @@ use Wayfair\Services\AddressService;
  *
  * @package Wayfair\Migrations
  */
-class ReUpdateWFAddress
-{
+class ReUpdateWFAddress {
   /**
    * @var AddressService
    */
@@ -32,13 +31,11 @@ class ReUpdateWFAddress
    *
    * @param AddressService $addressService
    */
-  public function __construct(AddressService $addressService)
-  {
+  public function __construct(AddressService $addressService) {
     $this->addressService = $addressService;
   }
 
-  public function run()
-  {
+  public function run() {
     $this->addressService->checkAndUpdate();
   }
 }

@@ -5,8 +5,7 @@
 
 namespace Wayfair\Core\Dto\Inventory;
 
-class ResponseDTO
-{
+class ResponseDTO {
   /**
    * @var int
    */
@@ -40,8 +39,7 @@ class ResponseDTO
   /**
    * @return int
    */
-  public function getId()
-  {
+  public function getId() {
     return $this->id;
   }
 
@@ -50,16 +48,14 @@ class ResponseDTO
    *
    * @return void
    */
-  public function setId($id)
-  {
+  public function setId($id) {
     $this->id = $id;
   }
 
   /**
    * @return string
    */
-  public function getHandle()
-  {
+  public function getHandle() {
     return $this->handle;
   }
 
@@ -68,16 +64,14 @@ class ResponseDTO
    *
    * @return void
    */
-  public function setHandle($handle)
-  {
+  public function setHandle($handle) {
     $this->handle = $handle;
   }
 
   /**
    * @return string
    */
-  public function getStatus()
-  {
+  public function getStatus() {
     return $this->status;
   }
 
@@ -86,16 +80,14 @@ class ResponseDTO
    *
    * @return void
    */
-  public function setStatus($status)
-  {
+  public function setStatus($status) {
     $this->status = $status;
   }
 
   /**
    * @return string
    */
-  public function getSubmittedAt()
-  {
+  public function getSubmittedAt() {
     return $this->submittedAt;
   }
 
@@ -104,16 +96,14 @@ class ResponseDTO
    *
    * @return void
    */
-  public function setSubmittedAt($submittedAt)
-  {
+  public function setSubmittedAt($submittedAt) {
     $this->submittedAt = $submittedAt;
   }
 
   /**
    * @return string
    */
-  public function getCompletedAt()
-  {
+  public function getCompletedAt() {
     return $this->completedAt;
   }
 
@@ -122,16 +112,14 @@ class ResponseDTO
    *
    * @return void
    */
-  public function setCompletedAt($completedAt)
-  {
+  public function setCompletedAt($completedAt) {
     $this->completedAt = $completedAt;
   }
 
   /**
    * @return array
    */
-  public function getErrors()
-  {
+  public function getErrors() {
     return $this->errors;
   }
 
@@ -140,8 +128,7 @@ class ResponseDTO
    *
    * @return void
    */
-  public function setErrors($errors)
-  {
+  public function setErrors($errors) {
     $this->errors = [];
     foreach ($errors as $key => $error) {
       $this->errors[] = ErrorDTO::createFromArray($error);
@@ -155,8 +142,7 @@ class ResponseDTO
    *
    * @return self
    */
-  public static function createFromArray(array $params): self
-  {
+  public static function createFromArray(array $params): self {
     /**
      * @var ResponseDTO $dto
      */
@@ -173,8 +159,7 @@ class ResponseDTO
   /**
    * @return array
    */
-  public function toArray()
-  {
+  public function toArray() {
     $data = [];
     $data['id'] = $this->getId();
     $data['handle'] = $this->getHandle();

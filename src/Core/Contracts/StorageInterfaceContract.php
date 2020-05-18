@@ -5,8 +5,7 @@
 
 namespace Wayfair\Core\Contracts;
 
-interface StorageInterfaceContract
-{
+interface StorageInterfaceContract {
 
   /**
    * @param string $key

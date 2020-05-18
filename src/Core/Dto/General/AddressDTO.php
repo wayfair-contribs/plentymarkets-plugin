@@ -5,8 +5,7 @@
 
 namespace Wayfair\Core\Dto\General;
 
-class AddressDTO
-{
+class AddressDTO {
   /**
    * @var string
    */
@@ -50,8 +49,7 @@ class AddressDTO
   /**
    * @return string
    */
-  public function getName()
-  {
+  public function getName() {
     return $this->name;
   }
 
@@ -60,16 +58,14 @@ class AddressDTO
    *
    * @return void
    */
-  public function setName($name)
-  {
+  public function setName($name) {
     $this->name = $name;
   }
 
   /**
    * @return string
    */
-  public function getAddress1()
-  {
+  public function getAddress1() {
     return $this->address1;
   }
 
@@ -78,16 +74,14 @@ class AddressDTO
    *
    * @return void
    */
-  public function setAddress1($address1)
-  {
+  public function setAddress1($address1) {
     $this->address1 = $address1;
   }
 
   /**
    * @return string|null
    */
-  public function getAddress2()
-  {
+  public function getAddress2() {
     return $this->address2;
   }
 
@@ -96,16 +90,14 @@ class AddressDTO
    *
    * @return void
    */
-  public function setAddress2($address2)
-  {
+  public function setAddress2($address2) {
     $this->address2 = $address2;
   }
 
   /**
    * @return string
    */
-  public function getCity()
-  {
+  public function getCity() {
     return $this->city;
   }
 
@@ -114,16 +106,14 @@ class AddressDTO
    *
    * @return void
    */
-  public function setCity($city)
-  {
+  public function setCity($city) {
     $this->city = $city;
   }
 
   /**
    * @return string|null
    */
-  public function getState()
-  {
+  public function getState() {
     return $this->state;
   }
 
@@ -132,16 +122,14 @@ class AddressDTO
    *
    * @return void
    */
-  public function setState($state)
-  {
+  public function setState($state) {
     $this->state = $state;
   }
 
   /**
    * @return string
    */
-  public function getCountry()
-  {
+  public function getCountry() {
     return $this->country;
   }
 
@@ -150,16 +138,14 @@ class AddressDTO
    *
    * @return void
    */
-  public function setCountry($country)
-  {
+  public function setCountry($country) {
     $this->country = $country;
   }
 
   /**
    * @return string|null
    */
-  public function getPostalCode()
-  {
+  public function getPostalCode() {
     return $this->postalCode;
   }
 
@@ -168,16 +154,14 @@ class AddressDTO
    *
    * @return void
    */
-  public function setPostalCode($postalCode)
-  {
+  public function setPostalCode($postalCode) {
     $this->postalCode = $postalCode;
   }
 
   /**
    * @return string|null
    */
-  public function getPhoneNumber()
-  {
+  public function getPhoneNumber() {
     return $this->phoneNumber;
   }
 
@@ -186,8 +170,7 @@ class AddressDTO
    *
    * @return void
    */
-  public function setPhoneNumber($phoneNumber)
-  {
+  public function setPhoneNumber($phoneNumber) {
     $this->phoneNumber = $phoneNumber;
   }
 
@@ -198,8 +181,7 @@ class AddressDTO
    *
    * @return self
    */
-  public static function createFromArray(array $params): self
-  {
+  public static function createFromArray(array $params): self {
     $dto = pluginApp(AddressDTO::class);
     $dto->setName($params['name'] ?? null);
     $dto->setAddress1($params['address1'] ?? null);

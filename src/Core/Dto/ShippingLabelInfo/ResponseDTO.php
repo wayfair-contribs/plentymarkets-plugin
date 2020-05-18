@@ -5,8 +5,7 @@
 
 namespace Wayfair\Core\Dto\ShippingLabelInfo;
 
-class ResponseDTO
-{
+class ResponseDTO {
   /**
    * @var string
    */
@@ -30,8 +29,7 @@ class ResponseDTO
   /**
    * @return string
    */
-  public function getId()
-  {
+  public function getId() {
     return $this->id;
   }
 
@@ -40,16 +38,14 @@ class ResponseDTO
    *
    * @return void
    */
-  public function setId($id)
-  {
+  public function setId($id) {
     $this->id = $id;
   }
 
   /**
    * @return string
    */
-  public function getEventDate()
-  {
+  public function getEventDate() {
     return $this->eventDate;
   }
 
@@ -58,16 +54,14 @@ class ResponseDTO
    *
    * @return void
    */
-  public function setEventDate($eventDate)
-  {
+  public function setEventDate($eventDate) {
     $this->eventDate = $eventDate;
   }
 
   /**
    * @return string
    */
-  public function getPickupDate()
-  {
+  public function getPickupDate() {
     return $this->pickupDate;
   }
 
@@ -76,16 +70,14 @@ class ResponseDTO
    *
    * @return void
    */
-  public function setPickupDate($pickupDate)
-  {
+  public function setPickupDate($pickupDate) {
     $this->pickupDate = $pickupDate;
   }
 
   /**
    * @return int
    */
-  public function getPoNumber()
-  {
+  public function getPoNumber() {
     return $this->poNumber;
   }
 
@@ -94,8 +86,7 @@ class ResponseDTO
    *
    * @return void
    */
-  public function setPoNumber($poNumber)
-  {
+  public function setPoNumber($poNumber) {
     $this->poNumber = $poNumber;
   }
 
@@ -106,8 +97,7 @@ class ResponseDTO
    *
    * @return self
    */
-  public static function createFromArray(array $params): self
-  {
+  public static function createFromArray(array $params): self {
     $dto = pluginApp(ResponseDTO::class);
     $dto->setId($params['id'] ?? null);
     $dto->setEventDate($params['eventDate'] ?? null);

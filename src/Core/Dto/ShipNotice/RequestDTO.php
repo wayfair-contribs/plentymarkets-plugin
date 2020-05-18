@@ -11,8 +11,7 @@ namespace Wayfair\Core\Dto\ShipNotice;
  *
  * @package Wayfair\Core\Dto\ShipNotice
  */
-class RequestDTO
-{
+class RequestDTO {
   /**
    * @var string
    */
@@ -77,192 +76,168 @@ class RequestDTO
   /**
    * @return string
    */
-  public function getPoNumber()
-  {
+  public function getPoNumber() {
     return $this->poNumber;
   }
 
   /**
    * @param string $poNumber
    */
-  public function setPoNumber($poNumber)
-  {
+  public function setPoNumber($poNumber) {
     $this->poNumber = $poNumber;
   }
 
   /**
    * @return string
    */
-  public function getSupplierId()
-  {
+  public function getSupplierId() {
     return $this->supplierId;
   }
 
   /**
    * @param string $supplierId
    */
-  public function setSupplierId($supplierId)
-  {
+  public function setSupplierId($supplierId) {
     $this->supplierId = $supplierId;
   }
 
   /**
    * @return int
    */
-  public function getPackageCount()
-  {
+  public function getPackageCount() {
     return $this->packageCount;
   }
 
   /**
    * @param int $packageCount
    */
-  public function setPackageCount($packageCount)
-  {
+  public function setPackageCount($packageCount) {
     $this->packageCount = $packageCount;
   }
 
   /**
    * @return float
    */
-  public function getWeight()
-  {
+  public function getWeight() {
     return $this->weight;
   }
 
   /**
    * @param float $weight
    */
-  public function setWeight($weight)
-  {
+  public function setWeight($weight) {
     $this->weight = $weight;
   }
 
   /**
    * @return float
    */
-  public function getVolume()
-  {
+  public function getVolume() {
     return $this->volume;
   }
 
   /**
    * @param float $volume
    */
-  public function setVolume($volume)
-  {
+  public function setVolume($volume) {
     $this->volume = $volume;
   }
 
   /**
    * @return string
    */
-  public function getCarrierCode()
-  {
+  public function getCarrierCode() {
     return $this->carrierCode;
   }
 
   /**
    * @param string $carrierCode
    */
-  public function setCarrierCode($carrierCode)
-  {
+  public function setCarrierCode($carrierCode) {
     $this->carrierCode = $carrierCode;
   }
 
   /**
    * @return string
    */
-  public function getShipSpeed()
-  {
+  public function getShipSpeed() {
     return $this->shipSpeed;
   }
 
   /**
    * @param string $shipSpeed
    */
-  public function setShipSpeed($shipSpeed)
-  {
+  public function setShipSpeed($shipSpeed) {
     $this->shipSpeed = $shipSpeed;
   }
 
   /**
    * @return string
    */
-  public function getTrackingNumber()
-  {
+  public function getTrackingNumber() {
     return $this->trackingNumber;
   }
 
   /**
    * @param string $trackingNumber
    */
-  public function setTrackingNumber($trackingNumber)
-  {
+  public function setTrackingNumber($trackingNumber) {
     $this->trackingNumber = $trackingNumber;
   }
 
   /**
    * @return string
    */
-  public function getShipDate()
-  {
+  public function getShipDate() {
     return $this->shipDate;
   }
 
   /**
    * @param string $shipDate
    */
-  public function setShipDate($shipDate)
-  {
+  public function setShipDate($shipDate) {
     $this->shipDate = $shipDate;
   }
 
   /**
    * @return ShipNoticeAddressDTO
    */
-  public function getSourceAddress()
-  {
+  public function getSourceAddress() {
     return $this->sourceAddress;
   }
 
   /**
    * @param ShipNoticeAddressDTO $sourceAddress
    */
-  public function setSourceAddress($sourceAddress)
-  {
+  public function setSourceAddress($sourceAddress) {
     $this->sourceAddress = $sourceAddress;
   }
 
   /**
    * @return ShipNoticeAddressDTO
    */
-  public function getDestinationAddress()
-  {
+  public function getDestinationAddress() {
     return $this->destinationAddress;
   }
 
   /**
    * @param ShipNoticeAddressDTO $destinationAddress
    */
-  public function setDestinationAddress($destinationAddress)
-  {
+  public function setDestinationAddress($destinationAddress) {
     $this->destinationAddress = $destinationAddress;
   }
 
   /**
    * @return array
    */
-  public function getSmallParcelShipments()
-  {
+  public function getSmallParcelShipments() {
     return $this->smallParcelShipments;
   }
 
   /**
    * @param array $smallParcelShipments
    */
-  public function setSmallParcelShipments($smallParcelShipments)
-  {
+  public function setSmallParcelShipments($smallParcelShipments) {
     $this->smallParcelShipments = $smallParcelShipments;
   }
 
@@ -272,21 +247,20 @@ class RequestDTO
    *
    * @return array
    */
-  public function toArray(): array
-  {
+  public function toArray(): array {
     return [
-      'poNumber'             => $this->getPoNumber(),
-      'supplierId'           => $this->getSupplierId(),
-      'weight'               => $this->getWeight(),
-      'volume'               => $this->getVolume(),
-      'carrierCode'          => $this->getCarrierCode(),
-      'shipSpeed'            => $this->getShipSpeed(),
-      'trackingNumber'       => $this->getTrackingNumber(),
-      'shipDate'             => $this->getShipDate(),
-      'sourceAddress'        => $this->getSourceAddress()->toArray(),
-      'destinationAddress'   => $this->getDestinationAddress()->toArray(),
-      'packageCount'         => $this->getPackageCount(),
-      'smallParcelShipments' => $this->getSmallParcelShipments()
+        'poNumber'             => $this->getPoNumber(),
+        'supplierId'           => $this->getSupplierId(),
+        'weight'               => $this->getWeight(),
+        'volume'               => $this->getVolume(),
+        'carrierCode'          => $this->getCarrierCode(),
+        'shipSpeed'            => $this->getShipSpeed(),
+        'trackingNumber'       => $this->getTrackingNumber(),
+        'shipDate'             => $this->getShipDate(),
+        'sourceAddress'        => $this->getSourceAddress()->toArray(),
+        'destinationAddress'   => $this->getDestinationAddress()->toArray(),
+        'packageCount'         => $this->getPackageCount(),
+        'smallParcelShipments' => $this->getSmallParcelShipments()
     ];
   }
 }

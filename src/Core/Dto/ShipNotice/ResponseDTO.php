@@ -10,8 +10,7 @@ namespace Wayfair\Core\Dto\ShipNotice;
  *
  * @package Wayfair\Core\Dto\ShipNotice
  */
-class ResponseDTO
-{
+class ResponseDTO {
   /**
    * @var string
    */
@@ -55,128 +54,112 @@ class ResponseDTO
   /**
    * @return string
    */
-  public function getId()
-  {
+  public function getId() {
     return $this->id;
   }
 
   /**
    * @param string $id
    */
-  public function setId($id)
-  {
+  public function setId($id) {
     $this->id = $id;
   }
 
   /**
    * @return string
    */
-  public function getHandle()
-  {
+  public function getHandle() {
     return $this->handle;
   }
 
   /**
    * @param string $handle
    */
-  public function setHandle($handle)
-  {
+  public function setHandle($handle) {
     $this->handle = $handle;
   }
 
   /**
    * @return string
    */
-  public function getStatus()
-  {
+  public function getStatus() {
     return $this->status;
   }
 
   /**
    * @param string $status
    */
-  public function setStatus($status)
-  {
+  public function setStatus($status) {
     $this->status = $status;
   }
 
   /**
    * @return string
    */
-  public function getSubmittedAt()
-  {
+  public function getSubmittedAt() {
     return $this->submittedAt;
   }
 
   /**
    * @param string $submittedAt
    */
-  public function setSubmittedAt($submittedAt)
-  {
+  public function setSubmittedAt($submittedAt) {
     $this->submittedAt = $submittedAt;
   }
 
   /**
    * @return string
    */
-  public function getCompletedAt()
-  {
+  public function getCompletedAt() {
     return $this->completedAt;
   }
 
   /**
    * @param string $completedAt
    */
-  public function setCompletedAt($completedAt)
-  {
+  public function setCompletedAt($completedAt) {
     $this->completedAt = $completedAt;
   }
 
   /**
    * @return ItemStatusDTO
    */
-  public function getErrors()
-  {
+  public function getErrors() {
     return $this->errors;
   }
 
   /**
    * @param ItemStatusDTO $errors
    */
-  public function setErrors($errors)
-  {
+  public function setErrors($errors) {
     $this->errors = $errors;
   }
 
   /**
    * @return ItemStatusDTO
    */
-  public function getCompleted()
-  {
+  public function getCompleted() {
     return $this->completed;
   }
 
   /**
    * @param ItemStatusDTO $completed
    */
-  public function setCompleted($completed)
-  {
+  public function setCompleted($completed) {
     $this->completed = $completed;
   }
 
   /**
    * @return ItemStatusDTO
    */
-  public function getProcessing()
-  {
+  public function getProcessing() {
     return $this->processing;
   }
 
   /**
    * @param ItemStatusDTO $processing
    */
-  public function setProcessing($processing)
-  {
+  public function setProcessing($processing) {
     $this->processing = $processing;
   }
 
@@ -187,8 +170,7 @@ class ResponseDTO
    *
    * @return ResponseDTO
    */
-  public static function createFromArray(array $input): self
-  {
+  public static function createFromArray(array $input): self {
     /** @var ResponseDTO $dto */
     $dto = pluginApp(ResponseDTO::class);
 

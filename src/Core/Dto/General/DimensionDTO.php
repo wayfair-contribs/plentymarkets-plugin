@@ -5,8 +5,7 @@
 
 namespace Wayfair\Core\Dto\General;
 
-class DimensionDTO
-{
+class DimensionDTO {
   /**
    * @var MeasurementDTO
    */
@@ -25,8 +24,7 @@ class DimensionDTO
   /**
    * @return MeasurementDTO
    */
-  public function getLength()
-  {
+  public function getLength() {
     return $this->length;
   }
 
@@ -35,16 +33,14 @@ class DimensionDTO
    *
    * @return void
    */
-  public function setLength($length)
-  {
+  public function setLength($length) {
     $this->length = MeasurementDTO::createFromArray($length);
   }
 
   /**
    * @return MeasurementDTO
    */
-  public function getWidth()
-  {
+  public function getWidth() {
     return $this->width;
   }
 
@@ -53,16 +49,14 @@ class DimensionDTO
    *
    * @return void
    */
-  public function setWidth($width)
-  {
+  public function setWidth($width) {
     $this->width = MeasurementDTO::createFromArray($width);
   }
 
   /**
    * @return MeasurementDTO
    */
-  public function getHeight()
-  {
+  public function getHeight() {
     return $this->height;
   }
 
@@ -71,8 +65,7 @@ class DimensionDTO
    *
    * @return void
    */
-  public function setHeight($height)
-  {
+  public function setHeight($height) {
     $this->height = MeasurementDTO::createFromArray($height);
   }
 
@@ -83,8 +76,7 @@ class DimensionDTO
    *
    * @return self
    */
-  public static function createFromArray(array $params): self
-  {
+  public static function createFromArray(array $params): self {
     $dto = pluginApp(DimensionDTO::class);
     $dto->setLength($params['length'] ?? null);
     $dto->setWidth($params['width'] ?? null);

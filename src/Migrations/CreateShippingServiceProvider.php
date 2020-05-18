@@ -15,8 +15,7 @@ use Wayfair\Repositories\KeyValueRepository;
  *
  * @package Wayfair\Migrations
  */
-class CreateShippingServiceProvider
-{
+class CreateShippingServiceProvider {
 
   /**
    * @var ShippingServiceProviderRepositoryContract
@@ -29,7 +28,7 @@ class CreateShippingServiceProvider
    * @param ShippingServiceProviderRepositoryContract $shippingServiceProviderRepository
    */
   public function __construct(
-    ShippingServiceProviderRepositoryContract $shippingServiceProviderRepository
+      ShippingServiceProviderRepositoryContract $shippingServiceProviderRepository
   ) {
     $this->shippingServiceProviderRepository = $shippingServiceProviderRepository;
   }
@@ -39,16 +38,17 @@ class CreateShippingServiceProvider
    *
    * @return void
    */
-  public function run(KeyValueRepository $keyValueRepository)
-  {
+  public function run(KeyValueRepository $keyValueRepository) {
     try {
       $shippingServiceProvider = $this->shippingServiceProviderRepository->saveShippingServiceProvider(
-        AbstractConfigHelper::PLUGIN_NAME,
-        AbstractConfigHelper::SHIPPING_PROVIDER_NAME
+          AbstractConfigHelper::PLUGIN_NAME,
+          AbstractConfigHelper::SHIPPING_PROVIDER_NAME
       );
 
       $keyValueRepository->putOrReplace(AbstractConfigHelper::SHIPPING_PROVIDER_ID, $shippingServiceProvider->id);
+
     } catch (\Exception $exception) {
+      
     }
   }
 }

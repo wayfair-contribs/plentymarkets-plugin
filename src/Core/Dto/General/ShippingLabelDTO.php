@@ -5,8 +5,7 @@
 
 namespace Wayfair\Core\Dto\General;
 
-class ShippingLabelDTO
-{
+class ShippingLabelDTO {
   /**
    * @var string
    */
@@ -15,8 +14,7 @@ class ShippingLabelDTO
   /**
    * @return string
    */
-  public function getUrl()
-  {
+  public function getUrl() {
     return $this->url;
   }
 
@@ -25,8 +23,7 @@ class ShippingLabelDTO
    *
    * @return void
    */
-  public function setUrl($url)
-  {
+  public function setUrl($url) {
     $this->url = $url;
   }
 
@@ -37,8 +34,7 @@ class ShippingLabelDTO
    *
    * @return self
    */
-  public static function createFromArray(array $params): self
-  {
+  public static function createFromArray(array $params): self {
     $dto = pluginApp(ShippingLabelDTO::class);
     $dto->setUrl($params['url'] ?? null);
     return $dto;

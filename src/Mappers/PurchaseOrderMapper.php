@@ -13,8 +13,7 @@ use Plenty\Plugin\Application;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Repositories\KeyValueRepository;
 
-class PurchaseOrderMapper
-{
+class PurchaseOrderMapper {
   const ORDER_STATUS_WAITING_FOR_ACTIVATION = 2;
   const ORDER_STATUS_CANCELED = 8;
   /**
@@ -39,8 +38,7 @@ class PurchaseOrderMapper
    * @param ProductMapper      $productMapper
    * @param KeyValueRepository $keyValueRepository
    */
-  public function __construct(Application $app, ProductMapper $productMapper, KeyValueRepository $keyValueRepository)
-  {
+  public function __construct(Application $app, ProductMapper $productMapper, KeyValueRepository $keyValueRepository) {
     $this->app = $app;
     $this->productMapper = $productMapper;
     $this->keyValueRepository = $keyValueRepository;
@@ -57,8 +55,7 @@ class PurchaseOrderMapper
    *
    * @return array
    */
-  public function map(ResponseDTO $dto, int $billingAddressId, int $billingContactId, int $deliveryAddressId, int $referrerId, string $warehouseId, string $paymentMethodId): array
-  {
+  public function map(ResponseDTO $dto, int $billingAddressId, int $billingContactId, int $deliveryAddressId, int $referrerId, string $warehouseId, string $paymentMethodId): array {
     $orderItems = [];
     foreach ($dto->getProducts() as $product) {
       $orderItems[] = $this->productMapper->map($product, $referrerId, $warehouseId, $dto->getPoNumber());

@@ -17,8 +17,7 @@ use Wayfair\Models\OrderASN;
  *
  * @package Wayfair\Repositories
  */
-class OrderASNRepository extends Repository
-{
+class OrderASNRepository extends Repository {
 
   const LOG_KEY_QUERY_FAILED = 'asnQueryFailed';
 
@@ -30,8 +29,7 @@ class OrderASNRepository extends Repository
    *
    * @param AccountService $accountService
    */
-  public function __construct(AccountService $accountService)
-  {
+  public function __construct(AccountService $accountService) {
     parent::__construct($accountService);
     /** @var DataBase database */
     $this->database = pluginApp(DataBase::class);
@@ -44,15 +42,16 @@ class OrderASNRepository extends Repository
    *
    * @return OrderASN|null
    */
-  public function findByOrderId(int $orderId)
-  {
+  public function findByOrderId(int $orderId) {
     $model = [];
 
-    try {
+    try
+    {
       $model = $this->database->query(OrderASN::class)
           ->where('orderId', '=', $orderId)
           ->get();
-    } catch (\Exception $e) {
+    }
+    catch (\Exception $e) {
       $this->loggerContract
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
@@ -79,19 +78,17 @@ class OrderASNRepository extends Repository
    *
    * @return OrderASN|null
    */
-  public function createOrUpdate($data)
-  {
+  public function createOrUpdate($data) {
     /**
      * @var LoggerContract $loggerContract
      */
     $loggerContract = pluginApp(LoggerContract::class);
     $loggerContract
         ->info(
-          TranslationHelper::getLoggerKey('addOrderToSentASNList'),
-          [
+            TranslationHelper::getLoggerKey('addOrderToSentASNList'), [
             'additionalInfo' => ['order' => $data],
             'method' => __METHOD__
-          ]
+            ]
         );
 
     if ($data['orderId']) {

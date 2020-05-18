@@ -14,15 +14,13 @@ use Wayfair\Models\OrderASN;
  *
  * @package Wayfair\Migrations
  */
-class CreateOrderASNTable
-{
+class CreateOrderASNTable {
   /**
    * @param Migrate $migrate
    *
    * @return void
    */
-  public function run(Migrate $migrate)
-  {
+  public function run(Migrate $migrate) {
     $migrate->createTable(OrderASN::class);
   }
 }

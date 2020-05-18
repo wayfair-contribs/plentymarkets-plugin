@@ -52,7 +52,8 @@ class OrderShipmentNotifyProcedure
     ShipmentNotificationService $shipmentNotificationService,
     StorageInterfaceContract $storageInterfaceContract,
     LoggerContract $loggerContract
-  ) {
+  )
+  {
     $this->shipmentNotificationService = $shipmentNotificationService;
     $this->storageInterfaceContract = $storageInterfaceContract;
     $this->loggerContract = $loggerContract;
@@ -76,13 +77,13 @@ class OrderShipmentNotifyProcedure
     try {
       /** @var Order $order */
       $order = $eventProceduresTriggered->getOrder();
-      if ($order) {
+      if ($order)
+      {
         $order_id = $order->id;
       }
 
       $this->loggerContract->info(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_RUN_ORDER_STATUS_CHANGE_EVENT),
-        [
+        TranslationHelper::getLoggerKey(self::LOG_KEY_RUN_ORDER_STATUS_CHANGE_EVENT), [
           'additionalInfo' => ['order' => $order],
           'method' => __METHOD__
         ]
@@ -91,18 +92,17 @@ class OrderShipmentNotifyProcedure
       if ($this->shipmentNotificationService->isOrderSentASN($order)) {
         // we believe the ASN was already sent - another will NOT be sent.
         $this->loggerContract->info(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_ASN_ALREADY_SENT),
-          [
+          TranslationHelper::getLoggerKey(self::LOG_KEY_ASN_ALREADY_SENT), [
             'additionalInfo' => ['order' => $order],
             'method' => __METHOD__
           ]
         );
 
         $externalLogs->addInfoLog("ASN already sent for order with ID " . $order->id . " so another will NOT be sent.");
+
       } else {
         $this->loggerContract->debug(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_SENDING_NEW_SHIPMENT_NOTIFICATION),
-          [
+          TranslationHelper::getLoggerKey(self::LOG_KEY_SENDING_NEW_SHIPMENT_NOTIFICATION), [
             'additionalInfo' => ['order' => $order],
             'method' => __METHOD__
           ]
@@ -111,8 +111,7 @@ class OrderShipmentNotifyProcedure
         $this->shipmentNotificationService->notifyShipment($order);
 
         $this->loggerContract->debug(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_FINISHED_SENDING_NEW_SHIPMENT_NOTIFICATION),
-          [
+          TranslationHelper::getLoggerKey(self::LOG_KEY_FINISHED_SENDING_NEW_SHIPMENT_NOTIFICATION), [
             'additionalInfo' => ['order' => $order],
             'method' => __METHOD__
           ]
@@ -120,11 +119,14 @@ class OrderShipmentNotifyProcedure
 
         $externalLogs->addInfoLog("Sent an ASN for the order with ID " . $order_id);
       }
-    } catch (\Exception $e) {
+    }
+    catch (\Exception $e)
+    {
       $externalLogs->addErrorLog("Failed to notify wayfair about shipment for order with ID " .
         $order_id . " " . get_class($e) . " " . $e->getMessage());
     } finally {
-      if (count($externalLogs->getLogs())) {
+      if (count($externalLogs->getLogs()))
+      {
         /** @var LogSenderService $logSenderService */
         $logSenderService = pluginApp(LogSenderService::class);
         $logSenderService->execute($externalLogs->getLogs());
