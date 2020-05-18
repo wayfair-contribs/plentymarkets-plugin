@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+  <ruleset name="WfPlugin">
+  <description>PSR2 with indents of 2</description>
+
+  <rule ref="PSR2"/>
+
+ <rule ref="Generic.Arrays.ArrayIndent">
+   <properties>
+     <property name="indent" value="2"/>
+   </properties>
+ </rule>
+
+<rule ref="Generic.WhiteSpace.ScopeIndent">
+  <properties>
+    <property name="indent" value="2"/>
+  </properties>
+</rule>
+
+<rule ref="PSR2.Classes.ClassDeclaration">
+  <properties>
+    <property name="indent" value="2"/>
+  </properties>
+</rule>
+
+<rule ref="PSR2.ControlStructures.SwitchDeclaration">
+  <properties>
+    <property name="indent" value="2"/>
+  </properties>
+</rule>
+
+<rule ref="PSR2.Methods.FunctionCallSignature">
+  <properties>
+    <property name="indent" value="2"/>
+  </properties>
+</rule>
+
+
+<rule ref="PEAR.ControlStructures.MultiLineCondition">
+  <properties>
+    <property name="indent" value="2"/>
+  </properties>
+</rule>
+
+
+<rule ref="PEAR.Formatting.MultiLineAssignment">
+  <properties>
+    <property name="indent" value="2"/>
+  </properties>
+</rule>
+
+<rule ref="PEAR.Functions.FunctionDeclaration">
+  <properties>
+    <property name="indent" value="2"/>
+  </properties>
+</rule>
+
+<rule ref="Squiz.Functions.MultiLineFunctionDeclaration">
+    <properties>
+        <property name="indent" value="2"/>
+    </properties>
+</rule>
+
+</ruleset>
