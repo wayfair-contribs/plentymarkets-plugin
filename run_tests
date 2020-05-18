@@ -16,6 +16,8 @@ SNIFF_WARNING_REGEX=".* ([0-9]+) (warn|WARN).*"
 
 SNIFF_STANDARD="./sniffRuleset.xml"
 
+ANALYSIS_LEVEL=7
+
 ###
 # Sum an array of numbers; Echo the sum of all items in the array
 #
@@ -92,7 +94,7 @@ run_phpstan() {
   fi
 
   print_header "RUNNING PHPStan"
-  $(get_script_dir)/vendor/bin/phpstan analyze --level 7 ${files}
+  $(get_script_dir)/vendor/bin/phpstan analyze --level ${ANALYSIS_LEVEL} ${files}
 }
 
 run_codesniffer() {
