@@ -48,13 +48,16 @@
   </div>
 </div>
 <br />
-<p *ngIf="status.value" class="{{ status.type + ' col-md-12' }}">
-  {{ status.value }}
-</p>
-<br />
-<div class="col-md-12">
-  <button class="btn btn-success" id="saveMappingBtn" (click)="save()">
-    {{ "save" | translate: lang }}
-  </button>
+<div class="text-center center-block">
+  <p *ngIf="status.value" class="{{ status.type + ' col-md-12' }}">
+    {{ status.value }}
+  </p>
+  <br />
+
+  <div class="col-md-12">
+    <button class="btn btn-success" id="saveMappingBtn" (click)="save()">
+      {{ "save" | translate: lang }}
+    </button>
+  </div>
 </div>
 <div style="clear: both;"></div>
