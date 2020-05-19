@@ -18,6 +18,7 @@ class LoggingService implements LoggerContract {
   const WARNING = 'WARNING';
   const ERROR = 'ERROR';
   const WAYFAIR_PLUGIN_VERSION = 'Wayfair Plugin Version';
+  const STRING_LIMIT = 32768;
 
   /**
    * Stores the version of the plugin
@@ -116,18 +117,21 @@ class LoggingService implements LoggerContract {
   }
 
   /**
-   * Maps data from the he associative array that Wayfair provides to the PlentyMarkets logging API's inputs
+   * Maps data from the associative array that Wayfair provides to the PlentyMarkets logging API's inputs
    *
    * @param $loggingInfo
    *
    * @return array
    */
   public function extractVars($loggingInfo): array {
+    $test = json_encode($loggingInfo['additionalInfo']);
     $additionalInfo = $loggingInfo['additionalInfo'] ?? [];
     $method = $loggingInfo['method'] ?? null;
     $referenceType = $loggingInfo['referenceType'] ?? null;
     $referenceValue = (int) $loggingInfo['referenceValue'] ?? null;
     $additionalInfo[self::WAYFAIR_PLUGIN_VERSION] = $this->version;
+    $additionalInfo['test'] = strlen($test);
+
 
     return array($additionalInfo, $method, $referenceType, $referenceValue);
   }
