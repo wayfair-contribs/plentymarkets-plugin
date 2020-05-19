@@ -134,4 +134,9 @@ export class CarrierScacMappingComponent implements OnInit {
   private validateScacRow(row) {
     return !Object.values(row).some((itemValue) => !itemValue);
   }
+
+  private clearMessage() {
+    this.status.type = null;
+    this.status.value = null;
+  }
 }
