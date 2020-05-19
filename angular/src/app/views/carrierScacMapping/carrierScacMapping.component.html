@@ -1,37 +1,60 @@
 <div class="text-center center-block">
-  <input type="radio" value="wayfair_shipping" name="wfShipping" [(ngModel)]="wfShipping">
-  {{'wayfair_shipping' | translate:lang}}
-  <input type="radio" value="own_account_shipping" name="wfShipping" [(ngModel)]="wfShipping">
-  {{'own_account_shipping' | translate:lang}}
+  <input
+    type="radio"
+    value="wayfair_shipping"
+    name="wfShipping"
+    [(ngModel)]="wfShipping"
+  />
+  {{ "wayfair_shipping" | translate: lang }}
+  <input
+    type="radio"
+    value="own_account_shipping"
+    name="wfShipping"
+    [(ngModel)]="wfShipping"
+  />
+  {{ "own_account_shipping" | translate: lang }}
 </div>
-<br/>
-<div class="text-center center-block" *ngIf="wfShipping == 'own_account_shipping'">
+<br />
+<div
+  class="text-center center-block"
+  *ngIf="wfShipping == 'own_account_shipping'"
+>
   <div class="header" *ngIf="carriers.length > 0">
     <div class="form-row">
       <div class="col-md-4 col-md-offset-1">
-        <label class="font-weight-bold">{{ 'carrier_scac_mapping_title' | translate:lang }}</label>
+        <label class="font-weight-bold">{{
+          "carrier_scac_mapping_title" | translate: lang
+        }}</label>
       </div>
       <div class="col-md-4">
-        <label>{{ 'carrier_title' | translate:lang }}</label>
+        <label>{{ "carrier_title" | translate: lang }}</label>
       </div>
     </div>
   </div>
-  <br/><br/>
+  <br /><br />
 
   <div class="form-row" *ngFor="let carrier of carriers">
     <div class="form-group col-md-4 col-md-offset-1">
-      <label>{{carrier.name}}</label>
+      <label>{{ carrier.name }}</label>
     </div>
     <div class="form-group col-md-4">
-      <input class="form-control" type="text" name="defaultOrderStatus" [(ngModel)]="carrierScacs[carrier.id]"/>
+      <input
+        class="form-control"
+        type="text"
+        name="defaultOrderStatus"
+        [(ngModel)]="carrierScacs[carrier.id]"
+      />
     </div>
   </div>
-
-  <br/>
-  <p *ngIf="status.value" class="{{status.type + ' col-md-12'}}">{{status.value}}</p>
-  <br/>
-  <div class="col-md-12">
-    <button class="btn btn-success" id="saveMappingBtn" (click)="save()"> {{ 'save' | translate:lang }}</button>
-  </div>
+</div>
+<br />
+<p *ngIf="status.value" class="{{ status.type + ' col-md-12' }}">
+  {{ status.value }}
+</p>
+<br />
+<div class="col-md-12">
+  <button class="btn btn-success" id="saveMappingBtn" (click)="save()">
+    {{ "save" | translate: lang }}
+  </button>
 </div>
 <div style="clear: both;"></div>
