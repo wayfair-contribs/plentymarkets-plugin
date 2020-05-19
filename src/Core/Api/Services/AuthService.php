@@ -36,11 +36,11 @@ class AuthService implements AuthenticationContract
   const PRIVATE_INFO_KEYS = [self::CLIENT_ID, self::CLIENT_SECRET];
 
   /**
-   * stores information about authentications since boot, to avoid using tokens from before boot
+   * stores the last result of checking the test/live setting
    *
-   * @var mixed[]
-   */ 
-  private static $authSinceBoot = null;
+   * @var bool
+   */
+  private static $lastTestingSettingResult = null;
 
   /**
    * @var StorageInterfaceContract
@@ -102,16 +102,16 @@ class AuthService implements AuthenticationContract
 
     if (!isset($wayfairAudience) || empty($wayfairAudience)) {
       $this->loggerContract
-      ->warning(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_NON_WAYFAIR),
-        [
-          'additionalInfo' =>
+        ->warning(
+          TranslationHelper::getLoggerKey(self::LOG_KEY_NON_WAYFAIR),
           [
-            'audience' => $audience
-          ],
-          'method' => __METHOD__
-        ]
-      );
+            'additionalInfo' =>
+            [
+              'audience' => $audience
+            ],
+            'method' => __METHOD__
+          ]
+        );
       return null;
     }
 
@@ -149,18 +149,15 @@ class AuthService implements AuthenticationContract
         'body' => json_encode($bodyArray)
       ]
     ];
-    
+
     // make sanitized versions for logging
     $maskedHeaders = $headersArray;
     $maskedBody = $bodyArray;
     $maskedArrays = [&$maskedBody, &$maskedHeaders];
-    foreach (self::PRIVATE_INFO_KEYS as $pik)
-    {
-      foreach($maskedArrays as &$masked)
-      {
-        if (array_key_exists($pik, $masked))
-        {
-            $masked[$pik] = StringHelper::mask($masked[$pik]);
+    foreach (self::PRIVATE_INFO_KEYS as $pik) {
+      foreach ($maskedArrays as &$masked) {
+        if (array_key_exists($pik, $masked)) {
+          $masked[$pik] = StringHelper::mask($masked[$pik]);
         }
       }
     }
@@ -217,7 +214,7 @@ class AuthService implements AuthenticationContract
   {
     $token[self::STORE_TIME] = time();
     $key = self::getKeyForToken($audience);
-    // FIXME: should be encrypted?
+    // TODO: should be encrypted?
     $this->store->set($key, json_encode($token));
   }
 
@@ -225,17 +222,15 @@ class AuthService implements AuthenticationContract
    * @param string $audience
    * @return bool
    */
-  public function isTokenExpired(string $audience)
+  private function isTokenExpired(string $audience)
   {
     $wayfairAudience = $this->urlHelperContract->getWayfairAudience($audience);
 
     if (isset($wayfairAudience) && !empty($wayfairAudience)) {
       $testingSetting = $this->configHelperContract->isTestingEnabled();
-      if (!in_array($testingSetting, self::$authSinceBoot)) {
-        // haven't used a Wayfair token for this "mode" since boot
-        // so don't use token stored in the DB!
-
-        self::$authSinceBoot[] = $testingSetting;
+      if ($testingSetting !== self::$lastTestingSettingResult) {
+        // testing setting has changed, so we should not use cached tokens
+        self::$lastTestingSettingResult = $testingSetting;
         return true;
       }
     }
@@ -268,7 +263,7 @@ class AuthService implements AuthenticationContract
   {
 
     $key = self::getKeyForToken($audience);
-    // FIXME: need to decrypt if we add encryption for the token
+    // TODO: need to decrypt if we add encryption for the token
     return json_decode($this->store->get($key), true);
   }
 
