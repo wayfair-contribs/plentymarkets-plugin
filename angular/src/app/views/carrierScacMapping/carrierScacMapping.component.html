@@ -4,7 +4,7 @@
     value="wayfair_shipping"
     name="wfShipping"
     [(ngModel)]="wfShipping"
-    (click)="clearMessage()"
+    (change)="clearMessage()"
   />
   {{ "wayfair_shipping" | translate: lang }}
   <input
@@ -12,7 +12,7 @@
     value="own_account_shipping"
     name="wfShipping"
     [(ngModel)]="wfShipping"
-    (click)="clearMessage()"
+    (change)="clearMessage()"
   />
   {{ "own_account_shipping" | translate: lang }}
 </div>
@@ -45,6 +45,7 @@
         type="text"
         name="defaultOrderStatus"
         [(ngModel)]="carrierScacs[carrier.id]"
+        (change)="clearMessage()"
       />
     </div>
   </div>
