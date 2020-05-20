@@ -67,13 +67,13 @@ class InventoryMapper
    *
    * @return RequestDTO[]
    */
-  public function createInventoryDTOsFromVariation($variationData)
+  public function createrequestDtosBySuIDFromVariation($variationData)
   {
     /** @var LoggerContract $loggerContract */
     $loggerContract = pluginApp(LoggerContract::class);
 
-    /** @var array $inventoryDTOs */
-    $inventoryDTOs = [];
+    /** @var array<string,RequestDTO> $requestDtosBySuID */
+    $requestDtosBySuID = [];
 
     $supplierPartNumber = $this->getSupplierPartNumberFromVariation($variationData);
 
@@ -120,24 +120,22 @@ class InventoryMapper
       $dtoKey = $supplierId . '_' . $supplierPartNumber;
 
       /** @var RequestDTO $existingDTO */
-      $existingDTO = $inventoryDTOs[$dtoKey];
+      $existingDTO = $requestDtosBySuID[$dtoKey];
 
-      if (isset($existingDTO))
+      if (isset($existingDTO) && !empty($existingDTO))
       {
-        // merge with previous values for this suID
-        if (isset($existingDTO->getQuantityOnHand()))
+        /* merge with previous values for this suID.
+         * stock values should be summed.
+         * Variation-level data (nextAvailableDate) does not vary.
+        */
+        if (null !== $existingDTO->getQuantityOnHand())
         {
           $onHand += $existingDTO->getQuantityOnHand();
         }
 
-        if (isset($existingDTO->getQuantityOnOrder()))
+        if (null !== $existingDTO->getQuantityOnOrder())
         {
-          $onOrder += $existingDTO;
-        }
-
-        if (!isset($nextAvailableDate))
-        {
-          $nextAvailableDate = $existingDTO->getItemNextAvailabilityDate();
+          $onOrder += $existingDTO->getQuantityOnOrder();
         }
       }
 
@@ -151,10 +149,10 @@ class InventoryMapper
       ];
 
       // replaces any existing DTO with a "merge" for this suID
-      $inventoryDTOs[$dtoKey] = RequestDTO::createFromArray($dtoData);
+      $requestDtosBySuID[$dtoKey] = RequestDTO::createFromArray($dtoData);
     }
 
-    return array_values($inventoryDTOs);
+    return array_values($requestDtosBySuID);
   }
 
   /**
