@@ -95,6 +95,12 @@ export class CarrierScacMappingComponent implements OnInit {
       this.validateScacRow(row)
     );
 
+    if (carrierScacsArray.length < 1) {
+      // the user cannot ship in this configuration - don't push it do backend
+      this.showMessage("text-danger", "must_have_at_least_one_scac");
+      return;
+    }
+
     this.carrierScacService.postMappings(carrierScacsArray).subscribe(
       (data) => {
         this.updateCarrierScacs(data);
