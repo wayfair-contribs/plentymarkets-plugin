@@ -12,7 +12,6 @@
 	"stock_buffer": "Lagerpuffer",
 	"default_order_status": "Standard-Bestellstatus",
 	"default_shipping_provider": "Standardversandanbieter",
-	"empty_values_mapping": "Werte in Zuordnungen dürfen nicht leer sein.",
 	"saving_status": "Speichern ..",
 	"saved": "Gespeichert",
 	"error_fetch": "Fehler beim Abrufen.",
@@ -36,5 +35,6 @@
 	"order_marked_as_shipped_status": "Als versandt markieren wenn",
 	"wayfair_shipping": "Wayfair Versand",
 	"own_account_shipping": "Selbst Versende",
-	"import_orders_since": "Aufträge importieren ab"
+	"import_orders_since": "Aufträge importieren ab",
+	"must_have_at_least_one_scac": "Selbst Versende erfordert mindenstens ein Eintrag für die Trägertabelle"
 }
