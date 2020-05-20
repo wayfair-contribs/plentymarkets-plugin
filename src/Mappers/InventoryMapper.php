@@ -61,7 +61,8 @@ class InventoryMapper
   }
 
   /**
-   * Create an Inventory DTO for each Warehouse in the Variation data
+   * Create Inventory DTOs for one variation.
+   * Returns a DTO for each supplier ID that has stock information for the variation.
    * @param $variationData
    *
    * @return RequestDTO[]
@@ -71,7 +72,7 @@ class InventoryMapper
     /** @var LoggerContract $loggerContract */
     $loggerContract = pluginApp(LoggerContract::class);
 
-    /** @var RequestDTO[] $inventoryDTOs */
+    /** @var array $inventoryDTOs */
     $inventoryDTOs = [];
 
     $supplierPartNumber = $this->getSupplierPartNumberFromVariation($variationData);
@@ -110,19 +111,50 @@ class InventoryMapper
         continue;
       }
 
+      // Avl Immediately. Net Stock.
+      $onHand = isset($stock['netStock']) ? $stock['netStock'] : null;
+      // Already Ordered items.
+      $onOrder = isset($stock['reservedStock']) ? $stock['reservedStock'] : null;
+
+      // key for a potential preexisting DTO that we need to merge with
+      $dtoKey = $supplierId . '_' . $supplierPartNumber;
+
+      /** @var RequestDTO $existingDTO */
+      $existingDTO = $inventoryDTOs[$dtoKey];
+
+      if (isset($existingDTO))
+      {
+        // merge with previous values for this suID
+        if (isset($existingDTO->getQuantityOnHand()))
+        {
+          $onHand += $existingDTO->getQuantityOnHand();
+        }
+
+        if (isset($existingDTO->getQuantityOnOrder()))
+        {
+          $onOrder += $existingDTO;
+        }
+
+        if (!isset($nextAvailableDate))
+        {
+          $nextAvailableDate = $existingDTO->getItemNextAvailabilityDate();
+        }
+      }
+
       $dtoData = [
         'supplierId' => $supplierId,
         'supplierPartNumber' => $supplierPartNumber,
-        'quantityOnHand' => isset($stock['netStock']) ? $stock['netStock'] : null, // Avl Immediately. Net Stock.
-        'quantityOnOrder' => isset($stock['reservedStock']) ? $stock['reservedStock'] : null, // Already Ordered items.
+        'quantityOnHand' => $onHand,
+        'quantityOnOrder' => $onOrder,
         'itemNextAvailabilityDate' => $nextAvailableDate,
         'productNameAndOptions' => $variationData['name']
       ];
 
-      $inventoryDTOs[] = RequestDTO::createFromArray($dtoData);
+      // replaces any existing DTO with a "merge" for this suID
+      $inventoryDTOs[$dtoKey] = RequestDTO::createFromArray($dtoData);
     }
 
-    return $inventoryDTOs;
+    return array_values($inventoryDTOs);
   }
 
   /**
