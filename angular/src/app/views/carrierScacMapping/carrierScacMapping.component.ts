@@ -95,10 +95,6 @@ export class CarrierScacMappingComponent implements OnInit {
       this.validateScacRow(row)
     );
 
-    if (carrierScacsArray.length < 1) {
-      this.showMessage("text-danger", "empty_values_mapping");
-    }
-
     this.carrierScacService.postMappings(carrierScacsArray).subscribe(
       (data) => {
         this.updateCarrierScacs(data);
