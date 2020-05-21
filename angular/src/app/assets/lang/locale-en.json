@@ -38,6 +38,7 @@
 	"import_orders_since": "Import orders since",
 	"must_have_at_least_one_scac": "When using Own account shipping, configure one or more carrier configurations",
 	"advanced_settings_menu": "Advanced",
+	"authentication_settings": "Authentication settings",
 	"reset_authentication": "Reset Authentication",
 	"operation_failed": "The operation has failed", 
 	"success": "success"
