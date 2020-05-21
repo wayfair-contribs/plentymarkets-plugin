@@ -36,5 +36,9 @@
 	"wayfair_shipping": "Wayfair Versand",
 	"own_account_shipping": "Selbst Versende",
 	"import_orders_since": "Aufträge importieren ab",
-	"must_have_at_least_one_scac": "Selbst Versende erfordert mindenstens ein Eintrag für die Trägertabelle"
+	"must_have_at_least_one_scac": "Selbst Versende erfordert mindenstens ein Eintrag für die Trägertabelle",
+	"advanced_settings_menu": "Erweiterte Einstellungen",
+	"reset_authentication": "Authentifizierung zurücksetzen",
+	"operation_failed": "Die Operation ist fehlgeschlagen",
+	"success": "Die Operation war erfolgreich"
 }

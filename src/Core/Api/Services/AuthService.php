@@ -222,21 +222,21 @@ class AuthService implements AuthenticationContract
    * @param string $audience
    * @return bool
    */
-  private function isTokenExpired(string $audience)
+  private function tokenIsInvalid(string $audience)
   {
     $wayfairAudience = $this->urlHelperContract->getWayfairAudience($audience);
 
     if (isset($wayfairAudience) && !empty($wayfairAudience)) {
       $testingSetting = $this->configHelperContract->isTestingEnabled();
-      if ($testingSetting !== self::$lastTestingSettingResult) {
-        // testing setting has changed, so we should not use cached tokens
+      if (null == $testingSetting || $testingSetting !== self::$lastTestingSettingResult) {
+        // changed, so we should not use cached tokens
         self::$lastTestingSettingResult = $testingSetting;
         return true;
       }
     }
 
     $token = $this->getStoredTokenModel($audience);
-    return self::isTokenDataExpired($token);
+    return !isset($token) || self::isTokenDataExpired($token);
   }
 
   /**
@@ -297,7 +297,7 @@ class AuthService implements AuthenticationContract
   public function getOAuthToken(string $audience)
   {
     // check for staleness and refresh
-    if ($this->isTokenExpired($audience)) {
+    if ($this->tokenIsInvalid($audience)) {
       $this->refreshOAuthToken($audience);
     }
 

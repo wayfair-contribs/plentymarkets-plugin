@@ -94,7 +94,7 @@ class KeyValueRepository extends Repository {
   /**
    * @param mixed $key
    *
-   * @return string|null
+   * @return mixed|null
    */
   public function get($key) {
     

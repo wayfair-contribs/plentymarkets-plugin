@@ -10,25 +10,6 @@ use Wayfair\Core\Contracts\URLHelperContract;
 
 class URLHelper implements URLHelperContract{
 
-  // Base URLs for use in this module.
-  // cannot mark private as plentymarkets is only at PHP 7.0
-  const BASE_URL_AUTH = 'https://sso.auth.wayfair.com/';
-  const BASE_URL_API = 'https://api.wayfair.com/';
-  const BASE_URL_SANDBOX = 'https://sandbox.api.wayfair.com/';
-  
-  // paths to append to appropriate base URLs
-  const URL_PATH = [
-      self::URL_ID_GRAPHQL => 'v1/graphql',
-      self::URL_ID_AUTH    => 'oauth/token',
-      self::URL_ID_PACKING_SLIP => 'v1/packing_slip/',
-  ];
-
-  // whitelisting URLs for the sending of Wayfair Auth header values
-  const URLS_USING_WAYFAIR_AUTH = [ 
-    self::BASE_URL_API,
-    self::BASE_URL_SANDBOX
-  ];
-
   /**
    * @param string $key
    *
