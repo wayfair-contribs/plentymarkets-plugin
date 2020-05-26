@@ -128,15 +128,10 @@ class InventoryMapper
          * stock values should be summed.
          * Variation-level data (nextAvailableDate) does not vary.
         */
-        if (null !== $existingDTO->getQuantityOnHand())
-        {
-          $onHand += $existingDTO->getQuantityOnHand();
-        }
 
-        if (null !== $existingDTO->getQuantityOnOrder())
-        {
-          $onOrder += $existingDTO->getQuantityOnOrder();
-        }
+        $onHand = self::mergeInventoryQuantities($onHand, $existingDTO->getQuantityOnHand());
+
+        $onOrder = self::mergeInventoryQuantities($onOrder, $existingDTO->getQuantityOnOrder());
       }
 
       $dtoData = [
@@ -198,5 +193,40 @@ class InventoryMapper
       default:
         return $variationData['number'];
     }
+  }
+
+  /**
+   * Merge two quantities for an inventory DTO,
+   * Normalizing null inputs to zero.
+   * 
+   * Note that -1 is a valid input for the inventory APIs!
+   *
+   * @param [int] $left
+   * @param [int] $right
+   * @return int
+   */
+  static function mergeInventoryQuantities($left, $right)
+  {
+    if (null == $left || $left < -1)
+    {
+      $left = 0;
+    }
+
+    if (null == $right || $right < -1)
+    {
+      $right = 0;
+    }
+
+    if ($left <= 0 && $right != 0)
+    {
+      return $right;
+    }
+
+    if ($right <= 0 && $left != 0)
+    {
+      return $left;
+    }
+
+    return $left + $right;
   }
 }
