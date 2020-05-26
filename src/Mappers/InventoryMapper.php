@@ -196,33 +196,33 @@ class InventoryMapper
   }
 
   /**
-   * Merge two quantities for an inventory DTO,
-   * Normalizing null inputs to zero.
+   * Merge two quantities for an inventory DTO
    * 
-   * Note that -1 is a valid input for the inventory APIs!
+   * Note that -1 is a VALID input for the inventory APIs!
    *
    * @param [int] $left
    * @param [int] $right
-   * @return int
+   * @return int|null
    */
   static function mergeInventoryQuantities($left, $right)
   {
-    if (null == $left || $left < -1)
+    // protecting against values below -1
+    if (null != $left && $left < -1)
     {
       $left = 0;
     }
 
-    if (null == $right || $right < -1)
+    if (null != $right && $right < -1)
     {
       $right = 0;
     }
 
-    if ($left <= 0 && $right != 0)
+    if (null == $left || $left <= 0 && $right != 0)
     {
       return $right;
     }
 
-    if ($right <= 0 && $left != 0)
+    if (null == $right || $right <= 0 && $left != 0)
     {
       return $left;
     }

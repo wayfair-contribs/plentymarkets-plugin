@@ -19,9 +19,13 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
     public function dataProviderForInventoryQuantityMerge()
     {
         return array(
-            array(null, null, 0, "two nulls should make zero"),
+            array(null, null, null, "two nulls should make null"),
+            array(null, -1, -1, "null and negative 1 should make negative 1"),
+            array(-1, null, -1, "null and negative 1 should make negative 1"),
             array(null, 1, 1, "null and 1 should make 1"),
             array (1, null, 1, "1 and null should make 1"),
+            array(null, 0, 0, "null and zero should make zero"),
+            array(0, null, 0, "zero and null should make zero"),
             array(0, 0, 0, "zero and zero should make zero"),
             array(-1, 0, -1, "negative 1 and zero should make negative 1"),
             array(0, -1, -1, "zero and negative 1 should make negative 1"),
