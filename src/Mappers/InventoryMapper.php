@@ -67,7 +67,7 @@ class InventoryMapper
    *
    * @return RequestDTO[]
    */
-  public function createrequestDtosBySuIDFromVariation($variationData)
+  public function createInventoryDTOsFromVariation($variationData)
   {
     /** @var LoggerContract $loggerContract */
     $loggerContract = pluginApp(LoggerContract::class);
