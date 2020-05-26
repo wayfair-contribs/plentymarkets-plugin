@@ -74,7 +74,7 @@ get_script_dir () {
 }
 
 run_phpunit() {
-  if [[ $# -ge 2 ]]
+  if [[ $# -ge 1 ]]
   then
       files="$@"
   else
