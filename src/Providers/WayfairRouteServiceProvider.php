@@ -190,7 +190,7 @@ class WayfairRouteServiceProvider extends RouteServiceProvider {
     $router->post(
         'wayfair/resetAuthentication',
         [
-            'uses'       => 'Wayfair\Controllers\Authenticationcontroller@postResetAuthentication',
+            'uses'       => 'Wayfair\Controllers\AuthenticationController@postResetAuthentication',
             'middleware' => ['oauth.cookie']
         ]
     );
