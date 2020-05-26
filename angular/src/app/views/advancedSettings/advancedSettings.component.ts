@@ -30,20 +30,19 @@ export class AdvancedSettingsComponent implements OnInit {
     let status = false;
     this.resetAuthService.resetAuthentication().subscribe(
       (data) => {
-        status = data.status;
+        if (data.status)
+        {
+          this.showResetAuthSuccess();
+        }
+        else
+        {
+          this.showResetAuthError();
+        }
       },
       (err) => {
-        status = false;
+        this.showResetAuthError();
       }
     );
-
-    if (! status)
-    {
-      this.showResetAuthError();
-      return;
-    }
-
-    this.showResetAuthSuccess();
   }
 
   /**
