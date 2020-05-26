@@ -8,18 +8,26 @@ namespace Wayfair\Mappers;
 final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @dataProvider dataProviderForInventoryQuantityMerge
+     * @dataProvider dataProviderForInventoryQuantityMergeNullable
      */
-    public function testMergeQuantities($left, $right, $expected, $msg)
+    public function testMergeQuantitiesNullable($left, $right, $expected, $msg)
     {
-        $result = InventoryMapper::mergeInventoryQuantities($left, $right);
+        $result = InventoryMapper::mergeInventoryQuantities($left, $right, true);
         $this->assertEquals($expected, $result, $msg);
     }
 
-    public function dataProviderForInventoryQuantityMerge()
+    /**
+     * @dataProvider dataProviderForInventoryQuantityMergeNotNullable
+     */
+    public function testMergeQuantitiesNotNullable($left, $right, $expected, $msg)
+    {
+        $result = InventoryMapper::mergeInventoryQuantities($left, $right, false);
+        $this->assertEquals($expected, $result, $msg);
+    }
+
+    public function dataProviderForInventoryQuantityMergeBase()
     {
         return array(
-            array(null, null, null, "two nulls should make null"),
             array(null, -1, -1, "null and negative 1 should make negative 1"),
             array(-1, null, -1, "null and negative 1 should make negative 1"),
             array(null, 1, 1, "null and 1 should make 1"),
@@ -41,5 +49,19 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
             array(-2, 5, 5, "negative 2 and five should make five"),
             array(5, -2, 5, "five and negative 2 should make five")
         );
+    }
+
+    public function dataProviderForInventoryQuantityMergeNullable()
+    {
+        $cases = $this->dataProviderForInventoryQuantityMergeBase();
+        $cases[] = array(null, null, null, "two nulls should make null");
+        return $cases;
+    }
+
+    public function dataProviderForInventoryQuantityMergeNotNullable()
+    {
+        $cases = $this->dataProviderForInventoryQuantityMergeBase();
+        $cases[] = array(null, null, 0, "two nulls should make zero");
+        return $cases;
     }
 }

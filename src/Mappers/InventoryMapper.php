@@ -129,9 +129,11 @@ class InventoryMapper
          * Variation-level data (nextAvailableDate) does not vary.
         */
 
-        $onHand = self::mergeInventoryQuantities($onHand, $existingDTO->getQuantityOnHand());
+        // quantityOnHand is NOT nullable
+        $onHand = self::mergeInventoryQuantities($onHand, $existingDTO->getQuantityOnHand(), false);
 
-        $onOrder = self::mergeInventoryQuantities($onOrder, $existingDTO->getQuantityOnOrder());
+        // quantityOnOrder IS nullable.
+        $onOrder = self::mergeInventoryQuantities($onOrder, $existingDTO->getQuantityOnOrder(), true);
       }
 
       $dtoData = [
@@ -200,19 +202,20 @@ class InventoryMapper
    * 
    * Note that -1 is a VALID input for the inventory APIs!
    *
-   * @param [int] $left
-   * @param [int] $right
-   * @return int|null
+   * @param [float] $left
+   * @param [float] $right
+   * @param [bool] $nullable
+   * @return float|null
    */
-  static function mergeInventoryQuantities($left, $right)
+  static function mergeInventoryQuantities($left, $right, $nullable)
   {
-    // protecting against values below -1
-    if (null != $left && $left < -1)
+    // applying nullable and/or protecting against values below -1
+    if ((null == $left && !$nullable)  || (null != $left && $left < -1))
     {
       $left = 0;
     }
 
-    if (null != $right && $right < -1)
+    if ((null == $right && !$nullable) || (null != $right && $right < -1))
     {
       $right = 0;
     }
