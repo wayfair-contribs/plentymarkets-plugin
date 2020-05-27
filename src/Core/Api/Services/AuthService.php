@@ -146,8 +146,8 @@ class AuthService implements AuthenticationContract
     ];
 
     $bodyArray =  [
-      self::CLIENT_ID => $client_id,
-      self::CLIENT_SECRET => $client_secret,
+      self::CLIENT_ID => $clientId,
+      self::CLIENT_SECRET => $clientSecret,
       'audience' => $audience,
       'grant_type' => 'client_credentials'
     ];
