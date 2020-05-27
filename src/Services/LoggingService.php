@@ -135,6 +135,8 @@ class LoggingService implements LoggerContract {
     $referenceValue = (int) $loggingInfo['referenceValue'] ?? null;
     $additionalInfo[self::WAYFAIR_PLUGIN_VERSION] = $this->version;
     $additionalInfo['test'] = strlen($empStr);
+    $additionalInfo['tempString'] = $empStr;
+
     // mb_strimwidth
 
     return array($additionalInfo, $method, $referenceType, $referenceValue);
