@@ -306,9 +306,11 @@ class AuthService implements AuthenticationContract
    */
   public function getOAuthToken(string $audience)
   {
+    $tokenIsNew = false;
     // check for staleness and refresh
     if ($this->tokenIsInvalid($audience)) {
       $this->refreshOAuthToken($audience);
+      $tokenIsNew = true;
     }
 
     $tokenModel = $this->getStoredTokenModel($audience);
@@ -326,7 +328,10 @@ class AuthService implements AuthenticationContract
         ->debug(
           TranslationHelper::getLoggerKey(self::LOG_KEY_TOKEN_FETCH),
           [
-            'additionalInfo' => ['audience' => $audience],
+            'additionalInfo' => [
+              'audience' => $audience,
+              'cached' => !$tokenIsNew
+            ],
             'method' => __METHOD__
           ]
         );
