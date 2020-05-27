@@ -132,13 +132,17 @@ class LoggingService implements LoggerContract {
     // if($loggingInfo['additionalInfo'] > self::STRING_LIMIT) {
 
     // }
+    if($empStr > self::STRING_LIMIT) {
+      $truncatedMsg = mb_strimwidth($empStr, 0, 10000, '...');
+    }
     $test = json_encode($loggingInfo['additionalInfo']);
     // $additionalInfo = $loggingInfo['additionalInfo'] ?? [];
+    $additionalInfo = $truncatedMsg ?? [];
     $method = $loggingInfo['method'] ?? null;
     $referenceType = $loggingInfo['referenceType'] ?? null;
     $referenceValue = (int) $loggingInfo['referenceValue'] ?? null;
     $additionalInfo[self::WAYFAIR_PLUGIN_VERSION] = $this->version;
-    $additionalInfo['tempString'] = $empStr;
+    // $additionalInfo['tempString'] = $empStr;
     $additionalInfo['test'] = strlen($empStr);
 
     // mb_strimwidth
