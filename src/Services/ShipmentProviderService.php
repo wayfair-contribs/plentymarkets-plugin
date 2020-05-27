@@ -9,7 +9,7 @@ use Plenty\Exceptions\ValidationException;
 use Plenty\Modules\Order\Shipping\ServiceProvider\Contracts\ShippingServiceProviderRepositoryContract;
 use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 use Wayfair\Core\Dto\Constants;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Models\CarrierScac;
 use Wayfair\Repositories\CarrierScacRepository;
 use Wayfair\Repositories\KeyValueRepository;
@@ -61,7 +61,7 @@ class ShipmentProviderService {
    * @throws ValidationException
    */
   public function updateShippingMethod(string $data) {
-    $this->keyValueRepository->putOrReplace(AbstractConfigHelper::SHIPPING_METHOD, $data);
+    $this->keyValueRepository->putOrReplace(ConfigHelperContract::SHIPPING_METHOD, $data);
 
     return $data;
   }
@@ -72,7 +72,7 @@ class ShipmentProviderService {
    * @return string
    */
   public function getShippingMethod() {
-    return $this->keyValueRepository->get(AbstractConfigHelper::SHIPPING_METHOD);
+    return $this->keyValueRepository->get(ConfigHelperContract::SHIPPING_METHOD);
   }
 
   /**
@@ -81,7 +81,7 @@ class ShipmentProviderService {
    * @return bool
    */
   public function isShippingWithWayfair(): bool {
-    $shippingMethod = $this->keyValueRepository->get(AbstractConfigHelper::SHIPPING_METHOD);
+    $shippingMethod = $this->keyValueRepository->get(ConfigHelperContract::SHIPPING_METHOD);
 
     return ($shippingMethod === Constants::SHIPPING_WITH_WF);
   }

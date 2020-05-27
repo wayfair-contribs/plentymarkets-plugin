@@ -1,6 +1,7 @@
 <?php
+
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Helpers;
@@ -8,13 +9,18 @@ namespace Wayfair\Helpers;
 use Plenty\Modules\Plugin\Contracts\PluginRepositoryContract;
 use Plenty\Plugin\CachingRepository;
 use Plenty\Plugin\ConfigRepository;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Core\Contracts\ConfigHelperContract;
+use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Repositories\KeyValueRepository;
 
-class ConfigHelper extends AbstractConfigHelper {
+class ConfigHelper implements ConfigHelperContract
+{
 
   const CACHING_MINUTES = 360;
-  const INTEGRATION_AGENT_NAME = 'PlentyMarket';
+
+  const LOG_KEY_TEST_MODE_OFF = 'testModeOff';
+  const LOG_KEY_TEST_MODE_ON = 'testModeOn';
+
   /**
    * @var ConfigRepository
    */
@@ -32,28 +38,32 @@ class ConfigHelper extends AbstractConfigHelper {
    *
    * @param ConfigRepository $config
    */
-  public function __construct(ConfigRepository $config) {
+  public function __construct(ConfigRepository $config)
+  {
     $this->config = $config;
   }
 
   /**
    * @return mixed
    */
-  public function getClientId() {
+  public function getWayfairClientId()
+  {
     return $this->config->get(self::PLUGIN_NAME . '.global.container.clientId');
   }
 
   /**
    * @return mixed
    */
-  public function getClientSecret() {
+  public function getWayfairClientSecret()
+  {
     return $this->config->get(self::PLUGIN_NAME . '.global.container.clientSecret');
   }
 
   /**
    * @return int
    */
-  public function getOrderReferrerValue(): int {
+  public function getOrderReferrerValue(): int
+  {
     /**
      * @var KeyValueRepository $keyValueRepository
      */
@@ -65,7 +75,7 @@ class ConfigHelper extends AbstractConfigHelper {
     if ($cachingRepository->has(self::SETTINGS_ORDER_REFERRER_KEY)) {
       return $cachingRepository->get(self::SETTINGS_ORDER_REFERRER_KEY);
     }
-    $value = (int)$keyValueRepository->get(self::SETTINGS_ORDER_REFERRER_KEY);
+    $value = (int) $keyValueRepository->get(self::SETTINGS_ORDER_REFERRER_KEY);
     $cachingRepository->put(self::SETTINGS_ORDER_REFERRER_KEY, $value, self::CACHING_MINUTES);
     return $value;
   }
@@ -73,35 +83,36 @@ class ConfigHelper extends AbstractConfigHelper {
   /**
    * @return int|mixed
    */
-  public function getStockBufferValue() {
+  public function getStockBufferValue()
+  {
     /**
      * @var KeyValueRepository $keyValueRepository
      */
     $keyValueRepository = pluginApp(KeyValueRepository::class);
 
-    return (int)$keyValueRepository->get(self::SETTINGS_STOCK_BUFFER_KEY);
+    return (int) $keyValueRepository->get(self::SETTINGS_STOCK_BUFFER_KEY);
   }
 
-  /**
-   * @return string
-   */
-  public function getDryRun(): string {
+  public function getDryRun(): string
+  {
     return $this->config->get(self::PLUGIN_NAME . '.global.container.dryRunMode');
   }
 
-  public function isAllItemsActive(): bool {
+  public function isAllItemsActive(): bool
+  {
     /**
      * @var KeyValueRepository $keyValueRepository
      */
     $keyValueRepository = pluginApp(KeyValueRepository::class);
 
-    return (bool)$keyValueRepository->get(self::SETTINGS_SEND_ALL_ITEMS_KEY);
+    return (bool) $keyValueRepository->get(self::SETTINGS_SEND_ALL_ITEMS_KEY);
   }
 
   /**
    * @return string
    */
-  public function getImportOrderSince() {
+  public function getImportOrderSince()
+  {
     /**
      * @var KeyValueRepository $keyValueRepository
      */
@@ -113,9 +124,10 @@ class ConfigHelper extends AbstractConfigHelper {
   /**
    * @return string
    */
-  public function getPluginVersion(): string {
+  public function getPluginVersion(): string
+  {
     $pluginRepo = pluginApp(PluginRepositoryContract::class);
-    $plugin = $pluginRepo->getPluginByName(AbstractConfigHelper::PLUGIN_NAME);
+    $plugin = $pluginRepo->getPluginByName(self::PLUGIN_NAME);
     $plugin = $pluginRepo->decoratePlugin($plugin);
     return $plugin->versionProductive;
   }
@@ -123,7 +135,8 @@ class ConfigHelper extends AbstractConfigHelper {
   /**
    * @return string
    */
-  public function getIntegrationAgentHeader() {
+  public function getIntegrationAgentHeader()
+  {
     return self::INTEGRATION_AGENT_NAME . ' - v:' . $this->getPluginVersion();
   }
 
@@ -142,7 +155,32 @@ class ConfigHelper extends AbstractConfigHelper {
    *
    * @return bool
    */
-  public function hasBooted(): bool {
+  public function hasBooted(): bool
+  {
     return self::$bootFlag;
+  }
+
+  public function isTestingEnabled(): bool
+  {
+    $log_key = self::LOG_KEY_TEST_MODE_OFF;
+    $result = filter_var($this->getDryRun(), FILTER_VALIDATE_BOOLEAN);
+
+    if ($result) {
+      $log_key = self::LOG_KEY_TEST_MODE_ON;
+    }
+
+    /**
+     * @var LoggerContract $logger
+     */
+    $logger = pluginApp(LoggerContract::class);
+    $logger->info(
+      TranslationHelper::getLoggerKey($log_key),
+      [
+        'additionalInfo' => [],
+        'method' => __METHOD__
+      ]
+    );
+
+    return $result;
   }
 }

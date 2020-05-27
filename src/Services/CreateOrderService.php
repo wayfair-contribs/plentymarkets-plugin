@@ -15,7 +15,7 @@ use Wayfair\Core\Api\Services\LogSenderService;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\General\AddressDTO;
 use Wayfair\Core\Dto\PurchaseOrder\ResponseDTO;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Core\Helpers\BillingAddress;
 use Wayfair\Helpers\PaymentHelper;
 use Wayfair\Helpers\TranslationHelper;
@@ -163,9 +163,9 @@ class CreateOrderService
   public function create(ResponseDTO $dto): bool
   {
     /**
-     * @var AbstractConfigHelper $configHelper
+     * @var ConfigHelperContract $configHelper
      */
-    $configHelper = pluginApp(AbstractConfigHelper::class);
+    $configHelper = pluginApp(ConfigHelperContract::class);
 
     /** @var LoggerContract $loggerContract */
     $loggerContract = pluginApp(LoggerContract::class);
@@ -217,7 +217,7 @@ class CreateOrderService
 
       $billing = null;
       $billingInfoFromDTO = $dto->getBillingInfo();
-      $encodedBillingContactFromRepository = $this->keyValueRepository->get(AbstractConfigHelper::BILLING_CONTACT);
+      $encodedBillingContactFromRepository = $this->keyValueRepository->get(ConfigHelperContract::BILLING_CONTACT);
       if (isset($encodedBillingContactFromRepository) && !empty($encodedBillingContactFromRepository)) {
         try {
           $billing = \json_decode($encodedBillingContactFromRepository, true);
@@ -234,7 +234,7 @@ class CreateOrderService
         }
 
         $billing = $this->addressService->createContactAndAddress($addressDTO, $billingInfoFromDTO, $referrerId, ContactType::TYPE_PARTNER, AddressRelationType::BILLING_ADDRESS);
-        $this->keyValueRepository->put(AbstractConfigHelper::BILLING_CONTACT, \json_encode($billing));
+        $this->keyValueRepository->put(ConfigHelperContract::BILLING_CONTACT, \json_encode($billing));
       }
 
       if (!isset($billingInfoFromDTO) || empty($billingInfoFromDTO)) {
@@ -267,7 +267,7 @@ class CreateOrderService
 
       $orderData = $this->purchaseOrderMapper->map(
         $dto, $billing['addressId'], $billing['contactId'], $delivery['addressId'], $referrerId, $warehouseId,
-        (string)AbstractConfigHelper::PAYMENT_METHOD_INVOICE
+        (string)ConfigHelperContract::PAYMENT_METHOD_INVOICE
       );
 
       if (!isset($orderData) || empty($orderData)) {
@@ -348,13 +348,13 @@ class CreateOrderService
   {
     $data = [
       'amount' => 0,
-      'mopId' => AbstractConfigHelper::PAYMENT_METHOD_INVOICE,
+      'mopId' => ConfigHelperContract::PAYMENT_METHOD_INVOICE,
       'status' => Payment::STATUS_APPROVED,
-      'transactionType' => AbstractConfigHelper::PAYMENT_TRANSACTION_TYPE_BOOKED_PAYMENT,
+      'transactionType' => ConfigHelperContract::PAYMENT_TRANSACTION_TYPE_BOOKED_PAYMENT,
       'properties' => [
         [
           'typeId' => PaymentProperty::TYPE_TRANSACTION_ID,
-          'value' => $poNumber . '_' . time() . '_' . AbstractConfigHelper::PAYMENT_KEY
+          'value' => $poNumber . '_' . time() . '_' . ConfigHelperContract::PAYMENT_KEY
         ]
       ]
     ];

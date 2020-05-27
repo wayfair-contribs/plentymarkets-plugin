@@ -9,6 +9,7 @@ import { WarehouseSupplierComponent } from './views/warehouseSupplier/warehouseS
 import { SettingsComponent } from './views/settings/settings.component';
 import { FullInventoryComponent } from './views/fullInventory/fullInventory.component';
 import {CarrierScacMappingComponent} from "./views/carrierScacMapping/carrierScacMapping.component";
+import { AdvancedSettingsComponent } from "./views/advancedSettings/advancedSettings.component";
 
 const appRoutes: Routes = [
     {
@@ -61,6 +62,13 @@ const appRoutes: Routes = [
                 component: CarrierScacMappingComponent,
                 data: {
                     label: 'Shipping carrier setting'
+                }
+            },
+            {
+                path: 'advancedSettings',
+                component: AdvancedSettingsComponent,
+                data: {
+                    label: 'Advancd Settings'
                 }
             }
         ]

@@ -6,7 +6,7 @@
 namespace Wayfair\Migrations;
 
 use Plenty\Modules\Order\Shipping\ServiceProvider\Contracts\ShippingServiceProviderRepositoryContract;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Repositories\KeyValueRepository;
 
 /**
@@ -41,11 +41,11 @@ class CreateShippingServiceProvider {
   public function run(KeyValueRepository $keyValueRepository) {
     try {
       $shippingServiceProvider = $this->shippingServiceProviderRepository->saveShippingServiceProvider(
-          AbstractConfigHelper::PLUGIN_NAME,
-          AbstractConfigHelper::SHIPPING_PROVIDER_NAME
+          ConfigHelperContract::PLUGIN_NAME,
+          ConfigHelperContract::SHIPPING_PROVIDER_NAME
       );
 
-      $keyValueRepository->putOrReplace(AbstractConfigHelper::SHIPPING_PROVIDER_ID, $shippingServiceProvider->id);
+      $keyValueRepository->putOrReplace(ConfigHelperContract::SHIPPING_PROVIDER_ID, $shippingServiceProvider->id);
 
     } catch (\Exception $exception) {
       

@@ -5,7 +5,7 @@
 
 namespace Wayfair\Migrations;
 
-use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Repositories\KeyValueRepository;
 
 /**
@@ -35,8 +35,8 @@ class CreateDefaultItemMapping {
    * @return void
    */
   public function run() {
-    if (empty($this->keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD))) {
-      $this->keyValueRepository->putOrReplace(AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD, AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER);
+    if (empty($this->keyValueRepository->get(ConfigHelperContract::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD))) {
+      $this->keyValueRepository->putOrReplace(ConfigHelperContract::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD, ConfigHelperContract::ITEM_MAPPING_VARIATION_NUMBER);
     }
   }
 

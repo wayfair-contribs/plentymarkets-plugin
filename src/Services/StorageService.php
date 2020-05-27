@@ -25,6 +25,8 @@ class StorageService implements StorageInterfaceContract {
   }
 
   /**
+   * Get the value for the key
+   * 
    * @param string $key
    *
    * @return mixed
@@ -34,6 +36,8 @@ class StorageService implements StorageInterfaceContract {
   }
 
   /**
+   * Set the value for the key
+   * 
    * @param string $key
    * @param mixed  $value
    *
@@ -43,4 +47,17 @@ class StorageService implements StorageInterfaceContract {
   public function set($key, $value) {
     $this->keyValueRepository->put($key, $value);
   }
+
+  /**
+   * Remove the value for the key,
+   * returning the value if stored
+   *
+   * @param string $key
+   * @return mixed
+   */
+  public function remove($key)
+  {
+    return $this->keyValueRepository->delete($key);
+  }
+
 }

@@ -12,7 +12,7 @@ use Plenty\Modules\Plugin\Storage\Contracts\StorageRepositoryContract;
 use Wayfair\Core\Contracts\FetchDocumentContract;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\RegisterPurchaseOrder\ResponseDTO;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Helpers\TranslationHelper;
 
 /**
@@ -154,7 +154,7 @@ class SaveOrderDocumentService
       );
 
     return $this->storageRepositoryContract->uploadObject(
-      AbstractConfigHelper::PLUGIN_NAME, $fileName, $fileData
+      ConfigHelperContract::PLUGIN_NAME, $fileName, $fileData
     );
   }
 

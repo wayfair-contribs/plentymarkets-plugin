@@ -1,12 +1,12 @@
 <?php
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Helpers;
 
 use Plenty\Plugin\Translation\Translator;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 
 /**
  * Class TranslationHelper
@@ -39,7 +39,7 @@ class TranslationHelper {
    * @return mixed
    */
   public static function translate(string $key, string $file = 'template') {
-    $fullLangKey = AbstractConfigHelper::PLUGIN_NAME . "::{$file}.{$key}";
+    $fullLangKey = ConfigHelperContract::PLUGIN_NAME . "::{$file}.{$key}";
 
     return self::getTranslator()->trans($fullLangKey);
   }
@@ -51,7 +51,7 @@ class TranslationHelper {
    * @return string
    */
   public static function getLoggerKey(string $key): string {
-    return AbstractConfigHelper::PLUGIN_NAME . '::logger.' . $key;
+    return ConfigHelperContract::PLUGIN_NAME . '::logger.' . $key;
   }
 
   /**

@@ -13,7 +13,7 @@ use Plenty\Modules\Account\Contact\Contracts\ContactAddressRepositoryContract;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Wayfair\Core\Dto\General\AddressDTO;
 use Wayfair\Core\Dto\General\BillingInfoDTO;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Core\Helpers\BillingAddress;
 use Wayfair\Mappers\AddressMapper;
 use Wayfair\Repositories\KeyValueRepository;
@@ -58,7 +58,7 @@ class AddressService {
    * Update existing Wayfair address using ContactAddressRepositoryContract.
    */
   public function checkAndUpdate() {
-    $billingSetting = \json_decode($this->keyValueRepository->get(AbstractConfigHelper::BILLING_CONTACT), true);
+    $billingSetting = \json_decode($this->keyValueRepository->get(ConfigHelperContract::BILLING_CONTACT), true);
     if (!empty($billingSetting['addressId']) && !empty($billingSetting['contactId'])) { // Billing address already exist -> update it.
       $addressDTO = AddressDTO::createFromArray(BillingAddress::BillingAddressAsArray);
       $addressData = $this->addressMapper->map($addressDTO);

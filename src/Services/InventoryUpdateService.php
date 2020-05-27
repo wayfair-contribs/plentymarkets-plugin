@@ -11,7 +11,7 @@ use Wayfair\Core\Api\Services\InventoryService;
 use Wayfair\Core\Api\Services\LogSenderService;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\Inventory\RequestDTO;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Core\Helpers\TimeHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Mappers\InventoryMapper;
@@ -23,6 +23,7 @@ use Wayfair\Models\ExternalLogs;
 class InventoryUpdateService
 {
   const LOG_KEY_DEBUG = 'debugInventoryUpdate';
+  const LOG_KEY_INVALID_INVENTORY_UPDATE = 'invalidInventoryUpdate';
   const LOG_KEY_INVENTORY_UPDATE_END = 'inventoryUpdateEnd';
   const LOG_KEY_INVENTORY_UPDATE_ERROR = 'inventoryUpdateError';
   const LOG_KEY_INVENTORY_UPDATE_START = 'inventoryUpdateStart';
@@ -75,8 +76,7 @@ class InventoryUpdateService
 
     $loggerContract
       ->error(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_ERROR),
-        [
+        TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_INVENTORY_UPDATE), [
           'additionalInfo' => [
             'message' => 'inventory request data is invalid',
             'issues' => json_encode($issues),
@@ -128,7 +128,7 @@ class InventoryUpdateService
     try {
       $fields = $this->getResultFields();
       /* Page size is tuned for a balance between memory usage (in plentymarkets) and number of transactions  */
-      $fields['itemsPerPage'] = AbstractConfigHelper::INVENTORY_ITEMS_PER_PAGE;
+      $fields['itemsPerPage'] = ConfigHelperContract::INVENTORY_ITEMS_PER_PAGE;
       $variationSearchRepository->setFilters($this->getFilters($fullInventory));
 
       do {
@@ -211,13 +211,29 @@ class InventoryUpdateService
       // TODO: consider failing out of one item / one page instead of failing the whole sync
       $externalLogs->addInventoryLog('Inventory: ' . $e->getMessage(), 'inventoryFailed' . ($fullInventory ? 'Full' : ''), 1, 0, false);
 
+      $exceptionType = get_class($e);
+      $msg = $e->getMessage();
+      $stack = $e->getTrace();
+      $lenStack = count($stack);
+      $lenMsg = strlen($msg);
+
+      if ($lenStack > 2)
+      {
+        // truncate the stack to avoid PM saying the log message is too large for display
+        // TODO: remove this if/when this is handled in the logger modules (see ticket 'EM-100')
+        $stack = array_slice($stack, 0, 2);
+        $stack[] = '...';
+      }
+
       $loggerContract->error(
         TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_ERROR),
         [
           'additionalInfo' => [
-            'exception' => $e,
-            'message' => $e->getMessage(),
-            'stackTrace' => $e->getTrace(),
+            'exceptionType' => $exceptionType,
+            'message' => $msg,
+            'stackTrace' => $stack,
+            'lenStack' => $lenStack,
+            'lenMsg' => $lenMsg
           ],
           'method' => __METHOD__
         ]
@@ -262,9 +278,9 @@ class InventoryUpdateService
   public function getFilters(bool $fullInventory): array
   {
     /**
-     * @var AbstractConfigHelper $configHelper
+     * @var ConfigHelperContract $configHelper
      */
-    $configHelper = pluginApp(AbstractConfigHelper::class);
+    $configHelper = pluginApp(ConfigHelperContract::class);
 
     $filter = [
       'isActive' => true
@@ -276,7 +292,7 @@ class InventoryUpdateService
 
     if (!$fullInventory) {
       $filter['updatedBetween'] = [
-        'timestampFrom' => time() - AbstractConfigHelper::SECONDS_INTERVAL_FOR_INVENTORY,
+        'timestampFrom' => time() - ConfigHelperContract::SECONDS_INTERVAL_FOR_INVENTORY,
         'timestampTo' => time(),
       ];
     }

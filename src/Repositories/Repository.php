@@ -32,7 +32,7 @@ class Repository {
   /**
    * @return int
    */
-  public function getLoggedInUserId() {
+  private function getLoggedInUserId() {
     return $this->accountService->getAccountContactId();
   }
 

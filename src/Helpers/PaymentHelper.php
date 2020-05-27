@@ -6,7 +6,7 @@
 namespace Wayfair\Helpers;
 
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 
 class PaymentHelper {
 
@@ -28,7 +28,7 @@ class PaymentHelper {
    * @return int
    */
   public function getPaymentMethodId(): int {
-    $paymentMethods = $this->paymentMethodRepository->allForPlugin(AbstractConfigHelper::PLUGIN_NAME);
+    $paymentMethods = $this->paymentMethodRepository->allForPlugin(ConfigHelperContract::PLUGIN_NAME);
     foreach($paymentMethods as $paymentMethod) {
       return $paymentMethod->id;
     }
@@ -48,8 +48,8 @@ class PaymentHelper {
       }
     }
     $paymentMethodData = [
-      'pluginKey'  => AbstractConfigHelper::PLUGIN_NAME,
-      'paymentKey' => AbstractConfigHelper::PAYMENT_KEY,
+      'pluginKey'  => ConfigHelperContract::PLUGIN_NAME,
+      'paymentKey' => ConfigHelperContract::PAYMENT_KEY,
       'name' => 'Wayfair Direct Payment',
     ];
     $paymentMethod = $this->paymentMethodRepository->createPaymentMethod($paymentMethodData);

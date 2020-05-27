@@ -26,6 +26,7 @@ import {RouterViewComponent} from './views/router/router-view.component';
 import {WarehouseSupplierComponent} from './views/warehouseSupplier/warehouseSupplier.component';
 import {SettingsComponent} from './views/settings/settings.component';
 import {FullInventoryComponent} from './views/fullInventory/fullInventory.component';
+import {AdvancedSettingsComponent} from './views/advancedSettings/advancedSettings.component';
 import {TerraNodeTreeConfig} from '@plentymarkets/terra-components';
 
 // Services
@@ -38,6 +39,7 @@ import {CarrierScacMappingComponent} from "./views/carrierScacMapping/carrierSca
 import {CarrierService} from "./core/services/carrier/carrier.service";
 import {CarrierScacService} from "./core/services/carrierScac/carrierScac.service";
 import {ShippingMethodService} from "./core/services/shippingMethod/shippingMethod.service";
+import {ResetAuthenticationService} from "./core/services/resetAuthentication/resetAuthentication.service";
 
 @NgModule({
     imports: [
@@ -58,7 +60,8 @@ import {ShippingMethodService} from "./core/services/shippingMethod/shippingMeth
         WarehouseSupplierComponent,
         SettingsComponent,
         FullInventoryComponent,
-        CarrierScacMappingComponent
+        CarrierScacMappingComponent,
+        AdvancedSettingsComponent
     ],
     providers: [
         {
@@ -80,7 +83,8 @@ import {ShippingMethodService} from "./core/services/shippingMethod/shippingMeth
         FullInventoryService,
         CarrierService,
         CarrierScacService,
-        ShippingMethodService
+        ShippingMethodService,
+        ResetAuthenticationService
     ],
     bootstrap: [
         WayfairAppComponent

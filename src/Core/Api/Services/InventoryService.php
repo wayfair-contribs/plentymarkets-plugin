@@ -7,10 +7,8 @@ namespace Wayfair\Core\Api\Services;
 
 use Wayfair\Core\Api\APIService;
 use Wayfair\Core\Dto\Inventory\ResponseDTO;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Http\WayfairResponse;
-use Wayfair\Models\ExternalLogs;
 
 /**
  * Class InventoryService
@@ -21,6 +19,12 @@ class InventoryService extends APIService
 {
   const LOG_KEY_INVENTORY_QUERY_ERROR = 'inventoryQueryError';
   const LOG_KEY_INVENTORY_QUERY_DEBUG = 'debugInventoryQuery';
+  const LOG_KEY_INVENTORY_QUERY_BULK_ERROR = 'inventoryQueryBulkError';
+
+  const RESPONSE_KEY_ERRORS = 'errors';
+  const RESPONSE_KEY_DATA = 'data';
+  const RESPONSE_DATA_KEY_INVENTORY = 'inventory';
+  const RESPONSE_INVENTORY_KEY_SAVE = 'save';
 
   /**
    *
@@ -86,10 +90,6 @@ class InventoryService extends APIService
    */
   public function buildQuery(array $listOfRequestDTOs, bool $fullInventory = false)
   {
-    /**
-     * @var AbstractConfigHelper $configHelper
-     */
-    $configHelper = pluginApp(AbstractConfigHelper::class);
     $fullData = [];
     foreach ($listOfRequestDTOs as $requestDTO) {
       $fullData[] = [
@@ -109,7 +109,6 @@ class InventoryService extends APIService
       . 'save('
       . 'inventory: $inventory,'
       . 'feedKind: ' . ($fullInventory ? 'TRUE_UP' : 'DIFFERENTIAL') . ','
-      . 'dryRun: ' . $configHelper->getDryRun()
       . ') {'
       . 'id,'
       . 'handle,'
@@ -134,49 +133,53 @@ class InventoryService extends APIService
    */
   public function updateBulk(array $listOfRequestDto, bool $fullInventory = false)
   {
-    /** @var ExternalLogs $externalLogs */
-    $externalLogs = pluginApp(ExternalLogs::class);
-
     try {
-
       $queryData = $this->buildQuery($listOfRequestDto, $fullInventory);
 
       $response = $this->query($queryData['query'], 'post', $queryData['variables']);
 
       $responseBody = $response->getBodyAsArray();
+      $reponseErrors = $responseBody[self::RESPONSE_KEY_ERRORS];
 
-      if (isset($responseBody['errors'])) {
+      if (isset($reponseErrors)) {
         throw new \Exception("Unable to update inventory due to errors." .
-          " Response from  Wayfair: " . \json_encode($responseBody));
+          " Errors from  Wayfair: " . \json_encode($reponseErrors));
       }
 
-      if (!isset($responseBody['data'])) {
-        throw new \Exception("Unable to update inventory - no data in response. " .
-          " Response from  Wayfair: " . \json_encode($responseBody));
+      $response_data_array = $responseBody[self::RESPONSE_KEY_DATA];
+
+      if (!isset($response_data_array)) {
+        throw new \Exception("Unable to update inventory - no data element in response.");
       }
 
-      $response_data_array = $responseBody['data'];
+      $inventory = $response_data_array[self::RESPONSE_DATA_KEY_INVENTORY];
 
-      if (!isset($response_data_array['inventory'])) {
-        throw new \Exception("Unable to update inventory - no inventory data in response. " .
-          " Response from  Wayfair: " . \json_encode($responseBody));
+      if (!isset($inventory)) {
+        throw new \Exception("Unable to update inventory - no inventory data in response.");
       }
 
-      $inventory = $response_data_array['inventory'];
+      $inventorySave = $inventory[self::RESPONSE_INVENTORY_KEY_SAVE];
 
-      if (!isset($inventory['save'])) {
-        throw new \Exception("Unable to update inventory - no save data in inventory area of response. " .
-          " Response from  Wayfair: " . \json_encode($responseBody));
+      if (!isset($inventorySave)) {
+        throw new \Exception("Unable to update inventory - no save data in inventory area of response.");
       }
 
+      return ResponseDTO::createFromArray($inventorySave);
+    } catch (\Exception $e)
+    {
+      // put the Wayfair response into the debug log as a SEPARATE message when there was an issue
+      // this log may be too large. See ticket 'EM-100' about resolving that.
+      $this->loggerContract->debug(
+        TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_QUERY_BULK_ERROR),
+        [
+          'additionalInfo' => [
+            'bulkInventoryResponse' => $response
+          ],
+          'method' => __METHOD__
+        ]
+      );
 
-      return ResponseDTO::createFromArray($inventory['save']);
-    } finally {
-      if (count($externalLogs->getLogs())) {
-        /** @var LogSenderService $logSenderService */
-        $logSenderService = pluginApp(LogSenderService::class);
-        $logSenderService->execute($externalLogs->getLogs());
-      }
+      throw $e;
     }
   }
 }

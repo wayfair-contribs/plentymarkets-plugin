@@ -1,0 +1,15 @@
+<div class="text-center center-block">
+    <h2>{{ "authentication_settings" | translate: lang }}</h2>
+    <p *ngIf="authResetStatus.value" class="{{ authResetStatus.type + ' col-md-12' }}">
+      {{ authResetStatus.value }}
+    </p>
+    <br />
+  
+    <div class="col-md-12">
+      <button class="btn btn-success" id="resetAuthButton" (click)="resetAuthentication()">
+        {{ "reset_authentication" | translate: lang }}
+      </button>
+    </div>
+  </div>
+  <div style="clear: both;"></div>
+  

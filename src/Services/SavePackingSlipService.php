@@ -11,8 +11,8 @@ use Plenty\Modules\Document\Models\Document;
 use Wayfair\Core\Api\Services\LogSenderService;
 use Wayfair\Core\Contracts\FetchDocumentContract;
 use Wayfair\Core\Contracts\LoggerContract;
+use Wayfair\Core\Contracts\URLHelperContract;
 use Wayfair\Core\Helpers\ShippingLabelHelper;
-use Wayfair\Core\Helpers\URLHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Models\ExternalLogs;
 
@@ -46,21 +46,29 @@ class SavePackingSlipService
   private $loggerContract;
 
   /**
+   * @var URLHelperContract
+   */
+  private $urlHelperContract;
+
+  /**
    * SavePackingSlipService constructor.
    *
    * @param DocumentRepositoryContract $documentRepositoryContract
    * @param FetchDocumentContract $fetchDocumentContract
    * @param LoggerContract $loggerContract
+   * @param URLHelperContract $urlHelperContract
    */
   public function __construct(
     DocumentRepositoryContract $documentRepositoryContract,
     FetchDocumentContract $fetchDocumentContract,
-    LoggerContract $loggerContract
+    LoggerContract $loggerContract,
+    URLHelperContract $uRLHelperContract
   )
   {
     $this->documentRepositoryContract = $documentRepositoryContract;
     $this->fetchDocumentContract = $fetchDocumentContract;
     $this->loggerContract = $loggerContract;
+    $this->urlHelperContract = $uRLHelperContract;
   }
 
   /**
@@ -72,7 +80,7 @@ class SavePackingSlipService
   private function fetchPackingSlip(string $poNumber): string
   {
 
-    $packingSlipUrl = URLHelper::getPackingSlipUrl($poNumber);
+    $packingSlipUrl = $this->urlHelperContract->getPackingSlipUrl($poNumber);
 
     try
     {

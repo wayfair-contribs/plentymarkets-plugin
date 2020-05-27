@@ -7,7 +7,7 @@ namespace Wayfair\Cron;
 
 use Plenty\Modules\Cron\Contracts\CronHandler as Cron;
 use Wayfair\Core\Contracts\LoggerContract;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Repositories\KeyValueRepository;
 
@@ -40,9 +40,9 @@ class UpdateFullInventoryStatusCron extends Cron {
 
     $loggerContract->debug(TranslationHelper::getLoggerKey('cronStartedMessage'), ['method' => __METHOD__]);
     try {
-      $dt = $this->keyValueRepository->get(AbstractConfigHelper::FULL_INVENTORY_STATUS_UPDATED_AT);
+      $dt = $this->keyValueRepository->get(ConfigHelperContract::FULL_INVENTORY_STATUS_UPDATED_AT);
       if (!$dt || (\time() - \strtotime($dt)) > 7200) {
-        $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_CRON_STATUS, AbstractConfigHelper::FULL_INVENTORY_CRON_IDLE);
+        $this->keyValueRepository->putOrReplace(ConfigHelperContract::FULL_INVENTORY_CRON_STATUS, ConfigHelperContract::FULL_INVENTORY_CRON_IDLE);
       }
     }
     finally {

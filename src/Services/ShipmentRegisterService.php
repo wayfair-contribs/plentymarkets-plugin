@@ -15,7 +15,7 @@ use Wayfair\Core\Contracts\FetchDocumentContract;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Contracts\RegisterPurchaseOrderContract;
 use Wayfair\Core\Dto\RegisterPurchaseOrder\RequestDTO;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Core\Helpers\ShippingLabelHelper;
 use Wayfair\Core\Helpers\TimeHelper;
 use Wayfair\Helpers\TranslationHelper;
@@ -148,8 +148,8 @@ class ShipmentRegisterService
       /* @var OrderShippingPackage $orderShippingPackage */
       foreach ($orderShippingPackages as $orderShippingPackage) {
         $labelKey = explode('/', $orderShippingPackage->labelPath)[1]; //(index 0 is for plugin name)
-        if ($this->storageRepositoryContract->doesObjectExist(AbstractConfigHelper::PLUGIN_NAME, $labelKey)) {
-          $storageObject = $this->storageRepositoryContract->getObject(AbstractConfigHelper::PLUGIN_NAME, $labelKey);
+        if ($this->storageRepositoryContract->doesObjectExist(ConfigHelperContract::PLUGIN_NAME, $labelKey)) {
+          $storageObject = $this->storageRepositoryContract->getObject(ConfigHelperContract::PLUGIN_NAME, $labelKey);
           $labels[] = $storageObject->body;
         }
       }
@@ -170,7 +170,7 @@ class ShipmentRegisterService
                                         string $poNumber, ExternalLogs $externalLogs): bool
   {
     $already_registered = $shippingInformation !== null
-      && $shippingInformation->shippingServiceProvider === AbstractConfigHelper::PLUGIN_NAME
+      && $shippingInformation->shippingServiceProvider === ConfigHelperContract::PLUGIN_NAME
       && $shippingInformation->shippingStatus === self::SHIPPING_REGISTERED_STATUS;
 
     if ($already_registered) {
@@ -500,7 +500,7 @@ class ShipmentRegisterService
               ]
             );
 
-            $objectUrl = $this->storageRepositoryContract->getObjectUrl(AbstractConfigHelper::PLUGIN_NAME,
+            $objectUrl = $this->storageRepositoryContract->getObjectUrl(ConfigHelperContract::PLUGIN_NAME,
               $packageFileName);
 
             $shipmentNumber = ShippingLabelHelper::generateShipmentNumber($poNumber, $packageId);
@@ -691,7 +691,7 @@ class ShipmentRegisterService
     $data = [
       'orderId' => $orderId,
       'transactionId' => implode(',', $transactionIds),
-      'shippingServiceProvider' => AbstractConfigHelper::PLUGIN_NAME,
+      'shippingServiceProvider' => ConfigHelperContract::PLUGIN_NAME,
       'shippingStatus' => self::SHIPPING_REGISTERED_STATUS,
       'shippingCosts' => self::SHIPPING_WAYFAIR_COST,
       'additionalData' => $shipmentItems,

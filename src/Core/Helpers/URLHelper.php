@@ -1,45 +1,59 @@
 <?php
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Core\Helpers;
 
-class URLHelper {
-  // Production Base URLs
-  const BASE_URL = 'https://api.wayfair.com/';
-  const BASE_AUTH_URL = 'https://sso.auth.wayfair.com/';
+use Wayfair\Core\Contracts\ConfigHelperContract;
+use Wayfair\Core\Contracts\URLHelperContract;
 
-  // URLs
-  const URL_GRAPHQL = 'graphql';
-  const URL_AUTH = 'auth';
-  const URLS = [
-      self::URL_GRAPHQL => 'v1/graphql',
-      self::URL_AUTH    => 'oauth/token'
-  ];
+class URLHelper implements URLHelperContract{
 
   /**
    * @param string $key
    *
    * @return string
    */
-  public static function getUrl($key) {
-    $base = self::getBaseUrl();
-    return $base . self::URLS[$key];
+  public function getUrl($key): string {
+    $base = self::getBaseUrl($key);
+    // TODO: log about unknown URL path
+    return $base . self::URL_PATH[$key];
   }
 
   /**
+   * Get the URL to contact for authentication tokens
    * @return string
    */
-  public static function getAuthUrl() {
-    return self::BASE_AUTH_URL . self::URLS[self::URL_AUTH];
+  public function getWayfairAuthenticationUrl(): string {
+    return self::getBaseUrl(self::URL_ID_AUTH) . self::URL_PATH[self::URL_ID_AUTH];
   }
 
   /**
+   * Get the URL to the wayfair API
+   * The returned value depends on the plugin's configuration, and may point to the API Sandbox.
+   * @param string $key - the identifier of the endpoint that the URL is needed for
    * @return string
    */
-  public static function getBaseUrl() {
-    return self::BASE_URL;
+  private static function getBaseUrl($key = NULL): string {
+
+    if ($key === self::URL_ID_AUTH)
+    {
+      // prod and sandbox use the same auth service
+      return self::BASE_URL_AUTH;
+    }
+
+    /**
+     * @var ConfigHelperContract $configHelper
+     */
+    $configHelper = pluginApp(ConfigHelperContract::class);
+
+    if ($configHelper->isTestingEnabled())
+    {
+      return self::BASE_URL_SANDBOX;
+    }
+
+    return self::BASE_URL_API;
   }
 
   /**
@@ -49,8 +63,27 @@ class URLHelper {
    *
    * @return string
    */
-  public static function getPackingSlipUrl(string $poNumber) {
-    return self::BASE_URL . 'v1/packing_slip/' . $poNumber;
+  public function getPackingSlipUrl(string $poNumber): string {
+    return self::getBaseUrl(self::URL_ID_PACKING_SLIP) . 'v1/packing_slip/' . $poNumber;
+  }
+
+  /**
+   * Finds the Wayfair API audience (Production or Sandbox) for a URL
+   * @param string $url the URL that is being checked
+   * @return string
+   */
+  public function getWayfairAudience(string $url) {
+    // URL must START with one of the approved URLs.
+    // otherwise, someone can put our URL into the query string and trick us into sending the auth header.
+    foreach (self::URLS_USING_WAYFAIR_AUTH as $wayfair_authenticated_domain)
+    {
+      if (stripos($url, $wayfair_authenticated_domain) == 0)
+      {
+        return $url;
+      }
+    }
+
+    return null;
   }
 
 }

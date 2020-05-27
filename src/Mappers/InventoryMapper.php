@@ -9,7 +9,7 @@ namespace Wayfair\Mappers;
 use Plenty\Modules\Item\VariationStock\Contracts\VariationStockRepositoryContract;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\Inventory\RequestDTO;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Repositories\KeyValueRepository;
 use Wayfair\Repositories\WarehouseSupplierRepository;
@@ -49,9 +49,9 @@ class InventoryMapper
   public function getNetStock($variationStock)
   {
     /**
-     * @var AbstractConfigHelper $configHelper
+     * @var ConfigHelperContract $configHelper
      */
-    $configHelper = pluginApp(AbstractConfigHelper::class);
+    $configHelper = pluginApp(ConfigHelperContract::class);
     $stockBuffer = $configHelper->getStockBufferValue();
     if ($variationStock->netStock > $stockBuffer) {
       return $variationStock->netStock - $stockBuffer;
@@ -157,14 +157,16 @@ class InventoryMapper
   {
     /** @var KeyValueRepository $keyValueRepository */
     $keyValueRepository = pluginApp(KeyValueRepository::class);
-    $itemMappingMethod = $keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD);
+    $itemMappingMethod = $keyValueRepository->get(ConfigHelperContract::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD);
 
     switch ($itemMappingMethod) {
-      case AbstractConfigHelper::ITEM_MAPPING_SKU:
-        return $variationData['variationSkus'][0]['sku'];
-      case AbstractConfigHelper::ITEM_MAPPING_EAN:
-        return $variationData['variationBarcodes'][0]['code'];
-      case AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER:
+      case ConfigHelperContract::ITEM_MAPPING_SKU:
+        $supplierPartNumber = $variationData['variationSkus'][0]['sku'];
+        break;
+      case ConfigHelperContract::ITEM_MAPPING_EAN:
+        $supplierPartNumber = $variationData['variationBarcodes'][0]['code'];
+        break;
+      case ConfigHelperContract::ITEM_MAPPING_VARIATION_NUMBER:
       default:
         return $variationData['number'];
     }

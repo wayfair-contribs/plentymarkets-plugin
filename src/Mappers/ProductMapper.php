@@ -10,7 +10,7 @@ use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\General\ProductDTO;
 use Plenty\Modules\Order\Models\OrderItemType;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Repositories\KeyValueRepository;
 
@@ -49,16 +49,16 @@ class ProductMapper {
    */
   public function map(ProductDTO $dto, int $referrerId, string $warehouseId, string $poNumber): array {
 
-    $itemMappingMethod = $this->keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD);
+    $itemMappingMethod = $this->keyValueRepository->get(ConfigHelperContract::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD);
     $filterMapping = [
-        AbstractConfigHelper::ITEM_MAPPING_SKU,
-        AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER,
-        AbstractConfigHelper::ITEM_MAPPING_EAN
+        ConfigHelperContract::ITEM_MAPPING_SKU,
+        ConfigHelperContract::ITEM_MAPPING_VARIATION_NUMBER,
+        ConfigHelperContract::ITEM_MAPPING_EAN
     ];
 
     $partNumber = $dto->getPartNumber();
     if (empty($itemMappingMethod) || !in_array($itemMappingMethod, $filterMapping)) {
-      $itemMappingMethod = AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER;
+      $itemMappingMethod = ConfigHelperContract::ITEM_MAPPING_VARIATION_NUMBER;
     }
 
     $filters = [$itemMappingMethod => $partNumber];

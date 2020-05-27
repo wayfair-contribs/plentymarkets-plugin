@@ -8,7 +8,7 @@ namespace Wayfair\Services;
 use Plenty\Plugin\Log\Loggable;
 
 use Wayfair\Core\Contracts\LoggerContract;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Core\Contracts\ConfigHelperContract;
 
 class LoggingService implements LoggerContract {
   use Loggable;
@@ -30,7 +30,7 @@ class LoggingService implements LoggerContract {
    * Initialize a logging service object
    */
   public function __construct() {
-    $configHelper = pluginApp(AbstractConfigHelper::class);
+    $configHelper = pluginApp(ConfigHelperContract::class);
     $this->version = $configHelper->getPluginVersion();
   }
 
@@ -129,6 +129,8 @@ class LoggingService implements LoggerContract {
     $referenceValue = (int) $loggingInfo['referenceValue'] ?? null;
     $additionalInfo[self::WAYFAIR_PLUGIN_VERSION] = $this->version;
 
+    // FIXME: large amounts of data in additionalInfo are overloading plentymarkets logs
+    // the maximum amount of characters allowed in the log is 32k
     return array($additionalInfo, $method, $referenceType, $referenceValue);
   }
 
@@ -143,9 +145,9 @@ class LoggingService implements LoggerContract {
    */
   private function canLogLowerThanError(): bool {
     /**
-     * @var AbstractConfigHelper $configHelper
+     * @var ConfigHelperContract $configHelper
      */
-    $configHelper = pluginApp(AbstractConfigHelper::class);
+    $configHelper = pluginApp(ConfigHelperContract::class);
     return $configHelper->hasBooted();
   }
 }
