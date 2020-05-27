@@ -124,14 +124,18 @@ class LoggingService implements LoggerContract {
    * @return array
    */
   public function extractVars($loggingInfo): array {
+    $empStr = '';
+    for ($i = 0; $i <= 33000; $i++) {
+      $empStr .= 'x';
+    }
     $test = json_encode($loggingInfo['additionalInfo']);
     $additionalInfo = json_encode($loggingInfo['additionalInfo']) ?? [];
     $method = $loggingInfo['method'] ?? null;
     $referenceType = $loggingInfo['referenceType'] ?? null;
     $referenceValue = (int) $loggingInfo['referenceValue'] ?? null;
     $additionalInfo[self::WAYFAIR_PLUGIN_VERSION] = $this->version;
-    $additionalInfo['test'] = strlen($test) . 'ch';
-
+    $additionalInfo['test'] = strlen($empStr);
+    // mb_strimwidth
 
     return array($additionalInfo, $method, $referenceType, $referenceValue);
   }
