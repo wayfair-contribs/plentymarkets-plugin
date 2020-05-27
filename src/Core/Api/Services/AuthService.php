@@ -23,6 +23,7 @@ class AuthService implements AuthenticationContract
   const LOG_KEY_ATTEMPTING_AUTH = 'attemptingAuthentication';
   const LOG_KEY_DELETING_TOKEN = 'deletingToken';
   const LOG_KEY_NON_WAYFAIR = 'cannotAuthenticateNonWayfair';
+  const LOG_KEY_TOKEN_FETCH = "tokenFetch";
 
   const HEADER_KEY_CONTENT_TYPE = "Content-Type";
 
@@ -128,15 +129,13 @@ class AuthService implements AuthenticationContract
     // auth URL is the same for all Wayfair audiences.
     $method = 'post';
     $clientId = $this->configHelperContract->getWayfairClientId();
-    if (!isset($clientId) || empty($clientId))
-    {
+    if (!isset($clientId) || empty($clientId)) {
       throw new AuthenticationException("Unable to perform authentication: no client ID set for Wayfair");
     }
 
     $clientSecret = $this->configHelperContract->getWayfairClientSecret();
 
-    if (!isset($clientSecret) || empty($clientSecret))
-    {
+    if (!isset($clientSecret) || empty($clientSecret)) {
       throw new AuthenticationException("Unable to perform authentication: no client Secret set for Wayfair");
     }
 
@@ -317,7 +316,22 @@ class AuthService implements AuthenticationContract
       throw new TokenNotFoundException("Token not found for " . $audience);
     }
 
-    return $tokenModel[self::ACCESS_TOKEN];
+    $tokenValue = $tokenModel[self::ACCESS_TOKEN];
+
+    if (!isset($tokenValue) || empty($tokenValue)) {
+      throw new TokenNotFoundException("Token not found in token model for " . $audience);
+    }
+
+    $this->loggerContract
+        ->debug(
+          TranslationHelper::getLoggerKey(self::LOG_KEY_TOKEN_FETCH),
+          [
+            'additionalInfo' => ['audience' => $audience],
+            'method' => __METHOD__
+          ]
+        );
+
+    return $tokenValue;
   }
 
   /**
@@ -342,7 +356,14 @@ class AuthService implements AuthenticationContract
     $key = self::getKeyForToken($audience);
     if (isset($key) && !empty($key)) {
       $this->loggerContract
-        ->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_DELETING_TOKEN), ['audience' => $audience, 'method' => __METHOD__]);
+        ->debug(
+          TranslationHelper::getLoggerKey(self::LOG_KEY_DELETING_TOKEN),
+          [
+            'additionalInfo' => ['audience' => $audience],
+            'method' => __METHOD__
+          ]
+        );
+
       $this->store->remove($key);
     }
   }

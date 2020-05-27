@@ -177,7 +177,7 @@ class InventoryService extends APIService
         TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_QUERY_BULK_ERROR),
         [
           'additionalInfo' => [
-            'bulkInventoryResponse' => $response
+            'bulkInventoryResponse' => json_encode($response)
           ],
           'method' => __METHOD__
         ]
