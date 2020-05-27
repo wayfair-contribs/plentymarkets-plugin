@@ -130,7 +130,7 @@ class LoggingService implements LoggerContract {
     $referenceType = $loggingInfo['referenceType'] ?? null;
     $referenceValue = (int) $loggingInfo['referenceValue'] ?? null;
     $additionalInfo[self::WAYFAIR_PLUGIN_VERSION] = $this->version;
-    $additionalInfo['test'] = strlen($test);
+    $additionalInfo['test'] = strlen($test) . 'ch';
 
 
     return array($additionalInfo, $method, $referenceType, $referenceValue);
