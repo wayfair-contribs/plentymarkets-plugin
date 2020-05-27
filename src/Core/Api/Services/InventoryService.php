@@ -133,6 +133,7 @@ class InventoryService extends APIService
    */
   public function updateBulk(array $listOfRequestDto, bool $fullInventory = false)
   {
+    $response = null;
     try {
       $queryData = $this->buildQuery($listOfRequestDto, $fullInventory);
 
