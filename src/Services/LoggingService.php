@@ -129,7 +129,7 @@ class LoggingService implements LoggerContract {
       $empStr .= 'x';
     }
     $test = json_encode($loggingInfo['additionalInfo']);
-    $additionalInfo = json_encode($loggingInfo['additionalInfo']) ?? [];
+    $additionalInfo = $loggingInfo['additionalInfo'] ?? [];
     $method = $loggingInfo['method'] ?? null;
     $referenceType = $loggingInfo['referenceType'] ?? null;
     $referenceValue = (int) $loggingInfo['referenceValue'] ?? null;
