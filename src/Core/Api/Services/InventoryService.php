@@ -138,6 +138,10 @@ class InventoryService extends APIService
 
       $response = $this->query($queryData['query'], 'post', $queryData['variables']);
 
+      if (!isset($response)) {
+        throw new \Exception("Unable to update inventory - query action did not complete");
+      }
+
       $responseBody = $response->getBodyAsArray();
       $reponseErrors = $responseBody[self::RESPONSE_KEY_ERRORS];
 
