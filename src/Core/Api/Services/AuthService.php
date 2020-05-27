@@ -127,8 +127,18 @@ class AuthService implements AuthenticationContract
   {
     // auth URL is the same for all Wayfair audiences.
     $method = 'post';
-    $client_id = $this->configHelperContract->getWayfairClientId();
-    $client_secret = $this->configHelperContract->getWayfairClientSecret();
+    $clientId = $this->configHelperContract->getWayfairClientId();
+    if (!isset($clientId) || empty($clientId))
+    {
+      throw new AuthenticationException("Unable to perform authentication: no client ID set for Wayfair");
+    }
+
+    $clientSecret = $this->configHelperContract->getWayfairClientSecret();
+
+    if (!isset($clientSecret) || empty($clientSecret))
+    {
+      throw new AuthenticationException("Unable to perform authentication: no client Secret set for Wayfair");
+    }
 
     $headersArray = [
       self::HEADER_KEY_CONTENT_TYPE => 'application/json',
@@ -157,6 +167,7 @@ class AuthService implements AuthenticationContract
     foreach (self::PRIVATE_INFO_KEYS as $pik) {
       foreach ($maskedArrays as &$masked) {
         if (array_key_exists($pik, $masked)) {
+          // FIXME: getting an NPE for $masked[$pik]
           $masked[$pik] = StringHelper::mask($masked[$pik]);
         }
       }
