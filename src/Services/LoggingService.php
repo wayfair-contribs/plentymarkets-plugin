@@ -124,7 +124,7 @@ class LoggingService implements LoggerContract {
    * @return array
    */
   public function extractVars($loggingInfo): array {
-    $truncatedMsg ='';
+    $truncatedMsg =[];
     $empStr = '';
     for ($i = 0; $i <= 33000; $i++) {
       $empStr .= 'x';
@@ -133,7 +133,7 @@ class LoggingService implements LoggerContract {
 
     // }
     if($empStr > self::STRING_LIMIT) {
-      $truncatedMsg = mb_substr($empStr, 0, 10000);
+      $truncatedMsg['message'] = mb_substr($empStr, 0, 10000);
     }
     $test = json_encode($loggingInfo['additionalInfo']);
     // $additionalInfo = $loggingInfo['additionalInfo'] ?? [];
