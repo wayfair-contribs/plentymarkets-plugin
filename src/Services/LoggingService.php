@@ -125,7 +125,7 @@ class LoggingService implements LoggerContract {
    */
   public function extractVars($loggingInfo): array {
     $test = json_encode($loggingInfo['additionalInfo']);
-    $additionalInfo = $loggingInfo['additionalInfo'] ?? [];
+    $additionalInfo = json_encode($loggingInfo['additionalInfo']) ?? [];
     $method = $loggingInfo['method'] ?? null;
     $referenceType = $loggingInfo['referenceType'] ?? null;
     $referenceValue = (int) $loggingInfo['referenceValue'] ?? null;
