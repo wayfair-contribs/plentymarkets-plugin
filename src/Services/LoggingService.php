@@ -137,7 +137,7 @@ class LoggingService implements LoggerContract {
     }
     $test = json_encode($loggingInfo['additionalInfo']);
     $additionalInfo = $loggingInfo['additionalInfo'] ?? [];
-    $additionalInfo = $truncatedMsg ?? [];
+    $additionalInfo['truncatedMessage'] = $truncatedMsg ?? [];
     $method = $loggingInfo['method'] ?? null;
     $referenceType = $loggingInfo['referenceType'] ?? null;
     $referenceValue = (int) $loggingInfo['referenceValue'] ?? null;
