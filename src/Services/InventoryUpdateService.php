@@ -69,10 +69,18 @@ class InventoryUpdateService
       $issues[] = "Supplier Part number is missing";
     }
 
+    $onHand = $inventoryRequestDTO->getQuantityOnHand();
+
+    if (!isset($onHand))
+    {
+      $issues[] = "Quantity On Hand is missing";
+    }
+
     if (!isset($issues) || empty($issues)) {
       return true;
     }
 
+    // TODO: translate the issues?
     $loggerContract
       ->error(
         TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_ERROR),

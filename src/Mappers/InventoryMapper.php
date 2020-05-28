@@ -7,6 +7,7 @@
 namespace Wayfair\Mappers;
 
 use Plenty\Modules\Item\VariationStock\Contracts\VariationStockRepositoryContract;
+use Plenty\Modules\Item\VariationStock\Models\VariationStock;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\Inventory\RequestDTO;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
@@ -42,22 +43,58 @@ class InventoryMapper
   }
 
   /**
-   * @param mixed $variationStock
+   * Determine the "Quantity On Hand" to report to Wayfair,
+   * based on a VariationStock
+   * @param VariationStock $variationStock
+   * @param AbstractConfigHelper $configHelper
    *
    * @return int|mixed
    */
-  public function getNetStock($variationStock)
+  static function getQuantityOnHand($variationStock, $configHelper)
   {
-    /**
-     * @var AbstractConfigHelper $configHelper
-     */
-    $configHelper = pluginApp(AbstractConfigHelper::class);
-    $stockBuffer = $configHelper->getStockBufferValue();
-    if ($variationStock->netStock > $stockBuffer) {
-      return $variationStock->netStock - $stockBuffer;
-    } else {
-      return 0;
+    if (!isset($variationStock) || !isset($variationStock->netStock))
+    {
+      // API did not return a net stock
+      // not a valid input for Wayfair, should get filtered out later.
+      return null;
     }
+
+    $netStock = $variationStock->netStock;
+    
+    if ($netStock <= -1)
+    {
+      // Wayfair doesn't understand values below -1
+      return -1;
+    }
+
+    $stockBuffer = null;
+    if (isset($configHelper))
+    {
+      $stockBuffer = $configHelper->getStockBufferValue();
+    }
+
+    if (!isset($stockBuffer))
+    {
+      // no buffer to apply
+      return $netStock;
+    }
+
+
+    if ($stockBuffer < 0)
+    {
+      // invalid value for buffer
+      // TODO: add warning log
+      return $netStock;
+    }
+
+    if ($netStock > $stockBuffer)
+    {
+      // report stock, considering buffer
+      return $netStock - $stockBuffer;
+    }
+
+    // stock is less than buffer, so Wayfair should see this as no stock.
+    return 0;
   }
 
   /**
@@ -72,6 +109,9 @@ class InventoryMapper
     /** @var LoggerContract $loggerContract */
     $loggerContract = pluginApp(LoggerContract::class);
 
+    /**@var AbstractConfigHelper $configHelper */
+    $configHelper = pluginApp(AbstractConfigHelper::class);
+
     /** @var array<string,RequestDTO> $requestDtosBySuID */
     $requestDtosBySuID = [];
 
@@ -81,6 +121,7 @@ class InventoryMapper
     $nextAvailableDate = $this->getAvailableDate($mainVariationId); // Pending. Need Item
 
     $stockList = $variationData['stock'];
+    /** @var VariationStock $stock */
     foreach ($stockList as $stock) {
       $warehouseId = $stock['warehouseId'];
       if (!isset($warehouseId)) {
@@ -112,9 +153,17 @@ class InventoryMapper
       }
 
       // Avl Immediately. Net Stock.
-      $onHand = isset($stock['netStock']) ? $stock['netStock'] : null;
+      $onHand = $this->getQuantityOnHand($stock, $configHelper);
+
+      if (null == $onHand)
+      {
+        // null value is NOT a valid input for quantity on hand - do NOT send to Wayfair.
+        // TODO: add log?
+        continue;
+      }
+
       // Already Ordered items.
-      $onOrder = isset($stock['reservedStock']) ? $stock['reservedStock'] : null;
+      $onOrder = $stock->reservedStock;
 
       // key for a potential preexisting DTO that we need to merge with
       $dtoKey = $supplierId . '_' . $supplierPartNumber;
@@ -129,11 +178,11 @@ class InventoryMapper
          * Variation-level data (nextAvailableDate) does not vary.
         */
 
-        // quantityOnHand is NOT nullable
-        $onHand = self::mergeInventoryQuantities($onHand, $existingDTO->getQuantityOnHand(), false);
+        // all null $onHand values are thrown out before this calculation happens.
+        $onHand = self::mergeInventoryQuantities($onHand, $existingDTO->getQuantityOnHand());
 
         // quantityOnOrder IS nullable.
-        $onOrder = self::mergeInventoryQuantities($onOrder, $existingDTO->getQuantityOnOrder(), true);
+        $onOrder = self::mergeInventoryQuantities($onOrder, $existingDTO->getQuantityOnOrder());
       }
 
       $dtoData = [
@@ -201,22 +250,26 @@ class InventoryMapper
    * Merge two quantities for an inventory DTO
    * 
    * Note that -1 is a VALID input for the inventory APIs!
+   * Note that this MAY return null
    *
    * @param [float] $left
    * @param [float] $right
    * @param [bool] $nullable
    * @return float|null
    */
-  static function mergeInventoryQuantities($left, $right, $nullable)
+  static function mergeInventoryQuantities($left, $right)
   {
-    // applying nullable and/or protecting against values below -1
-    if ((null == $left && !$nullable)  || (null != $left && $left < -1))
+    // protecting against values below -1
+    if (null != $left && $left < -1)
     {
+      // TODO: add log?
       $left = 0;
     }
 
-    if ((null == $right && !$nullable) || (null != $right && $right < -1))
+    // protecting against values below -1
+    if (null != $right && $right < -1)
     {
+      // TODO: add log?
       $right = 0;
     }
 
