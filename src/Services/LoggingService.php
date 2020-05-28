@@ -133,7 +133,7 @@ class LoggingService implements LoggerContract {
 
     // }
     if($empStr > self::STRING_LIMIT) {
-      $truncatedMsg['message'] = mb_substr($empStr, 0, 10000);
+      $truncatedMsg['message'] = substr($empStr, 0, 10000, 'UFT-8');
     }
     $test = json_encode($loggingInfo['additionalInfo']);
     // $additionalInfo = $loggingInfo['additionalInfo'] ?? [];
@@ -144,6 +144,7 @@ class LoggingService implements LoggerContract {
     $additionalInfo[self::WAYFAIR_PLUGIN_VERSION] = $this->version;
     // $additionalInfo['tempString'] = $empStr;
     $additionalInfo['test'] = strlen($empStr);
+    $additionalInfo['msgLen'] = strlen($truncatedMsg['message']);
 
     // mb_strimwidth
 
