@@ -129,15 +129,15 @@ class LoggingService implements LoggerContract {
     for ($i = 0; $i <= 33000; $i++) {
       $empStr .= 'x';
     }
-    // if($loggingInfo['additionalInfo'] > self::STRING_LIMIT) {
-
-    // }
-    if(strlen($empStr) > self::STRING_LIMIT) {
-      $truncatedMsg['message'] = mb_substr($empStr, 0, 10000, 'UTF-8');
+    if(strlen(json_encode($loggingInfo['additionalInfo'])) > self::STRING_LIMIT) {
+      $truncatedMsg[message] =  $loggingInfo['additionalInfo']['message'];
     }
+    // if(strlen($empStr) > self::STRING_LIMIT) {
+    //   $truncatedMsg['message'] = mb_substr($empStr, 0, 10000, 'UTF-8');
+    // }
     $test = json_encode($loggingInfo['additionalInfo']);
     $additionalInfo = $loggingInfo['additionalInfo'] ?? [];
-    // $additionalInfo['truncatedMessage'] = $truncatedMsg ?? [];
+    $additionalInfo['truncatedMessage'] = $truncatedMsg ?? [];
     $method = $loggingInfo['method'] ?? null;
     $referenceType = $loggingInfo['referenceType'] ?? null;
     $referenceValue = (int) $loggingInfo['referenceValue'] ?? null;
