@@ -125,29 +125,19 @@ class LoggingService implements LoggerContract {
    */
   public function extractVars($loggingInfo): array {
     $truncatedMsg =[];
-    $empStr = '';
-    for ($i = 0; $i <= 33000; $i++) {
-      $empStr .= 'x';
-    }
-    if(strlen(json_encode($loggingInfo['additionalInfo'])) > 10000){ //self::STRING_LIMIT) {
-      $truncatedMsg['message'] =  $loggingInfo['additionalInfo']['message'];
-      $additionalInfo = $truncatedMsg ?? [];
-    }
-    // if(strlen($empStr) > self::STRING_LIMIT) {
-    //   $truncatedMsg['message'] = mb_substr($empStr, 0, 10000, 'UTF-8');
-    // }
-    $test = json_encode($loggingInfo['additionalInfo']);
-    // $additionalInfo = $loggingInfo['additionalInfo'] ?? [];
-    // $additionalInfo['truncatedMessage'] = $truncatedMsg ?? [];
+
+
+    $additionalInfo = $loggingInfo['additionalInfo'] ?? [];
     $method = $loggingInfo['method'] ?? null;
     $referenceType = $loggingInfo['referenceType'] ?? null;
     $referenceValue = (int) $loggingInfo['referenceValue'] ?? null;
-    $additionalInfo[self::WAYFAIR_PLUGIN_VERSION] = $this->version;
-    // $additionalInfo['tempString'] = $empStr;
-    $additionalInfo['test'] = strlen($empStr);
-    $additionalInfo['msgLen'] = strlen($truncatedMsg['message']);
 
-    // mb_strimwidth
+    if (strlen(json_encode($loggingInfo['additionalInfo'])) > 10000) { //self::STRING_LIMIT) {
+      $truncatedMsg['message'] =  $loggingInfo['additionalInfo']['message'];
+      $additionalInfo = $truncatedMsg ?? [];
+    }
+
+    $additionalInfo[self::WAYFAIR_PLUGIN_VERSION] = $this->version;
 
     return array($additionalInfo, $method, $referenceType, $referenceValue);
   }
