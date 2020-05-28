@@ -132,8 +132,8 @@ class LoggingService implements LoggerContract {
     // if($loggingInfo['additionalInfo'] > self::STRING_LIMIT) {
 
     // }
-    if($empStr > self::STRING_LIMIT) {
-      $truncatedMsg['message'] = mb_substr($empStr, 0, 10000, 'UFT-8');
+    if(strlen($empStr) > self::STRING_LIMIT) {
+      $truncatedMsg['message'] = mb_substr($empStr, 0, 10000, 'UTF-8');
     }
     $test = json_encode($loggingInfo['additionalInfo']);
     // $additionalInfo = $loggingInfo['additionalInfo'] ?? [];
