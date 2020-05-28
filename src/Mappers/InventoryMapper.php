@@ -93,7 +93,7 @@ class InventoryMapper
       return $netStock - $stockBuffer;
     }
 
-    // stock is less than buffer, so Wayfair should see this as no stock.
+    // stock is less than or equal buffer, so Wayfair should see this as no stock.
     return 0;
   }
 
