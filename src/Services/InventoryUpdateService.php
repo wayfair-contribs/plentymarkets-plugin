@@ -43,27 +43,6 @@ class InventoryUpdateService
 
     $issues = [];
 
-    if ($inventoryRequestDTO->getQuantityOnHand() < -1) {
-
-      $newQuantity = -1;
-
-      $loggerContract->warning(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_NORMALIZING_INVENTORY),
-        [
-          'additionalInfo' => [
-            'data' => $inventoryRequestDTO->toArray(), 
-            'newQuantity' => $newQuantity
-          ],
-          'method' => __METHOD__
-        ]
-      );
-
-      // the Wayfair Inventory system allows for a 'quantity on hand' value of -1,
-      // which may indicate a discontinued product or an unknown quantity.
-      // Any values lower than -1 are considered invalid and are being normalized to -1 here.
-      $inventoryRequestDTO->setQuantityOnHand($newQuantity);
-    }
-
     $supplierId = $inventoryRequestDTO->getSupplierId();
 
     if (!isset($supplierId) || $supplierId <= 0) {
@@ -78,7 +57,29 @@ class InventoryUpdateService
 
     $onHand = $inventoryRequestDTO->getQuantityOnHand();
 
-    if (!isset($onHand)) {
+    if (isset($onHand)) {
+      if ($onHand  < -1) {
+        $newQuantity = -1;
+  
+        $loggerContract->warning(
+          TranslationHelper::getLoggerKey(self::LOG_KEY_NORMALIZING_INVENTORY),
+          [
+            'additionalInfo' => [
+              'data' => $inventoryRequestDTO->toArray(), 
+              'newQuantity' => $newQuantity
+            ],
+            'method' => __METHOD__
+          ]
+        );
+  
+        // the Wayfair Inventory system allows for a 'quantity on hand' value of -1,
+        // which may indicate a discontinued product or an unknown quantity.
+        // Any values lower than -1 are considered invalid and are being normalized to -1 here.
+        $inventoryRequestDTO->setQuantityOnHand($newQuantity);
+      }
+    }
+    else
+    {
       $issues[] = "Quantity On Hand is missing";
     }
 
