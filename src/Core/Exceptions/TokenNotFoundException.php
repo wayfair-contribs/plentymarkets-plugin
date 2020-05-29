@@ -5,8 +5,8 @@
 
 namespace Wayfair\Core\Exceptions;
 
-use Wayfair\Core\Exceptions\AuthenticationException;
+use Wayfair\Core\Exceptions\AuthException;
 
-class TokenNotFoundException extends AuthenticationException {
+class TokenNotFoundException extends AuthException {
 
 }

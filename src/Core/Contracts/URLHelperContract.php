@@ -43,10 +43,10 @@ interface URLHelperContract {
   public function getUrl($key): string;
 
   /**
-   * Get the URL to contact for authentication tokens
+   * Get the URL to contact for auth tokens
    * @return string
    */
-  public function getWayfairAuthenticationUrl(): string;
+  public function getWayfairAuthUrl(): string;
 
   /**
    * Get packing slip url for PO

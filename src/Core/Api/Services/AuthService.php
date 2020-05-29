@@ -6,23 +6,23 @@
 
 namespace Wayfair\Core\Api\Services;
 
-use Wayfair\Core\Contracts\AuthenticationContract;
+use Wayfair\Core\Contracts\AuthContract;
 use Wayfair\Core\Contracts\ClientInterfaceContract;
 use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Contracts\StorageInterfaceContract;
 use Wayfair\Core\Contracts\URLHelperContract;
-use Wayfair\Core\Exceptions\AuthenticationException;
+use Wayfair\Core\Exceptions\AuthException;
 use Wayfair\Core\Exceptions\TokenNotFoundException;
 use Wayfair\Helpers\StringHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Http\WayfairResponse;
 
-class AuthService implements AuthenticationContract
+class AuthService implements AuthContract
 {
   const LOG_KEY_ATTEMPTING_AUTH = 'attemptingAuthentication';
   const LOG_KEY_DELETING_TOKEN = 'deletingToken';
-  const LOG_KEY_NON_WAYFAIR = 'cannotAuthenticateNonWayfair';
+  const LOG_KEY_NON_WAYFAIR = 'cannotAuthNonWayfair';
   const LOG_KEY_TOKEN_FETCH = "tokenFetch";
 
   const HEADER_KEY_CONTENT_TYPE = "Content-Type";
@@ -116,27 +116,27 @@ class AuthService implements AuthenticationContract
       return null;
     }
 
-    return $this->wayfairAuthenticate($audience);
+    return $this->fetchWayfairAuthToken($audience);
   }
 
   /**
-   * Fetch a new auth token using the wayfair authentication service
+   * Fetch a new auth token using the wayfair auth service
    * @param string $audience
    * @return WayfairResponse
    */
-  private function wayfairAuthenticate(string $audience)
+  private function fetchWayfairAuthToken(string $audience)
   {
     // auth URL is the same for all Wayfair audiences.
     $method = 'post';
     $clientId = $this->configHelperContract->getWayfairClientId();
     if (!isset($clientId) || empty($clientId)) {
-      throw new AuthenticationException("Unable to perform authentication: no client ID set for Wayfair");
+      throw new AuthException("Unable to perform authorization: no client ID set for Wayfair");
     }
 
     $clientSecret = $this->configHelperContract->getWayfairClientSecret();
 
     if (!isset($clientSecret) || empty($clientSecret)) {
-      throw new AuthenticationException("Unable to perform authentication: no client Secret set for Wayfair");
+      throw new AuthException("Unable to perform authroization: no client Secret set for Wayfair");
     }
 
     $headersArray = [
@@ -152,7 +152,7 @@ class AuthService implements AuthenticationContract
     ];
 
     $arguments = [
-      $this->urlHelperContract->getWayfairAuthenticationUrl(),
+      $this->urlHelperContract->getWayfairAuthUrl(),
       [
         'headers' => $headersArray,
         'body' => json_encode($bodyArray)
@@ -198,17 +198,17 @@ class AuthService implements AuthenticationContract
     $responseObject = $this->fetchNewToken($audience);
 
     if (!isset($responseObject) || empty($responseObject)) {
-      throw new AuthenticationException("Unable to authenticate user: no token data for " . $audience);
+      throw new AuthException("Unable to authorize user: no token data for " . $audience);
     }
 
     $responseArray = $responseObject->getBodyAsArray();
 
     if (!isset($responseArray) || empty($responseArray)) {
-      throw new AuthenticationException("Unable to authenticate user: no token data for " . $audience);
+      throw new AuthException("Unable to authorize user: no token data for " . $audience);
     }
 
     if (isset($responseArray['error'])) {
-      throw new AuthenticationException("Unable to authenticate user: " . $responseArray['error']);
+      throw new AuthException("Unable to authorize user: " . $responseArray['error']);
     }
 
     $this->saveToken($responseArray, $audience);
@@ -287,13 +287,13 @@ class AuthService implements AuthenticationContract
 
     $wayfairAudience = $this->urlHelperContract->getWayfairAudience($url);
     if (isset($wayfairAudience) && !empty($wayfairAudience)) {
-      // we only know how to authenticate for wayfair,
+      // we only know how to get tokens for wayfair,
       // and we should NEVER return token data when the endpoint is not at Wayfair.
       $tokenValue = $this->getOAuthToken($wayfairAudience);
       return 'Bearer ' . $tokenValue;
     }
 
-    // no authentication information available for this URL
+    // no auth information available for this URL
     return null;
   }
 

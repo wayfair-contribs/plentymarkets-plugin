@@ -38,8 +38,8 @@
 	"import_orders_since": "Aufträge importieren ab",
 	"must_have_at_least_one_scac": "Selbst Versende erfordert mindenstens ein Eintrag für die Trägertabelle",
 	"advanced_settings_menu": "Erweiterte Einstellungen",
-	"authentication_settings": "Authentifizierungseinstellungen",
-	"reset_authentication": "Authentifizierungstoken zurücksetzen",
+	"auth_settings": "Autorisierungseinstellungen",
+	"reset_auth": "Authentifizierungstoken zurücksetzen",
 	"operation_failed": "Die Operation ist fehlgeschlagen",
 	"success": "Die Operation war erfolgreich"
 }

@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { Language, TranslationService } from "angular-l10n";
-import { ResetAuthenticationService } from "../../core/services/resetAuthentication/resetAuthentication.service";
+import { ResetAuthService } from "../../core/services/resetAuth/resetAuth.service";
 
 @Component({
   selector: "advanced-settings",
@@ -17,7 +17,7 @@ export class AdvancedSettingsComponent implements OnInit {
   public authResetStatus = { type: null, value: null };
 
   constructor(
-    private resetAuthService: ResetAuthenticationService,
+    private resetAuthService: ResetAuthService,
     private translationService: TranslationService,
   ) {}
 
@@ -26,9 +26,9 @@ export class AdvancedSettingsComponent implements OnInit {
   /**
    * Reset the back-ends tokens for calling Wayfair APIs
    */
-  public resetAuthentication(): void {
+  public resetAuth(): void {
     let status = false;
-    this.resetAuthService.resetAuthentication().subscribe(
+    this.resetAuthService.resetAuth().subscribe(
       (data) => {
         if (data.status)
         {

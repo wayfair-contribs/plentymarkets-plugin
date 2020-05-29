@@ -22,10 +22,10 @@ class URLHelper implements URLHelperContract{
   }
 
   /**
-   * Get the URL to contact for authentication tokens
+   * Get the URL to contact for auth tokens
    * @return string
    */
-  public function getWayfairAuthenticationUrl(): string {
+  public function getWayfairAuthUrl(): string {
     return self::getBaseUrl(self::URL_ID_AUTH) . self::URL_PATH[self::URL_ID_AUTH];
   }
 
@@ -75,9 +75,9 @@ class URLHelper implements URLHelperContract{
   public function getWayfairAudience(string $url) {
     // URL must START with one of the approved URLs.
     // otherwise, someone can put our URL into the query string and trick us into sending the auth header.
-    foreach (self::URLS_USING_WAYFAIR_AUTH as $wayfair_authenticated_domain)
+    foreach (self::URLS_USING_WAYFAIR_AUTH as $wayfair_domain)
     {
-      if (stripos($url, $wayfair_authenticated_domain) == 0)
+      if (stripos($url, $wayfair_domain) == 0)
       {
         return $url;
       }

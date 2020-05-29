@@ -7,7 +7,7 @@
 
 namespace Wayfair\Core\Api\Services;
 
-use Wayfair\Core\Contracts\AuthenticationContract;
+use Wayfair\Core\Contracts\AuthContract;
 use Wayfair\Core\Contracts\ClientInterfaceContract;
 use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Core\Contracts\LoggerContract;
@@ -23,7 +23,7 @@ class LogSenderService {
   private $client;
 
   /**
-   * @var AuthenticationContract
+   * @var AuthContract
    */
   private $authService;
 
@@ -38,10 +38,10 @@ class LogSenderService {
   private $urlHelper;
 
   public function __construct(ClientInterfaceContract $clientInterfaceContract, 
-  AuthenticationContract $authenticationContract, ConfigHelperContract $configHelper,
+  AuthContract $authContract, ConfigHelperContract $configHelper,
   URLHelperContract $urlHelper) {
     $this->client = $clientInterfaceContract;
-    $this->authService = $authenticationContract;
+    $this->authService = $authContract;
     $this->configHelper = $configHelper;
     $this->urlHelper = $urlHelper;
   }

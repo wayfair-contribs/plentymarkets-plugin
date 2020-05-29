@@ -39,7 +39,7 @@ import {CarrierScacMappingComponent} from "./views/carrierScacMapping/carrierSca
 import {CarrierService} from "./core/services/carrier/carrier.service";
 import {CarrierScacService} from "./core/services/carrierScac/carrierScac.service";
 import {ShippingMethodService} from "./core/services/shippingMethod/shippingMethod.service";
-import {ResetAuthenticationService} from "./core/services/resetAuthentication/resetAuthentication.service";
+import {ResetAuthService} from "./core/services/resetAuth/resetAuth.service";
 
 @NgModule({
     imports: [
@@ -84,7 +84,7 @@ import {ResetAuthenticationService} from "./core/services/resetAuthentication/re
         CarrierService,
         CarrierScacService,
         ShippingMethodService,
-        ResetAuthenticationService
+        ResetAuthService
     ],
     bootstrap: [
         WayfairAppComponent

@@ -77,9 +77,9 @@ Click on "Save", then you should be shown a ClientID and Client Secret, which ar
 20. If an error symbol appears, check the Plentymarkets logs for plugin build and deployment failures
 
 
-### Authentication
+### Authorization
 
-After the plugin is installed in your Plentymarkets system, carry out the authentication to enable access to the Wayfair interfaces.
+After the plugin is installed in your Plentymarkets system, carry out the authorization process to enable access to the Wayfair interfaces.
 
 #### Activating the access to the Wayfair interfaces
 

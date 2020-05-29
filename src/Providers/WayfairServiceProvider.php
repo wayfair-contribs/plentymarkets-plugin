@@ -16,7 +16,7 @@ use Plenty\Plugin\ServiceProvider;
 use Wayfair\Core\Api\Services\AuthService;
 use Wayfair\Core\Api\Services\FetchDocumentService;
 use Wayfair\Core\Api\Services\RegisterPurchaseOrderService;
-use Wayfair\Core\Contracts\AuthenticationContract;
+use Wayfair\Core\Contracts\AuthContract;
 use Wayfair\Core\Contracts\ClientInterfaceContract;
 use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Core\Contracts\FetchDocumentContract;
@@ -55,7 +55,7 @@ class WayfairServiceProvider extends ServiceProvider
   {
     $this->getApplication()->register(WayfairRouteServiceProvider::class);
     $this->getApplication()->bind(ClientInterfaceContract::class, ClientService::class);
-    $this->getApplication()->bind(AuthenticationContract::class, AuthService::class);
+    $this->getApplication()->bind(AuthContract::class, AuthService::class);
     $this->getApplication()->bind(StorageInterfaceContract::class, StorageService::class);
     $this->getApplication()->singleton(ConfigHelperContract::class, ConfigHelper::class);
     $this->getApplication()->bind(RegisterPurchaseOrderContract::class, RegisterPurchaseOrderService::class);

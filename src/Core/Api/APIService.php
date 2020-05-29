@@ -6,7 +6,7 @@
 
 namespace Wayfair\Core\Api;
 
-use Wayfair\Core\Contracts\AuthenticationContract;
+use Wayfair\Core\Contracts\AuthContract;
 use Wayfair\Core\Contracts\ClientInterfaceContract;
 use Wayfair\Core\Contracts\ConfigHelperContract;
 use Wayfair\Core\Contracts\LoggerContract;
@@ -24,7 +24,7 @@ class APIService
   const MIME_TYPE_JSON = 'application/json';
 
   /**
-   * @var AuthenticationContract
+   * @var AuthContract
    */
   protected $authService;
 
@@ -50,20 +50,20 @@ class APIService
 
   /**
    * @param ClientInterfaceContract $clientInterfaceContract
-   * @param AuthenticationContract  $authenticationContract
+   * @param AuthContract  $authContract
    * @param ConfigHelperContract    $configHelper
    * @param LoggerContract          $loggerContract
    * @param URLHelperContract       $urlHelper
    */
   public function __construct(
     ClientInterfaceContract $clientInterfaceContract,
-    AuthenticationContract $authenticationContract,
+    AuthContract $authContract,
     ConfigHelperContract $configHelper,
     LoggerContract $loggerContract,
     URLHelperContract $urlHelper
   ) {
     $this->client = $clientInterfaceContract;
-    $this->authService = $authenticationContract;
+    $this->authService = $authContract;
     $this->configHelper = $configHelper;
     $this->loggerContract = $loggerContract;
     $this->urlHelper = $urlHelper;
