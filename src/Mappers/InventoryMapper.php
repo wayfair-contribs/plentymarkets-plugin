@@ -19,6 +19,7 @@ class InventoryMapper
 {
   const LOG_KEY_STOCK_MISSING_WAREHOUSE = 'stockMissingWarehouse';
   const LOG_KEY_NO_SUPPLIER_ID_ASSIGNED_TO_WAREHOUSE = 'noSupplierIDForWarehouse';
+  const LOG_KEY_INVALID_INVENTORY_AMOUNT = 'invalidInventoryAmount';
 
   /**
    * @param $mainVariationId
@@ -50,7 +51,7 @@ class InventoryMapper
    *
    * @return int|mixed
    */
-  static function getQuantityOnHand($variationStock, $configHelper)
+  static function getQuantityOnHand($variationStock, $configHelper = null)
   {
     if (!isset($variationStock) || !isset($variationStock->netStock))
     {
@@ -153,12 +154,20 @@ class InventoryMapper
       }
 
       // Avl Immediately. Net Stock.
-      $onHand = $this->getQuantityOnHand($stock, $configHelper);
+      $onHand = self::getQuantityOnHand($stock, $configHelper);
 
       if (null == $onHand)
       {
         // null value is NOT a valid input for quantity on hand - do NOT send to Wayfair.
-        // TODO: add log?
+        $loggerContract->warning(
+          TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_INVENTORY_AMOUNT),
+          [
+            'additionalInfo' => [
+              'amount' => json_encode($onHand)
+            ],
+            'method' => __METHOD__
+          ]
+        );
         continue;
       }
 
@@ -262,15 +271,13 @@ class InventoryMapper
     // protecting against values below -1
     if (null != $left && $left < -1)
     {
-      // TODO: add log?
-      $left = 0;
+      $left = -1;
     }
 
     // protecting against values below -1
     if (null != $right && $right < -1)
     {
-      // TODO: add log?
-      $right = 0;
+      $right = -1;
     }
 
     if (null == $left || $left <= 0 && $right != 0)

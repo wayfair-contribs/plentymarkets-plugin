@@ -26,7 +26,8 @@ class InventoryUpdateService
   const LOG_KEY_INVENTORY_UPDATE_END = 'inventoryUpdateEnd';
   const LOG_KEY_INVENTORY_UPDATE_ERROR = 'inventoryUpdateError';
   const LOG_KEY_INVENTORY_UPDATE_START = 'inventoryUpdateStart';
-  const LOG_KEY_NEGATIVE_INVENTORY = 'negativeInventory';
+  const LOG_KEY_INVALID_INVENTORY_DTO = 'invalidInventoryDto';
+  const LOG_KEY_NORMALIZING_INVENTORY = 'normalizingInventoryAmount';
 
   /**
    * Validate a request for inventory update
@@ -43,18 +44,24 @@ class InventoryUpdateService
     $issues = [];
 
     if ($inventoryRequestDTO->getQuantityOnHand() < -1) {
-      $loggerContract->debug(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_NEGATIVE_INVENTORY),
+
+      $newQuantity = -1;
+
+      $loggerContract->warning(
+        TranslationHelper::getLoggerKey(self::LOG_KEY_NORMALIZING_INVENTORY),
         [
-          'additionalInfo' => ['data' => $inventoryRequestDTO->toArray()],
+          'additionalInfo' => [
+            'data' => $inventoryRequestDTO->toArray(), 
+            'newQuantity' => $newQuantity
+          ],
           'method' => __METHOD__
         ]
       );
 
       // the Wayfair Inventory system allows for a 'quantity on hand' value of -1,
       // which may indicate a discontinued product or an unknown quantity.
-      // Any values lower than -1 are considered invalid and are being normalized to 0 here.
-      $inventoryRequestDTO->setQuantityOnHand(0);
+      // Any values lower than -1 are considered invalid and are being normalized to -1 here.
+      $inventoryRequestDTO->setQuantityOnHand($newQuantity);
     }
 
     $supplierId = $inventoryRequestDTO->getSupplierId();
@@ -71,8 +78,7 @@ class InventoryUpdateService
 
     $onHand = $inventoryRequestDTO->getQuantityOnHand();
 
-    if (!isset($onHand))
-    {
+    if (!isset($onHand)) {
       $issues[] = "Quantity On Hand is missing";
     }
 
@@ -80,10 +86,10 @@ class InventoryUpdateService
       return true;
     }
 
-    // TODO: translate the issues?
+    // TODO: replace issues with translated messsages?
     $loggerContract
       ->error(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_ERROR),
+        TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_INVENTORY_DTO),
         [
           'additionalInfo' => [
             'message' => 'inventory request data is invalid',

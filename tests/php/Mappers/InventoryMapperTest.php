@@ -43,7 +43,7 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
             [5, 9, 14, "5 and 9 should make 14"],
             [9, 5, 14, "9 and 5 should make 14"],
             [-1, -1, -1, "two negative 1s should make -1"],
-            [-2, -2, 0, "two negative 2s should make 0"],
+            [-2, -2, -1, "two negative 2s should make -1"],
             [-2, 5, 5, "negative 2 and five should make five"],
             [5, -2, 5, "five and negative 2 should make five"]
         ];
