@@ -20,6 +20,7 @@ class InventoryMapper
   const LOG_KEY_STOCK_MISSING_WAREHOUSE = 'stockMissingWarehouse';
   const LOG_KEY_NO_SUPPLIER_ID_ASSIGNED_TO_WAREHOUSE = 'noSupplierIDForWarehouse';
   const LOG_KEY_INVALID_INVENTORY_AMOUNT = 'invalidInventoryAmount';
+  const LOG_KEY_INVALID_STOCK_BUFFER = 'invalidStockBufferValue';
 
   /**
    * @param $mainVariationId
@@ -48,48 +49,53 @@ class InventoryMapper
    * based on a VariationStock
    * @param VariationStock $variationStock
    * @param AbstractConfigHelper $configHelper
+   * @param LoggerContract $loggerContract
    *
    * @return int|mixed
    */
-  static function getQuantityOnHand($variationStock, $configHelper = null)
+  static function getQuantityOnHand($variationStock, $configHelper = null, $loggerContract = null)
   {
-    if (!isset($variationStock) || !isset($variationStock->netStock))
-    {
+    if (!isset($variationStock) || !isset($variationStock->netStock)) {
       // API did not return a net stock
       // not a valid input for Wayfair, should get filtered out later.
       return null;
     }
 
     $netStock = $variationStock->netStock;
-    
-    if ($netStock <= -1)
-    {
+
+    if ($netStock <= -1) {
       // Wayfair doesn't understand values below -1
       return -1;
     }
 
     $stockBuffer = null;
-    if (isset($configHelper))
-    {
+    if (isset($configHelper)) {
       $stockBuffer = $configHelper->getStockBufferValue();
     }
 
-    if (!isset($stockBuffer))
-    {
+    if (!isset($stockBuffer)) {
       // no buffer to apply
       return $netStock;
     }
 
 
-    if ($stockBuffer < 0)
-    {
+    if ($stockBuffer < 0) {
       // invalid value for buffer
-      // TODO: add warning log
+
+      if (isset($loggerContract)) {
+        $loggerContract->warning(
+          TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_STOCK_BUFFER),
+          [
+            'additionalInfo' => ['stockBuffer' => $stockBuffer],
+            'method' => __METHOD__
+          ]
+        );
+      }
+
       return $netStock;
     }
 
-    if ($netStock > $stockBuffer)
-    {
+    if ($netStock > $stockBuffer) {
       // report stock, considering buffer
       return $netStock - $stockBuffer;
     }
@@ -128,10 +134,10 @@ class InventoryMapper
       if (!isset($warehouseId)) {
         // we don't know the warehouse, so we can't figure out the supplier ID.
         // Not an error, but unexpected.
-        $loggerContract->warning(
+        $loggerContract->info(
           TranslationHelper::getLoggerKey(self::LOG_KEY_STOCK_MISSING_WAREHOUSE),
           [
-            'additionalInfo' => ['variationID' => $mainVariationId,],
+            'additionalInfo' => ['variationID' => $mainVariationId],
             'method' => __METHOD__
           ]
         );
@@ -153,11 +159,10 @@ class InventoryMapper
         continue;
       }
 
-      // Avl Immediately. Net Stock.
-      $onHand = self::getQuantityOnHand($stock, $configHelper);
+      // Avl Immediately. ADJUSTED Net Stock (see Stock Buffer setting in Wayfair plugin).
+      $onHand = self::getQuantityOnHand($stock, $configHelper, $loggerContract);
 
-      if (null == $onHand)
-      {
+      if (null == $onHand) {
         // null value is NOT a valid input for quantity on hand - do NOT send to Wayfair.
         $loggerContract->warning(
           TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_INVENTORY_AMOUNT),
@@ -180,8 +185,7 @@ class InventoryMapper
       /** @var RequestDTO $existingDTO */
       $existingDTO = $requestDtosBySuID[$dtoKey];
 
-      if (isset($existingDTO) && !empty($existingDTO))
-      {
+      if (isset($existingDTO) && !empty($existingDTO)) {
         /* merge with previous values for this suID.
          * stock values should be summed.
          * Variation-level data (nextAvailableDate) does not vary.
@@ -269,24 +273,20 @@ class InventoryMapper
   static function mergeInventoryQuantities($left, $right)
   {
     // protecting against values below -1
-    if (null != $left && $left < -1)
-    {
+    if (null != $left && $left < -1) {
       $left = -1;
     }
 
     // protecting against values below -1
-    if (null != $right && $right < -1)
-    {
+    if (null != $right && $right < -1) {
       $right = -1;
     }
 
-    if (null == $left || $left <= 0 && $right != 0)
-    {
+    if (null == $left || $left <= 0 && $right != 0) {
       return $right;
     }
 
-    if (null == $right || $right <= 0 && $left != 0)
-    {
+    if (null == $right || $right <= 0 && $left != 0) {
       return $left;
     }
 
