@@ -50,6 +50,8 @@ class ProductMapper {
   public function map(ProductDTO $dto, int $referrerId, string $warehouseId, string $poNumber): array {
 
     $itemMappingMethod = $this->keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD);
+    // TODO: add debug log for mapping method
+
     $filterMapping = [
         AbstractConfigHelper::ITEM_MAPPING_SKU,
         AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER,
@@ -58,6 +60,7 @@ class ProductMapper {
 
     $partNumber = $dto->getPartNumber();
     if (empty($itemMappingMethod) || !in_array($itemMappingMethod, $filterMapping)) {
+      // TODO: add error/warning log about falling back here
       $itemMappingMethod = AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER;
     }
 
