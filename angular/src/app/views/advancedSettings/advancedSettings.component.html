@@ -3,6 +3,9 @@
     <p *ngIf="authResetStatus.value" class="{{ authResetStatus.type + ' col-md-12' }}">
       {{ authResetStatus.value }}
     </p>
+    <p *ngIf="authResetStatus.timestamp" class="{{ authResetStatus.type + ' col-md-12' }}">
+      {{ authResetStatus.timestamp}}
+    </p>
     <br />
   
     <div class="col-md-12">

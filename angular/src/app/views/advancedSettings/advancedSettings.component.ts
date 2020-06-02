@@ -14,7 +14,7 @@ export class AdvancedSettingsComponent implements OnInit {
 
   @Language()
   public lang: string;
-  public authResetStatus = { type: null, value: null };
+  public authResetStatus = { type: null, value: null, timestamp: null };
 
   constructor(
     private resetAuthService: ResetAuthService,
@@ -55,6 +55,7 @@ export class AdvancedSettingsComponent implements OnInit {
   private showResetAuthMessageVerbose(type, value){
     this.authResetStatus.type = type;
     this.authResetStatus.value = value;
+    this.authResetStatus.timestamp = Date().toLocaleString();
   }
 
   /**
@@ -79,7 +80,6 @@ export class AdvancedSettingsComponent implements OnInit {
    */
   private showResetAuthSuccess() {
     let message = this.translationService.translate(AdvancedSettingsComponent.MESSAGE_KEY_SUCCESS);
-    message += " - " + Date().toLocaleString();
     this.showResetAuthMessageVerbose(AdvancedSettingsComponent.MESSAGE_TYPE_GOOD, message);
   }
 
