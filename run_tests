@@ -82,7 +82,7 @@ run_phpunit() {
   fi
 
   print_header "RUNNING PHPUnit"
-  php $(get_script_dir)/vendor/bin/phpunit --bootstrap $(get_script_dir)/vendor/autoload.php ${files}
+  $(get_script_dir)/vendor/bin/phpunit --bootstrap $(get_script_dir)/vendor/autoload.php ${files}
 }
 
 run_phpstan() {
