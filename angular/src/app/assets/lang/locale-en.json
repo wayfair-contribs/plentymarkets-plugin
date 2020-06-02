@@ -12,7 +12,6 @@
 	"stock_buffer": "Stock Buffer",
 	"default_order_status": "Default Order Status",
 	"default_shipping_provider": "Default Shipping Provider",
-	"empty_values_mapping": "Values in mappings can't be empty.",
 	"saving_status": "Saving..",
 	"saved": "Saved",
 	"error_fetch": "Error while fetching.",
@@ -36,5 +35,6 @@
 	"order_marked_as_shipped_status": "When to mark as shipped",
 	"wayfair_shipping": "Wayfair shipping",
 	"own_account_shipping": "Own account shipping",
-	"import_orders_since": "Import orders since"
+	"import_orders_since": "Import orders since",
+	"must_have_at_least_one_scac": "When using Own account shipping, configure one or more carrier configurations"
 }

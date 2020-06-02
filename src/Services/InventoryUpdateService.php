@@ -26,7 +26,8 @@ class InventoryUpdateService
   const LOG_KEY_INVENTORY_UPDATE_END = 'inventoryUpdateEnd';
   const LOG_KEY_INVENTORY_UPDATE_ERROR = 'inventoryUpdateError';
   const LOG_KEY_INVENTORY_UPDATE_START = 'inventoryUpdateStart';
-  const LOG_KEY_NEGATIVE_INVENTORY = 'negativeInventory';
+  const LOG_KEY_INVALID_INVENTORY_DTO = 'invalidInventoryDto';
+  const LOG_KEY_NORMALIZING_INVENTORY = 'normalizingInventoryAmount';
 
   /**
    * Validate a request for inventory update
@@ -42,21 +43,6 @@ class InventoryUpdateService
 
     $issues = [];
 
-    if ($inventoryRequestDTO->getQuantityOnHand() < -1) {
-      $loggerContract->debug(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_NEGATIVE_INVENTORY),
-        [
-          'additionalInfo' => ['data' => $inventoryRequestDTO->toArray()],
-          'method' => __METHOD__
-        ]
-      );
-
-      // the Wayfair Inventory system allows for a 'quantity on hand' value of -1,
-      // which may indicate a discontinued product or an unknown quantity.
-      // Any values lower than -1 are considered invalid and are being normalized to 0 here.
-      $inventoryRequestDTO->setQuantityOnHand(0);
-    }
-
     $supplierId = $inventoryRequestDTO->getSupplierId();
 
     if (!isset($supplierId) || $supplierId <= 0) {
@@ -69,13 +55,42 @@ class InventoryUpdateService
       $issues[] = "Supplier Part number is missing";
     }
 
+    $onHand = $inventoryRequestDTO->getQuantityOnHand();
+
+    if (isset($onHand)) {
+      if ($onHand  < -1) {
+        $newQuantity = -1;
+  
+        $loggerContract->warning(
+          TranslationHelper::getLoggerKey(self::LOG_KEY_NORMALIZING_INVENTORY),
+          [
+            'additionalInfo' => [
+              'data' => $inventoryRequestDTO->toArray(), 
+              'newQuantity' => $newQuantity
+            ],
+            'method' => __METHOD__
+          ]
+        );
+  
+        // the Wayfair Inventory system allows for a 'quantity on hand' value of -1,
+        // which may indicate a discontinued product or an unknown quantity.
+        // Any values lower than -1 are considered invalid and are being normalized to -1 here.
+        $inventoryRequestDTO->setQuantityOnHand($newQuantity);
+      }
+    }
+    else
+    {
+      $issues[] = "Quantity On Hand is missing";
+    }
+
     if (!isset($issues) || empty($issues)) {
       return true;
     }
 
+    // TODO: replace issues with translated messsages?
     $loggerContract
       ->error(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_ERROR),
+        TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_INVENTORY_DTO),
         [
           'additionalInfo' => [
             'message' => 'inventory request data is invalid',
@@ -152,9 +167,9 @@ class InventoryUpdateService
           }
         }
 
-        $amt_to_update = count($normalizedInventoryRequestDTOs);
+        $amtToUpdate = count($normalizedInventoryRequestDTOs);
 
-        if ($amt_to_update <= 0) {
+        if ($amtToUpdate <= 0) {
           $loggerContract
             ->debug(
               TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
@@ -166,12 +181,12 @@ class InventoryUpdateService
 
           $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': No items to update');
         } else {
-          $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': ' . (string) $amt_to_update . ' items to update');
+          $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': ' . (string) $amtToUpdate . ' items to update');
 
           $loggerContract->debug(
             TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
             [
-              'additionalInfo' => ['info' => (string) $amt_to_update . ' items to update'],
+              'additionalInfo' => ['info' => (string) $amtToUpdate . ' items to update'],
               'method' => __METHOD__
             ]
           );
