@@ -37,6 +37,7 @@ class SettingsController
    * SettingsController constructor.
    *
    * @param KeyValueRepository $keyValueRepository
+   * @param LoggerContract $logger
    */
   public function __construct(KeyValueRepository $keyValueRepository, LoggerContract $logger)
   {
@@ -89,7 +90,7 @@ class SettingsController
     $data = $request->input('data');
 
     $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_CONTROLLER_IN), [
-      'additionalInfo' => ['payloadIn' => $request],
+      'additionalInfo' => ['payloadIn' => json_encode($data)],
       'method'         => __METHOD__
     ]);
 

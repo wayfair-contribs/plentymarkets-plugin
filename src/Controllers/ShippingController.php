@@ -17,6 +17,9 @@ use Wayfair\Services\ShipmentRegisterService;
  * @package Wayfair\Controllers
  */
 class ShippingController extends Controller {
+  const LOG_KEY_CONTROLLER_IN = "controllerInput";
+  const LOG_KEY_CONTROLLER_OUT = "controllerOutput";
+  
   /**
    * @var ShipmentRegisterService
    */
