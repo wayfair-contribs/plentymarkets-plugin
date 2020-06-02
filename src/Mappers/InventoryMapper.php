@@ -19,7 +19,8 @@ class InventoryMapper
   const LOG_KEY_STOCK_MISSING_WAREHOUSE = 'stockMissingWarehouse';
   const LOG_KEY_NO_SUPPLIER_ID_ASSIGNED_TO_WAREHOUSE = 'noSupplierIDForWarehouse';
   const LOG_KEY_UNDEFINED_MAPPING_METHOD = 'undefinedMappingMethod';
-  const LOG_KEY_MAPPING_METHOD_LOOKUP = 'itemMappingMethodLookup';
+  const LOG_KEY_PART_NUMBER_LOOKUP = 'partNumberLookup';
+  const LOG_KEY_PART_NUMBER_MISSING = 'partNumberMissing';
 
   /**
    * @param $mainVariationId
@@ -76,10 +77,30 @@ class InventoryMapper
     /** @var RequestDTO[] $inventoryDTOs */
     $inventoryDTOs = [];
 
-    // FIXME: need to cactch Exceptions and ignore a single variation, not fail out!
+    $mainVariationId = $variationData['id'];
+    $variationNumber = $variationData['number'];
+
     $supplierPartNumber = $this->getSupplierPartNumberFromVariation($variationData);
 
-    $mainVariationId = $variationData['id'];
+    if (!isset($supplierPartNumber) || empty($supplierPartNumber)) {
+      $itemMappingMethod = $this->getItemMappingMode();
+
+      $loggerContract->error(
+        TranslationHelper::getLoggerKey(self::LOG_KEY_PART_NUMBER_MISSING),
+        [
+          'additionalInfo' => [
+            'variationID' => $mainVariationId,
+            'variationNumber' => $variationNumber,
+            'itemMappingMethod' => $itemMappingMethod
+          ],
+          'method' => __METHOD__
+        ]
+      );
+
+      // inventory is worthless without part numbers
+      return [];
+    }
+
     $nextAvailableDate = $this->getAvailableDate($mainVariationId); // Pending. Need Item
 
     $stockList = $variationData['stock'];
@@ -91,7 +112,10 @@ class InventoryMapper
         $loggerContract->warning(
           TranslationHelper::getLoggerKey(self::LOG_KEY_STOCK_MISSING_WAREHOUSE),
           [
-            'additionalInfo' => ['variationID' => $mainVariationId,],
+            'additionalInfo' => [
+              'variationID' => $mainVariationId,
+              'variationNumber' => $variationNumber
+            ],
             'method' => __METHOD__
           ]
         );
@@ -154,71 +178,77 @@ class InventoryMapper
    * Get the supplier's part number from Plentymarkets Variation data
    *
    * @param array $variationData
+   * @param LoggerContract $logger
    * @return mixed
    */
-  private function getSupplierPartNumberFromVariation($variationData)
+  private function getSupplierPartNumberFromVariation($variationData, $logger = null)
   {
+    // TODO: add a unit test around this method
 
-    // TODO: add a unit test around this method (if using pluginApp doesn't block that)
+    $supplierPartNumber = null;
 
-    /** @var KeyValueRepository $keyValueRepository */
-    $keyValueRepository = pluginApp(KeyValueRepository::class);
-
-    /** @var LoggerContract $loggerContract */
-    $loggerContract = pluginApp(LoggerContract::class);
-
-    $itemMappingMethod = $keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD);
-
-    $loggerContract->debug(
-      TranslationHelper::getLoggerKey(self::LOG_KEY_MAPPING_METHOD_LOOKUP),
-      [
-        'additionalInfo' => [
-          'itemMappingMethodFound' => $itemMappingMethod,
-        ],
-        'method' => __METHOD__
-      ]
-    );
-
-    $variationId = $variationData['id'];
-
+    $mainVariationId = $variationData['id'];
     $variationNumber = $variationData['number'];
 
-    switch ($itemMappingMethod) {
-      case AbstractConfigHelper::ITEM_MAPPING_SKU:
-        $skuVal = $variationData['variationSkus'][0]['sku'];
-        if (!isset($skuVal) || empty($skuVal))
-        {
-          throw new \Exception("Variation with ID " . $variationId . " has no SKU value");
-        }
-        return $skuVal;
-      case AbstractConfigHelper::ITEM_MAPPING_EAN:
-        $barcodeVal = $variationData['variationBarcodes'][0]['code'];
-        if (!isset($barcodeVal) || empty($barcodeVal))
-        {
-          throw new \Exception("Variation with ID " . $variationId . " has no barcode value");
-        }
-        return $barcodeVal;
-      case AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER:
-        break;
-      default:
-        $loggerContract->warning(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_UNDEFINED_MAPPING_METHOD),
+    $itemMappingMethod = $itemMappingMethod = $this->getItemMappingMode();
+
+    $supplierPartNumber = $variationNumber;
+
+    try {
+
+      switch ($itemMappingMethod) {
+        case AbstractConfigHelper::ITEM_MAPPING_SKU:
+          $supplierPartNumber = $variationData['variationSkus'][0]['sku'];
+          break;
+        case AbstractConfigHelper::ITEM_MAPPING_EAN:
+          $supplierPartNumber = $variationData['variationBarcodes'][0]['code'];
+          break;
+        case AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER:
+          // already set to variationNumber
+          break;
+        default:
+          if (isset($logger)) {
+            $logger->warning(
+              TranslationHelper::getLoggerKey(self::LOG_KEY_UNDEFINED_MAPPING_METHOD),
+              [
+                'additionalInfo' => [
+                  'itemMappingMethodFound' => $itemMappingMethod,
+                  'defaultingTo' => AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER,
+                ],
+                'method' => __METHOD__
+              ]
+            );
+          }
+      }
+
+      return $supplierPartNumber;
+    } finally {
+      if (isset($logger)) {
+        $logger->debug(
+          TranslationHelper::getLoggerKey(self::LOG_KEY_PART_NUMBER_LOOKUP),
           [
             'additionalInfo' => [
-              'itemMappingMethodFound' => $itemMappingMethod,
-              'defaultingTo' => AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER,
+              'itemMappingMethod' => $itemMappingMethod,
+              'variationID' => $mainVariationId,
+              'variationNumber' => $variationNumber,
+              'resolvedPartNumber' => $supplierPartNumber
             ],
             'method' => __METHOD__
           ]
         );
-        break;
+      }
     }
+  }
 
-    if (!isset($variationNumber) || empty($variationNumber))
-    {
-      throw new \Exception("Variation with ID " . $variationId . " has no variation number");
-    }
-
-    return $variationNumber;
+  /**
+   * Wrapper for item mapping mode lookup
+   *
+   * @return string
+   */
+  private function getItemMappingMode()
+  {
+    /** @var KeyValueRepository $keyValueRepository */
+    $keyValueRepository = pluginApp(KeyValueRepository::class);
+    return $keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD);
   }
 }
