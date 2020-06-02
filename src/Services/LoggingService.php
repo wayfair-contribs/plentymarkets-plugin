@@ -130,12 +130,12 @@ class LoggingService implements LoggerContract {
     $truncatedMsg =[];
     $externalLogs = pluginApp(ExternalLogs::class);
 
-    $additionalInfo = $loggingInfo['additionalInfo'] ?? [];
+    // $additionalInfo = $loggingInfo['additionalInfo'] ?? [];
     $method = $loggingInfo['method'] ?? null;
     $referenceType = $loggingInfo['referenceType'] ?? null;
     $referenceValue = (int) $loggingInfo['referenceValue'] ?? null;
 
-    if (strlen(json_encode($loggingInfo['additionalInfo'])) > self::STRING_LIMIT) {
+    if (strlen(json_encode($loggingInfo)) > self::STRING_LIMIT) {
       if ($loggingInfo['additionalInfo']['message'] > self::STRING_LIMIT){
         $truncatedMsg['message'] = StringHelper::truncateString($loggingInfo['additionalInfo']['message'], self::TRUNCATED_SIZE);
       }
@@ -144,6 +144,9 @@ class LoggingService implements LoggerContract {
       }
       $additionalInfo = $truncatedMsg ?? [];
       $externalLogs->addErrorLog("Message was too long to log in PlentyMarkets " . $loggingInfo);
+    }
+    else {
+      $additionalInfo = $loggingInfo['additionalInfo'] ?? [];
     }
 
     $additionalInfo[self::WAYFAIR_PLUGIN_VERSION] = $this->version;
