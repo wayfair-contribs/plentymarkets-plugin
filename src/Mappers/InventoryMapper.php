@@ -76,6 +76,7 @@ class InventoryMapper
     /** @var RequestDTO[] $inventoryDTOs */
     $inventoryDTOs = [];
 
+    // FIXME: need to cactch Exceptions and ignore a single variation, not fail out!
     $supplierPartNumber = $this->getSupplierPartNumberFromVariation($variationData);
 
     $mainVariationId = $variationData['id'];
