@@ -43,4 +43,34 @@ abstract class StringHelper {
         return $masked;
     }
 
+    /**
+     * A function that will safely truncate a string (meaning truncation will not happen within a specific string).
+     *
+     * @param string $text
+     * @param int $maxchar
+     * @param string $end
+     * @return string
+     */
+    function truncateString($text, $maxchar, $end = '...'): string
+    {
+        if (strlen($text) > $maxchar || $text == '') {
+            $words = preg_split('/\s/', $text);
+            $output = '';
+            $i      = 0;
+            while (1) {
+                $length = strlen($output) + strlen($words[$i]);
+                if ($length > $maxchar) {
+                    break;
+                } else {
+                    $output .= " " . $words[$i];
+                    ++$i;
+                }
+            }
+            $output .= $end;
+        } else {
+            $output = $text;
+        }
+        return $output;
+    }
+
 }

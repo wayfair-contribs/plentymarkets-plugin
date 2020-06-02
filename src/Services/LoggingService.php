@@ -9,6 +9,8 @@ use Plenty\Plugin\Log\Loggable;
 
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Models\ExternalLogs;
+use Wayfair\Helpers\StringHelper;
 
 class LoggingService implements LoggerContract {
   use Loggable;
@@ -19,6 +21,7 @@ class LoggingService implements LoggerContract {
   const ERROR = 'ERROR';
   const WAYFAIR_PLUGIN_VERSION = 'Wayfair Plugin Version';
   const STRING_LIMIT = 32768;
+  const TRUNCATED_SIZE = 1000;
 
   /**
    * Stores the version of the plugin
@@ -125,7 +128,7 @@ class LoggingService implements LoggerContract {
    */
   public function extractVars($loggingInfo): array {
     $truncatedMsg =[];
-
+    $externalLogs = pluginApp(ExternalLogs::class);
 
     $additionalInfo = $loggingInfo['additionalInfo'] ?? [];
     $method = $loggingInfo['method'] ?? null;
@@ -133,8 +136,14 @@ class LoggingService implements LoggerContract {
     $referenceValue = (int) $loggingInfo['referenceValue'] ?? null;
 
     if (strlen(json_encode($loggingInfo['additionalInfo'])) > self::STRING_LIMIT) {
-      $truncatedMsg['message'] =  $loggingInfo['additionalInfo']['message'];
+      if ($loggingInfo['additionalInfo']['message'] > self::STRING_LIMIT){
+        $truncatedMsg['message'] = StringHelper::truncateString($loggingInfo['additionalInfo']['message'], self::TRUNCATED_SIZE);
+      }
+      else {
+        $truncatedMsg['message'] =  $loggingInfo['additionalInfo']['message'];
+      }
       $additionalInfo = $truncatedMsg ?? [];
+      $externalLogs->addErrorLog("Message was too long to log in PlentyMarkets " . $loggingInfo);
     }
 
     $additionalInfo[self::WAYFAIR_PLUGIN_VERSION] = $this->version;
