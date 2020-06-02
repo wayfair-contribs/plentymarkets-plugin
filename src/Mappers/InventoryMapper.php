@@ -110,7 +110,7 @@ class InventoryMapper
   /**
    * Create Inventory DTOs for one variation.
    * Returns a DTO for each supplier ID that has stock information for the variation.
-   * @param $variationData
+   * @param array $variationData
    *
    * @return RequestDTO[]
    */
@@ -270,7 +270,7 @@ class InventoryMapper
    * @param LoggerContract $logger
    * @return mixed
    */
-  private function getSupplierPartNumberFromVariation($variationData, $logger = null)
+  function getSupplierPartNumberFromVariation($variationData, $logger = null)
   {
     // TODO: add a unit test around this method
 
@@ -330,18 +330,6 @@ class InventoryMapper
   }
 
   /**
-   * Wrapper for item mapping mode lookup
-   *
-   * @return string
-   */
-  private function getItemMappingMode()
-  {
-    /** @var KeyValueRepository $keyValueRepository */
-    $keyValueRepository = pluginApp(KeyValueRepository::class);
-    return $keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD);
-  }
-
-  /**
    * Merge two quantities for an inventory DTO
    * 
    * Note that -1 is a VALID input for the inventory APIs!
@@ -373,5 +361,17 @@ class InventoryMapper
     }
 
     return $left + $right;
+  }
+
+  /**
+   * Wrapper for item mapping mode lookup
+   *
+   * @return string
+   */
+  function getItemMappingMode()
+  {
+    /** @var KeyValueRepository $keyValueRepository */
+    $keyValueRepository = pluginApp(KeyValueRepository::class);
+    return $keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD);
   }
 }

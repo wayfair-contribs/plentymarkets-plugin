@@ -157,7 +157,7 @@ class InventoryUpdateService
 
         /** @var array $variationWithStock information about a single Variation, including stock for each Warehouse */
         foreach ($response->getResult() as $variationWithStock) {
-          /** @var RequeestDTO[] $rawInventoryRequestDTOs non-normalized candidates for inclusion in bulk update */
+          /** @var RequestDTO[] $rawInventoryRequestDTOs non-normalized candidates for inclusion in bulk update */
           $rawInventoryRequestDTOs = $inventoryMapper->createInventoryDTOsFromVariation($variationWithStock);
           foreach ($rawInventoryRequestDTOs as $dto) {
             // validation method will output logs on failure

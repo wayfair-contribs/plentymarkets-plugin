@@ -5,15 +5,15 @@
 
 namespace Wayfair\Tests\Mappers;
 
+use Plenty\Modules\Item\Variation\Models\Variation;
 use Plenty\Modules\Item\VariationStock\Models\VariationStock;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Mappers\InventoryMapper;
-use Wayfair\Helpers\ConfigHelper;
 
 final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * Test Merging Quantities in nullable mode
+     * Test various cases of Merging Quantities
      * @dataProvider dataProviderForInventoryQuantityMerge
      */
     public function testMergeQuantities($left, $right, $expected, $msg)
@@ -22,39 +22,12 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result, $msg);
     }
 
-    public function dataProviderForInventoryQuantityMerge()
-    {
-        return [
-            [null, null, null, "two nulls should make null"],
-            [null, -1, -1, "null and negative 1 should make negative 1"],
-            [-1, null, -1, "null and negative 1 should make negative 1"],
-            [null, 1, 1, "null and 1 should make 1"],
-            [1, null, 1, "1 and null should make 1"],
-            [null, 0, 0, "null and zero should make zero"],
-            [0, null, 0, "zero and null should make zero"],
-            [0, 0, 0, "zero and zero should make zero"],
-            [-1, 0, -1, "negative 1 and zero should make negative 1"],
-            [0, -1, -1, "zero and negative 1 should make negative 1"],
-            [-1, 1, 1, "negative 1 and 1 should make positive 1"],
-            [1, -1, 1, "1 and negative 1 should make postiive 1"],
-            [0, 1, 1, "zero and 1 should make 1"],
-            [1, 0, 1, "1 and zero should make 1"],
-            [1, 1, 2, "1 and 1 should make 2"],
-            [5, 9, 14, "5 and 9 should make 14"],
-            [9, 5, 14, "9 and 5 should make 14"],
-            [-1, -1, -1, "two negative 1s should make -1"],
-            [-2, -2, -1, "two negative 2s should make -1"],
-            [-2, 5, 5, "negative 2 and five should make five"],
-            [5, -2, 5, "five and negative 2 should make five"]
-        ];
-    }
-
-    /**
+     /**
      * Make sure a null stock row always returns null quantity on hand
      */
     public function testGetQuantityOnHandNullStock()
     {
-        $configHelper = $this->createMock(ConfigHelper::class);
+        $configHelper = $this->createMock(AbstractConfigHelper::class);
         $this->assertEquals(null, InventoryMapper::getQuantityOnHand(null, null), "both inputs null");
         $this->assertEquals(null, InventoryMapper::getQuantityOnHand(null, $configHelper), "uninitialized confighelper");
 
@@ -112,6 +85,56 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result, $msg);
     }
 
+    /**
+     * Test various cases for getting part numbers from variations
+     *
+     * @param [mixed] $variation
+     * @param [mixed] $mappingMode
+     * @param [mixed] $expected
+     * @param [string] $msg
+     * 
+     * @dataProvider dataProviderForGetSupplierPartNumberFromVariation
+     */
+    public function testGetSupplierPartNumberFromVariation($variation, $mappingMode, $expected, $msg = null)
+    {
+        /** @var InventoryMapper */
+        $inventoryMapper = $this->createPartialMock(InventoryMapper::class, ['getItemMappingMode']);
+
+        $inventoryMapper->method('getItemMappingMode')->will($this->returnValue($mappingMode));
+
+        $result = $inventoryMapper->getSupplierPartNumberFromVariation($variation);
+
+        $this->assertEquals($expected, $result, $msg);
+    }
+
+    public function dataProviderForInventoryQuantityMerge()
+    {
+        return [
+            [null, null, null, "two nulls should make null"],
+            [null, -1, -1, "null and negative 1 should make negative 1"],
+            [-1, null, -1, "null and negative 1 should make negative 1"],
+            [null, 1, 1, "null and 1 should make 1"],
+            [1, null, 1, "1 and null should make 1"],
+            [null, 0, 0, "null and zero should make zero"],
+            [0, null, 0, "zero and null should make zero"],
+            [0, 0, 0, "zero and zero should make zero"],
+            [-1, 0, -1, "negative 1 and zero should make negative 1"],
+            [0, -1, -1, "zero and negative 1 should make negative 1"],
+            [-1, 1, 1, "negative 1 and 1 should make positive 1"],
+            [1, -1, 1, "1 and negative 1 should make postiive 1"],
+            [0, 1, 1, "zero and 1 should make 1"],
+            [1, 0, 1, "1 and zero should make 1"],
+            [1, 1, 2, "1 and 1 should make 2"],
+            [5, 9, 14, "5 and 9 should make 14"],
+            [9, 5, 14, "9 and 5 should make 14"],
+            [-1, -1, -1, "two negative 1s should make -1"],
+            [-2, -2, -1, "two negative 2s should make -1"],
+            [-2, 5, 5, "negative 2 and five should make five"],
+            [5, -2, 5, "five and negative 2 should make five"]
+        ];
+    }
+
+   
     public function dataProviderForGetQuantityOnHand()
     {
         return [
@@ -138,4 +161,14 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
             [5, 2, 3, "five stock with two buffer should make three quantityOnHand"]
         ];
     }
+
+    public function dataProviderForGetSupplierPartNumberFromVariation()
+    {
+        $cases = [];
+        
+        $cases[] = [null, null, null, "Null inputs should result in not finding any part number"];
+
+        return $cases;
+    }
+    
 }
