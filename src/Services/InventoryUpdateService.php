@@ -121,8 +121,16 @@ class InventoryUpdateService
     $externalLogs = pluginApp(ExternalLogs::class);
     /** @var VariationSearchRepositoryContract $variationSearchRepository */
     $variationSearchRepository = pluginApp(VariationSearchRepositoryContract::class);
+    /** @var AbstractConfigHelper $configHelper */
+    $configHelper = pluginApp(AbstractConfigHelper::class);
+
+    // look up item mapping method at this level to ensure consistency and improve efficiency
+    $itemMappingMethod = $configHelper->getItemMappingMethod();
+
     /** @var array $syncResultObjects collection of the individual results of bulk update actions against the Wayfair API */
     $syncResultObjects = [];
+    
+   
 
     $loggerContract->debug(
       TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_START),
@@ -158,7 +166,7 @@ class InventoryUpdateService
         /** @var array $variationWithStock information about a single Variation, including stock for each Warehouse */
         foreach ($response->getResult() as $variationWithStock) {
           /** @var RequestDTO[] $rawInventoryRequestDTOs non-normalized candidates for inclusion in bulk update */
-          $rawInventoryRequestDTOs = $inventoryMapper->createInventoryDTOsFromVariation($variationWithStock);
+          $rawInventoryRequestDTOs = $inventoryMapper->createInventoryDTOsFromVariation($variationWithStock, $itemMappingMethod);
           foreach ($rawInventoryRequestDTOs as $dto) {
             // validation method will output logs on failure
             if ($this->validateInventoryRequestData($dto, $loggerContract)) {
@@ -298,4 +306,5 @@ class InventoryUpdateService
 
     return $filter;
   }
+
 }

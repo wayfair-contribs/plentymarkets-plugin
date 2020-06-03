@@ -12,7 +12,6 @@ use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\Inventory\RequestDTO;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
-use Wayfair\Repositories\KeyValueRepository;
 use Wayfair\Repositories\WarehouseSupplierRepository;
 
 class InventoryMapper
@@ -114,10 +113,11 @@ class InventoryMapper
    * Create Inventory DTOs for one variation.
    * Returns a DTO for each supplier ID that has stock information for the variation.
    * @param array $variationData
+   * @param string $itemMappingMethod
    *
    * @return RequestDTO[]
    */
-  public function createInventoryDTOsFromVariation($variationData)
+  public function createInventoryDTOsFromVariation($variationData, $itemMappingMethod)
   {
     /** @var LoggerContract $loggerContract */
     $loggerContract = pluginApp(LoggerContract::class);
@@ -131,10 +131,9 @@ class InventoryMapper
     $mainVariationId = $variationData['id'];
     $variationNumber = $variationData['number'];
 
-    $supplierPartNumber = $this->getSupplierPartNumberFromVariation($variationData);
+    $supplierPartNumber = $this->getSupplierPartNumberFromVariation($variationData, $itemMappingMethod, $loggerContract);
 
     if (!isset($supplierPartNumber) || empty($supplierPartNumber)) {
-      $itemMappingMethod = $this->getItemMappingMode();
 
       $loggerContract->error(
         TranslationHelper::getLoggerKey(self::LOG_KEY_PART_NUMBER_MISSING),
@@ -272,10 +271,11 @@ class InventoryMapper
    * Get the supplier's part number from Plentymarkets Variation data
    *
    * @param array $variationData
+   * @param string $itemMappingMethod
    * @param LoggerContract $logger
    * @return mixed
    */
-  function getSupplierPartNumberFromVariation($variationData, $logger = null)
+  function getSupplierPartNumberFromVariation($variationData, $itemMappingMethod, $logger = null)
   {
     if (!isset($variationData))
     {
@@ -286,8 +286,6 @@ class InventoryMapper
 
     $mainVariationId = $variationData['id'];
     $variationNumber = $variationData['number'];
-
-    $itemMappingMethod = $itemMappingMethod = $this->getItemMappingMode();
 
     $supplierPartNumber = null;
 
@@ -376,17 +374,5 @@ class InventoryMapper
     }
 
     return $left + $right;
-  }
-
-  /**
-   * Wrapper for item mapping mode lookup
-   *
-   * @return string
-   */
-  function getItemMappingMode()
-  {
-    /** @var KeyValueRepository $keyValueRepository */
-    $keyValueRepository = pluginApp(KeyValueRepository::class);
-    return $keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD);
   }
 }

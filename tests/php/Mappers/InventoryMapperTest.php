@@ -96,12 +96,10 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetSupplierPartNumberFromVariation($variation, $mappingMode, $expected, $msg = null)
     {
-        /** @var InventoryMapper */
-        $inventoryMapper = $this->createPartialMock(InventoryMapper::class, ['getItemMappingMode']);
+        /** @var InventoryMapper $inventoryMapper*/
+        $inventoryMapper = new InventoryMapper();
 
-        $inventoryMapper->method('getItemMappingMode')->will($this->returnValue($mappingMode));
-
-        $result = $inventoryMapper->getSupplierPartNumberFromVariation($variation);
+        $result = $inventoryMapper->getSupplierPartNumberFromVariation($variation, $mappingMode);
 
         $this->assertEquals($expected, $result, $msg);
     }

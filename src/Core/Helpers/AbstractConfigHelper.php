@@ -86,4 +86,11 @@ abstract class AbstractConfigHelper {
    */
   abstract public function getPluginVersion(): string;
 
+   /**
+   * Retrieves the item mapping mode for Inventory
+   *
+   * @return string
+   */
+  abstract function getItemMappingMethod();
+
 }

@@ -145,4 +145,16 @@ class ConfigHelper extends AbstractConfigHelper {
   public function hasBooted(): bool {
     return self::$bootFlag;
   }
+
+  /**
+   * Get the item mapping mode for Inventory
+   *
+   * @return string
+   */
+  function getItemMappingMethod()
+  {
+    /** @var KeyValueRepository $keyValueRepository */
+    $keyValueRepository = pluginApp(KeyValueRepository::class);
+    return $keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD);
+  }
 }
