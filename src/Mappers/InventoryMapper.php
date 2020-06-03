@@ -275,7 +275,7 @@ class InventoryMapper
    * @param LoggerContract $logger
    * @return mixed
    */
-  function getSupplierPartNumberFromVariation($variationData, $itemMappingMethod, $logger = null)
+  static function getSupplierPartNumberFromVariation($variationData, $itemMappingMethod, $logger = null)
   {
     if (!isset($variationData))
     {
@@ -308,6 +308,7 @@ class InventoryMapper
           $supplierPartNumber = $variationNumber;
           break;
         default:
+          // just in case - ConfigHelper should have validated the method value
           $supplierPartNumber = $variationNumber;
           if (isset($logger)) {
             $logger->warning(

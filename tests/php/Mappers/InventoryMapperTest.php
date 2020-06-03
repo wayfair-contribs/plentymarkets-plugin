@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright 2020 Wayfair LLC - All rights reserved
  */
@@ -21,7 +22,7 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result, $msg);
     }
 
-     /**
+    /**
      * Make sure a null stock row always returns null quantity on hand
      */
     public function testGetQuantityOnHandNullStock()
@@ -64,17 +65,15 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
     {
         $configHelper = null;
         $variationStock = null;
-        
+
         // phpUnit 6.x (required for PHP 7.0.x) does not have createStub method.
 
-        if (isset($buffer))
-        {
+        if (isset($buffer)) {
             $configHelper = $this->createMock(AbstractConfigHelper::class);
             $configHelper->method('getStockBufferValue')->will($this->returnValue($buffer));
         }
 
-        if (isset($netStock))
-        {
+        if (isset($netStock)) {
             $variationStock = $this->createMock(VariationStock::class);
             $variationStock->netStock = $netStock;
         }
@@ -96,10 +95,7 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetSupplierPartNumberFromVariation($variation, $mappingMode, $expected, $msg = null)
     {
-        /** @var InventoryMapper $inventoryMapper*/
-        $inventoryMapper = new InventoryMapper();
-
-        $result = $inventoryMapper->getSupplierPartNumberFromVariation($variation, $mappingMode);
+        $result = InventoryMapper::getSupplierPartNumberFromVariation($variation, $mappingMode);
 
         $this->assertEquals($expected, $result, $msg);
     }
@@ -131,7 +127,7 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-   
+
     public function dataProviderForGetQuantityOnHand()
     {
         return [
@@ -205,28 +201,35 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
         $variationWithEverything[$keyVariationSkus] = $mockSkus;
 
         $variationsUnderTest = [$variationWithNumberOnly, $variationWithNumberAndBarcode, $variationWithEverything];
-        foreach($variationsUnderTest as $variation)
-        {
-            $cases[] = [$variation, AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER, $variation[$keyNumber]];
+        foreach ($variationsUnderTest as $variation) {
+            $cases[] = [$variation, "FakeItemMappingMethod", $variation[$keyNumber], "bogus mapping method defaults to Variation number"];
+
+            $cases[] = [
+                $variation, AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER, $variation[$keyNumber],
+                "choosing variation number should return variation number regardless of other settings"
+            ];
+
             $expectedPartNo = null;
-            if (isset($variation[$keyVariationBarcodes]) && !empty($variation[$keyVariationBarcodes]))
-            {
+            if (isset($variation[$keyVariationBarcodes]) && !empty($variation[$keyVariationBarcodes])) {
                 $expectedPartNo = $variation[$keyVariationBarcodes][0][$keyCode];
             }
 
-            $cases[] = [$variation, AbstractConfigHelper::ITEM_MAPPING_EAN, $expectedPartNo];
+            $cases[] = [
+                $variation, AbstractConfigHelper::ITEM_MAPPING_EAN, $expectedPartNo,
+                "choosing EAN should use EAN"
+            ];
 
             $expectedPartNo = null;
-            if (isset($variation[$keyVariationSkus]) && !empty($variation[$keyVariationSkus]))
-            {
+            if (isset($variation[$keyVariationSkus]) && !empty($variation[$keyVariationSkus])) {
                 $expectedPartNo = $variation[$keyVariationSkus][0][$keySku];
             }
 
-            $cases[] = [$variation, AbstractConfigHelper::ITEM_MAPPING_SKU, $expectedPartNo];
+            $cases[] = [
+                $variation, AbstractConfigHelper::ITEM_MAPPING_SKU, $expectedPartNo,
+                "choosing SKU should use SKU"
+            ];
         }
-
 
         return $cases;
     }
-    
 }
