@@ -293,13 +293,13 @@ class InventoryMapper
 
       switch ($itemMappingMethod) {
         case AbstractConfigHelper::ITEM_MAPPING_SKU:
-          if (key_exists(self::VARIATION_SKUS, $variationData) && !empty($variationData[self::VARIATION_SKUS]))
+          if (array_key_exists(self::VARIATION_SKUS, $variationData) && !empty($variationData[self::VARIATION_SKUS]))
           {
             $supplierPartNumber = $variationData[self::VARIATION_SKUS][0]['sku'];
           }
           break;
         case AbstractConfigHelper::ITEM_MAPPING_EAN:
-          if (key_exists(self::VARIATION_BARCODES, $variationData) && !empty($variationData[self::VARIATION_BARCODES]))
+          if (array_key_exists(self::VARIATION_BARCODES, $variationData) && !empty($variationData[self::VARIATION_BARCODES]))
           {
             $supplierPartNumber = $variationData[self::VARIATION_BARCODES][0]['code'];
           }
