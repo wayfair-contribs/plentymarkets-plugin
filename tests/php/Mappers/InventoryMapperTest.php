@@ -5,7 +5,6 @@
 
 namespace Wayfair\Tests\Mappers;
 
-use Plenty\Modules\Item\Variation\Models\Variation;
 use Plenty\Modules\Item\VariationStock\Models\VariationStock;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Mappers\InventoryMapper;
@@ -165,8 +164,69 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
     public function dataProviderForGetSupplierPartNumberFromVariation()
     {
         $cases = [];
-        
+
+        // cases with null variation
         $cases[] = [null, null, null, "Null inputs should result in not finding any part number"];
+        $cases[] = [null, AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER, null, "Null Variatoin with Number mode should result in not finding any part number"];
+        $cases[] = [null, AbstractConfigHelper::ITEM_MAPPING_EAN, null, "Null Variation with EAN mode should result in not finding any part number"];
+        $cases[] = [null, AbstractConfigHelper::ITEM_MAPPING_SKU, null, "Null Variaton with SKU mode should result in not finding any part number"];
+
+        $keyId = 'id';
+        $keyNumber = 'number';
+        $keyVariationBarcodes = 'variationBarcodes';
+        $keyVariationSkus = 'variationSkus';
+        $keyCode = 'code';
+        $keySku = 'sku';
+
+        $mockId = 2;
+        $mockNumber = 8000;
+        $mockBarcodes = [[$keyCode => '1234567891011']];
+        $mockSkus = [[$keySku => 'ABCDEFG123']];
+
+        $variationWithNumberOnly = [];
+        $variationWithNumberOnly[$keyId] = $mockId;
+        $variationWithNumberOnly[$keyNumber] = $mockNumber;
+
+        /** @var Variation */
+        $variationWithNumberAndBarcode = [];
+        $variationWithNumberAndBarcode[$keyId] = $mockId;
+        $variationWithNumberAndBarcode[$keyNumber] = $mockNumber;
+        $variationWithNumberAndBarcode[$keyVariationBarcodes] = $mockBarcodes;
+
+        /** @var Variation */
+        $variationWithNumberAndSku = [];
+        $variationWithNumberAndSku[$keyId] = $mockId;
+        $variationWithNumberAndSku[$keyNumber] = $mockNumber;
+        $variationWithNumberAndSku[$keyVariationSkus] = $mockSkus;
+
+        /** @var Variation */
+        $variationWithEverything = [];
+        $variationWithEverything[$keyId] = $mockId;
+        $variationWithEverything[$keyNumber] = $mockNumber;
+        $variationWithEverything[$keyVariationBarcodes] = $mockBarcodes;
+        $variationWithEverything[$keyVariationSkus] = $mockSkus;
+
+        $variationsUnderTest = [$variationWithNumberOnly, $variationWithNumberAndBarcode, $variationWithEverything];
+        foreach($variationsUnderTest as $variation)
+        {
+            $cases[] = [$variation, AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER, $variation[$keyNumber]];
+            $expectedPartNo = null;
+            if (isset($variation[$keyVariationBarcodes]) && !empty($variation[$keyVariationBarcodes]))
+            {
+                $expectedPartNo = $variation[$keyVariationBarcodes][0][$keyCode];
+            }
+
+            $cases[] = [$variation, AbstractConfigHelper::ITEM_MAPPING_EAN, $expectedPartNo];
+
+            $expectedPartNo = null;
+            if (isset($variation[$keyVariationSkus]) && !empty($variation[$keyVariationSkus]))
+            {
+                $expectedPartNo = $variation[$keyVariationSkus][0][$keySku];
+            }
+
+            $cases[] = [$variation, AbstractConfigHelper::ITEM_MAPPING_SKU, $expectedPartNo];
+        }
+
 
         return $cases;
     }

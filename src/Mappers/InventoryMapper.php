@@ -25,6 +25,9 @@ class InventoryMapper
   const LOG_KEY_INVALID_INVENTORY_AMOUNT = 'invalidInventoryAmount';
   const LOG_KEY_INVALID_STOCK_BUFFER = 'invalidStockBufferValue';
 
+  const VARIATION_BARCODES = 'variationBarcodes';
+  const VARIATION_SKUS = 'variationSkus';
+
   /**
    * @param $mainVariationId
    *
@@ -151,6 +154,8 @@ class InventoryMapper
 
     $nextAvailableDate = $this->getAvailableDate($mainVariationId); // Pending. Need Item
 
+    // the 'stock' element is not declared for the Variation type,
+    // so type hints for "variationData" need to stay as "array"
     $stockList = $variationData['stock'];
     /** @var VariationStock $stock */
     foreach ($stockList as $stock) {
@@ -272,7 +277,10 @@ class InventoryMapper
    */
   function getSupplierPartNumberFromVariation($variationData, $logger = null)
   {
-    // TODO: add a unit test around this method
+    if (!isset($variationData))
+    {
+      return null;
+    }
 
     $supplierPartNumber = null;
 
@@ -281,21 +289,28 @@ class InventoryMapper
 
     $itemMappingMethod = $itemMappingMethod = $this->getItemMappingMode();
 
-    $supplierPartNumber = $variationNumber;
+    $supplierPartNumber = null;
 
     try {
 
       switch ($itemMappingMethod) {
         case AbstractConfigHelper::ITEM_MAPPING_SKU:
-          $supplierPartNumber = $variationData['variationSkus'][0]['sku'];
+          if (key_exists(self::VARIATION_SKUS, $variationData) && !empty($variationData[self::VARIATION_SKUS]))
+          {
+            $supplierPartNumber = $variationData[self::VARIATION_SKUS][0]['sku'];
+          }
           break;
         case AbstractConfigHelper::ITEM_MAPPING_EAN:
-          $supplierPartNumber = $variationData['variationBarcodes'][0]['code'];
+          if (key_exists(self::VARIATION_BARCODES, $variationData) && !empty($variationData[self::VARIATION_BARCODES]))
+          {
+            $supplierPartNumber = $variationData[self::VARIATION_BARCODES][0]['code'];
+          }
           break;
         case AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER:
-          // already set to variationNumber
+          $supplierPartNumber = $variationNumber;
           break;
         default:
+          $supplierPartNumber = $variationNumber;
           if (isset($logger)) {
             $logger->warning(
               TranslationHelper::getLoggerKey(self::LOG_KEY_UNDEFINED_MAPPING_METHOD),
