@@ -151,6 +151,8 @@ class LoggingService implements LoggerContract {
 
     $additionalInfo[self::WAYFAIR_PLUGIN_VERSION] = $this->version;
     $additionalInfo['reference value'] = $loggingInfo['referenceValue'];
+    $additionalInfo['reference type'] = $loggingInfo['referenceType'];
+    $additionalInfo['logging info'] = $loggingInfo;
 
     return array($additionalInfo, $method, $referenceType, $referenceValue);
   }
