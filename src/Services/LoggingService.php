@@ -127,28 +127,18 @@ class LoggingService implements LoggerContract {
    * @return array
    */
   public function extractVars($loggingInfo): array {
-    $truncatedMsg =[];
     $externalLogs = pluginApp(ExternalLogs::class);
+    $shortMessage = [];
 
-    // $additionalInfo = $loggingInfo['additionalInfo'] ?? [];
+    $additionalInfo = $loggingInfo['additionalInfo'] ?? [];
     $method = $loggingInfo['method'] ?? null;
     $referenceType = $loggingInfo['referenceType'] ?? null;
     $referenceValue = (int) $loggingInfo['referenceValue'] ?? null;
 
     if (strlen(json_encode($loggingInfo)) > self::STRING_LIMIT) {
-      if (json_encode($loggingInfo['additionalInfo'])> self::STRING_LIMIT){
-        $truncatedMsg['message'] = StringHelper::truncateString($loggingInfo['additionalInfo']['message'], self::TRUNCATED_SIZE);
-      }
-      else {
-        $truncatedMsg['message'] =  $loggingInfo['additionalInfo']['message'];
-      }
-      $additionalInfo = $truncatedMsg ?? [];
+      $additionalInfo = $shortMessage['message'] = 'Message was too long to log in PlentyMarkets';
       $externalLogs->addErrorLog("Message was too long to log in PlentyMarkets " . $loggingInfo);
     }
-    else {
-      $additionalInfo = $loggingInfo['additionalInfo'] ?? [];
-    }
-
     $additionalInfo[self::WAYFAIR_PLUGIN_VERSION] = $this->version;
     $additionalInfo['reference value'] = $loggingInfo['referenceValue'];
     $additionalInfo['reference type'] = $loggingInfo['referenceType'];
@@ -173,4 +163,10 @@ class LoggingService implements LoggerContract {
     $configHelper = pluginApp(AbstractConfigHelper::class);
     return $configHelper->hasBooted();
   }
+
+  // public function messageTooLong($loggingInfo) {
+  //   if (strlen(json_encode($loggingInfo)) > self::STRING_LIMIT) {
+
+  //   }
+  // }
 }
