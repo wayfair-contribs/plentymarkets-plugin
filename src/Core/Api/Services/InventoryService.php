@@ -104,7 +104,7 @@ class InventoryService extends APIService
       ];
     }
 
-    $query = 'mutation save($inventory: [InventoryInput]!) {'
+    $query = 'mutation save($inventory: [inventoryInput]!) {'
       . 'inventory {'
       . 'save('
       . 'inventory: $inventory,'
