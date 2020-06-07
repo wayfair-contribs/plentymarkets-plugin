@@ -104,6 +104,7 @@ class SettingsController {
     $inputStockBuffer = (int)$data[AbstractConfigHelper::SETTINGS_STOCK_BUFFER_KEY];
 
     // Default Shipping Provider is deprecated in versions 1.1.2 and up
+    $inputDefaultShippingProvider = null;
     if ($dataContainsDefaultShippingProvider){
       $inputDefaultShippingProvider = (int)$data[AbstractConfigHelper::SETTINGS_DEFAULT_SHIPPING_PROVIDER_KEY];
     }
