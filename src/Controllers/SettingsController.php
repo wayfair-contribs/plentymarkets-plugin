@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Controllers;
@@ -62,11 +62,19 @@ class SettingsController {
    */
   public function post(Request $request, Response $response) {
     $data = $request->input('data');
+
+    if (!isset($data) || empty($data))
+    {
+      return $response->json(['error' => 'No settings data provided'], Response::HTTP_BAD_REQUEST);
+    }
+
     if (!is_numeric($data[AbstractConfigHelper::SETTINGS_STOCK_BUFFER_KEY])) {
       return $response->json(['error' => 'Stock Buffer must be a number'], Response::HTTP_BAD_REQUEST);
     }
 
-    if (!is_numeric($data[AbstractConfigHelper::SETTINGS_DEFAULT_SHIPPING_PROVIDER_KEY])) {
+    // Default Shipping Provider is deprecated in versions 1.1.2 and up
+    $dataContainsDefaultShippingProvider = array_key_exists(AbstractConfigHelper::SETTINGS_DEFAULT_SHIPPING_PROVIDER_KEY, $data);
+    if ($dataContainsDefaultShippingProvider && !is_numeric($data[AbstractConfigHelper::SETTINGS_DEFAULT_SHIPPING_PROVIDER_KEY])) {
       return $response->json(['error' => 'Shipping Provider ID must be a number'], Response::HTTP_BAD_REQUEST);
     }
 
@@ -94,7 +102,12 @@ class SettingsController {
     }
 
     $inputStockBuffer = (int)$data[AbstractConfigHelper::SETTINGS_STOCK_BUFFER_KEY];
-    $inputDefaultShippingProvider = (int)$data[AbstractConfigHelper::SETTINGS_DEFAULT_SHIPPING_PROVIDER_KEY];
+
+    // Default Shipping Provider is deprecated in versions 1.1.2 and up
+    if ($dataContainsDefaultShippingProvider){
+      $inputDefaultShippingProvider = (int)$data[AbstractConfigHelper::SETTINGS_DEFAULT_SHIPPING_PROVIDER_KEY];
+    }
+
     $inputDefaultOrderStatus = (int)$data[AbstractConfigHelper::SETTINGS_DEFAULT_ORDER_STATUS_KEY];
     $inputDefaultItemMapping = $data[AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD];
     $importOrderSince = $data[AbstractConfigHelper::IMPORT_ORDER_SINCE];
