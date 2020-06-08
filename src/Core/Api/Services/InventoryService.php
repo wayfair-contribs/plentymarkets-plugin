@@ -150,7 +150,7 @@ class InventoryService extends APIService
         [
           'additionalInfo' => [
             'query' => $queryData,
-            'response' => $responseBody
+            'response' => $response->getBody()
           ],
           'method' => __METHOD__
         ]
