@@ -184,20 +184,30 @@ class ConfigHelper extends AbstractConfigHelper
     /** @var LoggerContract $logger */
     $logger = pluginApp(LoggerContract::class);
 
-    return self::validateItemMappingMethod($itemMappingMethod, $logger);
+    return $this->normalizeItemMappingMethod($itemMappingMethod, $logger);
+  }
+
+  /**
+   * Check an Item Mapping Method choice against known values
+   *
+   * @param string $itemMappingMethod
+   * @return bool
+   */
+  public function validateItemMappingMethod($itemMappingMethod)
+  {
+    return isset($itemMappingMethod) && !empty($itemMappingMethod) && in_array($itemMappingMethod, self::KNOWN_ITEM_MAPPING_METHODS);
   }
 
   /**
    * Validate an itemMappingMethod choice,
    * Defaulting to Variation Number
    *
-   * @param [string] $itemMappingMethod
+   * @param string $itemMappingMethod
    * @return string
    */
-  static function validateItemMappingMethod($itemMappingMethod, $logger = null)
+  function normalizeItemMappingMethod($itemMappingMethod, $logger = null)
   {
-    // TODO: make a unit test for this
-    if (!isset($itemMappingMethod) || empty($itemMappingMethod) || !in_array($itemMappingMethod, self::KNOWN_ITEM_MAPPING_METHODS)) {
+    if (!$this->validateItemMappingMethod($itemMappingMethod)) {
 
       if (isset($logger)) {
         $logger->warning(
@@ -217,4 +227,5 @@ class ConfigHelper extends AbstractConfigHelper
 
     return $itemMappingMethod;
   }
+  
 }

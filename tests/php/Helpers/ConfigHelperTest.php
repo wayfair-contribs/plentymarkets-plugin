@@ -6,6 +6,7 @@
 
 namespace Wayfair\Tests\Mappers;
 
+use Plenty\Plugin\ConfigRepository;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Helpers\ConfigHelper;
 
@@ -14,16 +15,18 @@ final class ConfigHelperTest extends \PHPUnit\Framework\TestCase {
     /**
      * Various tests for validateItemMappingMethod
      * 
-     * @dataProvider dataProviderForTestValidateItemMappingMethod
-     */
-    public function testValidateItemMappingMethod($input, $expected, $msg = null)
+     * @dataProvider dataProviderForNormalizeValidateItemMappingMethod
+     */ 
+    public function testNormalizeItemMappingMethod($input, $expected, $msg = null)
     {
-        $result = ConfigHelper::validateItemMappingMethod($input);
+        /** @var ConfigRepository */
+        $configRepo = $this->createMock(ConfigRepository::class);
+        $result = (new ConfigHelper($configRepo))->normalizeItemMappingMethod($input);
 
         $this->assertEquals($expected, $result, $msg);
     }
 
-    public function dataProviderForTestValidateItemMappingMethod()
+    public function dataProviderForNormalizeValidateItemMappingMethod()
     {
         $cases = [];
 

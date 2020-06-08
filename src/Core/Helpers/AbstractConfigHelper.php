@@ -91,6 +91,13 @@ abstract class AbstractConfigHelper {
    *
    * @return string
    */
-  abstract function getItemMappingMethod();
+  abstract public function getItemMappingMethod();
 
+  /**
+   * Check an Item Mapping Method choice against known values
+   *
+   * @param string $itemMappingMethod
+   * @return bool
+   */
+  abstract public function validateItemMappingMethod($itemMappingMethod);
 }
