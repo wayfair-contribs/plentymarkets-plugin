@@ -14,6 +14,8 @@ use Wayfair\Core\Contracts\LoggerContract;
 
 class ClientService implements ClientInterfaceContract {
 
+  const LOG_KEY_INVENTORY_QUERY_DEBUG = 'Test';
+
   /**
    * @var LibraryCallContract
    */
