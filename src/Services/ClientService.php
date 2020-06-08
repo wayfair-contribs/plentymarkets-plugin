@@ -9,6 +9,8 @@ use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
 use Wayfair\Core\Contracts\ClientInterfaceContract;
 use Wayfair\Helpers\ConfigHelper;
 use Wayfair\Http\WayfairResponse;
+use Wayfair\Helpers\TranslationHelper;
+use Wayfair\Core\Contracts\LoggerContract;
 
 class ClientService implements ClientInterfaceContract {
 
@@ -16,6 +18,13 @@ class ClientService implements ClientInterfaceContract {
    * @var LibraryCallContract
    */
   public $library;
+
+  /**
+   * Undocumented variable
+   *
+   * @var LoggerContract
+   */
+  public $loggerContract;
 
   /**
    * @param LibraryCallContract $libraryCallContract
@@ -38,6 +47,18 @@ class ClientService implements ClientInterfaceContract {
             'arguments' => $arguments
         ]
     );
+
+    $this->loggerContract->debug(
+      TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_QUERY_DEBUG),
+      [
+        'additionalInfo' => [
+          'message' => 'Is this in the Client Service',
+          'response' => $response
+        ],
+        'method' => __METHOD__
+      ]
+    );
+
     return pluginApp(WayfairResponse::class, [$response]);
   }
 }
