@@ -14,6 +14,7 @@ use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Repositories\KeyValueRepository;
 
+<<<<<<< HEAD
 /**
  * Controller for the "Settings" tab in the Wayfair plugin
  */
@@ -22,6 +23,10 @@ class SettingsController
   const LOG_KEY_CONTROLLER_IN = "controllerInput";
   const LOG_KEY_CONTROLLER_OUT = "controllerOutput";
   const LOG_KEY_SETTING_MAPPING_METHOD = "settingMappingMethod";
+=======
+class SettingsController
+{
+>>>>>>> origin/master
 
   /**
    * @var KeyValueRepository
@@ -39,7 +44,11 @@ class SettingsController
    * @param KeyValueRepository $keyValueRepository
    * @param LoggerContract $logger
    */
+<<<<<<< HEAD
   public function __construct(KeyValueRepository $keyValueRepository, LoggerContract $logger)
+=======
+  public function __construct(KeyValueRepository $keyValueRepository)
+>>>>>>> origin/master
   {
     $this->keyValueRepository = $keyValueRepository;
     $this->logger = $logger;
@@ -89,17 +98,29 @@ class SettingsController
   {
     $data = $request->input('data');
 
+<<<<<<< HEAD
     $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_CONTROLLER_IN), [
       'additionalInfo' => ['payloadIn' => json_encode($data)],
       'method'         => __METHOD__
     ]);
+=======
+    if (!isset($data) || empty($data)) {
+      return $response->json(['error' => 'No settings data provided'], Response::HTTP_BAD_REQUEST);
+    }
+>>>>>>> origin/master
 
     if (!is_numeric($data[AbstractConfigHelper::SETTINGS_STOCK_BUFFER_KEY])) {
       return $response->json(['error' => 'Stock Buffer must be a number'], Response::HTTP_BAD_REQUEST);
     }
 
-    if (!is_numeric($data[AbstractConfigHelper::SETTINGS_DEFAULT_SHIPPING_PROVIDER_KEY])) {
-      return $response->json(['error' => 'Shipping Provider ID must be a number'], Response::HTTP_BAD_REQUEST);
+    // Default Shipping Provider is deprecated in versions 1.1.2 and up
+    $inputDefaultShippingProvider = $data[AbstractConfigHelper::SETTINGS_DEFAULT_SHIPPING_PROVIDER_KEY];
+    if (isset($inputDefaultShippingProvider)) {
+      if (!is_numeric($data[AbstractConfigHelper::SETTINGS_DEFAULT_SHIPPING_PROVIDER_KEY])) {
+        return $response->json(['error' => 'Shipping Provider ID must be a number'], Response::HTTP_BAD_REQUEST);
+      }
+
+      $inputDefaultShippingProvider = (int) $inputDefaultShippingProvider;
     }
 
     if (!is_numeric($data[AbstractConfigHelper::SETTINGS_DEFAULT_ORDER_STATUS_KEY])) {
@@ -128,7 +149,10 @@ class SettingsController
     }
 
     $inputStockBuffer = (int) $data[AbstractConfigHelper::SETTINGS_STOCK_BUFFER_KEY];
+<<<<<<< HEAD
     $inputDefaultShippingProvider = (int) $data[AbstractConfigHelper::SETTINGS_DEFAULT_SHIPPING_PROVIDER_KEY];
+=======
+>>>>>>> origin/master
     $inputDefaultOrderStatus = (int) $data[AbstractConfigHelper::SETTINGS_DEFAULT_ORDER_STATUS_KEY];
     $inputDefaultItemMapping = $data[AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD];
     $importOrderSince = $data[AbstractConfigHelper::IMPORT_ORDER_SINCE];
@@ -155,6 +179,7 @@ class SettingsController
       $this->keyValueRepository->putOrReplace(AbstractConfigHelper::IMPORT_ORDER_SINCE, $importOrderSince);
       $this->keyValueRepository->putOrReplace(AbstractConfigHelper::SETTINGS_SEND_ALL_ITEMS_KEY, $isAllInventorySyncEnabled);
 
+<<<<<<< HEAD
       $dataOut = [
         AbstractConfigHelper::SETTINGS_STOCK_BUFFER_KEY => $inputStockBuffer,
         AbstractConfigHelper::SETTINGS_DEFAULT_SHIPPING_PROVIDER_KEY => $inputDefaultShippingProvider,
@@ -170,6 +195,18 @@ class SettingsController
       ]);
 
       return $response->json($dataOut);
+=======
+      return $response->json(
+        [
+          AbstractConfigHelper::SETTINGS_STOCK_BUFFER_KEY => $inputStockBuffer,
+          AbstractConfigHelper::SETTINGS_DEFAULT_SHIPPING_PROVIDER_KEY => $inputDefaultShippingProvider,
+          AbstractConfigHelper::SETTINGS_DEFAULT_ORDER_STATUS_KEY => $inputDefaultOrderStatus,
+          AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD => $inputDefaultItemMapping,
+          AbstractConfigHelper::IMPORT_ORDER_SINCE => $importOrderSince,
+          AbstractConfigHelper::SETTINGS_SEND_ALL_ITEMS_KEY => $isAllInventorySyncEnabled,
+        ]
+      );
+>>>>>>> origin/master
     } catch (ValidationException $e) {
       return $response->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
     }
