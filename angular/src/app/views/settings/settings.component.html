@@ -1,69 +1,125 @@
 <div class="text-center center-block">
-    <div class="form-row">
-        <div class="form-group col-md-4 col-md-offset-2">
-            <label for="stockBuffer" style="margin-top: 5px;">{{ 'stock_buffer' | translate:lang }}</label>
-        </div>
-        <div class="form-group col-md-4">
-            <input class="form-control" type="text" name="stockBuffer" [(ngModel)]="stockBuffer" (change)="clearMessage() />
-        </div>
+  <div class="form-row">
+    <div class="form-group col-md-4 col-md-offset-2">
+      <label for="stockBuffer" style="margin-top: 5px;">{{
+        "stock_buffer" | translate: lang
+      }}</label>
     </div>
-
-    <div class="form-row">
-        <div class="form-group col-md-4 col-md-offset-2">
-            <label for="defaultOrderStatus" style="margin-top: 5px;">{{ 'default_order_status' | translate:lang }}</label>
-        </div>
-        <div class="form-group col-md-4">
-            <input class="form-control" type="text" name="defaultOrderStatus" [(ngModel)]="defaultOrderStatus" (change)="clearMessage()" />
-        </div>
+    <div class="form-group col-md-4">
+      <input class="form-control" type="text" name="stockBuffer"
+      [(ngModel)]="stockBuffer" (change)="clearMessage() />
     </div>
+  </div>
 
-    <!-- Default Shipping Provider has no effect in current versions -->
-    <div class="form-row" style="display: none;">
-        <div class="form-group col-md-4 col-md-offset-2">
-            <label for="defaultShippingProvider" style="margin-top: 5px;">{{ 'default_shipping_provider' | translate:lang }}</label>
-        </div>
-        <div class="form-group col-md-4">
-            <input class="form-control" type="text" name="defaultShippingProvider" [(ngModel)]="defaultShippingProvider" (change)="clearMessage()" />
-        </div>
+  <div class="form-row">
+    <div class="form-group col-md-4 col-md-offset-2">
+      <label for="defaultOrderStatus" style="margin-top: 5px;">{{
+        "default_order_status" | translate: lang
+      }}</label>
     </div>
-
-    <div class="form-row">
-        <div class="form-group col-md-4 col-md-offset-2">
-            <label for="defaultItemMappingMethod" style="margin-top: 5px;">{{ 'settings_default_item_mapping_method' | translate:lang }}</label>
-        </div>
-        <div class="form-group col-md-4">
-            <select class="form-control" name="defaultItemMappingMethod" [(ngModel)]="defaultItemMappingMethod" (change)="clearMessage()">
-                <option value="numberExact">{{ 'item_mapping_variation_number' | translate:lang }}</option>
-                <option value="barcode">{{ 'item_mapping_ean' | translate:lang }}</option>
-                <option value="sku">{{ 'item_mapping_sku' | translate:lang }}</option>
-            </select>
-        </div>
+    <div class="form-group col-md-4">
+      <input
+        class="form-control"
+        type="text"
+        name="defaultOrderStatus"
+        [(ngModel)]="defaultOrderStatus"
+        (change)="clearMessage()"
+      />
     </div>
+  </div>
 
-    <div class="form-row">
-        <div class="form-group col-md-4 col-md-offset-2">
-            <label for="importOrdersSince" style="margin-top: 5px;">{{ 'import_orders_since' | translate:lang }}</label>
-        </div>
-        <div class="form-group col-md-4">
-            <terra-date-picker [(ngModel)]="importOrdersSince" class="form-control" inputDisplayDateFormat="yyyy-mm-dd"(change)="clearMessage()" />
-        </div>
+  <!-- Default Shipping Provider has no effect in current versions -->
+  <div class="form-row" style="display: none;">
+    <div class="form-group col-md-4 col-md-offset-2">
+      <label for="defaultShippingProvider" style="margin-top: 5px;">{{
+        "default_shipping_provider" | translate: lang
+      }}</label>
     </div>
-
-    <div class="form-row">
-        <div class="form-group col-md-4 col-md-offset-2">
-            <label for="isAllInventorySyncEnabled" style="margin-top: 5px;">{{ 'settings_is_all_items_active' | translate:lang }}</label>
-        </div>
-        <div class="form-group col-md-4 text-left">
-            <input type="checkbox" name="isAllInventorySyncEnabled" [(ngModel)]="isAllInventorySyncEnabled" id="isAllInventorySyncEnabled" (change)="clearMessage()"/>
-        </div>
+    <div class="form-group col-md-4">
+      <input
+        class="form-control"
+        type="text"
+        name="defaultShippingProvider"
+        [(ngModel)]="defaultShippingProvider"
+        (change)="clearMessage()"
+      />
     </div>
+  </div>
 
-    <br/>
-    <p *ngIf="status.value" class="{{status.type + ' col-md-12'}}">{{status.value}}</p>
-    <br/>
-    <p *ngIf="status.timestamp" class="{{status.type + ' col-md-12'}}">{{status.timestamp}}</p>
-
-    <div class="col-md-12">
-        <button class="btn btn-success" id="saveMappingBtn" (click)="saveSettings()"> {{ 'save' | translate:lang }} </button>
+  <div class="form-row">
+    <div class="form-group col-md-4 col-md-offset-2">
+      <label for="defaultItemMappingMethod" style="margin-top: 5px;">{{
+        "settings_default_item_mapping_method" | translate: lang
+      }}</label>
     </div>
+    <div class="form-group col-md-4">
+      <select
+        class="form-control"
+        name="defaultItemMappingMethod"
+        [(ngModel)]="defaultItemMappingMethod"
+        (change)="clearMessage()"
+      >
+        <option value="numberExact">{{
+          "item_mapping_variation_number" | translate: lang
+        }}</option>
+        <option value="barcode">{{
+          "item_mapping_ean" | translate: lang
+        }}</option>
+        <option value="sku">{{ "item_mapping_sku" | translate: lang }}</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group col-md-4 col-md-offset-2">
+      <label for="importOrdersSince" style="margin-top: 5px;">{{
+        "import_orders_since" | translate: lang
+      }}</label>
+    </div>
+    <div class="form-group col-md-4">
+      <terra-date-picker
+        [(ngModel)]="importOrdersSince"
+        class="form-control"
+        inputDisplayDateFormat="yyyy-mm-dd"
+        (change)="clearMessage()"
+      >
+      </terra-date-picker>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group col-md-4 col-md-offset-2">
+      <label for="isAllInventorySyncEnabled" style="margin-top: 5px;">{{
+        "settings_is_all_items_active" | translate: lang
+      }}</label>
+    </div>
+    <div class="form-group col-md-4 text-left">
+      <input
+        type="checkbox"
+        name="isAllInventorySyncEnabled"
+        [(ngModel)]="isAllInventorySyncEnabled"
+        id="isAllInventorySyncEnabled"
+        (change)="clearMessage()"
+      />
+    </div>
+  </div>
+
+  <br />
+  <p *ngIf="status.value" class="{{ status.type + ' col-md-12' }}">
+    {{ status.value }}
+  </p>
+  <br />
+  <p *ngIf="status.timestamp" class="{{ status.type + ' col-md-12' }}">
+    {{ status.timestamp }}
+  </p>
+
+  <div class="col-md-12">
+    <button
+      class="btn btn-success"
+      id="saveMappingBtn"
+      (click)="saveSettings()"
+    >
+      {{ "save" | translate: lang }}
+    </button>
+  </div>
 </div>
