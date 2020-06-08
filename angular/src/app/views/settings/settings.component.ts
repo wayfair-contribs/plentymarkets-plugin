@@ -37,7 +37,7 @@ export class SettingsComponent {
    * Save in-memory settings after validation
    */
   public saveSettings(): void {
-    this.clearMesage();
+    this.clearMessage();
     this.showTranslatedInfo("saving_status");
 
     let error = this.normalizeSettings();
@@ -189,7 +189,7 @@ export class SettingsComponent {
   /**
    * Clear any message data on the page
    */
-  public clearMesage(): void {
+  public clearMessage(): void {
     this.showMessageVerbose(null, null, null);
   }
 
