@@ -42,6 +42,7 @@ class ClientService implements ClientInterfaceContract {
    * @return WayfairResponse
    */
   public function call($method, $arguments) {
+    $loggerContract = pluginApp(LoggerContract::class);
     $response = $this->library->call(
         ConfigHelper::PLUGIN_NAME . '::guzzle',
         [
@@ -50,7 +51,7 @@ class ClientService implements ClientInterfaceContract {
         ]
     );
 
-    $this->loggerContract->debug(
+    $loggerContract->debug(
       TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_QUERY_DEBUG),
       [
         'additionalInfo' => [
