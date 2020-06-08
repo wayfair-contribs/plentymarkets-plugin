@@ -11,7 +11,7 @@
         type="text"
         name="stockBuffer"
         [(ngModel)]="stockBuffer"
-        (change)="clearMessage()"
+        (input)="clearMessage()"
       />
     </div>
   </div>
@@ -28,7 +28,7 @@
         type="text"
         name="defaultOrderStatus"
         [(ngModel)]="defaultOrderStatus"
-        (change)="clearMessage()"
+        (input)="clearMessage()"
       />
     </div>
   </div>
@@ -46,7 +46,7 @@
         type="text"
         name="defaultShippingProvider"
         [(ngModel)]="defaultShippingProvider"
-        (change)="clearMessage()"
+        (input)="clearMessage()"
       />
     </div>
   </div>
@@ -62,7 +62,7 @@
         class="form-control"
         name="defaultItemMappingMethod"
         [(ngModel)]="defaultItemMappingMethod"
-        (change)="clearMessage()"
+        (input)="clearMessage()"
       >
         <option value="numberExact">{{
           "item_mapping_variation_number" | translate: lang
@@ -86,7 +86,7 @@
         [(ngModel)]="importOrdersSince"
         class="form-control"
         inputDisplayDateFormat="yyyy-mm-dd"
-        (change)="clearMessage()"
+        (input)="clearMessage()"
       >
       </terra-date-picker>
     </div>
@@ -104,7 +104,7 @@
         name="isAllInventorySyncEnabled"
         [(ngModel)]="isAllInventorySyncEnabled"
         id="isAllInventorySyncEnabled"
-        (change)="clearMessage()"
+        (input)="clearMessage()"
       />
     </div>
   </div>
