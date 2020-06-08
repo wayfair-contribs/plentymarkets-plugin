@@ -9,7 +9,7 @@ import { Language, TranslationService } from "angular-l10n";
 export class SettingsComponent {
   private static readonly TRANSLATION_KEY_NEGATIVE_NOT_ALLOWED =
     "negative_not_allowed";
-  private static readonly MESSAGE_DELIM = "\n<br/>\n";
+  private static readonly MESSAGE_DELIM = ", ";
 
   @Language()
   public lang: string;
@@ -37,6 +37,7 @@ export class SettingsComponent {
    * Save in-memory settings after validation
    */
   public saveSettings(): void {
+    this.clearMesage();
     this.showTranslatedInfo("saving_status");
 
     let error = this.normalizeSettings();
@@ -179,10 +180,17 @@ export class SettingsComponent {
    * @param type the style of the message
    * @param message the value of the message
    */
-  private showMessageVerbose(type, message): void {
+  private showMessageVerbose(type, message, timestamp = Date().toLocaleString()): void {
     this.status.type = type;
     this.status.value = message;
-    this.status.timestamp = Date().toLocaleString();
+    this.status.timestamp = timestamp;
+  }
+
+  /**
+   * Clear any message data on the page
+   */
+  private clearMesage(): void {
+    this.showMessageVerbose(null, null, null);
   }
 
   /**
