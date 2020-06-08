@@ -145,6 +145,17 @@ class InventoryService extends APIService
 
       $responseBody = $response->getBodyAsArray();
 
+      $this->loggerContract->debug(
+        TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_QUERY_DEBUG),
+        [
+          'additionalInfo' => [
+            'query' => $queryData,
+            'response' => $responseBody
+          ],
+          'method' => __METHOD__
+        ]
+      );
+
       if (isset($responseBody['errors'])) {
         throw new \Exception("Unable to update inventory due to errors." .
           " Response from  Wayfair: " . \json_encode($responseBody));
