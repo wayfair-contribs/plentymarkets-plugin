@@ -255,7 +255,7 @@ class SettingsController
     try {
       $date = \DateTime::createFromFormat('Y-m-d', $importOrderSince);
     } catch (\Exception $e) {
-      throw new ValidationException("When set, Import Orders Since setting must be a valid date", $e);
+      throw new ValidationException("When set, Import Orders Since setting must be a valid date", 400, $e);
     }
 
     if (!isset($date) || $date->format('Y-m-d') != $importOrderSince) {
