@@ -9,12 +9,12 @@ import { Language, TranslationService } from "angular-l10n";
 export class SettingsComponent {
   private static readonly TRANSLATION_KEY_NEGATIVE_NOT_ALLOWED =
     "negative_not_allowed";
-  private static readonly MESSAGE_DELIM = "\n";
+  private static readonly MESSAGE_DELIM = "\n<br/>\n";
 
   @Language()
   public lang: string;
 
-  public status = { type: null, value: null };
+  public status = { type: null, value: null, timestamp: null };
 
   public stockBuffer = 0;
   public defaultOrderStatus = null;
@@ -182,6 +182,7 @@ export class SettingsComponent {
   private showMessageVerbose(type, message): void {
     this.status.type = type;
     this.status.value = message;
+    this.status.timestamp = Date().toLocaleString();
   }
 
   /**
