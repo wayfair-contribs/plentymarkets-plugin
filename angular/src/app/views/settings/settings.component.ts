@@ -189,7 +189,7 @@ export class SettingsComponent {
   /**
    * Clear any message data on the page
    */
-  private clearMesage(): void {
+  public clearMesage(): void {
     this.showMessageVerbose(null, null, null);
   }
 
