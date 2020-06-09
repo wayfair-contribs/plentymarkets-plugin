@@ -101,6 +101,7 @@ class FullInventoryService
           $syncResultDetails = $this->inventoryUpdateService->sync(true);
           // FIXME: potential race conditions - change service management strategy in a future update
           $this->setServiceState(AbstractConfigHelper::FULL_INVENTORY_CRON_IDLE);
+          $this->markFullInventoryComplete();
         } catch (\Exception $e) {
           $this->setServiceState(AbstractConfigHelper::FULL_INVENTORY_CRON_FAILED);
           throw $e;
