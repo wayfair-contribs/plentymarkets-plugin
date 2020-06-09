@@ -12,15 +12,20 @@ use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\Inventory\RequestDTO;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
-use Wayfair\Repositories\KeyValueRepository;
 use Wayfair\Repositories\WarehouseSupplierRepository;
 
 class InventoryMapper
 {
   const LOG_KEY_STOCK_MISSING_WAREHOUSE = 'stockMissingWarehouse';
   const LOG_KEY_NO_SUPPLIER_ID_ASSIGNED_TO_WAREHOUSE = 'noSupplierIDForWarehouse';
+  const LOG_KEY_UNDEFINED_MAPPING_METHOD = 'undefinedMappingMethod';
+  const LOG_KEY_PART_NUMBER_LOOKUP = 'partNumberLookup';
+  const LOG_KEY_PART_NUMBER_MISSING = 'partNumberMissing';
   const LOG_KEY_INVALID_INVENTORY_AMOUNT = 'invalidInventoryAmount';
   const LOG_KEY_INVALID_STOCK_BUFFER = 'invalidStockBufferValue';
+
+  const VARIATION_BARCODES = 'variationBarcodes';
+  const VARIATION_SKUS = 'variationSkus';
 
   /**
    * @param $mainVariationId
@@ -107,11 +112,12 @@ class InventoryMapper
   /**
    * Create Inventory DTOs for one variation.
    * Returns a DTO for each supplier ID that has stock information for the variation.
-   * @param $variationData
+   * @param array $variationData
+   * @param string $itemMappingMethod
    *
    * @return RequestDTO[]
    */
-  public function createInventoryDTOsFromVariation($variationData)
+  public function createInventoryDTOsFromVariation($variationData, $itemMappingMethod)
   {
     /** @var LoggerContract $loggerContract */
     $loggerContract = pluginApp(LoggerContract::class);
@@ -122,11 +128,33 @@ class InventoryMapper
     /** @var array<string,RequestDTO> $requestDtosBySuID */
     $requestDtosBySuID = [];
 
-    $supplierPartNumber = $this->getSupplierPartNumberFromVariation($variationData);
-
     $mainVariationId = $variationData['id'];
+    $variationNumber = $variationData['number'];
+
+    $supplierPartNumber = $this->getSupplierPartNumberFromVariation($variationData, $itemMappingMethod, $loggerContract);
+
+    if (!isset($supplierPartNumber) || empty($supplierPartNumber)) {
+
+      $loggerContract->error(
+        TranslationHelper::getLoggerKey(self::LOG_KEY_PART_NUMBER_MISSING),
+        [
+          'additionalInfo' => [
+            'variationID' => $mainVariationId,
+            'variationNumber' => $variationNumber,
+            'itemMappingMethod' => $itemMappingMethod
+          ],
+          'method' => __METHOD__
+        ]
+      );
+
+      // inventory is worthless without part numbers
+      return [];
+    }
+
     $nextAvailableDate = $this->getAvailableDate($mainVariationId); // Pending. Need Item
 
+    // the 'stock' element is not declared for the Variation type,
+    // so type hints for "variationData" need to stay as "array"
     $stockList = $variationData['stock'];
     /** @var VariationStock $stock */
     foreach ($stockList as $stock) {
@@ -137,7 +165,10 @@ class InventoryMapper
         $loggerContract->info(
           TranslationHelper::getLoggerKey(self::LOG_KEY_STOCK_MISSING_WAREHOUSE),
           [
-            'additionalInfo' => ['variationID' => $mainVariationId],
+            'additionalInfo' => [
+              'variationID' => $mainVariationId,
+              'variationNumber' => $variationNumber
+            ],
             'method' => __METHOD__
           ]
         );
@@ -240,22 +271,75 @@ class InventoryMapper
    * Get the supplier's part number from Plentymarkets Variation data
    *
    * @param array $variationData
+   * @param string $itemMappingMethod
+   * @param LoggerContract $logger
    * @return mixed
    */
-  private function getSupplierPartNumberFromVariation($variationData)
+  static function getSupplierPartNumberFromVariation($variationData, $itemMappingMethod, $logger = null)
   {
-    /** @var KeyValueRepository $keyValueRepository */
-    $keyValueRepository = pluginApp(KeyValueRepository::class);
-    $itemMappingMethod = $keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD);
+    if (!isset($variationData))
+    {
+      return null;
+    }
 
-    switch ($itemMappingMethod) {
-      case AbstractConfigHelper::ITEM_MAPPING_SKU:
-        return $variationData['variationSkus'][0]['sku'];
-      case AbstractConfigHelper::ITEM_MAPPING_EAN:
-        return $variationData['variationBarcodes'][0]['code'];
-      case AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER:
-      default:
-        return $variationData['number'];
+    $supplierPartNumber = null;
+
+    $mainVariationId = $variationData['id'];
+    $variationNumber = $variationData['number'];
+
+    $supplierPartNumber = null;
+
+    try {
+
+      switch ($itemMappingMethod) {
+        case AbstractConfigHelper::ITEM_MAPPING_SKU:
+          if (array_key_exists(self::VARIATION_SKUS, $variationData) && !empty($variationData[self::VARIATION_SKUS]))
+          {
+            $supplierPartNumber = $variationData[self::VARIATION_SKUS][0]['sku'];
+          }
+          break;
+        case AbstractConfigHelper::ITEM_MAPPING_EAN:
+          if (array_key_exists(self::VARIATION_BARCODES, $variationData) && !empty($variationData[self::VARIATION_BARCODES]))
+          {
+            $supplierPartNumber = $variationData[self::VARIATION_BARCODES][0]['code'];
+          }
+          break;
+        case AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER:
+          $supplierPartNumber = $variationNumber;
+          break;
+        default:
+          // just in case - ConfigHelper should have validated the method value
+          $supplierPartNumber = $variationNumber;
+          if (isset($logger)) {
+            $logger->warning(
+              TranslationHelper::getLoggerKey(self::LOG_KEY_UNDEFINED_MAPPING_METHOD),
+              [
+                'additionalInfo' => [
+                  'itemMappingMethodFound' => $itemMappingMethod,
+                  'defaultingTo' => AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER,
+                ],
+                'method' => __METHOD__
+              ]
+            );
+          }
+      }
+
+      return $supplierPartNumber;
+    } finally {
+      if (isset($logger)) {
+        $logger->debug(
+          TranslationHelper::getLoggerKey(self::LOG_KEY_PART_NUMBER_LOOKUP),
+          [
+            'additionalInfo' => [
+              'itemMappingMethod' => $itemMappingMethod,
+              'variationID' => $mainVariationId,
+              'variationNumber' => $variationNumber,
+              'resolvedPartNumber' => $supplierPartNumber
+            ],
+            'method' => __METHOD__
+          ]
+        );
+      }
     }
   }
 
