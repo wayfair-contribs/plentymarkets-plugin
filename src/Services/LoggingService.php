@@ -31,11 +31,16 @@ class LoggingService implements LoggerContract {
   public $version;
 
   /**
+   * @var AbstractConfigHelper
+   */
+  private $configHelper;
+
+  /**
    * Initialize a logging service object
    */
   public function __construct() {
-    $configHelper = pluginApp(AbstractConfigHelper::class);
-    $this->version = $configHelper->getPluginVersion();
+    $this->configHelper = pluginApp(AbstractConfigHelper::class);
+    $this->version = $this->configHelper->getPluginVersion();
   }
 
   /**
@@ -128,8 +133,8 @@ class LoggingService implements LoggerContract {
    */
   public function extractVars($loggingInfo): array {
     $externalLogs = pluginApp(ExternalLogs::class);
-    $configHelper = pluginApp(AbstractConfigHelper::class);
-    $clientID = $this->$configHelper->getClientId();
+    // $configHelper = pluginApp(AbstractConfigHelper::class);
+    $clientID = $this->configHelper->getClientId();
     $shortMessage = [];
 
     $additionalInfo = $loggingInfo['additionalInfo'] ?? [];
