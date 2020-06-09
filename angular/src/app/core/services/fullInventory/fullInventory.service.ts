@@ -3,6 +3,7 @@ import { Http } from "@angular/http";
 import { TerraBaseService, TerraLoadingSpinnerService } from "@plentymarkets/terra-components";
 import { UrlHelper } from '../../helpers/url-helper';
 import { Observable } from 'rxjs';
+import { FullInventoryInterface } from './data/fullInventory.interface';
 @Injectable()
 export class FullInventoryService extends TerraBaseService {
 
@@ -10,7 +11,7 @@ export class FullInventoryService extends TerraBaseService {
         super(loadingBarService, http, UrlHelper.getWayfairUrl(UrlHelper.URL_WAYFAIR_FULL_INVENTORY))
     }
 
-    syncFullInventory()
+    syncFullInventory(): Observable<FullInventoryInterface>
     {
         this.setAuthorization()
         return this.mapRequest(

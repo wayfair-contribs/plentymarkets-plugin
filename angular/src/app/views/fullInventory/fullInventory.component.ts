@@ -10,18 +10,33 @@ export class FullInventoryComponent {
     @Language()
     public lang: string;
 
-    public status = {type: null, value: null};
+    public status = {type: null, value: null, timestamp: null};
 
     public constructor(private fullInventoryService: FullInventoryService, private translation: TranslationService) {
     }
 
     public syncFullInventory(): void {
+        this.showInfo('synchronizing');
         this.fullInventoryService.syncFullInventory().subscribe(data => {
-            this.status.type = 'text-info'
-            this.status.value = this.translation.translate('synced')
+            this.showInfo(data.status);
         }, err => {
-            this.status.type = 'text-danger'
-            this.status.value = this.translation.translate('error_sync')
+            this.showFailure('error_sync');
         })
+    }
+
+    private showMessage(type, messageKey, timestamp = Date().toLocaleString()) {
+        this.status.type = type;
+        this.status.value = this.translation.translate(messageKey);
+        this.status.timestamp = timestamp;
+    }
+
+    private showInfo(messageKey)
+    {
+        this.showMessage('text-info', messageKey);
+    }
+
+    private showFailure(messageKey)
+    {
+        this.showMessage('text-danger', messageKey);
     }
 }

@@ -1,6 +1,6 @@
 <div class="text-center center-block">
   <p *ngIf="status.value" class="{{status.type + ' col-md-12'}}">{{status.value}}</p>
-
+  <p *ngIf="status.value" class="{{status.type + ' col-md-12'}}">{{status.timestamp}}</p>
   <div class="col-md-12">
     <button class="btn btn-success" id="syncFullInventory" (click)="syncFullInventory()"> {{ 'sync' | translate:lang }} </button>
   </div>
