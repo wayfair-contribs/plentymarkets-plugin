@@ -127,7 +127,7 @@ class LoggingService implements LoggerContract {
    * @return array
    */
   public function extractVars($loggingInfo): array {
-    $date = new DateTime();
+    // $date = new DateTime();
     $externalLogs = pluginApp(ExternalLogs::class);
     $shortMessage = [];
 
@@ -142,7 +142,7 @@ class LoggingService implements LoggerContract {
       $externalLogs->addErrorLog("Message was too long to log in PlentyMarkets " . json_encode($loggingInfo));
     }
     $additionalInfo[self::WAYFAIR_PLUGIN_VERSION] = $this->version;
-    $additionalInfo['reference value'] = $this->$configHelper->getClientId() . '-' .  $date->getTimestamp();
+    $additionalInfo['reference value'] = $this->$configHelper->getClientId();
     $additionalInfo['reference type'] = $loggingInfo['referenceType'];
 
     return array($additionalInfo, $method, $referenceType, $referenceValue);
