@@ -135,17 +135,13 @@ class LoggingService implements LoggerContract {
     $externalLogs = pluginApp(ExternalLogs::class);
     $clientID = $this->configHelper->getClientId();
     $shortMessage = [];
-    $empStr = '';
-    for ($i = 0; $i <= 33000; $i++) {
-      $empStr .= 'x';
-    }
+
     $additionalInfo = $loggingInfo['additionalInfo'] ?? [];
     $method = $loggingInfo['method'] ?? null;
     $referenceType = $loggingInfo['referenceType'] ?? null;
     $referenceValue = (int) $loggingInfo['referenceValue'] ?? null;
 
-    // if (strlen(json_encode($loggingInfo)) > self::STRING_LIMIT) {
-    if (strlen($empStr) > self::STRING_LIMIT) {
+    if (strlen(json_encode($loggingInfo)) > self::STRING_LIMIT) {
       $logForKibana = [];
       $additionalInfo = $shortMessage['message'] = 'Message was too long to log in PlentyMarkets, ' . $clientID . '-' . date('M d Y H:i:s');
       $logForKibana['message'] = 'Message was too long to log in PlentyMarkets, ' . $clientID . '-' . date('D, d M Y H:i:s');
@@ -174,9 +170,4 @@ class LoggingService implements LoggerContract {
     return $configHelper->hasBooted();
   }
 
-  // public function messageTooLong($loggingInfo) {
-  //   if (strlen(json_encode($loggingInfo)) > self::STRING_LIMIT) {
-
-  //   }
-  // }
 }

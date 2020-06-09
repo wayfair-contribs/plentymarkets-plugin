@@ -104,7 +104,7 @@ class InventoryService extends APIService
       ];
     }
 
-    $query = 'mutation save($inventory: [InventoryInput]!) {'
+    $query = 'mutation save($inventory: [inventoryInput]!) {'
       . 'inventory {'
       . 'save('
       . 'inventory: $inventory,'
@@ -144,17 +144,6 @@ class InventoryService extends APIService
       $response = $this->query($queryData['query'], 'post', $queryData['variables']);
 
       $responseBody = $response->getBodyAsArray();
-
-      $this->loggerContract->debug(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_QUERY_DEBUG),
-        [
-          'additionalInfo' => [
-            'query' => $queryData,
-            'response' => $response->getBody()
-          ],
-          'method' => __METHOD__
-        ]
-      );
 
       if (isset($responseBody['errors'])) {
         throw new \Exception("Unable to update inventory due to errors." .
