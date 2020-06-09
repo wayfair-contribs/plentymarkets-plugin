@@ -36,5 +36,7 @@
 	"wayfair_shipping": "Wayfair Versand",
 	"own_account_shipping": "Selbst Versende",
 	"import_orders_since": "Aufträge importieren ab",
-	"must_have_at_least_one_scac": "Selbst Versende erfordert mindenstens ein Eintrag für die Trägertabelle"
+	"must_have_at_least_one_scac": "Selbst Versende erfordert mindenstens ein Eintrag für die Trägertabelle",
+	"synchronizing": "Die Synchronisierung wird ausgeführt",
+	"skipping_synchronization": "Synchronisation übersprungen - bereits in Bearbeitung"
 }
