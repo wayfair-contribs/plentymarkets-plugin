@@ -130,15 +130,26 @@ class FullInventoryService
     }
   }
 
+  /**
+   * Get the global state of the Full Inventory service,
+   * as an array of details
+   *
+   * @return array
+   */
   public function getServiceState(): array
   {
     return [
-      'status' => $this->getServiceState(),
+      'status' => $this->getServiceStatusValue(),
       'stateChangeTimestamp' => $this->getStateChangeTime(),
       'lastCompletion' => $this->getLastCompletionTime()
     ];
   }
 
+  /**
+   * Wrapper for getting FULL_INVENTORY_CRON_STATUS from storage
+   *
+   * @return string
+   */
   private function getServiceStatusValue(): string
   {
     $state = $this->keyValueRepository->get(AbstractConfigHelper::FULL_INVENTORY_CRON_STATUS);
@@ -151,11 +162,21 @@ class FullInventoryService
     return $state;
   }
 
+  /**
+   * Check if a Full Inventory sync is running
+   *
+   * @return boolean
+   */
   public function isFullInventoryRunning(): bool
   {
     return AbstractConfigHelper::FULL_INVENTORY_CRON_RUNNING == $this->getServiceStatusValue();
   }
 
+  /**
+   * Get the global timestamp for the last change to Full Inventory
+   *
+   * @return string
+   */
   public function getStateChangeTime(): string
   {
     return $this->keyValueRepository->get(AbstractConfigHelper::FULL_INVENTORY_STATUS_UPDATED_AT);
@@ -200,16 +221,31 @@ class FullInventoryService
     return false;
   }
 
+  /**
+   * Set the global timestamp for a successful sync to now
+   *
+   * @return void
+   */
   private function markFullInventoryComplete()
   {
     $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_LAST_COMPLETION, self::getCurrentTimeStamp());
   }
 
+  /**
+   * Get the global timestamp for a successful sync
+   *
+   * @return void
+   */
   public function getLastCompletionTime()
   {
     return $this->keyValueRepository->get(AbstractConfigHelper::FULL_INVENTORY_LAST_COMPLETION);
   }
 
+  /**
+   * Get a timestamp for setting global values
+   *
+   * @return void
+   */
   private static function getCurrentTimeStamp()
   {
     return date('Y-m-d H:i:s.u P');
