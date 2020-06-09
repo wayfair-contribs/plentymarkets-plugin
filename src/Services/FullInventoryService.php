@@ -71,6 +71,9 @@ class FullInventoryService
     /** @var ExternalLogs $externalLogs */
     $externalLogs = pluginApp(ExternalLogs::class);
 
+    $syncResultObjects = [];
+    $stateArray = [];
+
     try {
       $alreadyRunning = $this->isFullInventoryRunning();
       // FIXME: potential race conditions - change service management strategy in a future update
@@ -86,39 +89,53 @@ class FullInventoryService
 
         $externalLogs->addErrorLog(($manual ? "Manual " : "Automatic") . "Full inventory sync BLOCKED - full inventory sync is currently running");
       } else {
-        $lastState = $this->setServiceState(AbstractConfigHelper::FULL_INVENTORY_CRON_RUNNING);
+        try
+        {
+          $lastState = $this->setServiceState(AbstractConfigHelper::FULL_INVENTORY_CRON_RUNNING);
 
-        $externalLogs->addInfoLog("Starting " . ($manual ? "Manual " : "Automatic") . "full inventory sync.");
-        $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_START), [
-          'additionalInfo' => ['manual' => (string) $manual, 'lastState' => $lastState, 'lastStateChange' => $lastStateChange],
-          'method' => __METHOD__
-        ]);
+          $externalLogs->addInfoLog("Starting " . ($manual ? "Manual " : "Automatic") . "full inventory sync.");
+          $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_START), [
+            'additionalInfo' => ['manual' => (string) $manual, 'lastState' => $lastState, 'lastStateChange' => $lastStateChange],
+            'method' => __METHOD__
+          ]);
 
-        $result = null;
-          $result = $this->inventoryUpdateService->sync(true);
-
+          $syncResultObjects = $this->inventoryUpdateService->sync(true);
           // FIXME: potential race conditions - change service management strategy in a future update
           $this->setServiceState(AbstractConfigHelper::FULL_INVENTORY_CRON_IDLE);
-        }
 
-      return $this->getServiceState();
+        } catch (\Exception $e) {
+          $this->setServiceState(AbstractConfigHelper::FULL_INVENTORY_CRON_FAILED);
+          throw $e;
+        }
+      }
+
+      // capture state to put it into logs (see finally block)
+      $stateArray = $this->getServiceState();
+      // provide current state to clients
+      return $stateArray;
     } catch (\Exception $e) {
       $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_ERROR), [
         'additionalInfo' => ['manual' => (string) $manual, 'message' => $e->getMessage()],
         'method' => __METHOD__
       ]);
-
-      $this->setServiceState(AbstractConfigHelper::FULL_INVENTORY_CRON_FAILED);
     } finally {
-      $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_END), [
-        'additionalInfo' => ['result' => $result],
+      // amount of DTOs - one per variation per warehouse
+      $variatonsTimesWarehouses = 0;
+      if (isset($syncResultObjects))
+      {
+        $variatonsTimesWarehouses = count($syncResultObjects);
+      }
+
+      // don't put the results into the logs - too large.
+      $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_END), [
+        'additionalInfo' => ['state' => $stateArray, 'variatonsTimesWarehouses' => $variatonsTimesWarehouses],
         'method' => __METHOD__
       ]);
 
       $externalLogs->addInfoLog("Finished " . ($manual ? "Manual " : "Automatic") . "full inventory sync.");
-        /** @var LogSenderService $logSenderService */
-        $logSenderService = pluginApp(LogSenderService::class);
-        $logSenderService->execute($externalLogs->getLogs());
+      /** @var LogSenderService $logSenderService */
+      $logSenderService = pluginApp(LogSenderService::class);
+      $logSenderService->execute($externalLogs->getLogs());
     }
   }
 
