@@ -74,42 +74,6 @@ class WayfairRouteServiceProvider extends RouteServiceProvider {
         'middleware' => ['oauth.cookie']
         ]
     );
-    $router->get(
-        'order/fetchAndCreateOrders',  [
-        'uses' => 'Wayfair\Controllers\TestController@fetchAndCreateOrders',
-        'middleware' => ['oauth.cookie']
-        ]
-    );
-    $router->get(
-        'order/showKeyValueAll',  [
-        'uses' => 'Wayfair\Controllers\TestController@showKeyValueAll',
-        'middleware' => ['oauth.cookie']
-    ]);
-    $router->get(
-      'order/showPendingOrders',  [
-      'uses' => 'Wayfair\Controllers\TestController@showPendingOrders',
-      'middleware' => ['oauth.cookie']
-    ]);
-    $router->get(
-      'order/deleteOrders',  [
-      'uses' => 'Wayfair\Controllers\TestController@deleteOrders',
-      'middleware' => ['oauth.cookie']
-    ]);
-    $router->get(
-      'order/acceptOrders',  [
-      'uses' => 'Wayfair\Controllers\TestController@acceptOrders',
-      'middleware' => ['oauth.cookie']
-    ]);
-    $router->get(
-      'order/paymentMethods',  [
-      'uses' => 'Wayfair\Controllers\TestController@paymentMethods',
-      'middleware' => ['oauth.cookie']
-    ]);
-    $router->get(
-      'order/updateFullInventoryStatus',  [
-      'uses' => 'Wayfair\Controllers\TestController@updateFullInventoryStatus',
-      'middleware' => ['oauth.cookie']
-    ]);
 
     // Production URLs
 
