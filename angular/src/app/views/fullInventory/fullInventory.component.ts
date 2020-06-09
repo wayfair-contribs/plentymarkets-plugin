@@ -1,4 +1,5 @@
 import {Component} from '@angular/core';
+import {FullInventoryInterface} from '../../core/services/fullInventory/data/fullInventory.interface'
 import {FullInventoryService} from '../../core/services/fullInventory/fullInventory.service';
 import {Language, TranslationService} from 'angular-l10n';
 
@@ -10,33 +11,46 @@ export class FullInventoryComponent {
     @Language()
     public lang: string;
 
-    public status = {type: null, value: null, timestamp: null};
+    public serviceState = null;
+    public lastServiceCompletion = null;
 
     public constructor(private fullInventoryService: FullInventoryService, private translation: TranslationService) {
     }
 
+    public ngOnInit(): void {
+        this.refreshState();
+      }
+
     public syncFullInventory(): void {
-        this.showInfo('synchronizing');
+        this.setState('synchronizing');
         this.fullInventoryService.syncFullInventory().subscribe(data => {
-            this.showInfo(data.status);
+
+            this.refreshSateFromData(data);
         }, err => {
-            this.showFailure('error_sync');
+            this.setState('error_sync');
         })
     }
 
-    private showMessage(type, messageKey, timestamp = Date().toLocaleString()) {
-        this.status.type = type;
-        this.status.value = this.translation.translate(messageKey);
-        this.status.timestamp = timestamp;
+    private refreshState(): void {
+        this.setState('loading');
+        this.fullInventoryService.getState().subscribe(data => {
+            this.refreshSateFromData(data);
+        }, err => {
+            this.setState('error_fetch');
+        })
     }
 
-    private showInfo(messageKey)
-    {
-        this.showMessage('text-info', messageKey);
+    /**
+     * 
+     * @param data FullInventoryInterface
+     */
+    private refreshSateFromData(data: FullInventoryInterface) {
+        this.serviceState = data.status;
+        this.lastServiceCompletion = data.lastCompletion;
     }
 
-    private showFailure(messageKey)
+    private setState(messageKey)
     {
-        this.showMessage('text-danger', messageKey);
+        this.serviceState = this.translation.translate(messageKey);
     }
 }

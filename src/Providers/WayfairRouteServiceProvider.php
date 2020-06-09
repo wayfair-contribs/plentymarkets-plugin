@@ -98,8 +98,8 @@ class WayfairRouteServiceProvider extends RouteServiceProvider {
         ]
     );
     $router->get(
-        'wayfair/fullInventory_test', [
-        'uses'       => 'Wayfair\Controllers\FullInventoryController@syncTest',
+        'wayfair/fullInventory', [
+        'uses'       => 'Wayfair\Controllers\FullInventoryController@getState',
         'middleware' => ['oauth.cookie']
         ]
     );

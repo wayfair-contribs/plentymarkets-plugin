@@ -70,7 +70,7 @@ class FullInventoryService
   {
     /** @var ExternalLogs $externalLogs */
     $externalLogs = pluginApp(ExternalLogs::class);
-    
+
     try {
       $alreadyRunning = $this->isFullInventoryRunning();
       // FIXME: potential race conditions - change service management strategy in a future update
@@ -80,14 +80,12 @@ class FullInventoryService
 
       if ($alreadyRunning && !$lastRunTakingToolong) {
         $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_SKIPPED), [
-        'additionalInfo' => ['manual' => (string) $manual, 'startedAt' => $lastStateChange],
-        'method' => __METHOD__
+          'additionalInfo' => ['manual' => (string) $manual, 'startedAt' => $lastStateChange],
+          'method' => __METHOD__
         ]);
 
         $externalLogs->addErrorLog(($manual ? "Manual " : "Automatic") . "Full inventory sync BLOCKED - full inventory sync is currently running");
-      }
-      else
-      {
+      } else {
         $lastState = $this->setServiceState(AbstractConfigHelper::FULL_INVENTORY_CRON_RUNNING);
 
         $externalLogs->addInfoLog("Starting " . ($manual ? "Manual " : "Automatic") . "full inventory sync.");
@@ -98,13 +96,13 @@ class FullInventoryService
 
         $result = null;
         try {
-         
+
           $result = $this->inventoryUpdateService->sync(true);
 
           // FIXME: potential race conditions - change service management strategy in a future update
           $this->setServiceState(AbstractConfigHelper::FULL_INVENTORY_CRON_IDLE);
         } catch (\Exception $e) {
-          
+
           $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_ERROR), [
             'additionalInfo' => ['manual' => (string) $manual, 'message' => $e->getMessage()],
             'method' => __METHOD__
@@ -122,7 +120,7 @@ class FullInventoryService
         }
       }
 
-      return ['status' => $this->getServiceState(), 'stateChangeTimestamp' => $this->getStateChangeTime(), 'timestamp' => self::getCurrentTimeStamp()];
+      return $this->getServiceState();
     } finally {
       if (count($externalLogs->getLogs())) {
         /** @var LogSenderService $logSenderService */
@@ -132,10 +130,18 @@ class FullInventoryService
     }
   }
 
-  private function getServiceState(): string
+  public function getServiceState(): array
+  {
+    return [
+      'status' => $this->getServiceState(), 
+      'stateChangeTimestamp' => $this->getStateChangeTime(), 
+      'lastCompletion' => $this->getLastCompletionTime()];
+  }
+
+  private function getServiceStatusValue(): string
   {
     $state = $this->keyValueRepository->get(AbstractConfigHelper::FULL_INVENTORY_CRON_STATUS);
-    
+
     $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_STATE_CHECK), [
       'additionalInfo' => ['state' => $state],
       'method' => __METHOD__
@@ -146,7 +152,7 @@ class FullInventoryService
 
   public function isFullInventoryRunning(): bool
   {
-    return AbstractConfigHelper::FULL_INVENTORY_CRON_RUNNING == $this->getServiceState();
+    return AbstractConfigHelper::FULL_INVENTORY_CRON_RUNNING == $this->getServiceStatusValue();
   }
 
   public function getStateChangeTime(): string
@@ -166,7 +172,7 @@ class FullInventoryService
     $oldState = $this->keyValueRepository->get(AbstractConfigHelper::FULL_INVENTORY_CRON_STATUS);
     $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_CRON_STATUS, $state);
     // this replaces flaky code in KeyValueRepository that was attempting to do change tracking.
-    $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_STATUS_UPDATED_AT, self::getCurrentTime());
+    $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_STATUS_UPDATED_AT, self::getCurrentTimeStamp());
 
     return $oldState;
   }
@@ -179,20 +185,28 @@ class FullInventoryService
    */
   private function serviceHasBeenRunningTooLong(): bool
   {
-    if ($this->isFullInventoryRunning())
-    {
+    if ($this->isFullInventoryRunning()) {
       $lastStateChange = $this->getStateChangeTime();
-      if(!$lastStateChange || (\time() - \strtotime($lastStateChange)) > self::MAX_FULL_INVENTORY_TIME)
-      {
+      if (!$lastStateChange || (\time() - \strtotime($lastStateChange)) > self::MAX_FULL_INVENTORY_TIME) {
         $this->logger->warning(TranslationHelper::getLoggerKey(self::LOG_KEY_LONG_RUN), [
           'additionalInfo' => ['lastStateChange' => $lastStateChange, 'maximumTime' => self::MAX_FULL_INVENTORY_TIME],
           'method' => __METHOD__
-          ]);
+        ]);
         return true;
       }
     }
-    
+
     return false;
+  }
+
+  private function markFullInventoryComplete()
+  {
+    $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_LAST_COMPLETION, self::getCurrentTimeStamp());
+  }
+
+  public function getLastCompletionTime()
+  {
+    return $this->keyValueRepository->get(AbstractConfigHelper::FULL_INVENTORY_LAST_COMPLETION);
   }
 
   private static function getCurrentTimeStamp()

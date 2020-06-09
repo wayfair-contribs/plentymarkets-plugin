@@ -27,24 +27,8 @@ class FullInventoryController extends Controller
     return \json_encode($fullInventoryService->sync(true));
   }
 
-  /**
-   * @param KeyValueRepository $keyValueRepository
-   *
-   * @return string
-   * @throws \Exception
-   */
-  public function syncTest(Request $request, KeyValueRepository $keyValueRepository)
+  public function getState(FullInventoryService $fullInventoryService)
   {
-    $cronStatus = $keyValueRepository->get(AbstractConfigHelper::FULL_INVENTORY_CRON_STATUS);
-    if ($cronStatus !== AbstractConfigHelper::FULL_INVENTORY_CRON_RUNNING) {
-      $keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_CRON_STATUS, AbstractConfigHelper::FULL_INVENTORY_CRON_RUNNING);
-      $inventoryUpdateService = pluginApp(InventoryUpdateService::class);
-      $data = $inventoryUpdateService->sync(true);
-      $keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_CRON_STATUS, AbstractConfigHelper::FULL_INVENTORY_CRON_IDLE);
-
-      return $request->input('data') == 1 ? json_encode($data) : json_encode(['error' => 'Sync is running']);
-    }
-
-    return json_encode(['error' => 'Sync is running']);
+    return \json_encode($fullInventoryService->getServiceState());
   }
 }

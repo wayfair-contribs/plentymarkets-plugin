@@ -18,4 +18,12 @@ export class FullInventoryService extends TerraBaseService {
             this.http.post(this.url, {})
         )
     }
+
+    getState(): Observable<FullInventoryInterface>
+    {
+        this.setAuthorization()
+        return this.mapRequest(
+            this.http.get(this.url)
+        )
+    }
 }

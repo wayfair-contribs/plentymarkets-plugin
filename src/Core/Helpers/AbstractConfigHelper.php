@@ -27,6 +27,7 @@ abstract class AbstractConfigHelper {
   const FULL_INVENTORY_CRON_RUNNING = 'running';
   const FULL_INVENTORY_CRON_IDLE = 'idle';
   const FULL_INVENTORY_CRON_FAILED = 'failed';
+  const FULL_INVENTORY_LAST_COMPLETION = "full_inventory_last_completion";
   const SECONDS_INTERVAL_FOR_INVENTORY = 4800;
   const SHIPPING_METHOD = 'shippingMethod';
   const PAYMENT_METHOD_INVOICE = 2;

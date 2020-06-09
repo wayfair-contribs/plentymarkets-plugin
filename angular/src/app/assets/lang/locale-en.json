@@ -38,5 +38,9 @@
 	"import_orders_since": "Import orders since",
 	"must_have_at_least_one_scac": "When using Own account shipping, configure one or more carrier configurations",
 	"synchronizing": "Synchronization in progress...",
-	"skipping_synchronization": "Skipping synchronization because a syncronization is already in progress"
+	"skipping_synchronization": "Skipping synchronization because a syncronization is already in progress",
+	"full_inventory_status": "Full inventory status",
+	"last_good_sync": "Last synchronization",
+	"loading": "Loading",
+	"refresh": "Refresh"
 }
