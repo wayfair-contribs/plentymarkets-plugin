@@ -17,7 +17,7 @@
 	"error_fetch": "Error while fetching.",
 	"error_save": "Error while saving.",
 	"nothing_to_save": "Nothing to be saved.",
-	"negative_not_allowed": "Value can't be negative.",
+	"negative_not_allowed": "Value must be a non-negative number",
 	"buffer": "Buffer",
 	"order_status_id" :"Order Status ID",
 	"shipping_provider_id": "Shipping Provider ID",

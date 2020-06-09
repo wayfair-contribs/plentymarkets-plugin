@@ -17,7 +17,7 @@
 	"error_fetch": "Fehler beim Abrufen.",
 	"error_save": "Fehler beim Speichern.",
 	"nothing_to_save": "Nichts zu retten.",
-	"negative_not_allowed": "Wert  dkann nicht negativ sein.",
+	"negative_not_allowed": "Der Wert muss eine Zahl größer als Null sein",
 	"buffer": "Puffer",
 	"order_status_id": "Bestellstatus-ID",
 	"shipping_provider_id": "Versandanbieter-ID",
