@@ -127,11 +127,6 @@ class InventoryUpdateService
     // look up item mapping method at this level to ensure consistency and improve efficiency
     $itemMappingMethod = $configHelper->getItemMappingMethod();
 
-    /** @var array $syncResultObjects collection of the individual results of bulk update actions against the Wayfair API */
-    $syncResultObjects = [];
-    
-   
-
     $loggerContract->debug(
       TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_START),
       [
@@ -139,7 +134,6 @@ class InventoryUpdateService
         'method' => __METHOD__
       ]
     );
-
 
     $page = 0;
     $inventorySaveTotal = 0;
@@ -155,6 +149,7 @@ class InventoryUpdateService
       $variationSearchRepository->setFilters($this->getFilters($fullInventory));
 
       do {
+
         $msAtPageStart = TimeHelper::getMilliseconds();
 
         /** @var RequestDTO[] $normalizedInventoryRequestDTOs collection of DTOs to include in a bulk update*/
@@ -208,14 +203,17 @@ class InventoryUpdateService
           $inventorySaveTotal += count($normalizedInventoryRequestDTOs);
           $inventorySaveSuccess += count($normalizedInventoryRequestDTOs) - count($dto->getErrors());
           $inventorySaveFail += count($dto->getErrors());
-
-          $syncResultObjects[] = $dto->toArray();
         }
 
         $loggerContract->debug(
           TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
           [
-            'additionalInfo' => ['fullInventory' => (string) $fullInventory, 'page_num' => (string) $page, 'info' => 'page done'],
+            'additionalInfo' => [
+              'fullInventory' => (string) $fullInventory, 
+              'page_num' => (string) $page, 
+              'info' => 'page done',
+              'resultsForPage' => $dto
+            ],
             'method' => __METHOD__
           ]
         );
@@ -258,8 +256,14 @@ class InventoryUpdateService
       $logSenderService->execute($externalLogs->getLogs());
     }
 
-    // TODO: refactor to return information on failures so that users / cron jobs can react to them
-    return $syncResultObjects;
+    return [
+      'inventorySaveTotal' => $inventorySaveTotal,
+      'inventorySaveSuccess' => $inventorySaveSuccess,
+      'inventorySaveFail' => $inventorySaveFail,
+      'saveInventoryDuration' => $saveInventoryDuration,
+      'savedInventoryDuration' => $savedInventoryDuration,
+      'pages' => $page
+    ];
   }
 
   /**
@@ -306,5 +310,4 @@ class InventoryUpdateService
 
     return $filter;
   }
-
 }

@@ -71,7 +71,7 @@ class FullInventoryService
     /** @var ExternalLogs $externalLogs */
     $externalLogs = pluginApp(ExternalLogs::class);
 
-    $syncResultObjects = [];
+    $syncResultDetails = [];
     $stateArray = [];
 
     try {
@@ -89,8 +89,7 @@ class FullInventoryService
 
         $externalLogs->addErrorLog(($manual ? "Manual " : "Automatic") . "Full inventory sync BLOCKED - full inventory sync is currently running");
       } else {
-        try
-        {
+        try {
           $lastState = $this->setServiceState(AbstractConfigHelper::FULL_INVENTORY_CRON_RUNNING);
 
           $externalLogs->addInfoLog("Starting " . ($manual ? "Manual " : "Automatic") . "full inventory sync.");
@@ -99,10 +98,9 @@ class FullInventoryService
             'method' => __METHOD__
           ]);
 
-          $syncResultObjects = $this->inventoryUpdateService->sync(true);
+          $syncResultDetails = $this->inventoryUpdateService->sync(true);
           // FIXME: potential race conditions - change service management strategy in a future update
           $this->setServiceState(AbstractConfigHelper::FULL_INVENTORY_CRON_IDLE);
-
         } catch (\Exception $e) {
           $this->setServiceState(AbstractConfigHelper::FULL_INVENTORY_CRON_FAILED);
           throw $e;
@@ -119,16 +117,8 @@ class FullInventoryService
         'method' => __METHOD__
       ]);
     } finally {
-      // amount of DTOs - one per variation per warehouse
-      $variatonsTimesWarehouses = 0;
-      if (isset($syncResultObjects))
-      {
-        $variatonsTimesWarehouses = count($syncResultObjects);
-      }
-
-      // don't put the results into the logs - too large.
       $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_END), [
-        'additionalInfo' => ['state' => $stateArray, 'variatonsTimesWarehouses' => $variatonsTimesWarehouses],
+        'additionalInfo' => ['state' => $stateArray, 'details' => $syncResultDetails],
         'method' => __METHOD__
       ]);
 
