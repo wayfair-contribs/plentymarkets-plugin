@@ -148,7 +148,7 @@ class LoggingService implements LoggerContract {
       $externalLogs->addErrorLog("Message was too long to log in PlentyMarkets " . json_encode($loggingInfo));
     }
     $additionalInfo[self::WAYFAIR_PLUGIN_VERSION] = $this->version;
-    $additionalInfo['reference value'] = $clientID;
+    $additionalInfo['reference value'] = $clientID . '-' . date('D, d M Y H:i:s');
     $additionalInfo['reference type'] = $loggingInfo['referenceType'];
 
     return array($additionalInfo, $method, $referenceType, $referenceValue);
