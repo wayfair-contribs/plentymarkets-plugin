@@ -1,6 +1,6 @@
 ﻿# Release notes for Wayfair
 
-## v1.1.2 (2020-06-02)
+## v1.1.2 (2020-06-15)
 - Add support for paginated inventory synchronization
 - Fixed downloading empty documents to plentymarkets
 - Increased logging
