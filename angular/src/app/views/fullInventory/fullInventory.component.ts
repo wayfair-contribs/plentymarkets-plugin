@@ -36,13 +36,13 @@ export class FullInventoryComponent {
   }
 
   private refreshState(): void {
-      this.showLoading();
+    this.showLoading();
     this.fullInventoryService.getState().subscribe(
       (data) => {
         this.refreshSateFromData(data);
       },
       (err) => {
-          this.showFetchError();
+        this.showFetchError();
       }
     );
   }
@@ -54,6 +54,9 @@ export class FullInventoryComponent {
   private refreshSateFromData(data: FullInventoryInterface) {
     let unknown = this.translation.translate("unknown");
     // service may not know last completion datestamp. Don't clear out a value if we already had one.
+    
+    this.serviceState = data.status;
+
     this.lastServiceCompletion = data.lastCompletion
       ? data.lastCompletion
       : this.lastServiceCompletion
@@ -65,19 +68,18 @@ export class FullInventoryComponent {
     this.serviceState = this.translation.translate(messageKey);
   }
 
-  private showLoading()
-  {
+  private showLoading() {
     this.setState("loading");
     this.lastServiceCompletion = this.lastServiceCompletion
       ? this.lastServiceCompletion
       : this.translation.translate("loading");
   }
 
-  private showFetchError()
-  {
+  private showFetchError() {
     this.setState("error_fetch");
-    this.lastServiceCompletion = this.lastServiceCompletion != this.translation.translate("loading")
-      ? this.lastServiceCompletion
-      : this.translation.translate("unknown");
+    this.lastServiceCompletion =
+      this.lastServiceCompletion != this.translation.translate("loading")
+        ? this.lastServiceCompletion
+        : this.translation.translate("unknown");
   }
 }
