@@ -76,7 +76,7 @@ export class FullInventoryComponent {
   private showFetchError()
   {
     this.setState("error_fetch");
-    this.lastServiceCompletion = this.lastServiceCompletion
+    this.lastServiceCompletion = this.lastServiceCompletion != this.translation.translate("loading")
       ? this.lastServiceCompletion
       : this.translation.translate("unknown");
   }
