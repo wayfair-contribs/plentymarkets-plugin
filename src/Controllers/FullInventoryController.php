@@ -6,11 +6,7 @@
 namespace Wayfair\Controllers;
 
 use Plenty\Plugin\Controller;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
-use Wayfair\Repositories\KeyValueRepository;
 use Wayfair\Services\FullInventoryService;
-use Wayfair\Services\InventoryUpdateService;
-use Plenty\Plugin\Http\Request;
 
 class FullInventoryController extends Controller
 {

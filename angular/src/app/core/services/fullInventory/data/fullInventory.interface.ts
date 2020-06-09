@@ -2,5 +2,5 @@ export interface FullInventoryInterface
 {
     status:string;
     stateChangeTimestamp:string;
-    lastCompletion:string
+    lastCompletion?:string
 }

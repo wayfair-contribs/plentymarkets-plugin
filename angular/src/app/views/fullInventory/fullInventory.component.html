@@ -1,30 +1,40 @@
 <div class="text-center center-block">
-  
   <div class="form-row">
     <div class="form-group col-md-4 col-md-offset-2">
-      <label for="serviceState" style="margin-top: 5px;">{{
-        "full_inventory_status" | translate: lang
-      }}</label>
+      <label for="serviceState" style="margin-top: 5px; font-weight: bold;"
+        >{{ "full_inventory_status" | translate: lang }}:</label
+      >
     </div>
     <div class="form-group col-md-4">
-      {{serviceState}}
+      {{ serviceState }}
     </div>
   </div>
 
   <div class="form-row">
     <div class="form-group col-md-4 col-md-offset-2">
-      <label for="lastServiceCompletion" style="margin-top: 5px;">{{
-        "last_good_sync" | translate: lang
-      }}</label>
+      <label
+        for="lastServiceCompletion"
+        style="margin-top: 5px; font-weight: bold;"
+        >{{ "last_good_sync" | translate: lang }}:</label
+      >
     </div>
     <div class="form-group col-md-4">
-      {{lastServiceCompletion}}
+      {{ lastServiceCompletion }}
     </div>
   </div>
-  
+
   <div class="col-md-12">
-    <button class="btn btn-primary" id="syncFullInventory" (click)="syncFullInventory()"> {{ 'sync' | translate:lang }} </button>
-    <br/>
-    <button class="btn btn-info" id="refreshState" (click)="refreshState()"> {{ 'refresh' | translate:lang }} </button>
+    <button class="btn btn-info" id="refreshState" (click)="refreshState()">
+      {{ "refresh" | translate: lang }}
+    </button>
+    <br />
+    <br />
+    <button
+      class="btn btn-primary"
+      id="syncFullInventory"
+      (click)="syncFullInventory()"
+    >
+      {{ "sync" | translate: lang }}
+    </button>
   </div>
 </div>

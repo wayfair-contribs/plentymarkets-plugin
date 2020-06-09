@@ -1,56 +1,69 @@
-import {Component} from '@angular/core';
-import {FullInventoryInterface} from '../../core/services/fullInventory/data/fullInventory.interface'
-import {FullInventoryService} from '../../core/services/fullInventory/fullInventory.service';
-import {Language, TranslationService} from 'angular-l10n';
+import { Component } from "@angular/core";
+import { FullInventoryInterface } from "../../core/services/fullInventory/data/fullInventory.interface";
+import { FullInventoryService } from "../../core/services/fullInventory/fullInventory.service";
+import { Language, TranslationService } from "angular-l10n";
 
 @Component({
-    selector: 'fullInventory',
-    template: require('./fullInventory.component.html')
+  selector: "fullInventory",
+  template: require("./fullInventory.component.html"),
 })
 export class FullInventoryComponent {
-    @Language()
-    public lang: string;
+  @Language()
+  public lang: string;
 
-    public serviceState = null;
-    public lastServiceCompletion = null;
+  public serviceState = null;
+  public lastServiceCompletion = null;
 
-    public constructor(private fullInventoryService: FullInventoryService, private translation: TranslationService) {
-    }
+  public constructor(
+    private fullInventoryService: FullInventoryService,
+    private translation: TranslationService
+  ) {}
 
-    public ngOnInit(): void {
-        this.refreshState();
+  public ngOnInit(): void {
+    this.refreshState();
+  }
+
+  public syncFullInventory(): void {
+    this.setState("synchronizing");
+    this.fullInventoryService.syncFullInventory().subscribe(
+      (data) => {
+        this.refreshSateFromData(data);
+      },
+      (err) => {
+        this.setState("error_sync");
       }
+    );
+  }
 
-    public syncFullInventory(): void {
-        this.setState('synchronizing');
-        this.fullInventoryService.syncFullInventory().subscribe(data => {
+  private refreshState(): void {
+    this.setState("loading");
+    this.fullInventoryService.getState().subscribe(
+      (data) => {
+        this.refreshSateFromData(data);
+      },
+      (err) => {
+        this.setState("error_fetch");
+      }
+    );
+  }
 
-            this.refreshSateFromData(data);
-        }, err => {
-            this.setState('error_sync');
-        })
-    }
+  /**
+   *
+   * @param data FullInventoryInterface
+   */
+  private refreshSateFromData(data: FullInventoryInterface) {
+    let unknown = this.translation.translate("unknown");
+    let datestamp = (this.serviceState = data.status ? data.status : unknown);
 
-    private refreshState(): void {
-        this.setState('loading');
-        this.fullInventoryService.getState().subscribe(data => {
-            this.refreshSateFromData(data);
-        }, err => {
-            this.setState('error_fetch');
-        })
-    }
+    // service may not know last completion datestamp. Don't clear out a value if we already had one.
+    this.lastServiceCompletion = data.lastCompletion
+      ? data.lastCompletion
+      : this.lastServiceCompletion
+      ? this.lastServiceCompletion
+      : unknown;
+  }
 
-    /**
-     * 
-     * @param data FullInventoryInterface
-     */
-    private refreshSateFromData(data: FullInventoryInterface) {
-        this.serviceState = data.status;
-        this.lastServiceCompletion = data.lastCompletion;
-    }
-
-    private setState(messageKey)
-    {
-        this.serviceState = this.translation.translate(messageKey);
-    }
+  private setState(messageKey) {
+    this.serviceState = this.translation.translate(messageKey);
+  }
 }

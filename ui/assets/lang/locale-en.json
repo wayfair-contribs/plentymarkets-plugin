@@ -42,5 +42,6 @@
 	"full_inventory_status": "Full inventory status",
 	"last_good_sync": "Last synchronization",
 	"loading": "Loading",
-	"refresh": "Refresh"
+	"refresh": "Refresh",
+	"unknown": "Unknown"
 }

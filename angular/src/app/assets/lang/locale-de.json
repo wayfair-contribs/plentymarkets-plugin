@@ -40,5 +40,6 @@
 	"synchronizing": "Die Synchronisierung wird ausgeführt",
 	"skipping_synchronization": "Synchronisation übersprungen - bereits in Bearbeitung",
 	"loading": "lade Daten",
-	"refresh": "aktualisieren"
+	"refresh": "aktualisieren",
+	"unknown": "Unbekannt"
 }
