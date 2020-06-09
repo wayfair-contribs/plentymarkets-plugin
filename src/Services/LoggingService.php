@@ -142,7 +142,7 @@ class LoggingService implements LoggerContract {
     $referenceValue = (int) $loggingInfo['referenceValue'] ?? null;
 
     if (strlen(json_encode($loggingInfo)) > self::STRING_LIMIT) {
-      $additionalInfo = $shortMessage['message'] = 'Message was too long to log in PlentyMarkets, ' . $clientID . '-' . date('D, d M Y H:i:s');
+      $additionalInfo = $shortMessage['message'] = 'Message was too long to log in PlentyMarkets, ' . $clientID . '-' . date('M d Y H:i:s');
       $logForKibana['message'] = 'Message was too long to log in PlentyMarkets, ' . $clientID . '-' . date('D, d M Y H:i:s');
       $logForKibana['details'] = $loggingInfo;
       $externalLogs->addErrorLog(json_encode($logForKibana));
