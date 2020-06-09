@@ -133,9 +133,10 @@ class FullInventoryService
   public function getServiceState(): array
   {
     return [
-      'status' => $this->getServiceState(), 
-      'stateChangeTimestamp' => $this->getStateChangeTime(), 
-      'lastCompletion' => $this->getLastCompletionTime()];
+      'status' => $this->getServiceState(),
+      'stateChangeTimestamp' => $this->getStateChangeTime(),
+      'lastCompletion' => $this->getLastCompletionTime()
+    ];
   }
 
   private function getServiceStatusValue(): string
