@@ -38,7 +38,6 @@ class ClientService implements ClientInterfaceContract {
             'arguments' => $arguments
         ]
     );
-
     return pluginApp(WayfairResponse::class, [$response]);
   }
 }
