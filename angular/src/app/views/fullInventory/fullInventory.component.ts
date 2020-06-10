@@ -55,7 +55,8 @@ export class FullInventoryComponent {
     let unknown = this.translation.translate("unknown");
     // service may not know last completion datestamp. Don't clear out a value if we already had one.
     
-    this.setState(data.status);
+    let status = data.status ? data.status : unknown;
+    this.setState(status);
 
     this.lastServiceCompletion = data.lastCompletion
       ? data.lastCompletion
@@ -65,6 +66,7 @@ export class FullInventoryComponent {
   }
 
   private setState(messageKey) {
+    // TODO: if state is negative, change text style?
     this.serviceState = this.translation.translate(messageKey);
   }
 

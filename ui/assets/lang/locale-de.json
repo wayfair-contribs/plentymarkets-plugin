@@ -39,6 +39,8 @@
 	"must_have_at_least_one_scac": "Selbst Versende erfordert mindenstens ein Eintrag für die Trägertabelle",
 	"synchronizing": "Die Synchronisierung wird ausgeführt",
 	"skipping_synchronization": "Synchronisation übersprungen - bereits in Bearbeitung",
+	"full_inventory_status": "Status der Synchronisation des gesamten Inventars",
+	"last_good_sync": "Zeitpunkt der letzten Synchronisation des gesamten Inventars",
 	"loading": "lade Daten",
 	"refresh": "aktualisieren",
 	"unknown": "Unbekannt",
