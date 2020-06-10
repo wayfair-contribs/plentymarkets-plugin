@@ -1,23 +1,23 @@
 <div class="text-center center-block">
   <div class="form-row">
     <div class="form-group col-md-4 col-md-offset-2">
-      <p style="font-weight: bold;">
+      <span style="font-weight: bold;">
         {{ "full_inventory_status" | translate: lang }}:
-      </p>
+      </span>
     </div>
     <div class="form-group col-md-4">
-      <p>{{ serviceState }}</p>
+      <span name="serviceState">{{ serviceState }}</span>
     </div>
   </div>
 
   <div class="form-row">
     <div class="form-group col-md-4 col-md-offset-2">
-      <p style="font-weight: bold;">
+      <span style="font-weight: bold;">
         {{ "last_good_sync" | translate: lang }}:
-      </p>
+      </span>
     </div>
     <div class="form-group col-md-4">
-      <p [(ngModel)]="lastServiceCompletion">{{ lastServiceCompletion }}</p>
+      <span name="lastServiceCompletion">{{ lastServiceCompletion }}</span>
     </div>
   </div>
 
