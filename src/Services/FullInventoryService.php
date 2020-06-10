@@ -99,9 +99,20 @@ class FullInventoryService
           ]);
 
           $syncResultDetails = $this->inventoryUpdateService->sync(true);
+          // TODO: replace string literal with constant
+          $numFailures = $syncResultDetails['inventorySaveFail'];
+
           // FIXME: potential race conditions - change service management strategy in a future update
-          $this->setServiceState(AbstractConfigHelper::FULL_INVENTORY_CRON_IDLE);
-          $this->markFullInventoryComplete();
+          if (isset($numFailures) && $numFailures > 0 )
+          {
+            // TODO: log about failures
+            $this->setServiceState(AbstractConfigHelper::FULL_INVENTORY_CRON_FAILED);
+          }
+          else
+          {
+            $this->markFullInventoryComplete();
+            $this->setServiceState(AbstractConfigHelper::FULL_INVENTORY_CRON_IDLE);
+          }
         } catch (\Exception $e) {
           $this->setServiceState(AbstractConfigHelper::FULL_INVENTORY_CRON_FAILED);
           throw $e;
@@ -113,6 +124,7 @@ class FullInventoryService
       // provide current state to clients
       return $stateArray;
     } catch (\Exception $e) {
+      // FIXME: this needs its own log key
       $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_ERROR), [
         'additionalInfo' => ['manual' => (string) $manual, 'message' => $e->getMessage()],
         'method' => __METHOD__
