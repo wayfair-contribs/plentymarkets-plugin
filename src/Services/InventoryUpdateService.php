@@ -142,6 +142,9 @@ class InventoryUpdateService
     $saveInventoryDuration = 0;
     $savedInventoryDuration = 0;
 
+    $errorMessage = null;
+    $amtOfDtosForPage = 0;
+
     try {
       $fields = $this->getResultFields();
       /* Page size is tuned for a balance between memory usage (in plentymarkets) and number of transactions  */
@@ -170,9 +173,9 @@ class InventoryUpdateService
           }
         }
 
-        $amtToUpdate = count($normalizedInventoryRequestDTOs);
+        $amtOfDtosForPage = count($normalizedInventoryRequestDTOs);
 
-        if ($amtToUpdate <= 0) {
+        if ($amtOfDtosForPage <= 0) {
           $loggerContract
             ->debug(
               TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
@@ -184,12 +187,12 @@ class InventoryUpdateService
 
           $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': No items to update');
         } else {
-          $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': ' . (string) $amtToUpdate . ' updates to send');
+          $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': ' . (string) $amtOfDtosForPage . ' updates to send');
 
           $loggerContract->debug(
             TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
             [
-              'additionalInfo' => ['info' => (string) $amtToUpdate . ' updates to send'],
+              'additionalInfo' => ['info' => (string) $amtOfDtosForPage . ' updates to send'],
               'method' => __METHOD__
             ]
           );
@@ -197,10 +200,12 @@ class InventoryUpdateService
           $saveInventoryDuration += TimeHelper::getMilliseconds() - $msAtPageStart;
           $msBeforeUpdate = TimeHelper::getMilliseconds();
 
+          $inventorySaveTotal +=  $amtOfDtosForPage;
+
           $dto = $inventoryService->updateBulk($normalizedInventoryRequestDTOs, $fullInventory);
 
           $savedInventoryDuration += TimeHelper::getMilliseconds() - $msBeforeUpdate;
-          $inventorySaveTotal += count($normalizedInventoryRequestDTOs);
+          
           $inventorySaveSuccess += count($normalizedInventoryRequestDTOs) - count($dto->getErrors());
           $inventorySaveFail += count($dto->getErrors());
         }
@@ -243,6 +248,17 @@ class InventoryUpdateService
           'method' => __METHOD__
         ]
       );
+
+      // bulk update failed, so everything we were going to save should be considered failing.
+      // (we want the failure amount to be more than zero in order for client to know this failed.)
+      $inventorySaveFail += $amtOfDtosForPage;
+
+      $errorMessage = $e->getMessage();
+      if (!isset($errorMessage))
+      {
+        $errorMessage = (string) $e;
+      }
+
     } finally {
       // FIXME: the 'inventorySave' and 'inventorySaved' log types are too similar
       // TODO: determine if changing the types will impact kibana / graphana / influxDB before changing
@@ -262,7 +278,8 @@ class InventoryUpdateService
       'inventorySaveFail' => $inventorySaveFail,
       'saveInventoryDuration' => $saveInventoryDuration,
       'savedInventoryDuration' => $savedInventoryDuration,
-      'pages' => $page
+      'pages' => $page,
+      'errorMessage' => $errorMessage
     ];
   }
 

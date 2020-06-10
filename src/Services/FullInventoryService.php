@@ -101,9 +101,10 @@ class FullInventoryService
           $syncResultDetails = $this->inventoryUpdateService->sync(true);
           // TODO: replace string literal with constant
           $numFailures = $syncResultDetails['inventorySaveFail'];
+          $syncError = $syncResultDetails['errorMessage'];
 
           // FIXME: potential race conditions - change service management strategy in a future update
-          if (isset($numFailures) && $numFailures > 0 )
+          if ((isset($syncError) && !empty($syncError)) || (isset($numFailures) && $numFailures > 0 ))
           {
             // TODO: log about failures
             $this->setServiceState(AbstractConfigHelper::FULL_INVENTORY_CRON_FAILED);
