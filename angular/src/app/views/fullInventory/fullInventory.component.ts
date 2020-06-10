@@ -55,7 +55,7 @@ export class FullInventoryComponent {
     let unknown = this.translation.translate("unknown");
     // service may not know last completion datestamp. Don't clear out a value if we already had one.
     
-    this.serviceState = data.status;
+    this.setState(data.status);
 
     this.lastServiceCompletion = data.lastCompletion
       ? data.lastCompletion
