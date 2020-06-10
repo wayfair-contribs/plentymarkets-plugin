@@ -43,5 +43,8 @@
 	"last_good_sync": "Last synchronization",
 	"loading": "Loading",
 	"refresh": "Refresh",
-	"unknown": "Unknown"
+	"unknown": "Unknown",
+	"running": "Running",
+	"idle": "Idle",
+	"failed": "Failed"
 }

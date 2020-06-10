@@ -184,12 +184,12 @@ class InventoryUpdateService
 
           $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': No items to update');
         } else {
-          $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': ' . (string) $amtToUpdate . ' items to update');
+          $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': ' . (string) $amtToUpdate . ' updates to send');
 
           $loggerContract->debug(
             TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
             [
-              'additionalInfo' => ['info' => (string) $amtToUpdate . ' items to update'],
+              'additionalInfo' => ['info' => (string) $amtToUpdate . ' updates to send'],
               'method' => __METHOD__
             ]
           );

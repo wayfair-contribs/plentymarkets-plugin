@@ -41,5 +41,8 @@
 	"skipping_synchronization": "Synchronisation übersprungen - bereits in Bearbeitung",
 	"loading": "lade Daten",
 	"refresh": "aktualisieren",
-	"unknown": "Unbekannt"
+	"unknown": "Unbekannt",
+	"running": "im Gange",
+	"idle": "untätig",
+	"failed": "Fehler"
 }
