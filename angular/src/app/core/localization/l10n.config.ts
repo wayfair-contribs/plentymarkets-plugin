@@ -6,12 +6,12 @@ import {
 
 export const l10nConfig:L10nConfig = getL10nConfig();
 
-const LANG_DE = 'de';
-const LANG_EN = 'en';
+export const LANG_DE:string = 'de';
+export const LANG_EN:string = 'en';
 
 // Plentymarkets defaults to German
-const DEFAULT_LANG = LANG_DE;
-const KNOWN_LANGS = [LANG_DE, LANG_EN];
+export const DEFAULT_LANG:string = LANG_DE;
+export const KNOWN_LANGS:string[] = [LANG_DE, LANG_EN];
 
 function getL10nConfig():L10nConfig
 {
@@ -27,7 +27,7 @@ function getL10nConfig():L10nConfig
         // because we do not own the plentymarkets-wide language
     }
 
-    if(! KNOWN_LANGS.includes(lang))
+    if(!(KNOWN_LANGS.includes(lang)))
     {
         lang = DEFAULT_LANG;
     }
