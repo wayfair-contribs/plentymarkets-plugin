@@ -56,7 +56,7 @@ function getL10nConfig():L10nConfig
             ],
             language:  lang,
             defaultLocale: { languageCode: lang},
-            storage:   StorageStrategy.Cookie
+            storage:   StorageStrategy.Local
         },
         translation: {
             providers:            [
