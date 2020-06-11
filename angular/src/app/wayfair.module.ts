@@ -67,6 +67,11 @@ import {ShippingMethodService} from "./core/services/shippingMethod/shippingMeth
             deps: [L10nLoader],
             multi: true
         },
+        // {
+        //     provide: HTTP_INTERCEPTORS,
+        //     useClass: LocalHTTPInterceptor,
+        //     multi: true,
+        // },
         appRoutingProviders,
         TerraNodeTreeConfig,
         WarehouseSupplierService,
@@ -87,7 +92,6 @@ export class PluginTerraBasicModule {
     }
 }
 
-export function initL10n(l10nLoader: L10nLoader): Function {
-    // removed promise here so that the l10n setup is synchronous
-    return () => l10nLoader.load();
+function initL10n(l10nLoader: L10nLoader): Function {
+    return (): Promise<void> => l10nLoader.load();
 }
