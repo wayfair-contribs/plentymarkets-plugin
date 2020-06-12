@@ -60,6 +60,7 @@ function getL10nConfig(): L10nConfig {
         },
       ],
       language: resolvedLang,
+      defaultLocale: { languageCode: resolvedLang},
       storage: StorageStrategy.Local,
     },
     translation: {
