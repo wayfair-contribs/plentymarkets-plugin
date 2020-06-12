@@ -39,8 +39,7 @@ function getL10nConfig(): L10nConfig {
 
   // build the config object.
   //
-  // - using StorageStrategy.Local
-  //      * we are matching the Plentymarkets language in local storage
+  // - using StorageStrategy.Session (was Cookie)
   //      * we should NOT be defining the language for this site at a larger scope,
   //      * our language settings should not persist after use
   //
@@ -61,7 +60,7 @@ function getL10nConfig(): L10nConfig {
       ],
       language: resolvedLang,
       defaultLocale: { languageCode: resolvedLang},
-      storage: StorageStrategy.Local,
+      storage: StorageStrategy.Session,
     },
     translation: {
       providers: [
