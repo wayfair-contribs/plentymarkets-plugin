@@ -37,7 +37,7 @@ function getL10nConfig(): L10nConfig {
       "node_modules/@plentymarkets/terra-components/app/assets/lang/locale-";
   }
 
-  // build the config json.
+  // build the config object.
   //
   // - using StorageStrategy.Local
   //      * we are matching the Plentymarkets language in local storage
