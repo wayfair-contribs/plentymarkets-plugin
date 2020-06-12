@@ -7,10 +7,10 @@ namespace Wayfair\Services;
 
 use Plenty\Plugin\Log\Loggable;
 
+use Wayfair\Core\Api\Services\LogSenderService;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Models\ExternalLogs;
-use Wayfair\Helpers\StringHelper;
 
 class LoggingService implements LoggerContract {
   use Loggable;
@@ -147,6 +147,11 @@ class LoggingService implements LoggerContract {
       $logForKibana['message'] = 'Message was too long to log in PlentyMarkets, ' . $clientID . '-' . date('D, d M Y H:i:s');
       $logForKibana['details'] = $loggingInfo;
       $externalLogs->addErrorLog(json_encode($logForKibana));
+      if (count($externalLogs->getLogs())) {
+        /** @var LogSenderService $logSenderService */
+        $logSenderService = pluginApp(LogSenderService::class);
+        $logSenderService->execute($externalLogs->getLogs());
+      }
     }
     $additionalInfo[self::WAYFAIR_PLUGIN_VERSION] = $this->version;
 
