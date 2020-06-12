@@ -495,6 +495,18 @@ class ShipmentNotificationService
         $orderTrackingNumbers = $this->orderRepositoryContract->getPackageNumbers($orderId);
         $requestDto->setPackageCount(count($orderShippingPackages) > 0 ? count($orderShippingPackages) : 1);
 
+        $this->loggerContract->debug(
+          TranslationHelper::getLoggerKey(self::LOG_KEY_SHIPPING_ON_OWN_ACCOUNT),
+          [
+            'additionalInfo' => [
+              'PoNumber' => $poNumber,
+              'order' => $order,
+              'shipping' => $this->shipmentProviderService
+            ],
+            'method' => __METHOD__
+          ]
+        );
+
         /** @var OrderShippingPackage $orderShippingPackage */
         foreach ($orderShippingPackages as $orderShippingPackage) {
           // TODO: determine if packageId is more useful at logging time than id
