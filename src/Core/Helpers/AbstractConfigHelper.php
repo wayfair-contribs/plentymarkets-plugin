@@ -31,6 +31,7 @@ abstract class AbstractConfigHelper {
   const PAYMENT_METHOD_INVOICE = 2;
   const WAYFAIR_INTEGRATION_HEADER = 'Wayfair-Integration-Agent';
   const INVENTORY_ITEMS_PER_PAGE = 500;
+  const INTEGRATION_AGENT_NAME = 'PlentyMarket';
 
   /**
    * Retrieve the configured client ID for connections to Wayfair's secure APIs

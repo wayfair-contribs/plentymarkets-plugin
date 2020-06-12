@@ -54,7 +54,7 @@ class WayfairServiceProvider extends ServiceProvider
   {
     $this->getApplication()->register(WayfairRouteServiceProvider::class);
     $this->getApplication()->bind(ClientInterfaceContract::class, ClientService::class);
-    $this->getApplication()->bind(AuthenticationContract::class, AuthService::class);
+    $this->getApplication()->singleton(AuthenticationContract::class, AuthService::class);
     $this->getApplication()->bind(StorageInterfaceContract::class, StorageService::class);
     $this->getApplication()->singleton(AbstractConfigHelper::class, ConfigHelper::class);
     $this->getApplication()->bind(RegisterPurchaseOrderContract::class, RegisterPurchaseOrderService::class);
