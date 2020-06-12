@@ -20,10 +20,15 @@ use Wayfair\Http\WayfairResponse;
 
 class AuthService implements AuthenticationContract
 {
+  const STORAGE_KEY_TOKEN = 'token';
+
   const LOG_KEY_ATTEMPTING_AUTH = 'attemptingAuthentication';
 
   const HEADER_KEY_CONTENT_TYPE = "Content-Type";
 
+  const EXPIRES_IN = 'expires_in';
+  const ACCESS_TOKEN = 'access_token';
+  const STORE_TIME = 'store_time';
   const CLIENT_ID = 'client_id';
   const CLIENT_SECRET = 'client_secret';
   const PRIVATE_INFO_KEYS = [self::CLIENT_ID, self::CLIENT_SECRET];
@@ -140,20 +145,21 @@ class AuthService implements AuthenticationContract
 
   /**
    * This refreshes the Authorization Token if it has been expired.
+   * The token will also be refreshed if the credentials have changed.
    *
    * @return void
    * @throws \Exception
    */
   public function refresh()
   {
-    $token = $this->getToken();
-    if ($this->updateCredentials())
+    $token = null;
+    if (! $this->updateCredentials())
     {
-      // token doesn't match credentials
-      $token = null;
+      // credentials have not changed since we got token
+      $token = $this->getToken();
     }
 
-    if (!isset($token) or $this->isTokenExpired()) {
+    if (!isset($token) or $this->isTokenDataExpired($token)) {
 
       $responseObject = $this->fetchWayfairAuthToken();
 
@@ -183,22 +189,22 @@ class AuthService implements AuthenticationContract
   public function saveToken($token)
   {
     $token['store_time'] = time();
-    $this->store->set('token', json_encode($token));
+    $this->store->set(self::STORAGE_KEY_TOKEN, json_encode($token));
   }
 
-  /**
+    /**
+   * Check if the token data is missing or expired
+   *
+   * @param mixed $token
    * @return bool
    */
-  public function isTokenExpired()
+  private static function isTokenDataExpired($token)
   {
-    $token = $this->getToken();
-    if (isset($token) && isset($token['access_token']) && isset($token['store_time'])) {
-      if (($token['expires_in'] + $token['store_time']) > time()) {
-        return false;
-      }
-    }
-
-    return true;
+    return (!isset($token)  || empty($token)
+      || !isset($token[self::ACCESS_TOKEN]) || empty($token[self::ACCESS_TOKEN])
+      || !isset($token[self::STORE_TIME]) || empty($token[self::STORE_TIME])
+      || !isset($token[self::EXPIRES_IN]) || empty($token[self::EXPIRES_IN])
+      || ($token[self::EXPIRES_IN] + $token[self::STORE_TIME]) < time());
   }
 
   /**
@@ -206,7 +212,7 @@ class AuthService implements AuthenticationContract
    */
   public function getToken()
   {
-    return json_decode($this->store->get('token'), true);
+    return json_decode($this->store->get(self::STORAGE_KEY_TOKEN), true);
   }
 
   /**
