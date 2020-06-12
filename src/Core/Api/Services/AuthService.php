@@ -188,7 +188,7 @@ class AuthService implements AuthenticationContract
    */
   public function saveToken($token)
   {
-    $token['store_time'] = time();
+    $token[self::STORE_TIME] = time();
     $this->store->set(self::STORAGE_KEY_TOKEN, json_encode($token));
   }
 
