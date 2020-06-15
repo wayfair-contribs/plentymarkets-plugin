@@ -356,7 +356,8 @@ class ShipmentNotificationService
           'additionalInfo' => [
             'order' => $order,
             'po' => $purchaseOrderInfo,
-            'shippingInformation' => $plentymarketsShippingInformation
+            'shippingInformation' => $plentymarketsShippingInformation,
+            'ShippingOnWayfair' => $this->shipmentProviderService->isShippingWithWayfair()
           ],
           'method' => __METHOD__
         ]
@@ -505,7 +506,7 @@ class ShipmentNotificationService
             ],
             'method' => __METHOD__
           ]
-        );
+        ); //Xjgd8NJgyliPHLY2YxoynxSDxV9ri7tV13ogYziJ8bY31p6wAZfLRBp0nGZsxZWgtVSU-THou7fagA7GsWwAlg-L
 
         /** @var OrderShippingPackage $orderShippingPackage */
         foreach ($orderShippingPackages as $orderShippingPackage) {
