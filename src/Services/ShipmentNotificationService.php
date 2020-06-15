@@ -486,7 +486,8 @@ class ShipmentNotificationService
           TranslationHelper::getLoggerKey(self::LOG_KEY_SHIPPING_ON_OWN_ACCOUNT), [
             'additionalInfo' => [
               'PoNumber' => $poNumber,
-              'order' => $order
+              'order' => $order,
+              'TrackingNumber' => $orderTrackingNumbers = $this->orderRepositoryContract->getPackageNumbers($orderId)
             ],
             'method' => __METHOD__
           ]
