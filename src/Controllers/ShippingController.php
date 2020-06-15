@@ -55,6 +55,13 @@ class ShippingController extends Controller {
             'method' => __METHOD__
             ]
         );
+    $this->loggerContract
+        ->debug(
+            TranslationHelper::getLoggerKey('debugRegisterShipmentForOrders'), [
+            'additionalInfo' => ['orderIds' => $orderIds],
+            'method' => __METHOD__
+            ]
+        );
 
     return $this->shipmentRegisterService->register($orderIds);
   }
