@@ -29,6 +29,15 @@ class InventoryUpdateService
   const LOG_KEY_INVALID_INVENTORY_DTO = 'invalidInventoryDto';
   const LOG_KEY_NORMALIZING_INVENTORY = 'normalizingInventoryAmount';
 
+
+  const INVENTORY_SAVE_TOTAL = 'inventorySaveTotal';
+  const INVENTORY_SAVE_SUCCESS = 'inventorySaveSuccess';
+  const INVENTORY_SAVE_FAIL = 'inventorySaveFail';
+  const SAVE_INVENTORY_DURATION = 'saveInventoryDuration';
+  const SAVED_INVENTORY_DURATION = 'savedInventoryDuration';
+  const PAGES = 'pages';
+  const ERROR_MESSAGE = 'errorMessage';
+
   /**
    * Validate a request for inventory update
    * @param RequestDTO $inventoryRequestDTO
@@ -273,13 +282,13 @@ class InventoryUpdateService
     }
 
     return [
-      'inventorySaveTotal' => $inventorySaveTotal,
-      'inventorySaveSuccess' => $inventorySaveSuccess,
-      'inventorySaveFail' => $inventorySaveFail,
-      'saveInventoryDuration' => $saveInventoryDuration,
-      'savedInventoryDuration' => $savedInventoryDuration,
-      'pages' => $page,
-      'errorMessage' => $errorMessage
+      self::INVENTORY_SAVE_TOTAL => $inventorySaveTotal,
+      self::INVENTORY_SAVE_SUCCESS => $inventorySaveSuccess,
+      self::INVENTORY_SAVE_FAIL => $inventorySaveFail,
+      self::SAVE_INVENTORY_DURATION => $saveInventoryDuration,
+      self::SAVED_INVENTORY_DURATION => $savedInventoryDuration,
+      self::PAGES => $page,
+      self::ERROR_MESSAGE => $errorMessage
     ];
   }
 

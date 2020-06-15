@@ -1,38 +1,56 @@
 <div class="text-center center-block">
-  <div class="form-row">
-    <div class="form-group col-md-4 col-md-offset-2">
-      <span style="font-weight: bold;">
-        {{ "full_inventory_status" | translate: lang }}:
-      </span>
-    </div>
-    <div class="form-group col-md-4">
-      <span name="serviceState">{{ serviceState }}</span>
+  <span>{{ full_inventory_helper_text | translate: lang }}</span>
+  <span>{{ partial_inventory_helper_text | translate: lang }}</span>
+
+  <div class="form-group row">
+    <label
+      class="col-md-4 col-form-label col-md-offset-2"
+      style="font-weight: bold;"
+      for="successfulServiceCompletionTimestamp"
+    >
+      {{ "last_good_sync_time" | translate: lang }}:
+    </label>
+    <div class="col-md-4 col-md-offset-1">
+      <span name="successfulServiceCompletionTimestamp">{{
+        successfulServiceCompletionTimestamp
+      }}</span>
     </div>
   </div>
 
-  <div class="form-row">
-    <div class="form-group col-md-4 col-md-offset-2">
-      <span style="font-weight: bold;">
-        {{ "last_good_sync" | translate: lang }}:
-      </span>
+  <div class="form-group row">
+    <label
+      class="col-md-4 col-form-label col-md-offset-2"
+      style="font-weight: bold;"
+      for="lastResult"
+    >
+      {{ "full_inventory_status" | translate: lang }}:</label
+    >
+    <div class="col-md-2">
+      <span name="lastResult">{{ lastResult }}</span>
     </div>
-    <div class="form-group col-md-4">
-      <span name="lastServiceCompletion">{{ lastServiceCompletion }}</span>
+    <div class="col-md-2">
+      <span name="latestServiceAttemptTimestamp">{{
+        latestServiceAttemptTimestamp
+      }}</span>
     </div>
   </div>
 
   <div class="col-md-12">
-    <button class="btn btn-primary" id="refreshState" (click)="refreshState()">
-      {{ "refresh" | translate: lang }}
-    </button>
-    <br />
-    <br />
     <button
-      class="btn btn-success"
+      class="btn btn-primary"
       id="syncFullInventory"
       (click)="syncFullInventory()"
+      [disabled]="stateOfSyncButton.disabled"
     >
-      {{ "sync" | translate: lang }}
+      {{ syncButtonState.text }}
+    </button>
+    <button
+      class="btn btn-secondary"
+      id="refreshState"
+      (click)="refreshState()"
+      [disabled]="stateOfRefreshButton.disabled"
+    >
+      {{ "refresh_status" | translate: lang }}
     </button>
   </div>
 </div>

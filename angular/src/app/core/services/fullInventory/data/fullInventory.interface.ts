@@ -1,6 +1,8 @@
 export interface FullInventoryInterface
 {
     status:string;
-    stateChangeTimestamp:string;
+    stateChangeTimestamp?:string;
     lastCompletion?:string
+    lastAttempt?:string
+    lastAttemptSucceeded?:boolean
 }

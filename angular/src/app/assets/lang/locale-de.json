@@ -26,7 +26,7 @@
 	"item_mapping_variation_number": "Variationsnummer",
 	"item_mapping_ean": "EAN",
 	"item_mapping_sku": "SKU",
-	"sync": "Synchronisieren",
+	"sync": "Jetzt synchronisieren",
 	"synced": "Synchronisiert",
 	"error_sync": "Fehler beim synchronisieren, bitte versuchen sie es später erneut",
 	"carrier_scac_mapping_title": "Shipping carrier",
@@ -38,13 +38,11 @@
 	"import_orders_since": "Aufträge importieren ab",
 	"must_have_at_least_one_scac": "Selbst Versende erfordert mindenstens ein Eintrag für die Trägertabelle",
 	"synchronizing": "Die Synchronisierung wird ausgeführt",
-	"skipping_synchronization": "Synchronisation übersprungen - bereits in Bearbeitung",
-	"full_inventory_status": "Status der Synchronisation des gesamten Inventars",
-	"last_good_sync": "Zeitpunkt der letzten Synchronisation des gesamten Inventars",
+	"full_inventory_status": "Status des letzten Versuchs",
+	"last_good_sync_time": "Zeitpunkt der letzten erfolgreichen Synchronisation",
 	"loading": "lade Daten",
-	"refresh": "aktualisieren",
-	"unknown": "Unbekannt",
-	"running": "im Gange",
-	"idle": "untätig",
-	"failed": "Fehler"
+	"refresh_status": "Status aktualisieren",
+	"failed": "Fehler",
+	"full_inventory_helper_text": "Die folgenden Informationen gelten nur für die vollständige Inventarsynchronisierung.",
+	"partial_inventory_helper_text": "Inventaränderungen werden den ganzen Tag über synchronisiert"
 }

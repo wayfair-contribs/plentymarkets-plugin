@@ -26,7 +26,7 @@
 	"item_mapping_variation_number": "Variation Number",
 	"item_mapping_ean": "EAN",
 	"item_mapping_sku": "SKU",
-	"sync": "Synchronize",
+	"sync": "Start synchronization",
 	"synced": "synchronized",
 	"error_sync": "Error while synchronizing, please try again later",
 	"carrier_scac_mapping_title": "Shipping carrier",
@@ -38,13 +38,11 @@
 	"import_orders_since": "Import orders since",
 	"must_have_at_least_one_scac": "When using Own account shipping, configure one or more carrier configurations",
 	"synchronizing": "Synchronization in progress...",
-	"skipping_synchronization": "Skipping synchronization because a syncronization is already in progress",
-	"full_inventory_status": "Full inventory synchronization status",
-	"last_good_sync": "Time of last full inventory synchronization",
+	"full_inventory_status": "Status of last attempt",
+	"last_good_sync_time": "Time of last successful inventory synchronization",
 	"loading": "Loading",
-	"refresh": "Refresh",
-	"unknown": "Unknown",
-	"running": "Running",
-	"idle": "Idle",
-	"failed": "Failed"
+	"refresh_status": "refresh status",
+	"failed": "Failed",
+	"full_inventory_helper_text": "The following information applies only to Full Inventory synchronization.",
+	"partial_inventory_helper_text": "Changes in inventory are synchronized throughout the day."
 }
