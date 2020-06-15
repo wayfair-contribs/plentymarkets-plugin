@@ -487,7 +487,8 @@ class ShipmentNotificationService
             'additionalInfo' => [
               'PoNumber' => $poNumber,
               'order' => $order,
-              'TrackingNumber' => $orderTrackingNumbers = $this->orderRepositoryContract->getPackageNumbers($orderId)
+              'TrackingNumber' => $orderTrackingNumbers = $this->orderRepositoryContract->getPackageNumbers($orderId),
+              'packages' => $this->orderShippingPackageRepositoryContract->listOrderShippingPackages($orderId)
             ],
             'method' => __METHOD__
           ]
