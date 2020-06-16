@@ -23,7 +23,7 @@ class FullInventoryStatusService
   const STATUS = 'status';
   const STATE_CHANGE_TIMESTAMP = 'stateChangeTimestamp';
   const LAST_COMPLETION = 'lastCompletion';
-  const LAST_ATTEMPT = 'lastAttempt';
+  const LAST_ATTEMPT_TIMESTAMP = 'lastAttemptTimestamp';
   const LAST_ATTEMPT_SUCCEEDED = 'lastAttemptSucceeded';
 
   const FULL_INVENTORY_CRON_STATUS = 'full_inventory_cron_status';
@@ -44,7 +44,7 @@ class FullInventoryStatusService
    */
   private $logger;
 
-   /**
+  /**
    * FullInventoryStatusService constructor.
    *
    * @param KeyValueRepository $keyValueRepository
@@ -87,7 +87,7 @@ class FullInventoryStatusService
       self::STATUS => $this->getServiceStatusValue(),
       self::STATE_CHANGE_TIMESTAMP => $this->getStateChangeTime(),
       self::LAST_COMPLETION => $this->getLastCompletionTime(),
-      self::LAST_ATTEMPT => $this->getLastAttemptTime(),
+      self::LAST_ATTEMPT_TIMESTAMP => $this->getLastAttemptTime(),
       self::LAST_ATTEMPT_SUCCEEDED => $this->getLatestAttemptSuccess()
     ];
   }

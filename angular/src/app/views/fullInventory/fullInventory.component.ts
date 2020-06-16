@@ -36,7 +36,7 @@ export class FullInventoryComponent {
 
   public lastResult: string = null;
   public successfulServiceCompletionTimestamp: string = null;
-  public latestServiceAttemptTimestamp: string = null;
+  public latestInteractionTimestamp: string = null;
 
   public stateOfSyncButton = {
     text: FullInventoryComponent.TRANSLATION_KEY_START_SYNC,
@@ -179,24 +179,27 @@ export class FullInventoryComponent {
     );
     // service may not know last completion datestamp. Don't clear out a value if we already had one.
 
-    if (data.lastAttemptSucceeded == null) {
-      this.lastResult = unknown;
-    } else if (data.status == FullInventoryComponent.STATE_IDLE) {
-      this.lastResult = this.translation.translate(
-        data.lastAttemptSucceeded == "true"
-          ? FullInventoryComponent.TRANSLATION_KEY_COMPLETE
-          : FullInventoryComponent.TRANSLATION_KEY_FAILED
-      );
+    if (data.stateChangeTimestamp) {
+      this.latestInteractionTimestamp = new Date(
+        data.stateChangeTimestamp
+      ).toLocaleString();
+
+      if (data.status == FullInventoryComponent.STATE_IDLE) {
+        this.lastResult = this.translation.translate(
+          data.lastAttemptSucceeded
+            ? FullInventoryComponent.TRANSLATION_KEY_COMPLETE
+            : FullInventoryComponent.TRANSLATION_KEY_FAILED
+        );
+      } else {
+        this.lastResult = this.translation.translate(data.status);
+      }
     } else {
-      this.lastResult = this.translation.translate(data.status);
+      // no record of any sync attempts
+      this.lastResult = unknown;
     }
 
     this.successfulServiceCompletionTimestamp = data.lastCompletion
       ? new Date(data.lastCompletion).toLocaleString()
-      : unknown;
-
-    this.latestServiceAttemptTimestamp = data.stateChangeTimestamp
-      ? new Date(data.stateChangeTimestamp).toLocaleString()
       : unknown;
 
     this.updateSyncButton(data.status);
@@ -210,7 +213,7 @@ export class FullInventoryComponent {
       FullInventoryComponent.TRANSLATION_KEY_LOADING
     );
     this.lastResult = loading;
-    this.successfulServiceCompletionTimestamp = loading;
+    this.latestInteractionTimestamp = loading;
     this.updateSyncButton();
     this.updateRefreshButton(FullInventoryComponent.STATE_LOADING);
   }
@@ -220,8 +223,7 @@ export class FullInventoryComponent {
       FullInventoryComponent.TRANSLATION_KEY_ERROR
     );
     this.lastResult = error;
-    this.successfulServiceCompletionTimestamp = error;
-    this.latestServiceAttemptTimestamp = error;
+    this.latestInteractionTimestamp = error;
     this.updateSyncButton();
     this.updateRefreshButton();
   }
