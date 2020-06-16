@@ -22,13 +22,6 @@ abstract class AbstractConfigHelper {
   const ITEM_MAPPING_EAN = 'barcode';
   const ITEM_MAPPING_VARIATION_NUMBER = 'numberExact';
   const ITEM_MAPPING_SKU = 'sku';
-  const FULL_INVENTORY_CRON_STATUS = 'full_inventory_cron_status';
-  const FULL_INVENTORY_STATUS_UPDATED_AT = 'full_inventory_status_updated_at';
-  const FULL_INVENTORY_CRON_RUNNING = 'running';
-  const FULL_INVENTORY_CRON_IDLE = 'idle';
-  const FULL_INVENTORY_LAST_COMPLETION = "full_inventory_last_completion";
-  const FULL_INVENTORY_LAST_ATTEMPT = "full_inventory_last_attempt";
-  const FULL_INVENTORY_SUCCESS = "full_inventory_success";
   const SECONDS_INTERVAL_FOR_INVENTORY = 4800;
   const SHIPPING_METHOD = 'shippingMethod';
   const PAYMENT_METHOD_INVOICE = 2;
