@@ -115,7 +115,7 @@ export class FullInventoryComponent {
     else if (data.status == FullInventoryComponent.STATE_IDLE)
     {
       this.lastResult = this.translation.translate(
-        data.lastAttemptSucceeded == null
+        data.lastAttemptSucceeded == 'true'
           ? FullInventoryComponent.TRANSLATION_KEY_COMPLETE
           : FullInventoryComponent.TRANSLATION_KEY_FAILED
       );

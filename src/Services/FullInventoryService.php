@@ -266,7 +266,7 @@ class FullInventoryService
     ]);
 
     $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_LAST_COMPLETION, self::getCurrentTimeStamp());
-    $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_SUCCESS, false);
+    $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_SUCCESS, 'false');
     $this->setServiceState(AbstractConfigHelper::FULL_INVENTORY_CRON_IDLE);
   }
 
@@ -282,7 +282,7 @@ class FullInventoryService
     ]);
 
     $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_LAST_COMPLETION, self::getCurrentTimeStamp());
-    $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_SUCCESS, true);
+    $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_SUCCESS, 'true');
     $this->setServiceState(AbstractConfigHelper::FULL_INVENTORY_CRON_IDLE);
   }
 

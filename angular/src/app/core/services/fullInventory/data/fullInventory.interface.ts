@@ -4,5 +4,5 @@ export interface FullInventoryInterface
     stateChangeTimestamp?:string;
     lastCompletion?:string
     lastAttempt?:string
-    lastAttemptSucceeded?:boolean
+    lastAttemptSucceeded?:string
 }
