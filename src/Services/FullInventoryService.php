@@ -244,8 +244,9 @@ class FullInventoryService
       'method' => __METHOD__
     ]);
 
-    $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_LAST_ATTEMPT, self::getCurrentTimeStamp());
-    $this->setServiceState(AbstractConfigHelper::FULL_INVENTORY_CRON_IDLE);
+    $ts = $this->markStateChange();
+    $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_LAST_ATTEMPT, $ts);
+    $this->setServiceState(AbstractConfigHelper::FULL_INVENTORY_CRON_RUNNING);
   }
 
   /**
@@ -265,7 +266,8 @@ class FullInventoryService
       'method' => __METHOD__
     ]);
 
-    $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_LAST_COMPLETION, self::getCurrentTimeStamp());
+    $ts = $this->markStateChange();
+    $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_STATUS_UPDATED_AT, $ts);
     $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_SUCCESS, 'false');
     $this->setServiceState(AbstractConfigHelper::FULL_INVENTORY_CRON_IDLE);
   }
@@ -281,9 +283,24 @@ class FullInventoryService
       'manual' => (string) $manual, 'method' => __METHOD__
     ]);
 
-    $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_LAST_COMPLETION, self::getCurrentTimeStamp());
+    $ts = $this->markStateChange();
+    $this->markStateChange($ts);
+    $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_LAST_COMPLETION, $ts);
     $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_SUCCESS, 'true');
     $this->setServiceState(AbstractConfigHelper::FULL_INVENTORY_CRON_IDLE);
+  }
+
+  /**
+   * Set global timestamp for service interaction, and return the timestamp
+   *
+   * @return string
+   */
+  private function markStateChange(): string
+  {
+    $ts = self::getCurrentTimeStamp();
+    $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_STATUS_UPDATED_AT, $ts);
+
+    return $ts;
   }
 
   /**
@@ -309,9 +326,9 @@ class FullInventoryService
   /**
    * Get a timestamp for setting global values
    *
-   * @return void
+   * @return string
    */
-  private static function getCurrentTimeStamp()
+  private static function getCurrentTimeStamp(): string
   {
     return date('Y-m-d H:i:s.u P');
   }
