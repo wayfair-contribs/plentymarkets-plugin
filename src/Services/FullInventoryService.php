@@ -83,6 +83,7 @@ class FullInventoryService
       // (but this is better than letting the old UpdateFullInventoryStatusCron randomly change service states)
       if ($this->isFullInventoryRunning() && !$this->serviceHasBeenRunningTooLong()) {
         $lastStartTime = $this->getLastAttemptTime();
+        $stateArray = $this->getServiceState();
         $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_SKIPPED), [
           'additionalInfo' => ['manual' => (string) $manual, 'startedAt' => $lastStartTime, 'state' => $stateArray],
           'method' => __METHOD__
@@ -90,7 +91,7 @@ class FullInventoryService
         $externalLogs->addErrorLog(($manual ? "Manual " : "Automatic") . "Full inventory sync BLOCKED - full inventory sync is currently running");
 
         // early exit
-        return $this->getServiceState();
+        return $stateArray;
       }
 
       try {
