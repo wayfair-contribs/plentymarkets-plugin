@@ -10,11 +10,10 @@ use Wayfair\Core\Api\Services\LogSenderService;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Models\ExternalLogs;
-use Wayfair\Repositories\KeyValueRepository;
 
 /**
  * Service module for performing a Full Inventory sync or checking the status
- * 
+ *
  * The service may be invoked in the following ways:
  * - Cron job
  * - Button in UI
@@ -28,11 +27,6 @@ class FullInventoryService
 
   // TODO: make this user-configurable in a future update
   const MAX_FULL_INVENTORY_TIME = 7200;
-
-  /**
-   * @var KeyValueRepository
-   */
-  private $keyValueRepository;
 
   /**
    * @var InventoryUpdateService
@@ -52,15 +46,15 @@ class FullInventoryService
   /**
    * FullInventoryService constructor.
    *
-   * @param KeyValueRepository $keyValueRepository
+   * @param InventoryUpdateService $inventoryUpdateService
+   * @param FullInventoryStatusService $statusService
+   * @param LoggerContract $logger
    */
   public function __construct(
-    KeyValueRepository $keyValueRepository,
     InventoryUpdateService $inventoryUpdateService,
     FullInventoryStatusService $statusService,
     LoggerContract $logger
   ) {
-    $this->keyValueRepository = $keyValueRepository;
     $this->inventoryUpdateService = $inventoryUpdateService;
     $this->statusService = $statusService;
     $this->logger = $logger;
