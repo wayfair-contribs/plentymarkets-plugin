@@ -130,7 +130,6 @@ export class FullInventoryComponent {
   public refreshState(): void {
     this.showLoading();
 
-    // TODO: make sure this is not blocked by sync
     this.fullInventoryService.getState().subscribe(
       (data) => {
         this.refreshStateFromData(data);
