@@ -284,7 +284,6 @@ class FullInventoryService
     ]);
 
     $ts = $this->markStateChange();
-    $this->markStateChange($ts);
     $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_LAST_COMPLETION, $ts);
     $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_SUCCESS, 'true');
     $this->setServiceState(AbstractConfigHelper::FULL_INVENTORY_CRON_IDLE);
