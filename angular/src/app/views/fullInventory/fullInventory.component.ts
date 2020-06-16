@@ -19,6 +19,7 @@ export class FullInventoryComponent {
 
   private static readonly STATE_RUNNING = "running";
   private static readonly STATE_LOADING = "loading";
+  private static readonly STATE_IDLE = "idle";
 
   @Language()
   public lang: string;
@@ -111,13 +112,17 @@ export class FullInventoryComponent {
     {
       this.lastResult = unknown;
     }
-    else
+    else if (data.status == FullInventoryComponent.STATE_IDLE)
     {
       this.lastResult = this.translation.translate(
         data.lastAttemptSucceeded == null
           ? FullInventoryComponent.TRANSLATION_KEY_COMPLETE
           : FullInventoryComponent.TRANSLATION_KEY_FAILED
       );
+    }
+    else
+    {
+      this.lastResult = this.translation.translate(data.status);
     }
 
     this.successfulServiceCompletionTimestamp = data.lastCompletion

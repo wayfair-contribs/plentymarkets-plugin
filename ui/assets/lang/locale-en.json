@@ -44,5 +44,6 @@
 	"refresh_status": "refresh status",
 	"failed": "Failed",
 	"full_inventory_helper_text": "The following information applies only to Full Inventory synchronization.",
-	"partial_inventory_helper_text": "Changes in inventory are synchronized throughout the day."
+	"partial_inventory_helper_text": "Changes in inventory are synchronized throughout the day.",
+	"In progress": "In progress"
 }

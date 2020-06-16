@@ -35,22 +35,26 @@
     </div>
   </div>
 
-  <div class="col-md-12">
-    <button
-      class="btn btn-primary"
-      id="syncFullInventory"
-      (click)="syncFullInventory()"
-      [disabled]="stateOfSyncButton.disabled"
-    >
-      {{ syncButtonState.text }}
-    </button>
-    <button
-      class="btn btn-secondary"
-      id="refreshState"
-      (click)="refreshState()"
-      [disabled]="stateOfRefreshButton.disabled"
-    >
-      {{ "refresh_status" | translate: lang }}
-    </button>
+  <div class="form-group row">
+    <div class="col-md-12">
+      <button
+        class="btn btn-primary"
+        id="syncFullInventory"
+        (click)="syncFullInventory()"
+        [disabled]="stateOfSyncButton.disabled"
+      >
+        {{ stateOfSyncButton.text | translate: lang }}
+      </button>
+    </div>
+    <div class="col-md-12">
+      <button
+        class="btn btn-secondary"
+        id="refreshState"
+        (click)="refreshState()"
+        [disabled]="stateOfRefreshButton.disabled"
+      >
+        {{ stateOfRefreshButton.text | translate: lang }}
+      </button>
+    </div>
   </div>
 </div>
