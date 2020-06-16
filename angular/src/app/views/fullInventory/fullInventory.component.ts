@@ -133,6 +133,10 @@ export class FullInventoryComponent {
       ? new Date(data.stateChangeTimestamp).toLocaleString()
       : unknown;
 
+      
+    this.updateSyncButton(data.status);
+    this.updateRefreshButton();
+
     return data.status;
   }
 

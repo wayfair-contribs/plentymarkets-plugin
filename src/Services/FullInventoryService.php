@@ -255,8 +255,13 @@ class FullInventoryService
    */
   private function markFullInventoryFailed(bool $manual = false, \Exception $exception = null)
   {
+    $info = ['manual' => (string) $manual];
+    if (isset($exception)) {
+      $info['errorMessage'] = $exception->getMessage();
+    }
+
     $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_FAILED), [
-      'additionalInfo' => ['manual' => (string) $manual, 'error' => $exception->getMessage()],
+      'additionalInfo' => $info,
       'method' => __METHOD__
     ]);
 
