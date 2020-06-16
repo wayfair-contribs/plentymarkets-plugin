@@ -61,7 +61,7 @@ export class FullInventoryComponent {
     // pull state from the DB on load
     this.refreshState();
     // pull state from the DB every 5 minutes
-    setInterval(this.refreshState, FullInventoryComponent.REFRESH_INTERVAL);
+    setInterval(() => this.refreshState(), FullInventoryComponent.REFRESH_INTERVAL);
   }
 
   /**
