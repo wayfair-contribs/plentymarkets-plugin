@@ -17,6 +17,13 @@ export class FullInventoryComponent {
   private static readonly TRANSLATION_KEY_FAILED = "failed";
   private static readonly TRANSLATION_KEY_UNKNOWN = "unknown";
 
+  private static readonly TEXT_CLASS_WARNING = "warning";
+  private static readonly TEXT_CLASS_SUCCESS = "success";
+  private static readonly TEXT_CLASS_DANGER = "warning";
+  private static readonly TEXT_CLASS_INFO = "info";
+
+
+
   private static readonly STATE_RUNNING = "running";
   private static readonly STATE_LOADING = "loading";
   private static readonly STATE_IDLE = "idle";
@@ -34,7 +41,11 @@ export class FullInventoryComponent {
   @Language()
   public lang: string;
 
-  public lastResult: string = null;
+
+  public lastResult = {
+    text: FullInventoryComponent.TRANSLATION_KEY_UNKNOWN,
+    type: FullInventoryComponent.TEXT_CLASS_WARNING
+  }
   public successfulServiceCompletionTimestamp: string = null;
   public latestInteractionTimestamp: string = null;
 
@@ -185,17 +196,25 @@ export class FullInventoryComponent {
       ).toLocaleString();
 
       if (data.status == FullInventoryComponent.STATE_IDLE) {
-        this.lastResult = this.translation.translate(
-          data.lastAttemptSucceeded
-            ? FullInventoryComponent.TRANSLATION_KEY_COMPLETE
-            : FullInventoryComponent.TRANSLATION_KEY_FAILED
-        );
+
+        if (data.lastAttemptSucceeded)
+        {
+          this.lastResult.text = FullInventoryComponent.TRANSLATION_KEY_COMPLETE;
+          this.lastResult.type = FullInventoryComponent.TEXT_CLASS_SUCCESS
+        }
+        else
+        {
+          this.lastResult.text = FullInventoryComponent.TRANSLATION_KEY_FAILED
+          this.lastResult.type = FullInventoryComponent.TEXT_CLASS_DANGER
+        }
       } else {
-        this.lastResult = this.translation.translate(data.status);
+        this.lastResult.text = this.translation.translate(data.status);
+        this.lastResult.type = FullInventoryComponent.TEXT_CLASS_INFO
       }
     } else {
       // no record of any sync attempts
-      this.lastResult = unknown;
+      this.lastResult.text = unknown;
+      this.lastResult.type = FullInventoryComponent.TEXT_CLASS_WARNING
     }
 
     this.successfulServiceCompletionTimestamp = data.lastCompletion
@@ -212,7 +231,7 @@ export class FullInventoryComponent {
     let loading = this.translation.translate(
       FullInventoryComponent.TRANSLATION_KEY_LOADING
     );
-    this.lastResult = loading;
+    this.lastResult = {text: loading, type: FullInventoryComponent.TEXT_CLASS_INFO}
     this.latestInteractionTimestamp = loading;
     this.updateSyncButton();
     this.updateRefreshButton(FullInventoryComponent.STATE_LOADING);
@@ -222,7 +241,7 @@ export class FullInventoryComponent {
     let error = this.translation.translate(
       FullInventoryComponent.TRANSLATION_KEY_ERROR
     );
-    this.lastResult = error;
+    this.lastResult = {text: error, type: FullInventoryComponent.TEXT_CLASS_DANGER};
     this.latestInteractionTimestamp = error;
     this.updateSyncButton();
     this.updateRefreshButton();
