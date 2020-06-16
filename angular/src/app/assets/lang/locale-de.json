@@ -45,5 +45,6 @@
 	"failed": "Fehler",
 	"full_inventory_helper_text": "Die folgenden Informationen gelten nur für die vollständige Inventarsynchronisierung.",
 	"partial_inventory_helper_text": "Inventaränderungen werden den ganzen Tag über synchronisiert",
-	"in_progress": "im Gange"
+	"running": "im Gange",
+	"complete": "Abgeschlossen"
 }

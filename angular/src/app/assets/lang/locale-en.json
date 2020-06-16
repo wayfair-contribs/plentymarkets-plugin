@@ -41,9 +41,10 @@
 	"full_inventory_status": "Status of last attempt",
 	"last_good_sync_time": "Time of last successful inventory synchronization",
 	"loading": "Loading",
-	"refresh_status": "refresh status",
+	"refresh_status": "Refresh status",
 	"failed": "Failed",
 	"full_inventory_helper_text": "The following information applies only to Full Inventory synchronization.",
 	"partial_inventory_helper_text": "Changes in inventory are synchronized throughout the day.",
-	"In progress": "In progress"
+	"running": "In progress",
+	"complete": "Complete"
 }
