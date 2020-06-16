@@ -43,7 +43,7 @@
 	"loading": "lade Daten",
 	"refresh_status": "Status aktualisieren",
 	"failed": "Fehler",
-	"full_inventory_helper_text": "Die folgenden Informationen gelten nur für die vollständige Inventarsynchronisierung.",
+	"full_inventory_helper_text": "Die Informationen auf dieser Seite gelten nur für die vollständige Inventarsynchronisierung, die jeden Tag automatisch durchgeführt wird.",
 	"partial_inventory_helper_text": "Inventaränderungen werden den ganzen Tag über synchronisiert",
 	"running": "im Gange",
 	"complete": "Abgeschlossen"

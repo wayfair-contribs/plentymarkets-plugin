@@ -1,14 +1,7 @@
 <div class="center-block">
-  <p class="bg-info text-center">
-    {{ "full_inventory_helper_text" | translate: lang }}
-    <br />
-    {{ "partial_inventory_helper_text" | translate: lang }}
-  </p>
-  <br />
-  <br />
   <div class="form-group row">
     <label
-      class="col-md-2 col-form-label col-md-offset-4"
+      class="col-md-4 col-form-label col-md-offset-2 text-right"
       style="font-weight: bold;"
       for="successfulServiceCompletionTimestamp"
     >
@@ -23,14 +16,14 @@
 
   <div class="form-group row">
     <label
-      class="col-md-2 col-form-label col-md-offset-4"
+      class="col-md-4 col-form-label col-md-offset-2 text-right"
       style="font-weight: bold;"
       for="lastResult"
     >
       {{ "full_inventory_status" | translate: lang }}:</label
     >
     <div class="col-md-1">
-      <span name="lastResult" class="{{ 'text-' + lastResult.type }}">{{ lastResult.text }}</span>
+      <span name="lastResult" class="{{ 'text-uppercase text-center text-' + lastResult.type }}">{{ lastResult.text }}</span>
     </div>
     <div class="col-md-3">
       <span name="latestInteractionTimestamp">{{
@@ -61,4 +54,11 @@
       </button>
     </div>
   </div>
+  <br />
+  <br />
+  <p class="bg-info text-center">
+    {{ "full_inventory_helper_text" | translate: lang }}
+    <br />
+    {{ "partial_inventory_helper_text" | translate: lang }}
+  </p>
 </div>
