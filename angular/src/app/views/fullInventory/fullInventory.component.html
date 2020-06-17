@@ -1,13 +1,13 @@
 <div class="center-block">
   <div class="form-group row">
     <label
-      class="col-md-4 col-form-label col-md-offset-2 text-right"
+      class="col-md-5 col-form-label col-md-offset-1 text-right"
       style="font-weight: bold;"
       for="successfulServiceCompletionTimestamp"
     >
       {{ "last_good_sync_time" | translate: lang }}:
     </label>
-    <div class="col-md-3 col-md-offset-1">
+    <div class="col-md-3 col-md-offset-2">
       <span name="successfulServiceCompletionTimestamp">{{
         successfulServiceCompletionTimestamp
       }}</span>
@@ -16,13 +16,13 @@
 
   <div class="form-group row">
     <label
-      class="col-md-4 col-form-label col-md-offset-2 text-right"
+      class="col-md-5 col-form-label col-md-offset-1 text-right"
       style="font-weight: bold;"
       for="lastResult"
     >
       {{ "full_inventory_status" | translate: lang }}:</label
     >
-    <div class="col-md-1">
+    <div class="col-md-2">
       <p name="lastResult" class="{{ 'text-uppercase text-center text-' + lastResult.type }}">{{ lastResult.text }}</p>
     </div>
     <div class="col-md-3">
