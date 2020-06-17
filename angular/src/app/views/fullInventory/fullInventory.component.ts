@@ -184,10 +184,10 @@ export class FullInventoryComponent {
    * @param data FullInventoryInterface
    */
   private refreshStateFromData(data: FullInventoryInterface): string {
-    let unknown = this.translation.translate(
+    let text = this.translation.translate(
       FullInventoryComponent.TRANSLATION_KEY_UNKNOWN
     );
-    // service may not know last completion datestamp. Don't clear out a value if we already had one.
+    let style = FullInventoryComponent.TEXT_CLASS_WARNING;
 
     if (data.stateChangeTimestamp) {
       this.latestInteractionTimestamp = new Date(
@@ -195,35 +195,42 @@ export class FullInventoryComponent {
       ).toLocaleString();
 
       if (data.status == FullInventoryComponent.STATE_IDLE) {
-        if (
-          data.lastAttemptSucceeded != null &&
-          data.lastAttemptSucceeded == true
-        ) {
-          this.lastResult.text =
-            FullInventoryComponent.TRANSLATION_KEY_COMPLETE;
-          this.lastResult.type = FullInventoryComponent.TEXT_CLASS_SUCCESS;
+        if (data.lastAttemptSucceeded) {
+          text = FullInventoryComponent.TRANSLATION_KEY_COMPLETE;
+          style = FullInventoryComponent.TEXT_CLASS_SUCCESS;
         } else {
-          this.lastResult.text = FullInventoryComponent.TRANSLATION_KEY_FAILED;
-          this.lastResult.type = FullInventoryComponent.TEXT_CLASS_DANGER;
+          text = FullInventoryComponent.TRANSLATION_KEY_FAILED;
+          style = FullInventoryComponent.TEXT_CLASS_DANGER;
         }
       } else {
-        this.lastResult.text = this.translation.translate(data.status);
-        this.lastResult.type = FullInventoryComponent.TEXT_CLASS_INFO;
+        text = data.status;
+        style = FullInventoryComponent.TEXT_CLASS_INFO;
       }
-    } else {
-      // no record of any sync attempts
-      this.lastResult.text = unknown;
-      this.lastResult.type = FullInventoryComponent.TEXT_CLASS_WARNING;
     }
 
-    this.successfulServiceCompletionTimestamp = data.lastCompletion
-      ? new Date(data.lastCompletion).toLocaleString()
-      : unknown;
+    this.lastResult.text = this.translation.translate(text);
+    this.lastResult.type = style;
+
+    this.updateLastCompletion(data.lastCompletion);
 
     this.updateSyncButton(data.status);
     this.updateRefreshButton();
 
     return data.status;
+  }
+
+  private updateLastCompletion(rawDate: string)
+  {
+    if (rawDate) {
+      this.successfulServiceCompletionTimestamp = new Date(rawDate).toLocaleString();
+      return;
+    }
+
+    if (!this.successfulServiceCompletionTimestamp) {
+      this.successfulServiceCompletionTimestamp = this.translation.translate(
+        FullInventoryComponent.TRANSLATION_KEY_UNKNOWN
+      );
+    }
   }
 
   private showLoading() {

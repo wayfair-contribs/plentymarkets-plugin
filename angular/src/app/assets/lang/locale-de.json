@@ -37,7 +37,7 @@
 	"own_account_shipping": "Selbst Versende",
 	"import_orders_since": "Aufträge importieren ab",
 	"must_have_at_least_one_scac": "Selbst Versende erfordert mindenstens ein Eintrag für die Trägertabelle",
-	"synchronizing": "Die Synchronisierung wird ausgeführt",
+	"synchronizing": "Synchronisierung läuft",
 	"full_inventory_status": "Status des letzten Versuchs",
 	"last_good_sync_time": "Zeitpunkt der letzten erfolgreichen Synchronisation",
 	"loading": "lade Daten",

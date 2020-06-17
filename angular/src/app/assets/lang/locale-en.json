@@ -37,7 +37,7 @@
 	"own_account_shipping": "Own account shipping",
 	"import_orders_since": "Import orders since",
 	"must_have_at_least_one_scac": "When using Own account shipping, configure one or more carrier configurations",
-	"synchronizing": "Synchronization in progress...",
+	"synchronizing": "Synchronization in progress",
 	"full_inventory_status": "Status of last attempt",
 	"last_good_sync_time": "Time of last successful inventory synchronization",
 	"loading": "Loading",
