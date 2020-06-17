@@ -7,7 +7,6 @@ namespace Wayfair\Repositories;
 
 use Plenty\Exceptions\ValidationException;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Models\KeyValue;
 
@@ -27,9 +26,12 @@ class KeyValueRepository extends Repository {
       throw new ValidationException("Key or Value cannot be empty.");
     }
     /**
-     * @var DataBase $database
+     * @var DataBase
      */
     $database              = pluginApp(DataBase::class);
+    /**
+     * @var KeyValue
+     */
     $keyValueModel         = pluginApp(KeyValue::class);
     $keyValueModel->key    = $key;
     $keyValueModel->value  = $value;
@@ -77,7 +79,7 @@ class KeyValueRepository extends Repository {
           ]
         );
     }
-    
+
     if ($firstModelForKey) {
       $firstModelForKey->value = $value;
       $database->save($firstModelForKey);
@@ -89,10 +91,10 @@ class KeyValueRepository extends Repository {
   /**
    * @param mixed $key
    *
-   * @return string|null
+   * @return mixed
    */
   public function get($key) {
-    
+
     $modelsForKey = [];
     try{
       /**
@@ -136,6 +138,9 @@ class KeyValueRepository extends Repository {
 
     try
     {
+      /**
+       * @var Database
+       */
       $database  = pluginApp(DataBase::class);
       $allModels = $database->query(KeyValue::class)->get();
     }

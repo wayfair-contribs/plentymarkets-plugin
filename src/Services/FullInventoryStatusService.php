@@ -152,11 +152,8 @@ class FullInventoryStatusService
   public function getLatestAttemptSuccess(): bool
   {
     $flag = $this->keyValueRepository->get(self::FULL_INVENTORY_SUCCESS);
-    if (!isset($flag)) {
-      return false;
-    }
 
-    return $flag;
+    return isset($flag) && $flag;
   }
 
   /**
@@ -195,7 +192,7 @@ class FullInventoryStatusService
 
     $ts = $this->markStateChange();
     $this->keyValueRepository->putOrReplace(self::FULL_INVENTORY_STATUS_UPDATED_AT, $ts);
-    $this->keyValueRepository->putOrReplace(self::FULL_INVENTORY_SUCCESS, 'false');
+    $this->keyValueRepository->putOrReplace(self::FULL_INVENTORY_SUCCESS, false);
     $this->setServiceState(self::FULL_INVENTORY_CRON_IDLE);
   }
 
@@ -212,7 +209,7 @@ class FullInventoryStatusService
 
     $ts = $this->markStateChange();
     $this->keyValueRepository->putOrReplace(self::FULL_INVENTORY_LAST_COMPLETION, $ts);
-    $this->keyValueRepository->putOrReplace(self::FULL_INVENTORY_SUCCESS, 'true');
+    $this->keyValueRepository->putOrReplace(self::FULL_INVENTORY_SUCCESS, true);
     $this->setServiceState(self::FULL_INVENTORY_CRON_IDLE);
   }
 

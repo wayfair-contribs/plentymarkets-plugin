@@ -195,7 +195,7 @@ export class FullInventoryComponent {
       ).toLocaleString();
 
       if (data.status == FullInventoryComponent.STATE_IDLE) {
-        if (data.lastAttemptSucceeded == true) {
+        if (data.lastAttemptSucceeded != null && data.lastAttemptSucceeded == true) {
           this.lastResult.text =
             FullInventoryComponent.TRANSLATION_KEY_COMPLETE;
           this.lastResult.type = FullInventoryComponent.TEXT_CLASS_SUCCESS;
