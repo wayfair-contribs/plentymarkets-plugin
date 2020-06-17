@@ -118,11 +118,14 @@ class AuthService implements AuthenticationContract
       'grant_type' => 'client_credentials'
     ];
 
+    $targetURL = URLHelper::getAuthUrl();
+    $bodyJson = json_encode($bodyArray);
+
     $arguments = [
-      URLHelper::getAuthUrl(),
+      $targetURL,
       [
         'headers' => $headersArray,
-        'body' => json_encode($bodyArray)
+        'body' => $bodyJson
       ]
     ];
 
@@ -153,8 +156,7 @@ class AuthService implements AuthenticationContract
   public function refresh()
   {
     $token = null;
-    if (! $this->updateCredentials())
-    {
+    if (!$this->updateCredentials()) {
       // credentials have not changed since we got token
       $token = $this->getToken();
     }
@@ -192,7 +194,7 @@ class AuthService implements AuthenticationContract
     $this->store->set(self::STORAGE_KEY_TOKEN, json_encode($token));
   }
 
-    /**
+  /**
    * Check if the token data is missing or expired
    *
    * @param mixed $token
