@@ -5,7 +5,7 @@
 
 namespace Wayfair\Core\Api;
 
-use Wayfair\Core\Contracts\AuthenticationContract;
+use Wayfair\Core\Contracts\AuthContract;
 use Wayfair\Core\Contracts\ClientInterfaceContract;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Helpers\URLHelper;
@@ -19,7 +19,7 @@ class APIService {
   const LOG_KEY_API_SERVICE = 'apiService';
 
   /**
-   * @var AuthenticationContract
+   * @var AuthContract
    */
   protected $authService;
 
@@ -40,13 +40,13 @@ class APIService {
 
   /**
    * @param ClientInterfaceContract $clientInterfaceContract
-   * @param AuthenticationContract  $authenticationContract
+   * @param AuthContract  $AuthContract
    * @param ConfigHelper            $configHelper
    * @param LoggerContract          $loggerContract
    */
-  public function __construct(ClientInterfaceContract $clientInterfaceContract, AuthenticationContract $authenticationContract, ConfigHelper $configHelper, LoggerContract $loggerContract) {
+  public function __construct(ClientInterfaceContract $clientInterfaceContract, AuthContract $AuthContract, ConfigHelper $configHelper, LoggerContract $loggerContract) {
     $this->client = $clientInterfaceContract;
-    $this->authService = $authenticationContract;
+    $this->authService = $AuthContract;
     $this->configHelper = $configHelper;
     $this->loggerContract = $loggerContract;
   }
@@ -58,7 +58,7 @@ class APIService {
     try {
       $this->authService->refresh();
 
-      return $this->authService->getOAuthToken();
+      return $this->authService->generateAuthHeader();
     } catch (\Exception $e) {
       $this->loggerContract
           ->error(TranslationHelper::getLoggerKey(self::LOG_KEY_API_SERVICE), ['additionalInfo' => ['message' => $e->getMessage()], 'method' => __METHOD__]);

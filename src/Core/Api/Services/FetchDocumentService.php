@@ -42,10 +42,10 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
       if (self::isWayfairAPI($url)) {
         // Check if token has already been expired and refresh it.
         $this->authService->refresh();
-        // getOAuthToken() currently returns 'Bearer MyToken' NOT the bare token.
+        // generateAuthHeader() currently returns 'Bearer MyToken' NOT the bare token.
         curl_setopt(
           $ch, CURLOPT_HTTPHEADER, [
-            'Authorization: ' . $this->authService->getOAuthToken(),
+            'Authorization: ' . $this->authService->generateAuthHeader(),
             ConfigHelper::WAYFAIR_INTEGRATION_HEADER . ': ' . $this->configHelper->getIntegrationAgentHeader()
           ]
         );
@@ -60,7 +60,7 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
         $this->loggerContract
           ->error(
             TranslationHelper::getLoggerKey(self::LOG_KEY_FAILED_WAYFAIR_API_CALL), [
-              'additionalInfo' => ['url' => $url, 'accessToken' => StringHelper::mask($this->authService->getOAuthToken())],
+              'additionalInfo' => ['url' => $url, 'accessToken' => StringHelper::mask($this->authService->generateAuthHeader())],
               'method' => __METHOD__
             ]
           );

@@ -7,7 +7,7 @@
 
 namespace Wayfair\Core\Api\Services;
 
-use Wayfair\Core\Contracts\AuthenticationContract;
+use Wayfair\Core\Contracts\AuthContract;
 use Wayfair\Core\Contracts\ClientInterfaceContract;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Helpers\URLHelper;
@@ -23,7 +23,7 @@ class LogSenderService {
   private $client;
 
   /**
-   * @var AuthenticationContract
+   * @var AuthContract
    */
   private $authService;
 
@@ -32,9 +32,9 @@ class LogSenderService {
    */
   private $configHelper;
 
-  public function __construct(ClientInterfaceContract $clientInterfaceContract, AuthenticationContract $authenticationContract, ConfigHelper $configHelper) {
+  public function __construct(ClientInterfaceContract $clientInterfaceContract, AuthContract $AuthContract, ConfigHelper $configHelper) {
     $this->client = $clientInterfaceContract;
-    $this->authService = $authenticationContract;
+    $this->authService = $AuthContract;
     $this->configHelper = $configHelper;
   }
 
@@ -93,7 +93,7 @@ class LogSenderService {
   public function query($query, $method = 'post', $variables = []) {
     $this->authService->refresh();
     $headers = [];
-    $headers['Authorization'] = $this->authService->getOAuthToken();
+    $headers['Authorization'] = $this->authService->generateAuthHeader();
     $headers['Content-Type'] = ['application/json'];
     $headers[ConfigHelper::WAYFAIR_INTEGRATION_HEADER] = $this->configHelper->getIntegrationAgentHeader();
 

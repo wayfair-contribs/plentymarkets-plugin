@@ -6,7 +6,7 @@
 
 namespace Wayfair\Core\Api\Services;
 
-use Wayfair\Core\Contracts\AuthenticationContract;
+use Wayfair\Core\Contracts\AuthContract;
 use Wayfair\Core\Contracts\ClientInterfaceContract;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Contracts\StorageInterfaceContract;
@@ -18,7 +18,7 @@ use Wayfair\Helpers\StringHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Http\WayfairResponse;
 
-class AuthService implements AuthenticationContract
+class AuthService implements AuthContract
 {
   const STORAGE_KEY_TOKEN = 'token';
 
@@ -221,7 +221,7 @@ class AuthService implements AuthenticationContract
    * @return string
    * @throws TokenNotFoundException
    */
-  public function getOAuthToken()
+  public function generateAuthHeader()
   {
     $token = $this->getToken();
     if (!isset($token)) {

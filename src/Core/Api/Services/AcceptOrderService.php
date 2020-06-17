@@ -6,7 +6,7 @@
 namespace Wayfair\Core\Api\Services;
 
 use Wayfair\Core\Api\APIService;
-use Wayfair\Core\Contracts\AuthenticationContract;
+use Wayfair\Core\Contracts\AuthContract;
 use Wayfair\Core\Contracts\ClientInterfaceContract;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Helpers\ConfigHelper;
@@ -25,20 +25,20 @@ class AcceptOrderService extends APIService
    * FetchOrderService constructor.
    *
    * @param ClientInterfaceContract $clientInterfaceContract
-   * @param AuthenticationContract $authenticationContract
+   * @param AuthContract $AuthContract
    * @param ConfigHelper $configHelper
    * @param PendingOrdersRepository $pendingOrdersRepository
    * @param LoggerContract $loggerContract
    */
   public function __construct(
     ClientInterfaceContract $clientInterfaceContract,
-    AuthenticationContract $authenticationContract,
+    AuthContract $AuthContract,
     ConfigHelper $configHelper,
     PendingOrdersRepository $pendingOrdersRepository,
     LoggerContract $loggerContract
   )
   {
-    parent::__construct($clientInterfaceContract, $authenticationContract, $configHelper, $loggerContract);
+    parent::__construct($clientInterfaceContract, $AuthContract, $configHelper, $loggerContract);
     $this->pendingOrdersRepository = $pendingOrdersRepository;
   }
 
