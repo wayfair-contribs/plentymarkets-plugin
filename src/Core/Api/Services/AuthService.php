@@ -223,6 +223,8 @@ class AuthService implements AuthContract
    */
   public function generateAuthHeader()
   {
+    $this->refresh();
+
     $token = $this->getToken();
     if (!isset($token)) {
       throw new TokenNotFoundException("Token not found.");

@@ -40,9 +40,6 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
     $ch = curl_init();
     try {
       if (self::isWayfairAPI($url)) {
-        // Check if token has already been expired and refresh it.
-        $this->authService->refresh();
-        // generateAuthHeader() currently returns 'Bearer MyToken' NOT the bare token.
         curl_setopt(
           $ch, CURLOPT_HTTPHEADER, [
             'Authorization: ' . $this->authService->generateAuthHeader(),

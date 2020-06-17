@@ -54,10 +54,8 @@ class APIService {
   /**
    * @return string
    */
-  public function getAuthenticationToken() {
+  public function getAuthHeader() {
     try {
-      $this->authService->refresh();
-
       return $this->authService->generateAuthHeader();
     } catch (\Exception $e) {
       $this->loggerContract
@@ -75,7 +73,7 @@ class APIService {
    */
   public function query($query, $method = 'post', $variables = []) {
     $headers = [];
-    $headers['Authorization'] = $this->getAuthenticationToken();
+    $headers['Authorization'] = $this->getAuthHeader();
     $headers['Content-Type'] = ['application/json'];
     $headers[ConfigHelper::WAYFAIR_INTEGRATION_HEADER] = $this->configHelper->getIntegrationAgentHeader();
 
