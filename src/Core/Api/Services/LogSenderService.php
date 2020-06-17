@@ -32,9 +32,9 @@ class LogSenderService {
    */
   private $configHelper;
 
-  public function __construct(ClientInterfaceContract $clientInterfaceContract, AuthContract $AuthContract, ConfigHelper $configHelper) {
+  public function __construct(ClientInterfaceContract $clientInterfaceContract, AuthContract $authContract, ConfigHelper $configHelper) {
     $this->client = $clientInterfaceContract;
-    $this->authService = $AuthContract;
+    $this->authService = $authContract;
     $this->configHelper = $configHelper;
   }
 
@@ -91,7 +91,6 @@ class LogSenderService {
    * @return WayfairResponse
    */
   public function query($query, $method = 'post', $variables = []) {
-    $this->authService->refresh();
     $headers = [];
     $headers['Authorization'] = $this->authService->generateAuthHeader();
     $headers['Content-Type'] = ['application/json'];

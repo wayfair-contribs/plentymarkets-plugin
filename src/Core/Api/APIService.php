@@ -40,13 +40,13 @@ class APIService {
 
   /**
    * @param ClientInterfaceContract $clientInterfaceContract
-   * @param AuthContract  $AuthContract
+   * @param AuthContract            $authContract
    * @param ConfigHelper            $configHelper
    * @param LoggerContract          $loggerContract
    */
-  public function __construct(ClientInterfaceContract $clientInterfaceContract, AuthContract $AuthContract, ConfigHelper $configHelper, LoggerContract $loggerContract) {
+  public function __construct(ClientInterfaceContract $clientInterfaceContract, AuthContract $authContract, ConfigHelper $configHelper, LoggerContract $loggerContract) {
     $this->client = $clientInterfaceContract;
-    $this->authService = $AuthContract;
+    $this->authService = $authContract;
     $this->configHelper = $configHelper;
     $this->loggerContract = $loggerContract;
   }

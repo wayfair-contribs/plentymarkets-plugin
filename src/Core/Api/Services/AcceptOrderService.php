@@ -25,20 +25,20 @@ class AcceptOrderService extends APIService
    * FetchOrderService constructor.
    *
    * @param ClientInterfaceContract $clientInterfaceContract
-   * @param AuthContract $AuthContract
+   * @param AuthContract $authContract
    * @param ConfigHelper $configHelper
    * @param PendingOrdersRepository $pendingOrdersRepository
    * @param LoggerContract $loggerContract
    */
   public function __construct(
     ClientInterfaceContract $clientInterfaceContract,
-    AuthContract $AuthContract,
+    AuthContract $authContract,
     ConfigHelper $configHelper,
     PendingOrdersRepository $pendingOrdersRepository,
     LoggerContract $loggerContract
   )
   {
-    parent::__construct($clientInterfaceContract, $AuthContract, $configHelper, $loggerContract);
+    parent::__construct($clientInterfaceContract, $authContract, $configHelper, $loggerContract);
     $this->pendingOrdersRepository = $pendingOrdersRepository;
   }
 
