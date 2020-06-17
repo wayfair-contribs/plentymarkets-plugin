@@ -192,7 +192,7 @@ class AuthService implements AuthContract
    *
    * @return boolean
    */
-  private static function validateToken($tokenData): bool
+  private static function validateToken($token): bool
   {
     return isset($token) && !empty($token)
       && isset($token[self::ACCESS_TOKEN]) && !empty($token[self::ACCESS_TOKEN])
