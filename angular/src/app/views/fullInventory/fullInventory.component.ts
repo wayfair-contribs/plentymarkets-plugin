@@ -208,8 +208,7 @@ export class FullInventoryComponent {
       }
     }
 
-    this.lastResult.text = this.translation.translate(text);
-    this.lastResult.type = style;
+    this.lastResult = {text: text, type: style};
 
     this.updateLastCompletion(data.lastCompletion);
 
