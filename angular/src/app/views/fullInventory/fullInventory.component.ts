@@ -10,7 +10,6 @@ import { Language, TranslationService } from "angular-l10n";
 export class FullInventoryComponent {
   private static readonly TRANSLATION_KEY_START_SYNC = "sync";
   private static readonly TRANSLATION_KEY_SYNCHRONIZING = "synchronizing";
-  private static readonly TRANSLATION_KEY_LOADING = "loading";
   private static readonly TRANSLATION_KEY_ERROR = "error";
   private static readonly TRANSLATION_KEY_REFRESH = "refresh_status";
   private static readonly TRANSLATION_KEY_COMPLETE = "complete";
@@ -22,8 +21,6 @@ export class FullInventoryComponent {
   private static readonly TEXT_CLASS_DANGER = "warning";
   private static readonly TEXT_CLASS_INFO = "info";
 
-
-
   private static readonly STATE_RUNNING = "running";
   private static readonly STATE_LOADING = "loading";
   private static readonly STATE_IDLE = "idle";
@@ -31,7 +28,7 @@ export class FullInventoryComponent {
   /**
    * The maximum amount of time to stay subscribed to a manual sync
    */
-  private static readonly SYNC_UI_TIMEOUT = 120000;
+  private static readonly SYNC_UI_TIMEOUT = 30000;
 
   /**
    * The interval on which the UI will automatically refresh
@@ -41,11 +38,10 @@ export class FullInventoryComponent {
   @Language()
   public lang: string;
 
-
   public lastResult = {
     text: FullInventoryComponent.TRANSLATION_KEY_UNKNOWN,
-    type: FullInventoryComponent.TEXT_CLASS_WARNING
-  }
+    type: FullInventoryComponent.TEXT_CLASS_WARNING,
+  };
   public successfulServiceCompletionTimestamp: string = null;
   public latestInteractionTimestamp: string = null;
 
@@ -72,7 +68,10 @@ export class FullInventoryComponent {
     // pull state from the DB on load
     this.refreshState();
     // pull state from the DB every 5 minutes
-    setInterval(() => this.refreshState(), FullInventoryComponent.REFRESH_INTERVAL);
+    setInterval(
+      () => this.refreshState(),
+      FullInventoryComponent.REFRESH_INTERVAL
+    );
   }
 
   /**
@@ -80,7 +79,7 @@ export class FullInventoryComponent {
    * Update the UI accordingly
    */
   public syncFullInventory(): void {
-    this.updateSyncButton(FullInventoryComponent.STATE_RUNNING);
+    this.showRunning();
 
     this.syncSubscription = this.fullInventoryService
       .syncFullInventory()
@@ -169,7 +168,7 @@ export class FullInventoryComponent {
   private updateRefreshButton(status = null): void {
     if (status === FullInventoryComponent.STATE_LOADING) {
       this.stateOfRefreshButton = {
-        text: FullInventoryComponent.TRANSLATION_KEY_LOADING,
+        text: FullInventoryComponent.STATE_LOADING,
         disabled: true,
       };
       return;
@@ -196,25 +195,22 @@ export class FullInventoryComponent {
       ).toLocaleString();
 
       if (data.status == FullInventoryComponent.STATE_IDLE) {
-
-        if (data.lastAttemptSucceeded)
-        {
-          this.lastResult.text = FullInventoryComponent.TRANSLATION_KEY_COMPLETE;
-          this.lastResult.type = FullInventoryComponent.TEXT_CLASS_SUCCESS
-        }
-        else
-        {
-          this.lastResult.text = FullInventoryComponent.TRANSLATION_KEY_FAILED
-          this.lastResult.type = FullInventoryComponent.TEXT_CLASS_DANGER
+        if (data.lastAttemptSucceeded == true) {
+          this.lastResult.text =
+            FullInventoryComponent.TRANSLATION_KEY_COMPLETE;
+          this.lastResult.type = FullInventoryComponent.TEXT_CLASS_SUCCESS;
+        } else {
+          this.lastResult.text = FullInventoryComponent.TRANSLATION_KEY_FAILED;
+          this.lastResult.type = FullInventoryComponent.TEXT_CLASS_DANGER;
         }
       } else {
         this.lastResult.text = this.translation.translate(data.status);
-        this.lastResult.type = FullInventoryComponent.TEXT_CLASS_INFO
+        this.lastResult.type = FullInventoryComponent.TEXT_CLASS_INFO;
       }
     } else {
       // no record of any sync attempts
       this.lastResult.text = unknown;
-      this.lastResult.type = FullInventoryComponent.TEXT_CLASS_WARNING
+      this.lastResult.type = FullInventoryComponent.TEXT_CLASS_WARNING;
     }
 
     this.successfulServiceCompletionTimestamp = data.lastCompletion
@@ -229,19 +225,37 @@ export class FullInventoryComponent {
 
   private showLoading() {
     let loading = this.translation.translate(
-      FullInventoryComponent.TRANSLATION_KEY_LOADING
+      FullInventoryComponent.STATE_LOADING
     );
-    this.lastResult = {text: loading, type: FullInventoryComponent.TEXT_CLASS_INFO}
+    this.lastResult = {
+      text: loading,
+      type: FullInventoryComponent.TEXT_CLASS_INFO,
+    };
     this.latestInteractionTimestamp = loading;
     this.updateSyncButton();
     this.updateRefreshButton(FullInventoryComponent.STATE_LOADING);
+  }
+
+  private showRunning() {
+    let running = this.translation.translate(
+      FullInventoryComponent.STATE_RUNNING
+    );
+
+    this.latestInteractionTimestamp = new Date().toLocaleString();
+    this.lastResult.text = running;
+    this.lastResult.type = FullInventoryComponent.TEXT_CLASS_INFO;
+    this.updateSyncButton(FullInventoryComponent.STATE_RUNNING);
+    this.updateRefreshButton(FullInventoryComponent.STATE_RUNNING)
   }
 
   private showError() {
     let error = this.translation.translate(
       FullInventoryComponent.TRANSLATION_KEY_ERROR
     );
-    this.lastResult = {text: error, type: FullInventoryComponent.TEXT_CLASS_DANGER};
+    this.lastResult = {
+      text: error,
+      type: FullInventoryComponent.TEXT_CLASS_DANGER,
+    };
     this.latestInteractionTimestamp = error;
     this.updateSyncButton();
     this.updateRefreshButton();
