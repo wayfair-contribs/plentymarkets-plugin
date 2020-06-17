@@ -147,37 +147,29 @@ class AuthService implements AuthContract
   }
 
   /**
-   * This refreshes the Authorization Token if it has been expired.
-   * The token will also be refreshed if the credentials have changed.
+   * Refresh the Authorization Token
    *
    * @return void
    * @throws \Exception
    */
   public function refresh()
   {
-    $token = null;
-    if (!$this->updateCredentials()) {
-      // credentials have not changed since we got token
-      $token = $this->getToken();
+    $this->clearToken();
+
+    $responseObject = $this->fetchWayfairAuthToken();
+
+    if (!isset($responseObject) || empty($responseObject)) {
+      throw new AuthException("Unable to authorize user: no token data in response from Wayfair");
     }
 
-    if (!isset($token) or $this->isTokenDataExpired($token)) {
+    $responseArray = $responseObject->getBodyAsArray();
 
-      $responseObject = $this->fetchWayfairAuthToken();
+    if (!isset($responseArray) || empty($responseArray)) {
+      throw new AuthException("Unable to authorize user: no token data in response from Wayfair");
+    }
 
-      if (!isset($responseObject) || empty($responseObject)) {
-        throw new AuthException("Unable to authorize user: no token data");
-      }
-
-      $responseArray = $responseObject->getBodyAsArray();
-
-      if (!isset($responseArray) || empty($responseArray)) {
-        throw new AuthException("Unable to authorize user: no token data");
-      }
-
-      if (isset($responseArray['error'])) {
-        throw new AuthException("Unable to authorize user: " . $responseArray['error']);
-      }
+    if (isset($responseArray['error'])) {
+      throw new AuthException("Unable to authorize user: " . $responseArray['error']);
     }
 
     $this->saveToken($responseArray);
@@ -188,33 +180,53 @@ class AuthService implements AuthContract
    *
    * @return void
    */
-  public function saveToken($token)
+  private function saveToken($token)
   {
     $token[self::STORE_TIME] = time();
     $this->store->set(self::STORAGE_KEY_TOKEN, json_encode($token));
   }
 
   /**
-   * Check if the token data is missing or expired
+   * Check if a token model is valid for use.
+   * A token that passes validation has all required fields and has not yet expired.
    *
-   * @param mixed $token
-   * @return bool
+   * @return boolean
    */
-  private static function isTokenDataExpired($token)
+  private static function validateToken($tokenData): bool
   {
-    return (!isset($token)  || empty($token)
-      || !isset($token[self::ACCESS_TOKEN]) || empty($token[self::ACCESS_TOKEN])
-      || !isset($token[self::STORE_TIME]) || empty($token[self::STORE_TIME])
-      || !isset($token[self::EXPIRES_IN]) || empty($token[self::EXPIRES_IN])
-      || ($token[self::EXPIRES_IN] + $token[self::STORE_TIME]) < time());
+    return isset($token) && !empty($token)
+      && isset($token[self::ACCESS_TOKEN]) && !empty($token[self::ACCESS_TOKEN])
+      && isset($token[self::STORE_TIME]) && !empty($token[self::STORE_TIME])
+      && isset($token[self::EXPIRES_IN]) && empty($token[self::EXPIRES_IN])
+      && ($token[self::EXPIRES_IN] + $token[self::STORE_TIME]) > time();
   }
 
   /**
    * @return mixed
    */
-  public function getToken()
+  private function getStoredToken()
   {
     return json_decode($this->store->get(self::STORAGE_KEY_TOKEN), true);
+  }
+
+  /**
+   * Get an OAuthToken object for use with Wayfair APIs
+   *
+   * @return string
+   */
+  public function getOAuthToken()
+  {
+    $token = null;
+    if (!$this->updateCredentials()) {
+      // no changes to credentials - token is okay, but could be expired
+      $token = $this->getStoredToken();
+    }
+
+    if (!isset($token) || !self::validateToken($token)) {
+      $this->refresh();
+    }
+
+    return $this->getStoredToken();
   }
 
   /**
@@ -223,25 +235,28 @@ class AuthService implements AuthContract
    */
   public function generateAuthHeader()
   {
-    $this->refresh();
+    $tokenValue = null;
 
-    $token = $this->getToken();
-    if (!isset($token)) {
-      throw new TokenNotFoundException("Token not found.");
+    $tokenModel = $this->getOAuthToken();
+    if (isset($tokenModel)) {
+      $tokenValue = $tokenModel['access_token'];
     }
 
-    return 'Bearer ' . $token['access_token'];
+    if (!isset($tokenValue) || empty($tokenValue)) {
+      throw new TokenNotFoundException("Could not get a valid OAUth token.");
+    }
+
+    return 'Bearer ' . $tokenValue;
   }
 
   /**
-   * Sync instance credentails with global values for credentails,
-   * Returning true if any changes ocurred.
+   * Sync instance credentails with global values for credentails.
+   * If changes are detected, the stored token is cleared and the funciton returns true
    *
    * @return boolean
    */
   private function updateCredentials(): bool
   {
-
     $updatedClientId = $this->configHelper->getClientId();
     $updatedClientSecret = $this->configHelper->getClientSecret();
 
@@ -249,9 +264,15 @@ class AuthService implements AuthContract
       $this->clientId = $updatedClientId;
       $this->clientSecret = $updatedClientSecret;
 
+      $this->clearToken();
       return true;
     }
 
     return false;
+  }
+
+  private function clearToken(): void
+  {
+    $this->saveToken([]);
   }
 }
