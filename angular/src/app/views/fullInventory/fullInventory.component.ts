@@ -195,7 +195,10 @@ export class FullInventoryComponent {
       ).toLocaleString();
 
       if (data.status == FullInventoryComponent.STATE_IDLE) {
-        if (data.lastAttemptSucceeded != null && data.lastAttemptSucceeded == true) {
+        if (
+          data.lastAttemptSucceeded != null &&
+          data.lastAttemptSucceeded == true
+        ) {
           this.lastResult.text =
             FullInventoryComponent.TRANSLATION_KEY_COMPLETE;
           this.lastResult.type = FullInventoryComponent.TEXT_CLASS_SUCCESS;
@@ -227,6 +230,7 @@ export class FullInventoryComponent {
     let loading = this.translation.translate(
       FullInventoryComponent.STATE_LOADING
     );
+
     this.lastResult = {
       text: loading,
       type: FullInventoryComponent.TEXT_CLASS_INFO,
@@ -241,11 +245,13 @@ export class FullInventoryComponent {
       FullInventoryComponent.STATE_RUNNING
     );
 
+    this.lastResult = {
+      text: running,
+      type: FullInventoryComponent.TEXT_CLASS_INFO,
+    };
     this.latestInteractionTimestamp = new Date().toLocaleString();
-    this.lastResult.text = running;
-    this.lastResult.type = FullInventoryComponent.TEXT_CLASS_INFO;
     this.updateSyncButton(FullInventoryComponent.STATE_RUNNING);
-    this.updateRefreshButton(FullInventoryComponent.STATE_RUNNING)
+    this.updateRefreshButton(FullInventoryComponent.STATE_RUNNING);
   }
 
   private showError() {
