@@ -6,6 +6,6 @@
 
 namespace Wayfair\Core\Exceptions;
 
-class AuthException extends \Exception {
-
+class AuthException extends \Exception
+{
 }
