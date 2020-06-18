@@ -22,6 +22,7 @@ class LoggingService implements LoggerContract {
   const WAYFAIR_PLUGIN_VERSION = 'Wayfair Plugin Version';
   const STRING_LIMIT = 32768;
   const TRUNCATED_SIZE = 1000;
+  const LOG_KEY_MESSAGE_TO_LONG = 'messageToLongForPM';
 
   /**
    * Stores the version of the plugin
@@ -143,8 +144,9 @@ class LoggingService implements LoggerContract {
 
     if (strlen(json_encode($loggingInfo)) > self::STRING_LIMIT) {
       $logForKibana = [];
-      $additionalInfo = $shortMessage['message'] = 'Message was too long to log in PlentyMarkets, ' . $clientID . '-' . date('M d Y H:i:s');
-      $logForKibana['message'] = 'Message was too long to log in PlentyMarkets, ' . $clientID . '-' . date('D, d M Y H:i:s');
+      $shortMessage['message'] = self::LOG_KEY_MESSAGE_TO_LONG . $clientID . '-' . date('M d Y H:i:s');
+      $additionalInfo = $shortMessage;
+      $logForKibana['message'] = self::LOG_KEY_MESSAGE_TO_LONG . $clientID . '-' . date('D, d M Y H:i:s');
       $logForKibana['details'] = $loggingInfo;
       $externalLogs->addErrorLog(json_encode($logForKibana));
       if (count($externalLogs->getLogs())) {
