@@ -56,9 +56,15 @@ class PurchaseOrderMapper {
    * @return array
    */
   public function map(ResponseDTO $dto, int $billingAddressId, int $billingContactId, int $deliveryAddressId, int $referrerId, string $warehouseId, string $paymentMethodId): array {
+
+    /** @var AbstractConfigHelper */
+    $configHelper = pluginApp(AbstractConfigHelper::class);
+    $itemMappingMethod = $configHelper->getItemMappingMethod();
+    
     $orderItems = [];
+
     foreach ($dto->getProducts() as $product) {
-      $orderItems[] = $this->productMapper->map($product, $referrerId, $warehouseId, $dto->getPoNumber());
+      $orderItems[] = $this->productMapper->map($product, $referrerId, $warehouseId, $dto->getPoNumber(), $itemMappingMethod);
     }
     // Init properties
     $properties = [

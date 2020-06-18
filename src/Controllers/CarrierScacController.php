@@ -7,7 +7,9 @@ namespace Wayfair\Controllers;
 
 use Plenty\Exceptions\ValidationException;
 use Plenty\Plugin\Http\Request;
+use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Services\ShipmentProviderService;
+use Wayfair\Helpers\TranslationHelper;
 
 /**
  * Carrier SCAC code mapping controller.
@@ -16,6 +18,8 @@ use Wayfair\Services\ShipmentProviderService;
  * @package Wayfair\Controllers
  */
 class CarrierScacController {
+  const LOG_KEY_CONTROLLER_IN = "controllerInput";
+  const LOG_KEY_CONTROLLER_OUT = "controllerOutput";
 
   const INPUT_DATA = 'data';
 
@@ -24,13 +28,20 @@ class CarrierScacController {
    */
   private $shipmentProviderService;
 
+    /**
+   * @var LoggerContract
+   */
+  private $logger;
+
   /**
    * CarrierScacController constructor.
    *
    * @param ShipmentProviderService $shipmentProviderService
+   * @param LoggerContract $logger
    */
-  public function __construct(ShipmentProviderService $shipmentProviderService) {
+  public function __construct(ShipmentProviderService $shipmentProviderService, LoggerContract $logger) {
     $this->shipmentProviderService = $shipmentProviderService;
+    $this->logger = $logger;
   }
 
   /**
@@ -39,7 +50,15 @@ class CarrierScacController {
    * @return mixed
    */
   public function getCarriers() {
-    return json_encode($this->shipmentProviderService->getShippingProviders());
+
+    $carrierData = json_encode($this->shipmentProviderService->getShippingProviders());
+
+    $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_CONTROLLER_OUT), [
+      'additionalInfo' => ['payloadOut' => $carrierData],
+      'method'         => __METHOD__
+    ]);
+
+    return $carrierData;
   }
 
   /**
@@ -48,7 +67,15 @@ class CarrierScacController {
    * @return mixed
    */
   public function getMapping() {
-    return json_encode($this->shipmentProviderService->getCarrierScacMapping());
+
+    $mappingData = json_encode($this->shipmentProviderService->getCarrierScacMapping());
+
+    $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_CONTROLLER_OUT), [
+      'additionalInfo' => ['payloadOut' => $mappingData],
+      'method'         => __METHOD__
+    ]);
+
+    return $mappingData;
   }
 
   /**
@@ -59,7 +86,19 @@ class CarrierScacController {
   public function post(Request $request) {
     $input = $request->get(self::INPUT_DATA);
 
-    return json_encode($this->shipmentProviderService->saveCarrierScacMapping($input));
+    $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_CONTROLLER_IN), [
+      'additionalInfo' => ['payloadIn' => json_encode($input)],
+      'method'         => __METHOD__
+    ]);
+
+    $dataOut = json_encode($this->shipmentProviderService->saveCarrierScacMapping($input));
+
+    $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_CONTROLLER_OUT), [
+      'additionalInfo' => ['payloadOut' => $dataOut],
+      'method'         => __METHOD__
+    ]);
+
+    return $dataOut;
   }
 
   /**
@@ -68,7 +107,14 @@ class CarrierScacController {
    * @return false|string
    */
   public function getShippingMethod() {
-    return json_encode(['name' => $this->shipmentProviderService->getShippingMethod()]);
+    $dataOut = json_encode(['name' => $this->shipmentProviderService->getShippingMethod()]);
+
+    $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_CONTROLLER_OUT), [
+      'additionalInfo' => ['payloadOut' => $dataOut],
+      'method'         => __METHOD__
+    ]);
+
+    return $dataOut;
   }
 
   /**
@@ -82,7 +128,19 @@ class CarrierScacController {
   public function postShippingMethod(Request $request) {
     $input = $request->get(self::INPUT_DATA);
 
-    return json_encode(['name' => $this->shipmentProviderService->updateShippingMethod($input)]);
+    $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_CONTROLLER_IN), [
+      'additionalInfo' => ['payloadIn' => json_encode($input)],
+      'method'         => __METHOD__
+    ]);
+
+    $dataOut = json_encode(['name' => $this->shipmentProviderService->updateShippingMethod($input)]);
+
+    $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_CONTROLLER_OUT), [
+      'additionalInfo' => ['payloadOut' => $dataOut],
+      'method'         => __METHOD__
+    ]);
+
+    return $dataOut;
   }
 
 }

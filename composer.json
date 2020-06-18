@@ -14,8 +14,14 @@
     "autoload": {
         "psr-4": {
             "Wayfair\\": "src/",
-            "Wayfair\\Tests\\": "tests/",
             "Wayfair\\Libs\\": "resources/lib/"
+        }
+    },
+    "autoload-dev":
+    {
+        "psr-4": {
+            "Plenty\\": "vendor/plentymarkets/plugin-interface",
+            "Wayfair\\Tests\\": "tests/"
         }
     },
     "require-dev": {
