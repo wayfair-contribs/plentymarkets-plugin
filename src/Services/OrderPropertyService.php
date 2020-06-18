@@ -97,6 +97,16 @@ class OrderPropertyService {
    */
   public function getWarehouseId(int $orderId): string {
     $orderProperties = $this->orderPropertyRepositoryContract->findByOrderId($orderId, OrderPropertyType::WAREHOUSE);
+    $this->loggerContract->debug(
+        TranslationHelper::getLoggerKey(self::LOG_KEY_WAREHOUSE_ID_NOT_FOUND),
+        [
+          'additionalInfo' => [
+            'orderId' => $orderId,
+          'order properties' => $orderProperties
+          ],
+          'method' => __METHOD__
+        ]
+      );
     if (empty($orderProperties) || empty($orderProperties[0]->value)) {
       $this->loggerContract
           ->error(
