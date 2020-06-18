@@ -102,6 +102,7 @@ class OrderPropertyService {
         [
           'additionalInfo' => [
             'orderId' => $orderId,
+            'typeId' => OrderPropertyType::WAREHOUSE,
           'order properties' => $orderProperties
           ],
           'method' => __METHOD__
