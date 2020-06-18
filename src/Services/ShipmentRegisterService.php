@@ -286,6 +286,17 @@ class ShipmentRegisterService
 
         try {
           $shippingInformation = $this->getOrderShippingInformation($orderId);
+          $this->loggerContract->debug(
+            TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG_ORDER_PURCHASE_ORDER_AND_SHIPPING_INFO),
+            [
+              'additionalInfo' => [
+                'orderID' => $orderId,
+                'message' => 'ShipmenetRegister service line 294',
+                'shippingInformation' => $shippingInformation
+              ],
+              'method' => __METHOD__
+            ]
+          );
 
           if ($this->shipmentIsRegistered($shippingInformation, $orderId, $poNumber, $externalLogs)) {
             continue;

@@ -488,7 +488,8 @@ class ShipmentNotificationService
               'PoNumber' => $poNumber,
               'order' => $order,
               'TrackingNumber' => $orderTrackingNumbers = $this->orderRepositoryContract->getPackageNumbers($orderId),
-              'packages' => $this->orderShippingPackageRepositoryContract->listOrderShippingPackages($orderId)
+              'packages' => $this->orderShippingPackageRepositoryContract->listOrderShippingPackages($orderId),
+              'shippingInfo' => $plentymarketsShippingInformation->shippingServiceProvider
             ],
             'method' => __METHOD__
           ]
