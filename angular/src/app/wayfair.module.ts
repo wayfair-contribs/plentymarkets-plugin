@@ -86,7 +86,7 @@ import {ShippingMethodService} from "./core/services/shippingMethod/shippingMeth
         WayfairAppComponent
     ]
 })
-export class PluginTerraBasicModule {
+export class WayfairPluginModule {
     constructor(public l10nLoader: L10nLoader) {
         this.l10nLoader.load();
     }

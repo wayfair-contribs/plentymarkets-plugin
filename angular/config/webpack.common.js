@@ -115,7 +115,7 @@ module.exports = function (options) {
             ),
 
             new webpack.optimize.CommonsChunkPlugin({
-                name: ['app', 'vendor', 'polyfills'],
+                names: ['app', 'vendor', 'polyfills'],
                 minChunks: Infinity
             }),
 
