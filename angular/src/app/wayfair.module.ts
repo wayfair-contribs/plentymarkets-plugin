@@ -33,7 +33,6 @@ import {WarehouseSupplierService} from './core/services/warehouseSupplier/wareho
 import {WarehouseService} from './core/services/warehouse/warehouse.service';
 import {SettingsService} from './core/services/settings/settings.service';
 import {FullInventoryService} from './core/services/fullInventory/fullInventory.service';
-import {LocalHTTPInterceptor} from './core/interceptors/LocalHttpInterceptor';
 import {CarrierScacMappingComponent} from "./views/carrierScacMapping/carrierScacMapping.component";
 import {CarrierService} from "./core/services/carrier/carrier.service";
 import {CarrierScacService} from "./core/services/carrierScac/carrierScac.service";
@@ -67,11 +66,6 @@ import {ShippingMethodService} from "./core/services/shippingMethod/shippingMeth
             deps: [L10nLoader],
             multi: true
         },
-        // {
-        //     provide: HTTP_INTERCEPTORS,
-        //     useClass: LocalHTTPInterceptor,
-        //     multi: true,
-        // },
         appRoutingProviders,
         TerraNodeTreeConfig,
         WarehouseSupplierService,

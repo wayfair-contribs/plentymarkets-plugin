@@ -22,7 +22,7 @@ module.exports = function (env) {
     output: {
       // Generate directly into ui folder.
       path: helpers.root("../ui"),
-      filename: "[name].js",
+      filename: "[name].[hash].js",
       chunkFilename: "[id].[hash].chunk.js",
     },
 
