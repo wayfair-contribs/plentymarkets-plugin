@@ -42,6 +42,7 @@ class ShipmentRegisterService
   const LOG_KEY_SHIPPING_LABEL_RETRIEVAL_FAILED = 'shippingLabelRetrievalFailed';
   const LOG_KEY_NO_SHIPPING_INFO_FOR_UNREGISTER = 'noShippingInformationForUnregister';
   const LOG_KEY_WAREHOUSE_MISSING_FOR_ORDER = 'warehouseMissingForOrder';
+  const LOG_KEY_DEBUG_REGISTER_INFO = 'registerDebuger';
 
   const SHIPPING_REGISTERED_STATUS = 'registered';
   const SHIPPING_WAYFAIR_COST = 0.00;
@@ -287,11 +288,11 @@ class ShipmentRegisterService
         try {
           $shippingInformation = $this->getOrderShippingInformation($orderId);
           $this->loggerContract->debug(
-            TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG_ORDER_PURCHASE_ORDER_AND_SHIPPING_INFO),
+            TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG_REGISTER_INFO),
             [
               'additionalInfo' => [
                 'orderID' => $orderId,
-                'message' => 'ShipmenetRegister service line 294',
+                'message' => 'ShipmentRegister service line 294',
                 'shippingInformation' => $shippingInformation
               ],
               'method' => __METHOD__
