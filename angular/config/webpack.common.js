@@ -19,19 +19,7 @@ module.exports = function (options) {
     entry: {
       bootstrap: "bootstrap-loader",
       polyfills: "./src/polyfills.ts",
-      vendor: [
-          '@angular/animations',
-          '@angular/platform-browser',
-          '@angular/platform-browser-dynamic',
-          '@angular/core',
-          '@angular/common',
-          '@angular/forms',
-          '@angular/http',
-          '@angular/router',
-          'rxjs',
-          'rxjs/add/operator/map',
-          'rxjs/add/operator/mergeMap',
-        ],
+      vendor: "./src/vendor.ts",
       plenty: [
           '@plentymarkets/terra-components',
           'quill'
