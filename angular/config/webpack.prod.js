@@ -22,8 +22,8 @@ module.exports = function (env) {
     output: {
       // Generate directly into ui folder.
       path: helpers.root("../ui"),
-      filename: "[name].[hash].js",
-      chunkFilename: "[id].[hash].chunk.js",
+      filename: "[name].[chunkhash].js",
+      chunkFilename: "[id].[chunkhash].chunk.js",
     },
 
     plugins: [
