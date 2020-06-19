@@ -19,8 +19,23 @@ module.exports = function (options) {
     entry: {
       bootstrap: "bootstrap-loader",
       polyfills: "./src/polyfills.ts",
-      vendor: './src/vendor.ts',
-      plenty: ['@plentymarkets/terra-components'],
+      vendor: [
+          '@angular/animations',
+          '@angular/platform-browser',
+          '@angular/platform-browser-dynamic',
+          '@angular/core',
+          '@angular/common',
+          '@angular/forms',
+          '@angular/http',
+          '@angular/router',
+          'rxjs',
+          'rxjs/add/operator/map',
+          'rxjs/add/operator/mergeMap',
+        ],
+      plenty: [
+          '@plentymarkets/terra-components',
+          'quill'
+        ],
       wayfair_plugin: "./src/main.ts",
 
     },
@@ -113,6 +128,11 @@ module.exports = function (options) {
       new webpack.optimize.CommonsChunkPlugin({
         name: 'commons',
         minChunks: 2
+      }),
+
+      new webpack.optimize.CommonsChunkPlugin({
+        name: 'manifest',
+        minChunks: Infinity
       }),
 
       new HtmlWebpackPlugin({

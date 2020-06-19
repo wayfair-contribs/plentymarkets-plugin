@@ -6,8 +6,6 @@ import '@angular/forms';
 import '@angular/http';
 import '@angular/router';
 
-import 'quill';
-
 // RxJS
 import 'rxjs';
 import 'rxjs/add/operator/map';
