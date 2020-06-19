@@ -19,6 +19,7 @@ module.exports = function (options) {
     entry: {
       bootstrap: "bootstrap-loader",
       polyfills: "./src/polyfills.ts",
+      vendor: './src/vendor.ts',
       plenty: ['@plentymarkets/terra-components'],
       wayfair_plugin: "./src/main.ts",
 
@@ -110,7 +111,7 @@ module.exports = function (options) {
       ),
 
       new webpack.optimize.CommonsChunkPlugin({
-        name: 'vendor',
+        name: 'commons',
         minChunks: 2
       }),
 
