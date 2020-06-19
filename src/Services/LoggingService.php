@@ -5,6 +5,7 @@
 
 namespace Wayfair\Services;
 
+use Exception;
 use Plenty\Plugin\Log\Loggable;
 
 use Wayfair\Core\Api\Services\LogSenderService;
@@ -136,28 +137,31 @@ class LoggingService implements LoggerContract {
     $externalLogs = pluginApp(ExternalLogs::class);
     $clientID = $this->configHelper->getClientId();
     $shortMessage = [];
+    try {
+      $additionalInfo = $loggingInfo['additionalInfo'] ?? [];
+      $method = $loggingInfo['method'] ?? null;
+      $referenceType = $loggingInfo['referenceType'] ?? null;
+      $referenceValue = (int) $loggingInfo['referenceValue'] ?? null;
 
-    $additionalInfo = $loggingInfo['additionalInfo'] ?? [];
-    $method = $loggingInfo['method'] ?? null;
-    $referenceType = $loggingInfo['referenceType'] ?? null;
-    $referenceValue = (int) $loggingInfo['referenceValue'] ?? null;
+      if (strlen(json_encode($loggingInfo)) > self::STRING_LIMIT) {
+          $logForKibana = [];
+          $shortMessage['message'] = self::LOG_KEY_MESSAGE_TO_LONG . $clientID . '-' . date('M d Y H:i:s');
+          $additionalInfo = $shortMessage;
+          $logForKibana['message'] = self::LOG_KEY_MESSAGE_TO_LONG . $clientID . '-' . date('D, d M Y H:i:s');
+          $logForKibana['details'] = $loggingInfo;
+          $externalLogs->addErrorLog(json_encode($logForKibana));
+      }
+      $additionalInfo[self::WAYFAIR_PLUGIN_VERSION] = $this->version;
 
-    if (strlen(json_encode($loggingInfo)) > self::STRING_LIMIT) {
-      $logForKibana = [];
-      $shortMessage['message'] = self::LOG_KEY_MESSAGE_TO_LONG . $clientID . '-' . date('M d Y H:i:s');
-      $additionalInfo = $shortMessage;
-      $logForKibana['message'] = self::LOG_KEY_MESSAGE_TO_LONG . $clientID . '-' . date('D, d M Y H:i:s');
-      $logForKibana['details'] = $loggingInfo;
-      $externalLogs->addErrorLog(json_encode($logForKibana));
+      return array($additionalInfo, $method, $referenceType, $referenceValue);
+
+    } finally {
       if (count($externalLogs->getLogs())) {
         /** @var LogSenderService $logSenderService */
         $logSenderService = pluginApp(LogSenderService::class);
         $logSenderService->execute($externalLogs->getLogs());
       }
     }
-    $additionalInfo[self::WAYFAIR_PLUGIN_VERSION] = $this->version;
-
-    return array($additionalInfo, $method, $referenceType, $referenceValue);
   }
 
   /**
