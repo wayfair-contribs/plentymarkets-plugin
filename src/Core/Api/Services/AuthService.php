@@ -147,12 +147,12 @@ class AuthService implements AuthContract
   }
 
   /**
-   * Refresh the Authorization Token
+   * Refresh the Authorization Token, unconditionally
    *
    * @return void
    * @throws \Exception
    */
-  public function refresh()
+  public function refreshAuth()
   {
     $this->clearToken();
 
@@ -223,7 +223,7 @@ class AuthService implements AuthContract
     }
 
     if (!isset($token) || !self::validateToken($token)) {
-      $this->refresh();
+      $this->refreshAuth();
     }
 
     return $this->getStoredToken();

@@ -16,5 +16,5 @@ interface AuthContract {
    * Force a refresh of the Authorization information
    * @return void
    */
-  public function refresh();
+  public function refreshAuth();
 }
