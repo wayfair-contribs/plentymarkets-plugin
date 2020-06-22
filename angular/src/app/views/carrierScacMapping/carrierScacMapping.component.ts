@@ -26,6 +26,18 @@ export class CarrierScacMappingComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+
+    this.shippingMethodService.fetch().subscribe(
+      (data) => {
+        if (data.name) {
+          this.wfShipping = data.name;
+        }
+      },
+      (err) => {
+        this.showFetchError();
+      }
+    );
+
     this.carrierService.fetchCarriers().subscribe(
       (data) => {
         this.carriers = data.entries;
@@ -38,17 +50,6 @@ export class CarrierScacMappingComponent implements OnInit {
     this.carrierScacService.fetchMappings().subscribe(
       (data) => {
         this.updateCarrierScacs(data);
-      },
-      (err) => {
-        this.showFetchError();
-      }
-    );
-
-    this.shippingMethodService.fetch().subscribe(
-      (data) => {
-        if (data.name) {
-          this.wfShipping = data.name;
-        }
       },
       (err) => {
         this.showFetchError();
