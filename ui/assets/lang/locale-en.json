@@ -43,8 +43,8 @@
 	"loading": "Loading",
 	"refresh_status": "Refresh status",
 	"failed": "Failed",
-	"full_inventory_helper_text": "The information on this page applies only to Full Inventory synchronization, which is performed automatically on a daily basis.",
-	"partial_inventory_helper_text": "Changes in inventory are synchronized throughout the day.",
 	"running": "In progress",
-	"complete": "Complete"
+	"complete": "Complete",
+	"full_inventory_disclaimer_label": "Disclaimer",
+	"full_inventory_disclaimer_text": "All inventory synchronizations are performed automatically throughout the day, with no manual effort required.\nActions performed on this page apply outside of auto-scheduled sync and apply only to Full Inventory Synchronization"
 }
