@@ -217,15 +217,19 @@ class AuthService implements AuthContract
   public function getOAuthToken()
   {
     $token = null;
-    if (!$this->updateCredentials()) {
-      // no changes to credentials - token is okay, but could be expired
+
+    $credentialsChanged = $this->updateCredentials();
+    if (!$credentialsChanged) {
+      // can continue using current token if it didn't expire
       $token = $this->getStoredToken();
+
+      if (isset($token) && self::validateToken($token)) {
+        return $token;
+      }
     }
 
-    if (!isset($token) || !self::validateToken($token)) {
-      $this->refreshAuth();
-    }
-
+    // abandon any stored token
+    $this->refreshAuth();
     return $this->getStoredToken();
   }
 
