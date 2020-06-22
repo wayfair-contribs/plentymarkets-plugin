@@ -26,7 +26,6 @@ use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Cron\InventoryFullCron;
 use Wayfair\Cron\InventorySyncCron;
 use Wayfair\Cron\OrderAcceptCron;
-use Wayfair\Cron\UpdateFullInventoryStatusCron;
 use Wayfair\Helpers\ConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Procedures\OrderShipmentNotifyProcedure;
@@ -83,7 +82,6 @@ class WayfairServiceProvider extends ServiceProvider
       $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, InventorySyncCron::class);
       $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, OrderAcceptCron::class);
       $cronContainer->add(CronContainer::DAILY, InventoryFullCron::class);
-      $cronContainer->add(CronContainer::HOURLY, UpdateFullInventoryStatusCron::class);
 
       $shippingControllers = [
         'Wayfair\\Controllers\\ShippingController@registerShipments',
