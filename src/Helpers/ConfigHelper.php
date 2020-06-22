@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Helpers;
@@ -226,5 +226,5 @@ class ConfigHelper extends AbstractConfigHelper
 
     return $itemMappingMethod;
   }
-  
+
 }
