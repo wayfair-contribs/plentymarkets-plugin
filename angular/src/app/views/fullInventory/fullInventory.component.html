@@ -23,7 +23,12 @@
       {{ "full_inventory_status" | translate: lang }}:</label
     >
     <div class="col-md-2">
-      <p name="lastResult" class="{{ 'text-uppercase text-center text-' + lastResult.type }}">{{ lastResult.text }}</p>
+      <p
+        name="lastResult"
+        class="{{ 'text-uppercase text-center text-' + lastResult.type }}"
+      >
+        {{ lastResult.text }}
+      </p>
     </div>
     <div class="col-md-3">
       <span name="latestInteractionTimestamp">{{
@@ -56,9 +61,10 @@
   </div>
   <br />
   <br />
-  <p class="bg-info text-center">
-    {{ "full_inventory_disclaimer_label" | translate: lang }}
-    <br />
-    {{ "full_inventory_disclaimer_text" | translate: lang }}
-  </p>
+  <div class="bg-info text-center">
+    <h3>{{ "full_inventory_disclaimer_label" | translate: lang }}</h3>
+    <p style="white-space: pre-line;">
+      {{ "full_inventory_disclaimer_text" | translate: lang }}:
+    </p>
+  </div>
 </div>
