@@ -29,6 +29,15 @@ class InventoryUpdateService
   const LOG_KEY_INVALID_INVENTORY_DTO = 'invalidInventoryDto';
   const LOG_KEY_NORMALIZING_INVENTORY = 'normalizingInventoryAmount';
 
+
+  const INVENTORY_SAVE_TOTAL = 'inventorySaveTotal';
+  const INVENTORY_SAVE_SUCCESS = 'inventorySaveSuccess';
+  const INVENTORY_SAVE_FAIL = 'inventorySaveFail';
+  const SAVE_INVENTORY_DURATION = 'saveInventoryDuration';
+  const SAVED_INVENTORY_DURATION = 'savedInventoryDuration';
+  const PAGES = 'pages';
+  const ERROR_MESSAGE = 'errorMessage';
+
   /**
    * Validate a request for inventory update
    * @param RequestDTO $inventoryRequestDTO
@@ -127,11 +136,6 @@ class InventoryUpdateService
     // look up item mapping method at this level to ensure consistency and improve efficiency
     $itemMappingMethod = $configHelper->getItemMappingMethod();
 
-    /** @var array $syncResultObjects collection of the individual results of bulk update actions against the Wayfair API */
-    $syncResultObjects = [];
-    
-   
-
     $loggerContract->debug(
       TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_START),
       [
@@ -140,13 +144,15 @@ class InventoryUpdateService
       ]
     );
 
-
     $page = 0;
     $inventorySaveTotal = 0;
     $inventorySaveSuccess = 0;
     $inventorySaveFail = 0;
     $saveInventoryDuration = 0;
     $savedInventoryDuration = 0;
+
+    $errorMessage = null;
+    $amtOfDtosForPage = 0;
 
     try {
       $fields = $this->getResultFields();
@@ -155,6 +161,7 @@ class InventoryUpdateService
       $variationSearchRepository->setFilters($this->getFilters($fullInventory));
 
       do {
+
         $msAtPageStart = TimeHelper::getMilliseconds();
 
         /** @var RequestDTO[] $normalizedInventoryRequestDTOs collection of DTOs to include in a bulk update*/
@@ -175,9 +182,9 @@ class InventoryUpdateService
           }
         }
 
-        $amtToUpdate = count($normalizedInventoryRequestDTOs);
+        $amtOfDtosForPage = count($normalizedInventoryRequestDTOs);
 
-        if ($amtToUpdate <= 0) {
+        if ($amtOfDtosForPage <= 0) {
           $loggerContract
             ->debug(
               TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
@@ -189,12 +196,12 @@ class InventoryUpdateService
 
           $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': No items to update');
         } else {
-          $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': ' . (string) $amtToUpdate . ' items to update');
+          $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': ' . (string) $amtOfDtosForPage . ' updates to send');
 
           $loggerContract->debug(
             TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
             [
-              'additionalInfo' => ['info' => (string) $amtToUpdate . ' items to update'],
+              'additionalInfo' => ['info' => (string) $amtOfDtosForPage . ' updates to send'],
               'method' => __METHOD__
             ]
           );
@@ -202,20 +209,25 @@ class InventoryUpdateService
           $saveInventoryDuration += TimeHelper::getMilliseconds() - $msAtPageStart;
           $msBeforeUpdate = TimeHelper::getMilliseconds();
 
+          $inventorySaveTotal +=  $amtOfDtosForPage;
+
           $dto = $inventoryService->updateBulk($normalizedInventoryRequestDTOs, $fullInventory);
 
           $savedInventoryDuration += TimeHelper::getMilliseconds() - $msBeforeUpdate;
-          $inventorySaveTotal += count($normalizedInventoryRequestDTOs);
+          
           $inventorySaveSuccess += count($normalizedInventoryRequestDTOs) - count($dto->getErrors());
           $inventorySaveFail += count($dto->getErrors());
-
-          $syncResultObjects[] = $dto->toArray();
         }
 
         $loggerContract->debug(
           TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
           [
-            'additionalInfo' => ['fullInventory' => (string) $fullInventory, 'page_num' => (string) $page, 'info' => 'page done'],
+            'additionalInfo' => [
+              'fullInventory' => (string) $fullInventory, 
+              'page_num' => (string) $page, 
+              'info' => 'page done',
+              'resultsForPage' => $dto
+            ],
             'method' => __METHOD__
           ]
         );
@@ -245,6 +257,17 @@ class InventoryUpdateService
           'method' => __METHOD__
         ]
       );
+
+      // bulk update failed, so everything we were going to save should be considered failing.
+      // (we want the failure amount to be more than zero in order for client to know this failed.)
+      $inventorySaveFail += $amtOfDtosForPage;
+
+      $errorMessage = $e->getMessage();
+      if (!isset($errorMessage))
+      {
+        $errorMessage = (string) $e;
+      }
+
     } finally {
       // FIXME: the 'inventorySave' and 'inventorySaved' log types are too similar
       // TODO: determine if changing the types will impact kibana / graphana / influxDB before changing
@@ -258,8 +281,15 @@ class InventoryUpdateService
       $logSenderService->execute($externalLogs->getLogs());
     }
 
-    // TODO: refactor to return information on failures so that users / cron jobs can react to them
-    return $syncResultObjects;
+    return [
+      self::INVENTORY_SAVE_TOTAL => $inventorySaveTotal,
+      self::INVENTORY_SAVE_SUCCESS => $inventorySaveSuccess,
+      self::INVENTORY_SAVE_FAIL => $inventorySaveFail,
+      self::SAVE_INVENTORY_DURATION => $saveInventoryDuration,
+      self::SAVED_INVENTORY_DURATION => $savedInventoryDuration,
+      self::PAGES => $page,
+      self::ERROR_MESSAGE => $errorMessage
+    ];
   }
 
   /**
@@ -306,5 +336,4 @@ class InventoryUpdateService
 
     return $filter;
   }
-
 }
