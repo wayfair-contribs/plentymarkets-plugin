@@ -20,7 +20,6 @@ class APIService
 {
 
   const LOG_KEY_API_SERVICE = 'apiService';
-  const LOG_KEY_ERROR = 'apiServiceError';
   const LOG_KEY_AUTH_FAILURE = 'authFailure';
 
   /**
