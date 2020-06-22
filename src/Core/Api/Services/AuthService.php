@@ -103,7 +103,7 @@ class AuthService implements AuthContract
     $clientSecret = $this->clientSecret;
 
     if (!isset($clientSecret) || empty($clientSecret)) {
-      throw new AuthException("Unable to perform authroization: no client Secret set for Wayfair");
+      throw new AuthException("Unable to perform authorization: no client Secret set for Wayfair");
     }
 
     $headersArray = [
@@ -250,8 +250,8 @@ class AuthService implements AuthContract
   }
 
   /**
-   * Sync instance credentails with global values for credentails.
-   * If changes are detected, the stored token is cleared and the funciton returns true
+   * Sync instance credentials with global values for credentials.
+   * If changes are detected, the stored token is cleared and the function returns true
    *
    * @return boolean
    */

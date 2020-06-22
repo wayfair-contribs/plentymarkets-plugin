@@ -8,6 +8,7 @@ namespace Wayfair\Core\Api\Services;
 use Wayfair\Core\Api\APIService;
 use Wayfair\Core\Contracts\FetchDocumentContract;
 use Wayfair\Core\Dto\ShippingLabel\ResponseDTO;
+use Wayfair\Core\Exceptions\GraphQLQueryException;
 use Wayfair\Core\Helpers\URLHelper;
 use Wayfair\Helpers\ConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
@@ -96,6 +97,12 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
     $responseBody = [];
     try {
       $response = $this->query($query);
+
+      if (!isset($response))
+      {
+        throw new GraphQLQueryException("Did not get query response");
+      }
+
       $responseBody = $response->getBodyAsArray();
 
       $this->loggerContract

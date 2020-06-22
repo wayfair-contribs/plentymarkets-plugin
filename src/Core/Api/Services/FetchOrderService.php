@@ -28,6 +28,12 @@ class FetchOrderService extends APIService {
     } catch (\Exception $e) {
       throw new GraphQLQueryException("RequestException exception for fetching purchase orders.", $e->getMessage());
     }
+
+    if (!isset($response))
+    {
+      throw new GraphQLQueryException("Did not get query response");
+    }
+
     $body = $response->getBodyAsArray();
     if ($response->getStatusCode() != 200 || isset($body['errors']) || !isset($body['data']['purchaseOrders'])) {
       throw new \Exception("Failed to fetch purchase orders. Status code: " . $response->getStatusCode());

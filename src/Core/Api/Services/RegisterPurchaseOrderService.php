@@ -9,6 +9,7 @@ use Wayfair\Core\Api\APIService;
 use Wayfair\Core\Contracts\RegisterPurchaseOrderContract;
 use Wayfair\Core\Dto\RegisterPurchaseOrder\RequestDTO;
 use Wayfair\Core\Dto\RegisterPurchaseOrder\ResponseDTO;
+use Wayfair\Core\Exceptions\GraphQLQueryException;
 use Wayfair\Helpers\TranslationHelper;
 
 /**
@@ -41,6 +42,11 @@ class RegisterPurchaseOrderService extends APIService implements RegisterPurchas
         ->info(TranslationHelper::getLoggerKey('attemptingRegisterMutationQuery'), ['additionalInfo' => ['query' => $query], 'method' => __METHOD__]);
     try {
       $response = $this->query($query);
+
+      if (!isset($response) or empty($response)) {
+        throw new GraphQLQueryException("Did not get query response");
+      }
+
       $responseBody = $response->getBodyAsArray();
       $this->loggerContract
           ->info(TranslationHelper::getLoggerKey('registerMutationQueryResponse'), ['additionalInfo' => ['responseBody' => $responseBody], 'method' => __METHOD__]);
