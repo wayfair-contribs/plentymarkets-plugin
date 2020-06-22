@@ -5,10 +5,13 @@
 
 namespace Wayfair\Services;
 
+use Exception;
 use Plenty\Plugin\Log\Loggable;
 
+use Wayfair\Core\Api\Services\LogSenderService;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Models\ExternalLogs;
 
 class LoggingService implements LoggerContract {
   use Loggable;
@@ -18,6 +21,9 @@ class LoggingService implements LoggerContract {
   const WARNING = 'WARNING';
   const ERROR = 'ERROR';
   const WAYFAIR_PLUGIN_VERSION = 'Wayfair Plugin Version';
+  const STRING_LIMIT = 32768;
+  const TRUNCATED_SIZE = 1000;
+  const LOG_KEY_MESSAGE_TO_LONG = 'messageToLongForPM';
 
   /**
    * Stores the version of the plugin
@@ -27,11 +33,16 @@ class LoggingService implements LoggerContract {
   public $version;
 
   /**
+   * @var AbstractConfigHelper
+   */
+  private $configHelper;
+
+  /**
    * Initialize a logging service object
    */
   public function __construct() {
-    $configHelper = pluginApp(AbstractConfigHelper::class);
-    $this->version = $configHelper->getPluginVersion();
+    $this->configHelper = pluginApp(AbstractConfigHelper::class);
+    $this->version = $this->configHelper->getPluginVersion();
   }
 
   /**
@@ -116,20 +127,41 @@ class LoggingService implements LoggerContract {
   }
 
   /**
-   * Maps data from the he associative array that Wayfair provides to the PlentyMarkets logging API's inputs
+   * Maps data from the associative array that Wayfair provides to the PlentyMarkets logging API's inputs
    *
    * @param $loggingInfo
    *
    * @return array
    */
   public function extractVars($loggingInfo): array {
-    $additionalInfo = $loggingInfo['additionalInfo'] ?? [];
-    $method = $loggingInfo['method'] ?? null;
-    $referenceType = $loggingInfo['referenceType'] ?? null;
-    $referenceValue = (int) $loggingInfo['referenceValue'] ?? null;
-    $additionalInfo[self::WAYFAIR_PLUGIN_VERSION] = $this->version;
+    $externalLogs = pluginApp(ExternalLogs::class);
+    $clientID = $this->configHelper->getClientId();
+    $shortMessage = [];
+    try {
+      $additionalInfo = $loggingInfo['additionalInfo'] ?? [];
+      $method = $loggingInfo['method'] ?? null;
+      $referenceType = $loggingInfo['referenceType'] ?? null;
+      $referenceValue = (int) $loggingInfo['referenceValue'] ?? null;
 
-    return array($additionalInfo, $method, $referenceType, $referenceValue);
+      if (strlen(json_encode($loggingInfo)) > self::STRING_LIMIT) {
+          $logForKibana = [];
+          $shortMessage['message'] = self::LOG_KEY_MESSAGE_TO_LONG . $clientID . '-' . date('M d Y H:i:s');
+          $additionalInfo = $shortMessage;
+          $logForKibana['message'] = self::LOG_KEY_MESSAGE_TO_LONG . $clientID . '-' . date('D, d M Y H:i:s');
+          $logForKibana['details'] = $loggingInfo;
+          $externalLogs->addErrorLog(json_encode($logForKibana));
+      }
+      $additionalInfo[self::WAYFAIR_PLUGIN_VERSION] = $this->version;
+
+      return array($additionalInfo, $method, $referenceType, $referenceValue);
+
+    } finally {
+      if (count($externalLogs->getLogs())) {
+        /** @var LogSenderService $logSenderService */
+        $logSenderService = pluginApp(LogSenderService::class);
+        $logSenderService->execute($externalLogs->getLogs());
+      }
+    }
   }
 
   /**
@@ -148,4 +180,5 @@ class LoggingService implements LoggerContract {
     $configHelper = pluginApp(AbstractConfigHelper::class);
     return $configHelper->hasBooted();
   }
+
 }
