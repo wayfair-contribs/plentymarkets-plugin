@@ -7,6 +7,7 @@ namespace Wayfair\Core\Api\Services;
 
 use Wayfair\Core\Api\APIService;
 use Wayfair\Core\Dto\Inventory\ResponseDTO;
+use Wayfair\Core\Exceptions\GraphQLQueryException;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Http\WayfairResponse;
@@ -39,7 +40,7 @@ class InventoryService extends APIService
       $response = $this->query($query);
 
       if (!isset($response) or empty($response)) {
-        throw new \Exception("Response object from inventory query is null or empty");
+        throw new GraphQLQueryException("Did not get query response");
       }
 
       $this->loggerContract->debug(
@@ -142,6 +143,10 @@ class InventoryService extends APIService
       $queryData = $this->buildQuery($listOfRequestDto, $fullInventory);
 
       $response = $this->query($queryData['query'], 'post', $queryData['variables']);
+
+      if (!isset($response) or empty($response)) {
+        throw new GraphQLQueryException("Did not get query response");
+      }
 
       $responseBody = $response->getBodyAsArray();
 

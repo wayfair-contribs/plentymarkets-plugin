@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Helpers;
@@ -17,7 +17,6 @@ class ConfigHelper extends AbstractConfigHelper
 {
 
   const CACHING_MINUTES = 360;
-  const INTEGRATION_AGENT_NAME = 'PlentyMarket';
 
   const LOG_KEY_UNDEFINED_MAPPING_METHOD = 'undefinedMappingMethod';
 
@@ -227,5 +226,5 @@ class ConfigHelper extends AbstractConfigHelper
 
     return $itemMappingMethod;
   }
-  
+
 }
