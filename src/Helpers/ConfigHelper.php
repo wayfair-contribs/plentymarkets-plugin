@@ -150,26 +150,6 @@ class ConfigHelper extends AbstractConfigHelper
   }
 
   /**
-   * Set the flag for booting to true
-   *
-   * @return void
-   */
-  public static function setBootFlag()
-  {
-    self::$bootFlag = true;
-  }
-
-  /**
-   * Check if boot completed
-   *
-   * @return bool
-   */
-  public function hasBooted(): bool
-  {
-    return self::$bootFlag;
-  }
-
-  /**
    * Get the item mapping mode for Inventory
    *
    * @return string
