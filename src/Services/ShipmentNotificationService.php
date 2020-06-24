@@ -332,19 +332,18 @@ class ShipmentNotificationService
       }
 
       $plentymarketsShippingInformation = $this->shippingInformationRepositoryContract->getShippingInformationByOrderId($orderId);
-      if (!isset($plentymarketsShippingInformation) || empty($plentymarketsShippingInformation)) {
-        $this->loggerContract
-          ->error(
-            TranslationHelper::getLoggerKey(self::LOG_KEY_PM_MISSING_SHIPPING_INFO), [
-              'additionalInfo' => [
-                'orderId' => $orderId,
-                'poNumber' => $poNumber
-              ],
-              'method' => __METHOD__,
-              'referenceType' => '$orderId',
-              'referenceValue' => $orderId
-            ]
-          );
+      if (!isset($plentymarketsShippingInformation) || empty($plentymarketsShippingInformation)){ //|| empty($plentymarketsShippingInformation->shippingServiceProvider)) {
+        $this->loggerContract->error(
+          TranslationHelper::getLoggerKey(self::LOG_KEY_PM_MISSING_SHIPPING_INFO), [
+            'additionalInfo' => [
+              'orderId' => $orderId,
+              'poNumber' => $poNumber
+            ],
+            'method' => __METHOD__,
+            'referenceType' => '$orderId',
+            'referenceValue' => $orderId
+          ]
+        );
 
         $externalLogs->addErrorLog("Unable to get shipping data from Plentymarkets for Order with ID " . $orderId
           . '. PO: ' . $poNumber);
@@ -369,8 +368,8 @@ class ShipmentNotificationService
       $products = $purchaseOrderInfo['products'];
 
       //Decide how to get tracking and package information.
-      if ($this->shipmentProviderService->isShippingWithWayfair()) {
-      // if ($this->shipmentProviderService->isShippingWithWayfair() || empty($plentymarketsShippingInformation->shippingServiceProvider)) {
+      // if ($this->shipmentProviderService->isShippingWithWayfair()) {
+      if ($this->shipmentProviderService->isShippingWithWayfair() || empty($plentymarketsShippingInformation->shippingServiceProvider)) {
         // shipping on wayfair account
         $this->loggerContract->info(
           TranslationHelper::getLoggerKey(self::LOG_KEY_SHIPPING_ON_WAYFAIR), [
@@ -510,7 +509,7 @@ class ShipmentNotificationService
             ],
             'method' => __METHOD__
           ]
-        ); //Xjgd8NJgyliPHLY2YxoynxSDxV9ri7tV13ogYziJ8bY31p6wAZfLRBp0nGZsxZWgtVSU-THou7fagA7GsWwAlg-L
+        );
 
         /** @var OrderShippingPackage $orderShippingPackage */
         foreach ($orderShippingPackages as $orderShippingPackage) {
