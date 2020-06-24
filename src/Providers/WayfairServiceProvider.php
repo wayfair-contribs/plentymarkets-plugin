@@ -121,28 +121,17 @@ class WayfairServiceProvider extends ServiceProvider
         );
       }
 
-      self::resetFullInventoryStatus();
+      /** @var FullInventoryStatusService */
+      $fullInventoryStatusService = pluginApp(FullInventoryStatusService::class);
+      $fullInventoryStatusService->markFullInventoryIdle();
 
-       // register crons LAST as they may depend on earlier actions
-       $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, OrderImportCron::class);
-       $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, InventorySyncCron::class);
-       $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, OrderAcceptCron::class);
-       $cronContainer->add(CronContainer::DAILY, InventoryFullCron::class);
-
+      // register crons LAST as they may depend on earlier actions
+      $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, OrderImportCron::class);
+      $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, InventorySyncCron::class);
+      $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, OrderAcceptCron::class);
+      $cronContainer->add(CronContainer::DAILY, InventoryFullCron::class);
     } finally {
       ConfigHelper::setBootFlag();
     }
-  }
-
-  /**
-   * Reset Full Inventory status in case it was running during redeploy
-   *
-   * @return void
-   */
-  private static function resetFullInventoryStatus()
-  {
-    /** @var FullInventoryStatusService */
-    $fullInventoryStatusService = pluginApp(FullInventoryStatusService::class);
-    $fullInventoryStatusService->markFullInventoryIdle();
   }
 }
