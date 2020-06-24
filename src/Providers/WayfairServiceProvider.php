@@ -26,14 +26,13 @@ use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Cron\InventoryFullCron;
 use Wayfair\Cron\InventorySyncCron;
 use Wayfair\Cron\OrderAcceptCron;
-use Wayfair\Cron\OrderImportCron;
 use Wayfair\Helpers\ConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Procedures\OrderShipmentNotifyProcedure;
 use Wayfair\Services\ClientService;
-use Wayfair\Services\FullInventoryStatusService;
 use Wayfair\Services\LoggingService;
 use Wayfair\Services\StorageService;
+use Wayfair\Cron\OrderImportCron;
 
 /**
  * Class WayfairServiceProvider
@@ -78,6 +77,11 @@ class WayfairServiceProvider extends ServiceProvider
   ) {
 
     try {
+      // register crons
+      $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, OrderImportCron::class);
+      $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, InventorySyncCron::class);
+      $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, OrderAcceptCron::class);
+      $cronContainer->add(CronContainer::DAILY, InventoryFullCron::class);
 
       $shippingControllers = [
         'Wayfair\\Controllers\\ShippingController@registerShipments',
@@ -120,16 +124,6 @@ class WayfairServiceProvider extends ServiceProvider
           ]
         );
       }
-
-      /** @var FullInventoryStatusService */
-      $fullInventoryStatusService = pluginApp(FullInventoryStatusService::class);
-      $fullInventoryStatusService->markFullInventoryIdle();
-
-      // register crons LAST as they may depend on earlier actions
-      $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, OrderImportCron::class);
-      $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, InventorySyncCron::class);
-      $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, OrderAcceptCron::class);
-      $cronContainer->add(CronContainer::DAILY, InventoryFullCron::class);
     } finally {
       ConfigHelper::setBootFlag();
     }
