@@ -16,11 +16,17 @@ use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Helpers\StringHelper;
 use Wayfair\Http\WayfairResponse;
 
+/**
+ * Base class for modules that call Wayfair's APIs
+ *
+ * WARNING: to avoid circular dependencies, do NOT use LogSenderService in this module
+ */
 class APIService
 {
 
   const LOG_KEY_API_SERVICE = 'apiService';
   const LOG_KEY_AUTH_FAILURE = 'authFailure';
+  const LOG_KEY_AUTH_RETRY = 'retryingAuth';
 
   /**
    * @var AuthContract
@@ -66,6 +72,21 @@ class APIService
    */
   public function query($query, $method = 'post', $variables = [])
   {
+    return $this->queryInternal($query, $method, $variables);
+  }
+
+  /**
+   * Perform the query, retrying if the allowance is more than 0
+   * @param string $query
+   * @param string $method
+   * @param array  $variables
+   * @param int $retryRemaining
+   *
+   * @throws \Exception
+   * @return WayfairResponse
+   */
+  private function queryInternal($query, $method = 'post', $variables = [], $retryRemaining = 1)
+  {
     try {
       $headers = [];
       // currently, all requests to go to Wayfair endpoints that require authorization
@@ -109,11 +130,34 @@ class APIService
           'Body' => $body_for_logging
         ], 'method' => __METHOD__]);
 
-      return $this->client->call($method, $arguments);
+      $response =  $this->client->call($method, $arguments);
+      $responseCode = 0;
+      if (isset($response)) {
+        $responseCode = $response->getStatusCode();
+      }
+
+      if (400 <= $responseCode < 500) {
+        throw new AuthException("Response code indicates auth issue", $response->getStatusCode());
+      }
+
+      return $response;
     } catch (AuthException $ae) {
+
       $this->loggerContract
         ->error(TranslationHelper::getLoggerKey(self::LOG_KEY_AUTH_FAILURE), ['additionalInfo' => ['message' => $ae->getMessage()], 'method' => __METHOD__]);
+
+      if ($retryRemaining > 0) {
+        // recursive call with new auth token
+        $this->loggerContract
+          ->info(TranslationHelper::getLoggerKey(self::LOG_KEY_AUTH_RETRY), ['additionalInfo' => ['message' => $ae->getMessage()], 'method' => __METHOD__]);
+
+        // let refreshAuth throw its Exceptions
+        $this->authService->refreshAuth();
+        return $this->queryInternal($query, $method, $variables, $retryRemaining - 1);
+      } else {
+        // no retries left - give up
         throw $ae;
+      }
     }
   }
 

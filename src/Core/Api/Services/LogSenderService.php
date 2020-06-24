@@ -1,42 +1,22 @@
 <?php
 /**
- * NOTE: This file is not extended from APIService to prevent Circular Dependency.
  *
  * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Core\Api\Services;
 
-use Wayfair\Core\Contracts\AuthContract;
-use Wayfair\Core\Contracts\ClientInterfaceContract;
+use Wayfair\Core\Api\APIService;
 use Wayfair\Core\Contracts\LoggerContract;
-use Wayfair\Core\Helpers\URLHelper;
 use Wayfair\Helpers\ConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
-use Wayfair\Http\WayfairResponse;
 
-class LogSenderService {
-
-  /**
-   * @var ClientInterfaceContract
-   */
-  private $client;
-
-  /**
-   * @var AuthContract
-   */
-  private $authService;
-
-  /**
-   * @var ConfigHelper
-   */
-  private $configHelper;
-
-  public function __construct(ClientInterfaceContract $clientInterfaceContract, AuthContract $authContract, ConfigHelper $configHelper) {
-    $this->client = $clientInterfaceContract;
-    $this->authService = $authContract;
-    $this->configHelper = $configHelper;
-  }
+/**
+ * Service for sending External logs to Wayfair
+ *
+ * WARNING: do not use this in the APIService module or its dependencies
+ */
+class LogSenderService extends APIService {
 
   public function execute(array $logs) {
     /** @var LoggerContract $loggerContract */
@@ -80,32 +60,5 @@ class LogSenderService {
           'method'         => __METHOD__
       ]);
     }
-  }
-
-  /**
-   * @param string $query
-   * @param string $method
-   * @param array  $variables
-   *
-   * @throws \Exception
-   * @return WayfairResponse
-   */
-  public function query($query, $method = 'post', $variables = []) {
-    $headers = [];
-    $headers['Authorization'] = $this->authService->generateAuthHeader();
-    $headers['Content-Type'] = ['application/json'];
-    $headers[ConfigHelper::WAYFAIR_INTEGRATION_HEADER] = $this->configHelper->getIntegrationAgentHeader();
-
-    $arguments = [
-        URLHelper::getUrl(URLHelper::URL_GRAPHQL),
-        [
-            'json' => [
-                'query' => $query,
-                'variables' => $variables
-            ],
-            'headers' => $headers
-        ]
-    ];
-    return $this->client->call($method, $arguments);
   }
 }

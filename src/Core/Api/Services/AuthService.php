@@ -149,7 +149,7 @@ class AuthService implements AuthContract
   /**
    * Refresh the Authorization Token, unconditionally
    *
-   * @return void
+   * @return bool
    * @throws \Exception
    */
   public function refreshAuth()
