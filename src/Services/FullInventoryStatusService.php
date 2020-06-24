@@ -19,6 +19,7 @@ class FullInventoryStatusService
   const LOG_KEY_START = 'fullInventoryStart';
   const LOG_KEY_END = 'fullInventoryEnd';
   const LOG_KEY_FAILED = 'fullInventoryFailed';
+  const LOG_KEY_RESET = 'fullInventoryReset';
 
   const STATUS = 'status';
   const STATE_CHANGE_TIMESTAMP = 'stateChangeTimestamp';
@@ -234,5 +235,21 @@ class FullInventoryStatusService
   private static function getCurrentTimeStamp(): string
   {
     return date('Y-m-d H:i:s.u P');
+  }
+
+   /**
+   * Clear status in case the plugin container was reset while service was running
+   *
+   * @return void
+   */
+  function markFullInventoryIdle(bool $manual = false)
+  {
+    $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_RESET), [
+      'additionalInfo' => ['manual' => (string) $manual],
+      'method' => __METHOD__
+    ]);
+
+    // don't mark this as a state change - use the last one
+    $this->setServiceState(self::FULL_INVENTORY_CRON_IDLE);
   }
 }
