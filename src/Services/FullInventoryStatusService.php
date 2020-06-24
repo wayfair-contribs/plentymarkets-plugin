@@ -15,11 +15,12 @@ use Wayfair\Repositories\KeyValueRepository;
  */
 class FullInventoryStatusService
 {
-  const LOG_KEY_STATE_CHECK = "fullInventoryStateCheck";
+  const LOG_KEY_STATE_CHECK = 'fullInventoryStateCheck';
   const LOG_KEY_START = 'fullInventoryStart';
   const LOG_KEY_END = 'fullInventoryEnd';
   const LOG_KEY_FAILED = 'fullInventoryFailed';
   const LOG_KEY_RESET = 'fullInventoryReset';
+  const LOG_KEY_STATE_CHANGE = 'fullInventoryStateChange';
 
   const STATUS = 'status';
   const STATE_CHANGE_TIMESTAMP = 'stateChangeTimestamp';
@@ -72,6 +73,15 @@ class FullInventoryStatusService
     $this->keyValueRepository->putOrReplace(self::FULL_INVENTORY_CRON_STATUS, $state);
     // this replaces flaky code in KeyValueRepository that was attempting to do change tracking.
     $this->keyValueRepository->putOrReplace(self::FULL_INVENTORY_STATUS_UPDATED_AT, self::getCurrentTimeStamp());
+
+
+    $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_STATE_CHANGE), [
+      'additionalInfo' => [
+        'oldState' => $oldState,
+        'newState' => $state
+      ],
+      'method' => __METHOD__
+    ]);
 
     return $oldState;
   }
@@ -237,7 +247,7 @@ class FullInventoryStatusService
     return date('Y-m-d H:i:s.u P');
   }
 
-   /**
+  /**
    * Clear status in case the plugin container was reset while service was running
    *
    * @return void
