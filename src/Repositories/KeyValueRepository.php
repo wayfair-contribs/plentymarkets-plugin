@@ -1,6 +1,7 @@
 <?php
+
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Repositories;
@@ -10,7 +11,8 @@ use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Models\KeyValue;
 
-class KeyValueRepository extends Repository {
+class KeyValueRepository extends Repository
+{
 
   const LOG_KEY_QUERY_FAILED = "keyValueQueryFailed";
 
@@ -21,9 +23,14 @@ class KeyValueRepository extends Repository {
    * @return KeyValue
    * @throws \Exception
    */
-  public function put($key, $value) {
-    if (empty($key) or empty($value)) {
-      throw new ValidationException("Key or Value cannot be empty.");
+  public function put($key, $value)
+  {
+    if (!isset($key) || empty($key)) {
+      throw new ValidationException("Key cannot be empty.");
+    }
+    if (!isset($value)) {
+      // TODO: consider deleting in this case
+      throw new ValidationException("Value cannot be null.");
     }
     /**
      * @var DataBase
@@ -49,21 +56,19 @@ class KeyValueRepository extends Repository {
    *
    * @return void
    */
-  public function putOrReplace($key, $value) {
+  public function putOrReplace($key, $value)
+  {
     $firstModelForKey = null;
-    try
-    {
+    try {
       /**
        * @var DataBase $database
        */
       $database = pluginApp(DataBase::class);
       $modelsForKey = $database->query(KeyValue::class)->where('key', '=', $key)->get();
-      if (isset($modelsForKey) && !empty($modelsForKey))
-      {
+      if (isset($modelsForKey) && !empty($modelsForKey)) {
         $firstModelForKey = $modelsForKey[0];
       }
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
       $this->loggerContract
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
@@ -93,17 +98,17 @@ class KeyValueRepository extends Repository {
    *
    * @return mixed
    */
-  public function get($key) {
+  public function get($key)
+  {
 
     $modelsForKey = [];
-    try{
+    try {
       /**
-     * @var DataBase $database
-     */
+       * @var DataBase $database
+       */
       $database      = pluginApp(DataBase::class);
       $modelsForKey = $database->query(KeyValue::class)->where('key', '=', $key)->get();
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
       $this->loggerContract
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
@@ -130,21 +135,20 @@ class KeyValueRepository extends Repository {
   /**
    * @return array
    */
-  public function getAll() {
+  public function getAll()
+  {
     /**
      * @var DataBase $database
      */
     $allModels = [];
 
-    try
-    {
+    try {
       /**
        * @var Database
        */
       $database  = pluginApp(DataBase::class);
       $allModels = $database->query(KeyValue::class)->get();
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
       $this->loggerContract
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
