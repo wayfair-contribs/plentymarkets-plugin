@@ -75,7 +75,7 @@ class FullInventoryStatusService
     $this->keyValueRepository->putOrReplace(self::FULL_INVENTORY_STATUS_UPDATED_AT, self::getCurrentTimeStamp());
 
 
-    $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_STATE_CHANGE), [
+    $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_STATE_CHANGE), [
       'additionalInfo' => [
         'oldState' => $oldState,
         'newState' => $state
@@ -196,7 +196,7 @@ class FullInventoryStatusService
       $info['errorMessage'] = $exception->getMessage();
     }
 
-    $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_FAILED), [
+    $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_FAILED), [
       'additionalInfo' => $info,
       'method' => __METHOD__
     ]);
