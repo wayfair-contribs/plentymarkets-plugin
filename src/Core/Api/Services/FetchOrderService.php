@@ -23,11 +23,8 @@ class FetchOrderService extends APIService {
    */
   public function fetch(int $circle): array {
     $query = $this->getQuery($circle);
-    try {
-      $response = $this->query($query);
-    } catch (\Exception $e) {
-      throw new GraphQLQueryException("RequestException exception for fetching purchase orders.", $e->getMessage());
-    }
+
+    $response = $this->query($query);
 
     if (!isset($response))
     {
