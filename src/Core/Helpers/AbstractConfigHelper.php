@@ -22,15 +22,12 @@ abstract class AbstractConfigHelper {
   const ITEM_MAPPING_EAN = 'barcode';
   const ITEM_MAPPING_VARIATION_NUMBER = 'numberExact';
   const ITEM_MAPPING_SKU = 'sku';
-  const FULL_INVENTORY_CRON_STATUS = 'full_inventory_cron_status';
-  const FULL_INVENTORY_STATUS_UPDATED_AT = 'full_inventory_status_updated_at';
-  const FULL_INVENTORY_CRON_RUNNING = 'running';
-  const FULL_INVENTORY_CRON_IDLE = 'idle';
   const SECONDS_INTERVAL_FOR_INVENTORY = 4800;
   const SHIPPING_METHOD = 'shippingMethod';
   const PAYMENT_METHOD_INVOICE = 2;
   const WAYFAIR_INTEGRATION_HEADER = 'Wayfair-Integration-Agent';
   const INVENTORY_ITEMS_PER_PAGE = 500;
+  const INTEGRATION_AGENT_NAME = 'PlentyMarket';
 
   /**
    * Retrieve the configured client ID for connections to Wayfair's secure APIs
@@ -86,4 +83,18 @@ abstract class AbstractConfigHelper {
    */
   abstract public function getPluginVersion(): string;
 
+   /**
+   * Retrieves the item mapping mode for Inventory
+   *
+   * @return string
+   */
+  abstract public function getItemMappingMethod();
+
+  /**
+   * Check an Item Mapping Method choice against known values
+   *
+   * @param string $itemMappingMethod
+   * @return bool
+   */
+  abstract public function validateItemMappingMethod($itemMappingMethod);
 }
