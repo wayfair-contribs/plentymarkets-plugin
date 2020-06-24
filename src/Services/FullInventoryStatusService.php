@@ -68,8 +68,12 @@ class FullInventoryStatusService
    * @param string $timestamp
    * @return string
    */
-  private function setServiceState($state, $timestamp = self::getCurrentTimestamp()): string
+  private function setServiceState($state, $timestamp = null): string
   {
+    if (!isset($timestamp) || empty($timestamp)) {
+      $timestamp = self::getCurrentTimestamp();
+    }
+
     $oldState = $this->keyValueRepository->get(self::FULL_INVENTORY_CRON_STATUS);
 
     if ($oldState != $state) {
@@ -233,8 +237,12 @@ class FullInventoryStatusService
    *
    * @return string
    */
-  private function markStateChange($timestamp = self::getCurrentTimestamp()): string
+  private function markStateChange($timestamp = null): string
   {
+    if (!isset($timestamp) || empty($timestamp)) {
+      $timestamp = self::getCurrentTimestamp();
+    }
+
     $this->keyValueRepository->putOrReplace(self::FULL_INVENTORY_STATUS_UPDATED_AT, $timestamp);
 
     return $timestamp;
