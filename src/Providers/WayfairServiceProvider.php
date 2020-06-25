@@ -75,57 +75,52 @@ class WayfairServiceProvider extends ServiceProvider
     ReferenceContainer $referenceContainer,
     EventProceduresService $eventProceduresService
   ) {
+    // register crons
+    $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, OrderImportCron::class);
+    $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, InventorySyncCron::class);
+    $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, OrderAcceptCron::class);
+    $cronContainer->add(CronContainer::DAILY, InventoryFullCron::class);
+
+    $shippingControllers = [
+      'Wayfair\\Controllers\\ShippingController@registerShipments',
+      'Wayfair\\Controllers\\ShippingController@getLabels',
+      'Wayfair\\Controllers\\ShippingController@deleteShipments'
+    ];
+    $shippingServiceProviderService->registerShippingProvider(
+      ConfigHelper::PLUGIN_NAME,
+      ['de' => ConfigHelper::SHIPPING_PROVIDER_NAME, 'en' => ConfigHelper::SHIPPING_PROVIDER_NAME],
+      $shippingControllers
+    );
+
+    //Register ASN sending procedure.
+    $eventProceduresService->registerProcedure(
+      'sendWayfairASN',
+      ProcedureEntry::EVENT_TYPE_ORDER,
+      [
+        'de' => 'Versandsbestätigung (ASN) an Wayfair senden',
+        'en' => 'Send Ship Confirmation (ASN) to Wayfair'
+      ],
+      OrderShipmentNotifyProcedure::class . '@run'
+    );
 
     try {
-      // register crons
-      $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, OrderImportCron::class);
-      $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, InventorySyncCron::class);
-      $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, OrderAcceptCron::class);
-      $cronContainer->add(CronContainer::DAILY, InventoryFullCron::class);
-
-      $shippingControllers = [
-        'Wayfair\\Controllers\\ShippingController@registerShipments',
-        'Wayfair\\Controllers\\ShippingController@getLabels',
-        'Wayfair\\Controllers\\ShippingController@deleteShipments'
-      ];
-      $shippingServiceProviderService->registerShippingProvider(
-        ConfigHelper::PLUGIN_NAME,
-        ['de' => ConfigHelper::SHIPPING_PROVIDER_NAME, 'en' => ConfigHelper::SHIPPING_PROVIDER_NAME],
-        $shippingControllers
-      );
-
-      //Register ASN sending procedure.
-      $eventProceduresService->registerProcedure(
-        'sendWayfairASN',
-        ProcedureEntry::EVENT_TYPE_ORDER,
+      $referenceContainer->add(
         [
-          'de' => 'Versandsbestätigung (ASN) an Wayfair senden',
-          'en' => 'Send Ship Confirmation (ASN) to Wayfair'
-        ],
-        OrderShipmentNotifyProcedure::class . '@run'
+          'poNumber'   => 'poNumber',
+          'orderId'    => 'orderId',
+          'statusCode' => 'statusCode',
+        ]
       );
-
-      try {
-        $referenceContainer->add(
-          [
-            'poNumber'   => 'poNumber',
-            'orderId'    => 'orderId',
-            'statusCode' => 'statusCode',
-          ]
-        );
-      } catch (\Exception $e) {
-        $this->getLogger(__METHOD__)->error(
-          TranslationHelper::getLoggerKey('errorAddingReferenceContainer'),
-          [
-            'poNumber'   => 'poNumber',
-            'orderId'    => 'orderId',
-            'statusCode' => 'statusCode',
-            'message'    => $e->getMessage()
-          ]
-        );
-      }
-    } finally {
-      ConfigHelper::setBootFlag();
+    } catch (\Exception $e) {
+      $this->getLogger(__METHOD__)->error(
+        TranslationHelper::getLoggerKey('errorAddingReferenceContainer'),
+        [
+          'poNumber'   => 'poNumber',
+          'orderId'    => 'orderId',
+          'statusCode' => 'statusCode',
+          'message'    => $e->getMessage()
+        ]
+      );
     }
   }
 }

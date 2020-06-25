@@ -70,13 +70,6 @@ abstract class AbstractConfigHelper {
   abstract public function isAllItemsActive(): bool;
 
   /**
-   * Check if boot is completed
-   *
-   * @return bool
-   */
-  abstract public function hasBooted(): bool;
-
-  /**
    * Retrieves the current Wayfair plugin version
    *
    * @return string
