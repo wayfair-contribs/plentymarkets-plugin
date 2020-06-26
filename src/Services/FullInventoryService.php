@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright 2020 Wayfair LLC - All rights reserved
  */
@@ -7,32 +8,56 @@ namespace Wayfair\Services;
 
 use Wayfair\Core\Api\Services\LogSenderService;
 use Wayfair\Core\Contracts\LoggerContract;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Models\ExternalLogs;
-use Wayfair\Repositories\KeyValueRepository;
 
+/**
+ * Service module for performing a Full Inventory sync or checking the status
+ *
+ * The service may be invoked in the following ways:
+ * - Cron job
+ * - Button in UI
+ */
 class FullInventoryService
 {
   const LOG_KEY_DEBUG = 'debugInventoryUpdate';
   const LOG_KEY_INVENTORY_UPDATE_ERROR = 'inventoryUpdateError';
   const LOG_KEY_SKIPPED = 'fullInventorySkipped';
-  const LOG_KEY_START = 'fullInventoryStart';
-  const LOG_KEY_END = 'fullInventoryEnd';
+  const LOG_KEY_LONG_RUN = "fullInventoryLongRunning";
+
+  // TODO: make this user-configurable in a future update
+  const MAX_FULL_INVENTORY_TIME = 7200;
 
   /**
-   * @var KeyValueRepository
+   * @var InventoryUpdateService
    */
-  public $keyValueRepository;
+  private $inventoryUpdateService;
+
+  /**
+   * @var FullInventoryStatusService
+   */
+  private $statusService;
+
+  /**
+   * @var LoggerContract
+   */
+  private $logger;
 
   /**
    * FullInventoryService constructor.
    *
-   * @param KeyValueRepository $keyValueRepository
+   * @param InventoryUpdateService $inventoryUpdateService
+   * @param FullInventoryStatusService $statusService
+   * @param LoggerContract $logger
    */
-  public function __construct(KeyValueRepository $keyValueRepository)
-  {
-    $this->keyValueRepository = $keyValueRepository;
+  public function __construct(
+    InventoryUpdateService $inventoryUpdateService,
+    FullInventoryStatusService $statusService,
+    LoggerContract $logger
+  ) {
+    $this->inventoryUpdateService = $inventoryUpdateService;
+    $this->statusService = $statusService;
+    $this->logger = $logger;
   }
 
   /**
@@ -43,64 +68,88 @@ class FullInventoryService
    */
   public function sync(bool $manual = false): array
   {
-    /** @var LoggerContract $loggerContract */
-    $loggerContract = pluginApp(LoggerContract::class);
     /** @var ExternalLogs $externalLogs */
     $externalLogs = pluginApp(ExternalLogs::class);
-
     try {
-      $loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG), [
-        'additionalInfo' => ['manual' => (string)$manual, 'message' => 'Checking if Full Inventory is currently running.'],
-        'method' => __METHOD__
-      ]);
-      $status = 'Sync did not run';
-      $cronStatus = $this->keyValueRepository->get(AbstractConfigHelper::FULL_INVENTORY_CRON_STATUS);
-      $lastRun = $this->keyValueRepository->get(AbstractConfigHelper::FULL_INVENTORY_STATUS_UPDATED_AT);
-      if ($cronStatus !== AbstractConfigHelper::FULL_INVENTORY_CRON_RUNNING) {
-        $externalLogs->addInfoLog("Starting " . ($manual ? "Manual " : "Automatic") . "full inventory sync.");
-        $loggerContract->info(TranslationHelper::getLoggerKey(self::LOG_KEY_START), [
-          'additionalInfo' => ['manual' => (string)$manual, 'lastRun' => $lastRun],
+      // potential race conditions - change service management strategy in a future update
+      // (but this is better than letting the old UpdateFullInventoryStatusCron randomly change service states)
+      if ($this->statusService->isFullInventoryRunning() && !$this->serviceHasBeenRunningTooLong()) {
+        $lastStartTime = $this->statusService->getLastAttemptTime();
+        $stateArray = $this->statusService->getServiceState();
+        $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_SKIPPED), [
+          'additionalInfo' => ['manual' => (string) $manual, 'startedAt' => $lastStartTime, 'state' => $stateArray],
           'method' => __METHOD__
         ]);
-        $result = null;
-        try {
-          $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_CRON_STATUS, AbstractConfigHelper::FULL_INVENTORY_CRON_RUNNING);
-          $inventoryUpdateService = pluginApp(InventoryUpdateService::class);
-          $result = $inventoryUpdateService->sync(true);
-          $status = 'OK';
-        } catch (\Exception $e) {
-          $loggerContract->error(TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_ERROR), [
-            'additionalInfo' => ['manual' => (string)$manual, 'message' => $e->getMessage()],
-            'method' => __METHOD__
-          ]);
-          $status = 'ERROR';
-        } finally {
-          $this->keyValueRepository->putOrReplace(AbstractConfigHelper::FULL_INVENTORY_CRON_STATUS, AbstractConfigHelper::FULL_INVENTORY_CRON_IDLE);
+        $externalLogs->addErrorLog(($manual ? "Manual " : "Automatic") . "Full inventory sync BLOCKED - full inventory sync is currently running");
 
-          $loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_END), [
-            'additionalInfo' => ['result' => $result],
-            'method' => __METHOD__
-          ]);
-
-          $externalLogs->addInfoLog("Finished " . ($manual ? "Manual " : "Automatic") . "full inventory sync.");
-        }
-      } else {
-        $status = 'Sync is already running';
-        // FIXME: this should be indicated in UI - currently says "synced" when skipped
-        $loggerContract->info(TranslationHelper::getLoggerKey(self::LOG_KEY_SKIPPED), [
-          'additionalInfo' => ['manual' => (string)$manual],
-          'method' => __METHOD__
-        ]);
-
-        $externalLogs->addErrorLog(($manual ? "Manual " : "Automatic") ."Full inventory sync BLOCKED - full inventory sync is currently running");
+        // early exit
+        return $stateArray;
       }
-      return ['status' => $status];
+
+      try {
+        $this->statusService->markFullInventoryStarted($manual);
+
+        $externalLogs->addInfoLog("Starting " . ($manual ? "Manual " : "Automatic") . "full inventory sync.");
+
+        $syncResultDetails = $this->inventoryUpdateService->sync(true);
+
+        // potential race conditions - change service management strategy in a future update
+        if (self::syncResultIndicatesFailure($syncResultDetails)) {
+          $this->statusService->markFullInventoryFailed($manual);
+        } else {
+          $this->statusService->markFullInventoryComplete($manual);
+        }
+      } catch (\Exception $e) {
+        $this->statusService->markFullInventoryFailed($manual, $e);
+      }
+
+      return $this->statusService->getServiceState();
     } finally {
-      if (count($externalLogs->getLogs())) {
-        /** @var LogSenderService $logSenderService */
-        $logSenderService = pluginApp(LogSenderService::class);
-        $logSenderService->execute($externalLogs->getLogs());
+      $externalLogs->addInfoLog("Finished " . ($manual ? "Manual " : "Automatic") . "use of full inventory service.");
+
+      /** @var LogSenderService $logSenderService */
+      $logSenderService = pluginApp(LogSenderService::class);
+      $logSenderService->execute($externalLogs->getLogs());
+    }
+  }
+
+  /**
+   * Check the results of calling the sync service
+   *
+   * @param array $syncResultDetails
+   * @return boolean
+   */
+  public static function syncResultIndicatesFailure($syncResultDetails): bool
+  {
+    if (!isset($syncResultDetails) || empty($syncResultDetails)) {
+      return true;
+    }
+
+    $numFailures = $syncResultDetails[InventoryUpdateService::INVENTORY_SAVE_FAIL];
+    $syncError = $syncResultDetails[InventoryUpdateService::ERROR_MESSAGE];
+
+    return (isset($syncError) && !empty($syncError)) || (isset($numFailures) && $numFailures > 0);
+  }
+
+  /**
+   * Check if the state of the FullInventoryService has been "running" for more than the maximum alotted time
+   * This functionality was extracted from the old UpdateFullInventoryStatusCron
+   *
+   * @return boolean
+   */
+  private function serviceHasBeenRunningTooLong(): bool
+  {
+    if ($this->statusService->isFullInventoryRunning()) {
+      $lastStateChange = $this->statusService->getStateChangeTime();
+      if (!$lastStateChange || (\time() - \strtotime($lastStateChange)) > self::MAX_FULL_INVENTORY_TIME) {
+        $this->logger->warning(TranslationHelper::getLoggerKey(self::LOG_KEY_LONG_RUN), [
+          'additionalInfo' => ['lastStateChange' => $lastStateChange, 'maximumTime' => self::MAX_FULL_INVENTORY_TIME],
+          'method' => __METHOD__
+        ]);
+        return true;
       }
     }
+
+    return false;
   }
 }

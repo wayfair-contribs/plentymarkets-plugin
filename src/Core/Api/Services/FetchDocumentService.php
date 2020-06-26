@@ -8,6 +8,7 @@ namespace Wayfair\Core\Api\Services;
 use Wayfair\Core\Api\APIService;
 use Wayfair\Core\Contracts\FetchDocumentContract;
 use Wayfair\Core\Dto\ShippingLabel\ResponseDTO;
+use Wayfair\Core\Exceptions\GraphQLQueryException;
 use Wayfair\Core\Helpers\URLHelper;
 use Wayfair\Helpers\ConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
@@ -40,12 +41,9 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
     $ch = curl_init();
     try {
       if (self::isWayfairAPI($url)) {
-        // Check if token has already been expired and refresh it.
-        $this->authService->refresh();
-        // getOAuthToken() currently returns 'Bearer MyToken' NOT the bare token.
         curl_setopt(
           $ch, CURLOPT_HTTPHEADER, [
-            'Authorization: ' . $this->authService->getOAuthToken(),
+            'Authorization: ' . $this->authService->generateAuthHeader(),
             ConfigHelper::WAYFAIR_INTEGRATION_HEADER . ': ' . $this->configHelper->getIntegrationAgentHeader()
           ]
         );
@@ -60,7 +58,7 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
         $this->loggerContract
           ->error(
             TranslationHelper::getLoggerKey(self::LOG_KEY_FAILED_WAYFAIR_API_CALL), [
-              'additionalInfo' => ['url' => $url, 'accessToken' => StringHelper::mask($this->authService->getOAuthToken())],
+              'additionalInfo' => ['url' => $url, 'accessToken' => StringHelper::mask($this->authService->generateAuthHeader())],
               'method' => __METHOD__
             ]
           );
@@ -99,6 +97,12 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
     $responseBody = [];
     try {
       $response = $this->query($query);
+
+      if (!isset($response))
+      {
+        throw new GraphQLQueryException("Did not get query response");
+      }
+
       $responseBody = $response->getBodyAsArray();
 
       $this->loggerContract

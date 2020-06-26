@@ -1,11 +1,12 @@
 <?php
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Core\Api\Services;
 
 use Wayfair\Core\Api\APIService;
+use Wayfair\Core\Exceptions\GraphQLQueryException;
 use Wayfair\Helpers\TranslationHelper;
 
 /**
@@ -66,7 +67,12 @@ class PurchaseOrderService extends APIService {
         );
 
     try {
-      $response     = $this->query($query);
+      $response = $this->query($query);
+
+      if (!isset($response) or empty($response)) {
+        throw new GraphQLQueryException("Did not get query response");
+      }
+
       $responseBody = $response->getBodyAsArray();
       $this->loggerContract
           ->info(

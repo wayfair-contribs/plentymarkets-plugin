@@ -180,7 +180,7 @@ export class SettingsComponent {
    * @param type the style of the message
    * @param message the value of the message
    */
-  private showMessageVerbose(type, message, timestamp = Date().toLocaleString()): void {
+  private showMessageVerbose(type, message, timestamp = new Date().toLocaleString()): void {
     this.status.type = type;
     this.status.value = message;
     this.status.timestamp = timestamp;

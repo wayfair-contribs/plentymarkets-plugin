@@ -1,76 +1,81 @@
-import {
-    L10nConfig,
-    ProviderType,
-    StorageStrategy
-} from 'angular-l10n';
+import { L10nConfig, ProviderType, StorageStrategy } from "angular-l10n";
 
-export const l10nConfig:L10nConfig = getL10nConfig();
+export const l10nConfig: L10nConfig = getL10nConfig();
 
-function getL10nConfig():L10nConfig
-{
-    let langInLocalStorage:string = localStorage.getItem('plentymarkets_lang_');
-    let lang:string = null;
+function getL10nConfig(): L10nConfig {
+  let langDE: string = "de";
+  let langEN: string = "en";
 
-    if(langInLocalStorage !== null)
-    {
-        lang = langInLocalStorage;
-    }
-    else
-    {
-        lang = navigator.language.slice(0, 2).toLocaleLowerCase();
+  // Plentymarkets defaults to German
+  let defaultLang: string = langDE;
+  let knownLangs: string[] = [langDE, langEN];
 
-        if(lang !== 'de' && lang !== 'en')
+  let langInLocalStorage: string = localStorage.getItem("plentymarkets_lang_");
+  let resolvedLang: string = langInLocalStorage;
+
+  if (resolvedLang == null) {
+    // ask browser for perferred language
+    resolvedLang = navigator.language.slice(0, 2).toLocaleLowerCase();
+
+    // as of 1.1.2, no longer (re)defining 'plentymarkets_lang_'
+    // because we do not own the plentymarkets-wide language
+  }
+
+  if (!knownLangs.includes(resolvedLang)) {
+    resolvedLang = defaultLang;
+  }
+
+  // default to production settings
+  let prefix: string = "assets/lang/locale-";
+  let terraComponentsLocalePrefix: string =
+    "assets/lang/terra-components/locale-";
+
+  if (process.env.ENV !== "production") {
+    // settings for local deployments
+    prefix = "src/app/assets/lang/locale-";
+    terraComponentsLocalePrefix =
+      "node_modules/@plentymarkets/terra-components/app/assets/lang/locale-";
+  }
+
+  // build the config object.
+  //
+  // - using StorageStrategy.Session (was Cookie)
+  //      * we should NOT be defining the language for this site at a larger scope,
+  //      * our language settings should not persist after use
+  //
+  // - specify DE before EN
+  //      * matches Plentymarkets
+
+  return {
+    locale: {
+      languages: [
         {
-            lang = 'en';
-        }
-
-        localStorage.setItem('plentymarkets_lang_', lang);
-    }
-
-    let prefix:string = null;
-    let terraComponentsLocalePrefix:string = null;
-
-    // Definitions for i18n
-    if(process.env.ENV === 'production')
-    {
-        prefix = 'assets/lang/locale-';
-        terraComponentsLocalePrefix = 'assets/lang/terra-components/locale-';
-    }
-    else
-    {
-        prefix = 'src/app/assets/lang/locale-';
-        terraComponentsLocalePrefix = 'node_modules/@plentymarkets/terra-components/app/assets/lang/locale-';
-    }
-
-    return {
-        locale:      {
-            languages: [
-                {
-                    code: 'en',
-                    dir:  'ltr'
-                },
-                {
-                    code: 'de',
-                    dir:  'ltr'
-                }
-            ],
-            language:  lang,
-            storage:   StorageStrategy.Cookie
+          code: langDE,
+          dir: "ltr",
         },
-        translation: {
-            providers:            [
-                {
-                    type:   ProviderType.Static,
-                    prefix: prefix
-                },
-                {
-                    type:   ProviderType.Static,
-                    prefix: terraComponentsLocalePrefix
-                }
-            ],
-            caching:              true,
-            composedKeySeparator: '.',
-            i18nPlural:           false
-        }
-    };
+        {
+          code: langEN,
+          dir: "ltr",
+        },
+      ],
+      language: resolvedLang,
+      defaultLocale: { languageCode: resolvedLang},
+      storage: StorageStrategy.Session,
+    },
+    translation: {
+      providers: [
+        {
+          type: ProviderType.Static,
+          prefix: prefix,
+        },
+        {
+          type: ProviderType.Static,
+          prefix: terraComponentsLocalePrefix,
+        },
+      ],
+      caching: true,
+      composedKeySeparator: ".",
+      i18nPlural: false,
+    },
+  };
 }
