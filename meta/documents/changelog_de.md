@@ -1,9 +1,15 @@
 ﻿# Versionshinweise für Wayfair
 
+<<<<<<< HEAD
 ## v1.1.2-beta (2020-06-23)
 - Unterstützung für die Synchronisierung paginierter Bestände hinzufügen
 - Das Herunterladen leerer Dokumente auf Plentymärkte wurde behoben
 - Neue Benutzererfahrung für das vollständige Inventar
+=======
+## v1.1.2 (2020-05-15)
+- Unterstützung für die Synchronisierung paginierter Bestände hinzufügen
+- Das Herunterladen leerer Dokumente auf Plentymärkte wurde behoben
+>>>>>>> master
 - Erhöhte Protokollierung
 - Erhöhte Telemetrie
 

@@ -1,9 +1,15 @@
 ﻿# Release notes for Wayfair
 
+<<<<<<< HEAD
 ## v1.1.2-beta (2020-06-23)
 - Add support for paginated inventory synchronization
 - Stopped erroneous downloading of empty documents to Plentymarkets
 - New Full Inventory user experience
+=======
+## v1.1.2 (2020-05-15)
+- Add support for paginated inventory synchronization
+- Fixed downloading empty documents to plentymarkets
+>>>>>>> master
 - Increased logging
 - Increased telemetry
 
@@ -23,7 +29,11 @@
 - Critical fix for full inventory update
 
 ## v1.0.7 (2019-10-23)
+<<<<<<< HEAD
 - Add packing slip to the order
+=======
+- Add packing slip to the order 
+>>>>>>> master
 - Add the option of choosing to send all items inventory data
 
 ## v1.0.6 (2019-09-06)
