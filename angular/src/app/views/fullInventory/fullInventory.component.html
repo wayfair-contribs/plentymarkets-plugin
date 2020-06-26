@@ -1,7 +1,70 @@
-<div class="text-center center-block">
-  <p *ngIf="status.value" class="{{status.type + ' col-md-12'}}">{{status.value}}</p>
+<div class="center-block">
+  <div class="form-group row">
+    <label
+      class="col-md-5 col-form-label text-right"
+      style="font-weight: bold;"
+      for="successfulServiceCompletionTimestamp"
+    >
+      {{ "last_good_sync_time" | translate: lang }}:
+    </label>
+    <div class="col-md-3 col-md-offset-2">
+      <span name="successfulServiceCompletionTimestamp">{{
+        successfulServiceCompletionTimestamp
+      }}</span>
+    </div>
+  </div>
 
-  <div class="col-md-12">
-    <button class="btn btn-success" id="syncFullInventory" (click)="syncFullInventory()"> {{ 'sync' | translate:lang }} </button>
+  <div class="form-group row">
+    <label
+      class="col-md-5 col-form-label text-right"
+      style="font-weight: bold;"
+      for="lastResult"
+    >
+      {{ "full_inventory_status" | translate: lang }}:</label
+    >
+    <div class="col-md-2">
+      <p
+        name="lastResult"
+        class="{{ 'text-uppercase text-center text-' + lastResult.type }}"
+      >
+        {{ lastResult.text }}
+      </p>
+    </div>
+    <div class="col-md-3">
+      <span name="latestInteractionTimestamp">{{
+        latestInteractionTimestamp
+      }}</span>
+    </div>
+  </div>
+
+  <div class="form-group row text-center">
+    <div class="col-md-2 col-md-offset-4">
+      <button
+        class="btn btn-primary"
+        id="syncFullInventory"
+        (click)="syncFullInventory()"
+        [disabled]="stateOfSyncButton.disabled"
+      >
+        {{ stateOfSyncButton.text | translate: lang }}
+      </button>
+    </div>
+    <div class="col-md-2">
+      <button
+        class="btn btn-default"
+        id="refreshState"
+        (click)="refreshState()"
+        [disabled]="stateOfRefreshButton.disabled"
+      >
+        {{ stateOfRefreshButton.text | translate: lang }}
+      </button>
+    </div>
+  </div>
+  <br />
+  <br />
+  <div class="bg-info text-center">
+    <h4>{{ "full_inventory_disclaimer_label" | translate: lang }}:</h4>
+    <p style="white-space: pre-line;">
+      {{ "full_inventory_disclaimer_text" | translate: lang }}
+    </p>
   </div>
 </div>

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Core\Api\Services;
@@ -23,11 +23,14 @@ class FetchOrderService extends APIService {
    */
   public function fetch(int $circle): array {
     $query = $this->getQuery($circle);
-    try {
-      $response = $this->query($query);
-    } catch (\Exception $e) {
-      throw new GraphQLQueryException("RequestException exception for fetching purchase orders.", $e->getMessage());
+
+    $response = $this->query($query);
+
+    if (!isset($response))
+    {
+      throw new GraphQLQueryException("Did not get query response");
     }
+
     $body = $response->getBodyAsArray();
     if ($response->getStatusCode() != 200 || isset($body['errors']) || !isset($body['data']['purchaseOrders'])) {
       throw new \Exception("Failed to fetch purchase orders. Status code: " . $response->getStatusCode());

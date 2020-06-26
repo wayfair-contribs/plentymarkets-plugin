@@ -1,22 +1,38 @@
 <?php
+
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Core\Api\Services;
 
-use Wayfair\Core\Contracts\AuthenticationContract;
+use Wayfair\Core\Contracts\AuthContract;
 use Wayfair\Core\Contracts\ClientInterfaceContract;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Contracts\StorageInterfaceContract;
+use Wayfair\Core\Exceptions\AuthException;
 use Wayfair\Core\Exceptions\TokenNotFoundException;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Core\Helpers\URLHelper;
-use Wayfair\Helpers\ConfigHelper;
+use Wayfair\Helpers\StringHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Http\WayfairResponse;
 
-class AuthService implements AuthenticationContract {
+class AuthService implements AuthContract
+{
+  const STORAGE_KEY_TOKEN = 'token';
+
+  const LOG_KEY_ATTEMPTING_AUTH = 'attemptingAuthentication';
+
+  const HEADER_KEY_CONTENT_TYPE = "Content-Type";
+
+  const EXPIRES_IN = 'expires_in';
+  const ACCESS_TOKEN = 'access_token';
+  const STORE_TIME = 'store_time';
+  const CLIENT_ID = 'client_id';
+  const CLIENT_SECRET = 'client_secret';
+  const PRIVATE_INFO_KEYS = [self::CLIENT_ID, self::CLIENT_SECRET];
+
   /**
    * @var StorageInterfaceContract
    */
@@ -30,13 +46,23 @@ class AuthService implements AuthenticationContract {
   /**
    * @var string
    */
-  private $client_id;
+  private $clientId;
 
   /**
+   * Secret is already exposed in Global Settings.
+   * Caching it here is less of an issue.
    * @var string
    */
-  private $client_secret;
+  private $clientSecret;
 
+  /**
+   * @var AbstractConfigHelper
+   */
+  private $configHelper;
+
+  /**
+   * @var LoggerContract
+   */
   private $loggerContract;
 
   /**
@@ -48,62 +74,105 @@ class AuthService implements AuthenticationContract {
    * @param LoggerContract           $loggerContract
    */
   public function __construct(
-      ClientInterfaceContract $clientInterfaceContract,
-      StorageInterfaceContract $storageInterfaceContract,
-      AbstractConfigHelper $abstractConfigHelper,
-      LoggerContract $loggerContract
+    ClientInterfaceContract $clientInterfaceContract,
+    StorageInterfaceContract $storageInterfaceContract,
+    AbstractConfigHelper $configHelper,
+    LoggerContract $loggerContract
   ) {
     $this->store = $storageInterfaceContract;
-    $this->client_id = $abstractConfigHelper->getClientId();
-    $this->client_secret = $abstractConfigHelper->getClientSecret();
     $this->client = $clientInterfaceContract;
+    $this->configHelper = $configHelper;
     $this->loggerContract = $loggerContract;
   }
 
   /**
+   * Fetch a new auth token using the wayfair auth service
+   * @param string $audience
    * @return WayfairResponse
    */
-  public function authenticate() {
-    $targetURL = URLHelper::getAuthUrl();
+  private function fetchWayfairAuthToken()
+  {
+    // auth URL is the same for all Wayfair audiences.
     $method = 'post';
-    $arguments = [
-        $targetURL,
-        [
-            'headers' => [
-                'Content-Type' => 'application/json',
-                ConfigHelper::WAYFAIR_INTEGRATION_HEADER => ConfigHelper::INTEGRATION_AGENT_NAME
-            ],
-            'body' => json_encode(
-                [
-                    'client_id' => $this->client_id,
-                    'client_secret' => $this->client_secret,
-                    'audience' => URLHelper::getBaseUrl(),
-                    'grant_type' => 'client_credentials'
-                ]
-            )
-        ]
+    $audience = URLHelper::getBaseUrl();
+    $clientId = $this->clientId;
+    if (!isset($clientId) || empty($clientId)) {
+      throw new AuthException("Unable to perform authorization: no client ID set for Wayfair");
+    }
+
+    $clientSecret = $this->clientSecret;
+
+    if (!isset($clientSecret) || empty($clientSecret)) {
+      throw new AuthException("Unable to perform authorization: no client Secret set for Wayfair");
+    }
+
+    $headersArray = [
+      self::HEADER_KEY_CONTENT_TYPE => 'application/json',
+      AbstractConfigHelper::WAYFAIR_INTEGRATION_HEADER => AbstractConfigHelper::INTEGRATION_AGENT_NAME
     ];
+
+    $bodyArray =  [
+      self::CLIENT_ID => $clientId,
+      self::CLIENT_SECRET => $clientSecret,
+      'audience' => $audience,
+      'grant_type' => 'client_credentials'
+    ];
+
+    $targetURL = URLHelper::getAuthUrl();
+    $bodyJson = json_encode($bodyArray);
+
+    $arguments = [
+      $targetURL,
+      [
+        'headers' => $headersArray,
+        'body' => $bodyJson
+      ]
+    ];
+
     $this->loggerContract
-        ->debug(TranslationHelper::getLoggerKey('attemptingAuthentication'), ['additionalInfo' => $arguments, 'method' => __METHOD__]);
+      ->debug(
+        TranslationHelper::getLoggerKey(self::LOG_KEY_ATTEMPTING_AUTH),
+        [
+          'additionalInfo' =>
+          [
+            'audience' => $audience,
+            'clientID' => $clientId,
+            'maskedSecret' => StringHelper::mask($clientSecret)
+          ],
+          'method' => __METHOD__
+        ]
+      );
 
     return $this->client->call($method, $arguments);
   }
 
   /**
-   * This refreshes the Authorization Token if it has been expired.
+   * Refresh the Authorization Token, unconditionally
    *
    * @return void
    * @throws \Exception
    */
-  public function refresh() {
-    $token = $this->getToken();
-    if (!isset($token) or $this->isTokenExpired()) {
-      $response = $this->authenticate()->getBodyAsArray();
-      if (isset($response['errors'])) {
-        throw new \Exception("Unable to authenticate user: " . $response['error']);
-      }
-      $this->saveToken($response);
+  public function refreshAuth()
+  {
+    $this->clearToken();
+
+    $responseObject = $this->fetchWayfairAuthToken();
+
+    if (!isset($responseObject) || empty($responseObject)) {
+      throw new AuthException("Unable to authorize user: no token data in response from Wayfair");
     }
+
+    $responseArray = $responseObject->getBodyAsArray();
+
+    if (!isset($responseArray) || empty($responseArray)) {
+      throw new AuthException("Unable to authorize user: no token data in response from Wayfair");
+    }
+
+    if (isset($responseArray['error'])) {
+      throw new AuthException("Unable to authorize user: " . $responseArray['error']);
+    }
+
+    $this->saveToken($responseArray);
   }
 
   /**
@@ -111,42 +180,103 @@ class AuthService implements AuthenticationContract {
    *
    * @return void
    */
-  public function saveToken($token) {
-    $token['store_time'] = time();
-    $this->store->set('token', json_encode($token));
+  private function saveToken($token)
+  {
+    $token[self::STORE_TIME] = time();
+    $this->store->set(self::STORAGE_KEY_TOKEN, json_encode($token));
   }
 
   /**
-   * @return bool
+   * Check if a token model is valid for use.
+   * A token that passes validation has all required fields and has not yet expired.
+   *
+   * @return boolean
    */
-  public function isTokenExpired() {
-    $token = $this->getToken();
-    if (isset($token) && isset($token['access_token']) && isset($token['store_time'])) {
-      if (($token['expires_in'] + $token['store_time']) > time()) {
-        return false;
-      }
-    }
-
-    return true;
+  private static function validateToken($token): bool
+  {
+    return isset($token) && !empty($token)
+      && isset($token[self::ACCESS_TOKEN]) && !empty($token[self::ACCESS_TOKEN])
+      && isset($token[self::STORE_TIME]) && !empty($token[self::STORE_TIME])
+      && isset($token[self::EXPIRES_IN]) && empty($token[self::EXPIRES_IN])
+      && ($token[self::EXPIRES_IN] + $token[self::STORE_TIME]) > time();
   }
 
   /**
    * @return mixed
    */
-  public function getToken() {
-    return json_decode($this->store->get('token'), true);
+  private function getStoredToken()
+  {
+    return json_decode($this->store->get(self::STORAGE_KEY_TOKEN), true);
+  }
+
+  /**
+   * Get an OAuthToken object for use with Wayfair APIs
+   *
+   * @return string
+   */
+  public function getOAuthToken()
+  {
+    $token = null;
+
+    $credentialsChanged = $this->updateCredentials();
+    if (!$credentialsChanged) {
+      // can continue using current token if it didn't expire
+      $token = $this->getStoredToken();
+
+      if (isset($token) && self::validateToken($token)) {
+        return $token;
+      }
+    }
+
+    // abandon any stored token
+    $this->refreshAuth();
+    return $this->getStoredToken();
   }
 
   /**
    * @return string
    * @throws TokenNotFoundException
    */
-  public function getOAuthToken() {
-    $token = $this->getToken();
-    if (!isset($token)) {
-      throw new TokenNotFoundException("Token not found.");
+  public function generateAuthHeader()
+  {
+    $tokenValue = null;
+
+    $tokenModel = $this->getOAuthToken();
+    if (isset($tokenModel)) {
+      $tokenValue = $tokenModel['access_token'];
     }
 
-    return 'Bearer ' . $token['access_token'];
+    if (!isset($tokenValue) || empty($tokenValue)) {
+      throw new TokenNotFoundException("Could not get a valid OAUth token.");
+    }
+
+    return 'Bearer ' . $tokenValue;
+  }
+
+  /**
+   * Sync instance credentials with global values for credentials.
+   * If changes are detected, the stored token is cleared and the function returns true
+   *
+   * @return boolean
+   */
+  private function updateCredentials(): bool
+  {
+    $updatedClientId = $this->configHelper->getClientId();
+    $updatedClientSecret = $this->configHelper->getClientSecret();
+
+    if ($updatedClientId !== $this->clientId || $updatedClientSecret != $this->clientSecret) {
+      $this->clientId = $updatedClientId;
+      $this->clientSecret = $updatedClientSecret;
+
+      $this->clearToken();
+      return true;
+    }
+
+    return false;
+  }
+
+  private function clearToken(): void
+  {
+    $this->saveToken([]);
   }
 }
