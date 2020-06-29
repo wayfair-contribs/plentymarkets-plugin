@@ -365,7 +365,7 @@ class InventoryMapper
     }
 
     // protecting against values below -1
-    if (isset($left) && $right < -1) {
+    if (isset($right) && $right < -1) {
       $right = -1;
     }
 
