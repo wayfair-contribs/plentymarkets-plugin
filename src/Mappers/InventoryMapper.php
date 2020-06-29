@@ -360,20 +360,20 @@ class InventoryMapper
   static function mergeInventoryQuantities($left, $right)
   {
     // protecting against values below -1
-    if (null != $left && $left < -1) {
+    if (isset($left) && $left < -1) {
       $left = -1;
     }
 
     // protecting against values below -1
-    if (null != $right && $right < -1) {
+    if (isset($left) && $right < -1) {
       $right = -1;
     }
 
-    if (null == $left || $left <= 0 && $right != 0) {
+    if (!isset($left) || $left <= 0 && $right != 0) {
       return $right;
     }
 
-    if (null == $right || $right <= 0 && $left != 0) {
+    if (!isset($right) || $right <= 0 && $left != 0) {
       return $left;
     }
 
