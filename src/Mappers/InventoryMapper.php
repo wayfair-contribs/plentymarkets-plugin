@@ -193,12 +193,15 @@ class InventoryMapper
       // Avl Immediately. ADJUSTED Net Stock (see Stock Buffer setting in Wayfair plugin).
       $onHand = self::getQuantityOnHand($stock, $configHelper, $loggerContract);
 
-      if (null == $onHand) {
+      if (!isset($onHand)) {
         // null value is NOT a valid input for quantity on hand - do NOT send to Wayfair.
         $loggerContract->warning(
           TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_INVENTORY_AMOUNT),
           [
             'additionalInfo' => [
+              'variationID' => $mainVariationId,
+              'variationNumber' => $variationNumber,
+              'warehouseId' => $warehouseId,
               'amount' => json_encode($onHand)
             ],
             'method' => __METHOD__
@@ -345,7 +348,7 @@ class InventoryMapper
 
   /**
    * Merge two quantities for an inventory DTO
-   * 
+   *
    * Note that -1 is a VALID input for the inventory APIs!
    * Note that this MAY return null
    *
@@ -357,20 +360,20 @@ class InventoryMapper
   static function mergeInventoryQuantities($left, $right)
   {
     // protecting against values below -1
-    if (null != $left && $left < -1) {
+    if (isset($left) && $left < -1) {
       $left = -1;
     }
 
     // protecting against values below -1
-    if (null != $right && $right < -1) {
+    if (isset($right) && $right < -1) {
       $right = -1;
     }
 
-    if (null == $left || $left <= 0 && $right != 0) {
+    if (!isset($left) || $left <= 0 && $right != 0) {
       return $right;
     }
 
-    if (null == $right || $right <= 0 && $left != 0) {
+    if (!isset($right) || $right <= 0 && $left != 0) {
       return $left;
     }
 
