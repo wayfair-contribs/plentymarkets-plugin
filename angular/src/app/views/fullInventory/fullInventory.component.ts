@@ -59,6 +59,8 @@ export class FullInventoryComponent {
 
   private syncSubscription = null;
 
+  public syncOverdue: boolean = false;
+
   public constructor(
     private fullInventoryService: FullInventoryService,
     private translation: TranslationService
@@ -120,7 +122,7 @@ export class FullInventoryComponent {
   }
 
   /**
-   * Logic called when the sync subsrciption returns
+   * Logic called when the sync subscription returns
    * in the allotted amount of time
    * @param data data from Sync service
    */
@@ -208,7 +210,7 @@ export class FullInventoryComponent {
       }
     }
 
-    this.lastResult = {text: this.translation.translate(text), type: style};
+    this.lastResult = { text: this.translation.translate(text), type: style };
 
     this.updateLastCompletion(data.lastCompletion);
 
@@ -218,14 +220,23 @@ export class FullInventoryComponent {
     return data.status;
   }
 
-  private updateLastCompletion(rawDate: string)
-  {
+  private updateLastCompletion(rawDate: string) {
+    let dateObj = null;
     if (rawDate) {
-      this.successfulServiceCompletionTimestamp = new Date(rawDate).toLocaleString();
-      return;
+      dateObj = new Date(rawDate);
+    } else if (this.successfulServiceCompletionTimestamp) {
+      dateObj = new Date(this.successfulServiceCompletionTimestamp);
     }
 
-    if (!this.successfulServiceCompletionTimestamp) {
+    if (dateObj instanceof Date && !isNaN(dateObj.valueOf())) {
+      this.successfulServiceCompletionTimestamp = dateObj.toLocaleString();
+
+      let now = new Date();
+      let dueDate = new Date();
+      dueDate.setDate(dateObj.getDate() + 1);
+
+      this.syncOverdue = dueDate < now;
+    } else {
       this.successfulServiceCompletionTimestamp = this.translation.translate(
         FullInventoryComponent.TRANSLATION_KEY_UNKNOWN
       );
