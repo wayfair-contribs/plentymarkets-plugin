@@ -22,7 +22,7 @@ class InventoryMapper
   const LOG_KEY_PART_NUMBER_LOOKUP = 'partNumberLookup';
   const LOG_KEY_PART_NUMBER_MISSING = 'partNumberMissing';
   const LOG_KEY_INVALID_INVENTORY_AMOUNT = 'invalidInventoryAmount';
-  const LOG_KEY_INVALID_STOCK_BUFFER = 'invalidStockBufferValue';
+  const LOG_KEY_NORMALIZING_INVENTORY = 'normalizingInventoryAmount';
 
   const VARIATION_BARCODES = 'variationBarcodes';
   const VARIATION_SKUS = 'variationSkus';
@@ -57,7 +57,7 @@ class InventoryMapper
    *
    * @return int|mixed
    */
-  static function getQuantityOnHand($variationStock, $loggerContract)
+  static function getQuantityOnHand($variationStock, $loggerContract = null)
   {
     if (!isset($variationStock) || !isset($variationStock->netStock)) {
       // API did not return a net stock
@@ -68,7 +68,22 @@ class InventoryMapper
     $netStock = $variationStock->netStock;
 
     if ($netStock <= -1) {
-      // TODO: add a log about this
+      if (isset($loggerContract))
+      {
+
+        $variationId = $variationStock->variationId;
+
+        $loggerContract->warning(
+          TranslationHelper::getLoggerKey(self::LOG_KEY_NORMALIZING_INVENTORY),
+          [
+            'additionalInfo' => [
+              'variationId' => $variationId,
+            ],
+            'method' => __METHOD__
+          ]
+        );
+      }
+
       // Wayfair doesn't understand values below -1
       return -1;
     }

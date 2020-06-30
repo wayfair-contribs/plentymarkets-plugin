@@ -27,8 +27,7 @@ class InventoryUpdateService
   const LOG_KEY_INVENTORY_UPDATE_ERROR = 'inventoryUpdateError';
   const LOG_KEY_INVENTORY_UPDATE_START = 'inventoryUpdateStart';
   const LOG_KEY_INVALID_INVENTORY_DTO = 'invalidInventoryDto';
-  const LOG_KEY_NORMALIZING_INVENTORY = 'normalizingInventoryAmount';
-
+  const LOG_KEY_INVALID_STOCK_BUFFER = 'invalidStockBufferValue';
 
   const INVENTORY_SAVE_TOTAL = 'inventorySaveTotal';
   const INVENTORY_SAVE_SUCCESS = 'inventorySaveSuccess';
@@ -68,23 +67,7 @@ class InventoryUpdateService
 
     if (isset($onHand)) {
       if ($onHand  < -1) {
-        $newQuantity = -1;
-
-        $loggerContract->warning(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_NORMALIZING_INVENTORY),
-          [
-            'additionalInfo' => [
-              'data' => $inventoryRequestDTO->toArray(),
-              'newQuantity' => $newQuantity
-            ],
-            'method' => __METHOD__
-          ]
-        );
-
-        // the Wayfair Inventory system allows for a 'quantity on hand' value of -1,
-        // which may indicate a discontinued product or an unknown quantity.
-        // Any values lower than -1 are considered invalid and are being normalized to -1 here.
-        $inventoryRequestDTO->setQuantityOnHand($newQuantity);
+        $issues[] = "Quantity on Hand is less than negative one";
       }
     }
     else
@@ -96,7 +79,7 @@ class InventoryUpdateService
       return true;
     }
 
-    // TODO: replace issues with translated messsages?
+    // TODO: replace issues with translated messages?
     $loggerContract
       ->error(
         TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_INVENTORY_DTO),
@@ -167,8 +150,8 @@ class InventoryUpdateService
 
         $msAtPageStart = TimeHelper::getMilliseconds();
 
-        /** @var RequestDTO[] $normalizedInventoryRequestDTOs collection of DTOs to include in a bulk update*/
-        $normalizedInventoryRequestDTOs = [];
+        /** @var RequestDTO[] $validatedRequestDTOs collection of DTOs to include in a bulk update*/
+        $validatedRequestDTOs = [];
         $fields['page'] = (string) $page;
         $variationSearchRepository->setSearchParams($fields);
         $response = $variationSearchRepository->search();
@@ -180,12 +163,12 @@ class InventoryUpdateService
           foreach ($rawInventoryRequestDTOs as $dto) {
             // validation method will output logs on failure
             if ($this->validateInventoryRequestData($dto, $loggerContract)) {
-              $normalizedInventoryRequestDTOs[] = $dto;
+              $validatedRequestDTOs[] = $dto;
             }
           }
         }
 
-        $amtOfDtosForPage = count($normalizedInventoryRequestDTOs);
+        $amtOfDtosForPage = count($validatedRequestDTOs);
 
         if ($amtOfDtosForPage <= 0) {
           $loggerContract
@@ -214,11 +197,11 @@ class InventoryUpdateService
 
           $inventorySaveTotal +=  $amtOfDtosForPage;
 
-          $dto = $inventoryService->updateBulk($normalizedInventoryRequestDTOs, $fullInventory);
+          $dto = $inventoryService->updateBulk($validatedRequestDTOs, $fullInventory);
 
           $savedInventoryDuration += TimeHelper::getMilliseconds() - $msBeforeUpdate;
 
-          $inventorySaveSuccess += count($normalizedInventoryRequestDTOs) - count($dto->getErrors());
+          $inventorySaveSuccess += count($validatedRequestDTOs) - count($dto->getErrors());
           $inventorySaveFail += count($dto->getErrors());
         }
 
