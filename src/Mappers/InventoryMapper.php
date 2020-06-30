@@ -68,8 +68,7 @@ class InventoryMapper
     $netStock = $variationStock->netStock;
 
     if ($netStock <= -1) {
-      if (isset($loggerContract))
-      {
+      if (isset($loggerContract)) {
 
         $variationId = $variationStock->variationId;
 

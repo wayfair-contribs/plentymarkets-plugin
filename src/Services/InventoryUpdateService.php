@@ -69,9 +69,7 @@ class InventoryUpdateService
       if ($onHand  < -1) {
         $issues[] = "Quantity on Hand is less than negative one";
       }
-    }
-    else
-    {
+    } else {
       $issues[] = "Quantity On Hand is missing";
     }
 
@@ -249,11 +247,9 @@ class InventoryUpdateService
       $inventorySaveFail += $amtOfDtosForPage;
 
       $errorMessage = $e->getMessage();
-      if (!isset($errorMessage))
-      {
+      if (!isset($errorMessage)) {
         $errorMessage = (string) $e;
       }
-
     } finally {
       // FIXME: the 'inventorySave' and 'inventorySaved' log types are too similar
       // TODO: determine if changing the types will impact kibana / graphana / influxDB before changing
@@ -330,17 +326,15 @@ class InventoryUpdateService
    * @param LoggerContract $loggerContract
    * @return int
    */
-  private static function getNormalizedStockBuffer($configHelper, $loggerContract)
+  private static function getNormalizedStockBuffer($configHelper, $loggerContract = null)
   {
     $stockBuffer = null;
     if (isset($configHelper)) {
       $stockBuffer = $configHelper->getStockBufferValue();
     }
 
-    if (isset($stockBuffer))
-    {
-      if ($stockBuffer >= 0)
-      {
+    if (isset($stockBuffer)) {
+      if ($stockBuffer >= 0) {
         return $stockBuffer;
       }
 
