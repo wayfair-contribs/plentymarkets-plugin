@@ -72,7 +72,7 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
         // RequestDTO::createFromArray uses PluginApp which doesn't work in test context.
         /** @var RequestDTO */
         $dto = new RequestDTO();
-        $dto->adoptArray($dtoData);
+        $dto->setQuantityOnHand($onHand);
 
         $dto = InventoryMapper::applyStockBuffer($dto, $buffer);
         $result = $dto->getQuantityOnHand();

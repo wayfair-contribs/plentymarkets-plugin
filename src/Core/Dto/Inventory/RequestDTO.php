@@ -186,7 +186,14 @@ class RequestDTO {
      * @var RequestDTO $dto
      */
     $dto = pluginApp(RequestDTO::class);
-    $dto->adoptArray($params);
+    $dto->setSupplierId($params['supplierId'] ?? null);
+    $dto->setSupplierPartNumber($params['supplierPartNumber'] ?? null);
+    $dto->setQuantityOnHand($params['quantityOnHand'] ?? null);
+    $dto->setQuantityBackorder($params['quantityBackorder'] ?? null);
+    $dto->setQuantityOnOrder($params['quantityOnOrder'] ?? null);
+    $dto->setItemNextAvailabilityDate($params['itemNextAvailabilityDate'] ?? null);
+    $dto->setProductNameAndOptions($params['productNameAndOptions'] ?? null);
+    $dto->setDiscontinued($params['discontinued'] ?? null);
     return $dto;
   }
 
@@ -204,28 +211,5 @@ class RequestDTO {
     $data['productNameAndOptions'] = $this->getProductNameAndOptions();
     $data['discontinued'] = $this->isDiscontinued();
     return $data;
-  }
-
-  /**
-   * Set the DTO's members based on the input array
-   *
-   * @param array $params
-   * @return void
-   */
-  function adoptArray(array $params)
-  {
-    if (!isset($params))
-    {
-      return;
-    }
-
-    $this->setSupplierId($params['supplierId'] ?? null);
-    $this->setSupplierPartNumber($params['supplierPartNumber'] ?? null);
-    $this->setQuantityOnHand($params['quantityOnHand'] ?? null);
-    $this->setQuantityBackorder($params['quantityBackorder'] ?? null);
-    $this->setQuantityOnOrder($params['quantityOnOrder'] ?? null);
-    $this->setItemNextAvailabilityDate($params['itemNextAvailabilityDate'] ?? null);
-    $this->setProductNameAndOptions($params['productNameAndOptions'] ?? null);
-    $this->setDiscontinued($params['discontinued'] ?? null);
   }
 }
