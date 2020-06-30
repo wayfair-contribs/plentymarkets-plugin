@@ -73,40 +73,7 @@ class InventoryMapper
       return -1;
     }
 
-    $stockBuffer = null;
-    if (isset($configHelper)) {
-      $stockBuffer = $configHelper->getStockBufferValue();
-    }
-
-    if (!isset($stockBuffer)) {
-      // no buffer to apply
-      return $netStock;
-    }
-
-
-    if ($stockBuffer < 0) {
-      // invalid value for buffer
-
-      if (isset($loggerContract)) {
-        $loggerContract->warning(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_STOCK_BUFFER),
-          [
-            'additionalInfo' => ['stockBuffer' => $stockBuffer],
-            'method' => __METHOD__
-          ]
-        );
-      }
-
-      return $netStock;
-    }
-
-    if ($netStock > $stockBuffer) {
-      // report stock, considering buffer
-      return $netStock - $stockBuffer;
-    }
-
-    // stock is less than or equal buffer, so Wayfair should see this as no stock.
-    return 0;
+    return $netStock
   }
 
   /**
@@ -245,7 +212,62 @@ class InventoryMapper
       $requestDtosBySuID[$dtoKey] = RequestDTO::createFromArray($dtoData);
     }
 
-    return array_values($requestDtosBySuID);
+    $inventoryDTOs = array_values($requestDtosBySuID);
+
+
+    return array_map(function ($dto) {return $this->applyStockBuffer($dto);}, $inventoryDTOs);
+
+    return $inventoryDTOs;
+  }
+
+  /**
+   * Apply stock buffer value to the DTO
+   *
+   * @param RequestDTO $dto
+   * @return void
+   */
+  private function applyStockBuffer($dto)
+  {
+    $stockBuffer = null;
+    if (isset($configHelper)) {
+      $stockBuffer = $configHelper->getStockBufferValue();
+    }
+
+    if (!isset($stockBuffer) || $stockBuffer == 0) {
+      // no buffer to apply
+      return $dto;
+    }
+
+    if ($stockBuffer < 0) {
+      // invalid value for buffer
+
+      if (isset($loggerContract)) {
+        $loggerContract->warning(
+          TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_STOCK_BUFFER),
+          [
+            'additionalInfo' => ['stockBuffer' => $stockBuffer],
+            'method' => __METHOD__
+          ]
+        );
+      }
+
+      return $dto;
+    }
+
+    $netStock = $dto->getQuantityOnHand();
+    if ($netStock > $stockBuffer) {
+        // report stock, considering buffer
+        $netStock -= $stockBuffer;
+      }
+      else
+      {
+        // stock is less than or equal buffer, so Wayfair should see this as no stock.
+        $netStock = 0;
+      }
+
+      $dto->setQuantityOnHand($netStock);
+
+    return $dto;
   }
 
   /**
