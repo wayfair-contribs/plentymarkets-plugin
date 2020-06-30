@@ -69,18 +69,18 @@ class InventoryUpdateService
     if (isset($onHand)) {
       if ($onHand  < -1) {
         $newQuantity = -1;
-  
+
         $loggerContract->warning(
           TranslationHelper::getLoggerKey(self::LOG_KEY_NORMALIZING_INVENTORY),
           [
             'additionalInfo' => [
-              'data' => $inventoryRequestDTO->toArray(), 
+              'data' => $inventoryRequestDTO->toArray(),
               'newQuantity' => $newQuantity
             ],
             'method' => __METHOD__
           ]
         );
-  
+
         // the Wayfair Inventory system allows for a 'quantity on hand' value of -1,
         // which may indicate a discontinued product or an unknown quantity.
         // Any values lower than -1 are considered invalid and are being normalized to -1 here.
@@ -160,6 +160,9 @@ class InventoryUpdateService
       $fields['itemsPerPage'] = AbstractConfigHelper::INVENTORY_ITEMS_PER_PAGE;
       $variationSearchRepository->setFilters($this->getFilters($fullInventory));
 
+      // stock buffer should be the same across all pages of inventory
+      $stockBuffer = self::getNormalizedStockBuffer($configHelper, $loggerContract);
+
       do {
 
         $msAtPageStart = TimeHelper::getMilliseconds();
@@ -173,7 +176,7 @@ class InventoryUpdateService
         /** @var array $variationWithStock information about a single Variation, including stock for each Warehouse */
         foreach ($response->getResult() as $variationWithStock) {
           /** @var RequestDTO[] $rawInventoryRequestDTOs non-normalized candidates for inclusion in bulk update */
-          $rawInventoryRequestDTOs = $inventoryMapper->createInventoryDTOsFromVariation($variationWithStock, $itemMappingMethod);
+          $rawInventoryRequestDTOs = $inventoryMapper->createInventoryDTOsFromVariation($variationWithStock, $itemMappingMethod, $stockBuffer);
           foreach ($rawInventoryRequestDTOs as $dto) {
             // validation method will output logs on failure
             if ($this->validateInventoryRequestData($dto, $loggerContract)) {
@@ -214,7 +217,7 @@ class InventoryUpdateService
           $dto = $inventoryService->updateBulk($normalizedInventoryRequestDTOs, $fullInventory);
 
           $savedInventoryDuration += TimeHelper::getMilliseconds() - $msBeforeUpdate;
-          
+
           $inventorySaveSuccess += count($normalizedInventoryRequestDTOs) - count($dto->getErrors());
           $inventorySaveFail += count($dto->getErrors());
         }
@@ -223,8 +226,8 @@ class InventoryUpdateService
           TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
           [
             'additionalInfo' => [
-              'fullInventory' => (string) $fullInventory, 
-              'page_num' => (string) $page, 
+              'fullInventory' => (string) $fullInventory,
+              'page_num' => (string) $page,
               'info' => 'page done',
               'resultsForPage' => $dto
             ],
@@ -335,5 +338,41 @@ class InventoryUpdateService
     }
 
     return $filter;
+  }
+
+  /**
+   * Get the stock buffer value, normalized to 0
+   *
+   * @param AbstractConfigHelper $configHelper
+   * @param LoggerContract $loggerContract
+   * @return int
+   */
+  private static function getNormalizedStockBuffer($configHelper, $loggerContract)
+  {
+    $stockBuffer = null;
+    if (isset($configHelper)) {
+      $stockBuffer = $configHelper->getStockBufferValue();
+    }
+
+    if (isset($stockBuffer))
+    {
+      if ($stockBuffer >= 0)
+      {
+        return $stockBuffer;
+      }
+
+      // invalid value for buffer
+      if (isset($loggerContract)) {
+        $loggerContract->warning(
+          TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_STOCK_BUFFER),
+          [
+            'additionalInfo' => ['stockBuffer' => $stockBuffer],
+            'method' => __METHOD__
+          ]
+        );
+      }
+    }
+
+    return 0;
   }
 }

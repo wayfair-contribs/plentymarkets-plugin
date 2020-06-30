@@ -81,16 +81,14 @@ class InventoryMapper
    * Returns a DTO for each supplier ID that has stock information for the variation.
    * @param array $variationData
    * @param string $itemMappingMethod
+   * @param int $stockBuffer
    *
    * @return RequestDTO[]
    */
-  public function createInventoryDTOsFromVariation($variationData, $itemMappingMethod)
+  public function createInventoryDTOsFromVariation($variationData, $itemMappingMethod, $stockBuffer)
   {
     /** @var LoggerContract $loggerContract */
     $loggerContract = pluginApp(LoggerContract::class);
-
-    /**@var AbstractConfigHelper $configHelper */
-    $configHelper = pluginApp(AbstractConfigHelper::class);
 
     /** @var array<string,RequestDTO> $requestDtosBySuID */
     $requestDtosBySuID = [];
@@ -215,8 +213,6 @@ class InventoryMapper
     // all stock amounts are now visited
     $inventoryDTOs = array_values($requestDtosBySuID);
 
-    $stockBuffer = self::getNormalizedStockBuffer($configHelper, $loggerContract);
-
     // apply the stock buffer setting to each DTO sent to Wayfair, not to each warehouse
     foreach ($inventoryDTOs as $idx => $oneDTO) {
       $dtos[$idx] = self::applyStockBuffer($oneDTO, $stockBuffer);
@@ -255,42 +251,6 @@ class InventoryMapper
     $dto->setQuantityOnHand($netStock);
 
     return $dto;
-  }
-
-  /**
-   * Get the stock buffer value, normalized to 0
-   *
-   * @param AbstractConfigHelper $configHelper
-   * @param LoggerContract $loggerContract
-   * @return int
-   */
-  private static function getNormalizedStockBuffer($configHelper, $loggerContract)
-  {
-    $stockBuffer = null;
-    if (isset($configHelper)) {
-      $stockBuffer = $configHelper->getStockBufferValue();
-    }
-
-    if (isset($stockBuffer))
-    {
-      if ($stockBuffer >= 0)
-      {
-        return $stockBuffer;
-      }
-
-      // invalid value for buffer
-      if (isset($loggerContract)) {
-        $loggerContract->warning(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_STOCK_BUFFER),
-          [
-            'additionalInfo' => ['stockBuffer' => $stockBuffer],
-            'method' => __METHOD__
-          ]
-        );
-      }
-    }
-
-    return 0;
   }
 
   /**
