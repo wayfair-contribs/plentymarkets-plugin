@@ -7,6 +7,7 @@
 namespace Wayfair\Tests\Mappers;
 
 use Plenty\Modules\Item\VariationStock\Models\VariationStock;
+use Wayfair\Core\Dto\Inventory\RequestDTO;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Mappers\InventoryMapper;
 
@@ -23,62 +24,58 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Make sure a null stock row always returns null quantity on hand
-     */
-    public function testGetQuantityOnHandNullStock()
-    {
-        $configHelper = $this->createMock(AbstractConfigHelper::class);
-        $this->assertEquals(null, InventoryMapper::getQuantityOnHand(null, null), "both inputs null");
-        $this->assertEquals(null, InventoryMapper::getQuantityOnHand(null, $configHelper), "uninitialized confighelper");
-
-        $configHelper->method('getStockBufferValue')->will($this->returnValue(5));
-        $this->assertEquals(null, InventoryMapper::getQuantityOnHand(null, $configHelper), "configHelper with positive buffer");
-
-        $configHelper->method('getStockBufferValue')->will($this->returnValue(-5));
-        $this->assertEquals(null, InventoryMapper::getQuantityOnHand(null, $configHelper), "configHelper with negative buffer");
-    }
-
-    /**
-     * Make sure null config helper counts as zero stock buffer
-     */
-    public function testGetQuantityOnHandNullConfigHelper()
-    {
-        $variationStock = $this->createMock(VariationStock::class);
-        $this->assertEquals(null, InventoryMapper::getQuantityOnHand(null, null), "both inputs null should make null");
-        $this->assertEquals(null, InventoryMapper::getQuantityOnHand($variationStock, null), "uninitialized VariationStock should make null");
-
-        $variationStock->netStock = 5;
-        $this->assertEquals(5, InventoryMapper::getQuantityOnHand($variationStock, null), "VariationStock with positive stock should make postiive quantity");
-
-        $variationStock->netStock = -1;
-        $this->assertEquals(-1, InventoryMapper::getQuantityOnHand($variationStock, null), "VariationStock with negative one stock should make negative one quantity");
-
-        $variationStock->netStock = -5;
-        $this->assertEquals(-1, InventoryMapper::getQuantityOnHand($variationStock, null), "VariationStock with negative five stock should make negative one quantity");
-    }
-
-    /**
      * Test various stocks and buffers making quantity on hand
      * @dataProvider dataProviderForGetQuantityOnHand
      */
-    public function testGetQuantityOnHand($netStock, $buffer, $expected, $msg = null)
+    public function testGetQuantityOnHand($netStock, $expected, $msg = null)
     {
-        $configHelper = null;
         $variationStock = null;
 
-        // phpUnit 6.x (required for PHP 7.0.x) does not have createStub method.
-
-        if (isset($buffer)) {
-            $configHelper = $this->createMock(AbstractConfigHelper::class);
-            $configHelper->method('getStockBufferValue')->will($this->returnValue($buffer));
-        }
-
         if (isset($netStock)) {
+            // phpUnit 6.x (required for PHP 7.0.x) does not have createStub method.
             $variationStock = $this->createMock(VariationStock::class);
             $variationStock->netStock = $netStock;
         }
 
-        $result = InventoryMapper::getQuantityOnHand($variationStock, $configHelper);
+        $result = InventoryMapper::getQuantityOnHand($variationStock);
+
+        $this->assertEquals($expected, $result, $msg);
+    }
+
+    /**
+     * Stock buffer should be ignored when input DTO is null
+     *
+     * @return void
+     */
+    public function testApplyStockBufferNullDTO()
+    {
+        $this->assertNull(InventoryMapper::applyStockBuffer(null, -5));
+        $this->assertNull(InventoryMapper::applyStockBuffer(null, -1));
+        $this->assertNull(InventoryMapper::applyStockBuffer(null, 0));
+        $this->assertNull(InventoryMapper::applyStockBuffer(null, 1));
+        $this->assertNull(InventoryMapper::applyStockBuffer(null, 5));
+    }
+
+    /**
+     * Test various stocks and buffers making quantity on hand
+     * @dataProvider dataProviderForApplyStockBuffer
+     */
+    public function testApplyStockBuffer($onHand, $buffer, $expected, $msg = null)
+    {
+        $dtoData = [
+            'supplierId' => 12345,
+            'supplierPartNumber' => 'p324',
+            'quantityOnHand' => $onHand,
+            'quantityOnOrder' => 6,
+        ];
+
+        // RequestDTO::createFromArray uses PluginApp which doesn't work in test context.
+        /** @var RequestDTO */
+        $dto = new RequestDTO();
+        $dto->adoptArray($dtoData);
+
+        $dto = InventoryMapper::applyStockBuffer($dto, $buffer);
+        $result = $dto->getQuantityOnHand();
 
         $this->assertEquals($expected, $result, $msg);
     }
@@ -90,7 +87,7 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
      * @param [mixed] $mappingMode
      * @param [mixed] $expected
      * @param [string] $msg
-     * 
+     *
      * @dataProvider dataProviderForGetSupplierPartNumberFromVariation
      */
     public function testGetSupplierPartNumberFromVariation($variation, $mappingMode, $expected, $msg = null)
@@ -114,7 +111,7 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
             [-1, 0, -1, "negative 1 and zero should make negative 1"],
             [0, -1, -1, "zero and negative 1 should make negative 1"],
             [-1, 1, 1, "negative 1 and 1 should make positive 1"],
-            [1, -1, 1, "1 and negative 1 should make postiive 1"],
+            [1, -1, 1, "1 and negative 1 should make positive 1"],
             [0, 1, 1, "zero and 1 should make 1"],
             [1, 0, 1, "1 and zero should make 1"],
             [1, 1, 2, "1 and 1 should make 2"],
@@ -131,27 +128,38 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
     public function dataProviderForGetQuantityOnHand()
     {
         return [
-            [null, null, null, "null inputs should make null quanityOnHand"],
-            [null, 0, null, "null stock with zero buffer should make null quanityOnHand"],
-            [-5, -2, -1, "stock less than negative one with invalid buffer should make negative 1 quanityOnHand"],
-            [-5, 0, -1, "stock less than negative one with zero buffer should make negative 1 quanityOnHand"],
-            [-5, 5, -1, "stock less than negative one with postiive buffer should make negative 1 quanityOnHand"],
-            [-1, -2, -1, "negative one stock with invalid buffer should make negative 1 quanityOnHand"],
-            [-1, -1, -1, "negative one stock with negative one buffer should make negative 1 quantityOnHand"],
-            [-1, 0, -1, "negative one stock with zero buffer should make negative 1 quantityOnHand"],
-            [-1, 1, -1, "negative one stock with one buffer should make negative 1 quantityOnHand"],
-            [-1, 5, -1, "negative one stock with positive buffer should make negative 1 quantityOnHand"],
-            [0, null, 0, "zero stock with null buffer should make zero quanityOnHand"],
-            [0, -2, 0,  "zero stock with negative buffer should make zero quanityOnHand"],
-            [0, 0, 0,  "zero stock with zero buffer should make zero quanityOnHand"],
-            [0, 2, 0,  "zero stock with positive buffer should make zero quanityOnHand"],
-            [1, null, 1, "one stock with null buffer should make 1 quantityOnHand"],
-            [1, 0, 1, "one stock with zero buffer should make 1 quantityOnHand"],
-            [1, 1, 0, "one stock with 1 buffer should make 0 quantityOnHand"],
-            [2, 5, 0, "two stock with five buffer should make zero quantityOnHand"],
-            [5, -2, 5, "five stock with negative buffer should make five quantityOnHand"],
-            [5, 5, 0, "five stock with five buffer should make zero quantityOnHand"],
-            [5, 2, 3, "five stock with two buffer should make three quantityOnHand"]
+            [null, null, "null stock should make null quantityOnHand"],
+            [-5, -1, "stock less than negative one should make negative 1 quantityOnHand"],
+            [-1, -1, "negative one stock should make negative 1 quantityOnHand"],
+            [0, 0, "zero stock should make zero quantityOnHand"],
+            [1, 1, "one stock should make 1 quantityOnHand"],
+            [5, 5, "five stock should make five quantityOnHand"],
+        ];
+    }
+
+    public function dataProviderForApplyStockBuffer()
+    {
+        return [
+            [null, null, null, "null inputs should make null quantityOnHand"],
+            [null, 0, null, "null input with zero buffer should make null quantityOnHand"],
+            [-5, -2, -5, "input less than negative one with invalid buffer should not change output"],
+            [-5, 0, -5, "input less than negative one with zero buffer should not change output"],
+            [-5, 5, -5, "input less than negative one with positive buffer should not change output"],
+            [-1, -2, -1, "negative one input with invalid buffer should make negative 1 quantityOnHand"],
+            [-1, 0, -1, "negative one input with zero buffer should make negative 1 quantityOnHand"],
+            [-1, 1, -1, "negative one input with one buffer should make negative 1 quantityOnHand"],
+            [-1, 5, -1, "negative one input with positive buffer should make negative 1 quantityOnHand"],
+            [0, null, 0, "zero input with null buffer should make zero quantityOnHand"],
+            [0, -2, 0,  "zero input with negative buffer should make zero quantityOnHand"],
+            [0, 0, 0,  "zero input with zero buffer should make zero quantityOnHand"],
+            [0, 2, 0,  "zero input with positive buffer should make zero quantityOnHand"],
+            [1, null, 1, "one input with null buffer should make 1 quantityOnHand"],
+            [1, 0, 1, "one input with zero buffer should make 1 quantityOnHand"],
+            [1, 1, 0, "one input with 1 buffer should make 0 quantityOnHand"],
+            [2, 5, 0, "two input with five buffer should make zero quantityOnHand"],
+            [5, -2, 5, "five input with negative buffer should make five quantityOnHand"],
+            [5, 5, 0, "five input with five buffer should make zero quantityOnHand"],
+            [5, 2, 3, "five input with two buffer should make three quantityOnHand"]
         ];
     }
 
@@ -161,9 +169,9 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
 
         // cases with null variation
         $cases[] = [null, null, null, "Null inputs should result in not finding any part number"];
-        $cases[] = [null, AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER, null, "Null Variatoin with Number mode should result in not finding any part number"];
+        $cases[] = [null, AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER, null, "Null Variation with Number mode should result in not finding any part number"];
         $cases[] = [null, AbstractConfigHelper::ITEM_MAPPING_EAN, null, "Null Variation with EAN mode should result in not finding any part number"];
-        $cases[] = [null, AbstractConfigHelper::ITEM_MAPPING_SKU, null, "Null Variaton with SKU mode should result in not finding any part number"];
+        $cases[] = [null, AbstractConfigHelper::ITEM_MAPPING_SKU, null, "Null Variation with SKU mode should result in not finding any part number"];
 
         $keyId = 'id';
         $keyNumber = 'number';

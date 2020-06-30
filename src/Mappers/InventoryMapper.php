@@ -241,9 +241,9 @@ class InventoryMapper
    * @param RequestDTO $dto
    * @return RequestDTO
    */
-  private static function applyStockBuffer($dto, $stockBuffer)
+  static function applyStockBuffer($dto, $stockBuffer)
   {
-    if (!isset($dto) || !isset($stockBuffer) || $stockBuffer == 0) {
+    if (!isset($dto) || !isset($stockBuffer) || $stockBuffer <= 0) {
       // no buffer to apply
       return $dto;
     }
