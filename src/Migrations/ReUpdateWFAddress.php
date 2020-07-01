@@ -5,13 +5,6 @@
 
 namespace Wayfair\Migrations;
 
-use Plenty\Modules\Account\Contact\Contracts\ContactAddressRepositoryContract;
-use Wayfair\Core\Dto\General\AddressDTO;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
-use Wayfair\Core\Helpers\BillingAddress;
-use Wayfair\Mappers\AddressMapper;
-use Wayfair\Repositories\KeyValueRepository;
-use Plenty\Modules\Account\Address\Models\AddressRelationType;
 use Wayfair\Services\AddressService;
 
 /**

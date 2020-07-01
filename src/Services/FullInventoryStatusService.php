@@ -15,10 +15,12 @@ use Wayfair\Repositories\KeyValueRepository;
  */
 class FullInventoryStatusService
 {
-  const LOG_KEY_STATE_CHECK = "fullInventoryStateCheck";
+  const LOG_KEY_STATE_CHECK = 'fullInventoryStateCheck';
   const LOG_KEY_START = 'fullInventoryStart';
   const LOG_KEY_END = 'fullInventoryEnd';
   const LOG_KEY_FAILED = 'fullInventoryFailed';
+  const LOG_KEY_RESET = 'fullInventoryReset';
+  const LOG_KEY_STATE_CHANGE = 'fullInventoryStateChange';
 
   const STATUS = 'status';
   const STATE_CHANGE_TIMESTAMP = 'stateChangeTimestamp';
@@ -63,14 +65,30 @@ class FullInventoryStatusService
    * returning the old state.
    *
    * @param string $state
+   * @param string $timestamp
    * @return string
    */
-  private function setServiceState($state): string
+  private function setServiceState($state, $timestamp = null): string
   {
+    if (!isset($timestamp) || empty($timestamp)) {
+      $timestamp = self::getCurrentTimestamp();
+    }
+
     $oldState = $this->keyValueRepository->get(self::FULL_INVENTORY_CRON_STATUS);
-    $this->keyValueRepository->putOrReplace(self::FULL_INVENTORY_CRON_STATUS, $state);
-    // this replaces flaky code in KeyValueRepository that was attempting to do change tracking.
-    $this->keyValueRepository->putOrReplace(self::FULL_INVENTORY_STATUS_UPDATED_AT, self::getCurrentTimeStamp());
+
+    if ($oldState != $state) {
+      $this->keyValueRepository->putOrReplace(self::FULL_INVENTORY_CRON_STATUS, $state);
+      // this replaces flaky code in KeyValueRepository that was attempting to do change tracking.
+      $ts = $this->markStateChange($timestamp);
+
+      $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_STATE_CHANGE), [
+        'additionalInfo' => [
+          'oldState' => $oldState,
+          'newState' => $state
+        ],
+        'method' => __METHOD__
+      ]);
+    }
 
     return $oldState;
   }
@@ -168,14 +186,16 @@ class FullInventoryStatusService
       'method' => __METHOD__
     ]);
 
-    $ts = $this->markStateChange();
+    $ts = self::getCurrentTimestamp();
     $this->keyValueRepository->putOrReplace(self::FULL_INVENTORY_LAST_ATTEMPT, $ts);
-    $this->setServiceState(self::FULL_INVENTORY_CRON_RUNNING);
+    // timestamp on state change should match last attempt
+    $this->setServiceState(self::FULL_INVENTORY_CRON_RUNNING, $ts);
   }
 
   /**
    * Set the global timestamp for a successful sync to now, and update related fields
-   *
+   * @param bool $manual
+   * @param \Exception $exception
    * @return void
    */
   function markFullInventoryFailed(bool $manual = false, \Exception $exception = null)
@@ -185,19 +205,17 @@ class FullInventoryStatusService
       $info['errorMessage'] = $exception->getMessage();
     }
 
-    $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_FAILED), [
+    $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_FAILED), [
       'additionalInfo' => $info,
       'method' => __METHOD__
     ]);
 
-    $ts = $this->markStateChange();
-    $this->keyValueRepository->putOrReplace(self::FULL_INVENTORY_STATUS_UPDATED_AT, $ts);
     $this->keyValueRepository->putOrReplace(self::FULL_INVENTORY_SUCCESS, false);
     $this->setServiceState(self::FULL_INVENTORY_CRON_IDLE);
   }
 
   /**
-   * Set the global timestamp for a successful sync to now, and update related fields
+   * Set the global Timestamp for a successful sync to now, and update related fields
    *
    * @return void
    */
@@ -207,10 +225,11 @@ class FullInventoryStatusService
       'manual' => (string) $manual, 'method' => __METHOD__
     ]);
 
-    $ts = $this->markStateChange();
+    $ts = self::getCurrentTimestamp();
     $this->keyValueRepository->putOrReplace(self::FULL_INVENTORY_LAST_COMPLETION, $ts);
     $this->keyValueRepository->putOrReplace(self::FULL_INVENTORY_SUCCESS, true);
-    $this->setServiceState(self::FULL_INVENTORY_CRON_IDLE);
+    // timestamp on state change should match timestamp of last completion
+    $this->setServiceState(self::FULL_INVENTORY_CRON_IDLE, $ts);
   }
 
   /**
@@ -218,12 +237,15 @@ class FullInventoryStatusService
    *
    * @return string
    */
-  private function markStateChange(): string
+  private function markStateChange($timestamp = null): string
   {
-    $ts = self::getCurrentTimeStamp();
-    $this->keyValueRepository->putOrReplace(self::FULL_INVENTORY_STATUS_UPDATED_AT, $ts);
+    if (!isset($timestamp) || empty($timestamp)) {
+      $timestamp = self::getCurrentTimestamp();
+    }
 
-    return $ts;
+    $this->keyValueRepository->putOrReplace(self::FULL_INVENTORY_STATUS_UPDATED_AT, $timestamp);
+
+    return $timestamp;
   }
 
   /**
@@ -231,8 +253,24 @@ class FullInventoryStatusService
    *
    * @return string
    */
-  private static function getCurrentTimeStamp(): string
+  private static function getCurrentTimestamp(): string
   {
     return date('Y-m-d H:i:s.u P');
+  }
+
+  /**
+   * Clear status in case the plugin container was reset while service was running
+   *
+   * @return void
+   */
+  function markFullInventoryIdle(bool $manual = false)
+  {
+    $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_RESET), [
+      'additionalInfo' => ['manual' => (string) $manual],
+      'method' => __METHOD__
+    ]);
+
+    // rewind timestamp to when we last tried to sync
+    $this->setServiceState(self::FULL_INVENTORY_CRON_IDLE, $this->getLastAttemptTime());
   }
 }
