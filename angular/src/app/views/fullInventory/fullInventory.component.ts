@@ -221,12 +221,12 @@ export class FullInventoryComponent {
     this.updateLastCompletion(data.lastCompletion);
 
     this.updateSyncButton(data.status);
-    this.updateRefreshButton();
+    this.updateRefreshButton(data.status);
 
     return data.status;
   }
 
-  private updateLastCompletion(rawDate: string) {
+  private updateLastCompletion(rawDate: string = null) {
     let dateObj = null;
     if (rawDate) {
       dateObj = new Date(rawDate);
@@ -259,8 +259,10 @@ export class FullInventoryComponent {
       type: FullInventoryComponent.TEXT_CLASS_INFO,
     };
     this.latestInteractionTimestamp = loading;
-    this.updateSyncButton();
-    this.updateRefreshButton(FullInventoryComponent.STATE_LOADING);
+    let state = FullInventoryComponent.STATE_LOADING;
+    this.updateSyncButton(state);
+    this.updateRefreshButton(state);
+    this.updateLastCompletion();
   }
 
   private showRunning() {
@@ -273,8 +275,9 @@ export class FullInventoryComponent {
       type: FullInventoryComponent.TEXT_CLASS_INFO,
     };
     this.latestInteractionTimestamp = new Date().toLocaleString();
-    this.updateSyncButton(FullInventoryComponent.STATE_RUNNING);
-    this.updateRefreshButton(FullInventoryComponent.STATE_RUNNING);
+    let state = FullInventoryComponent.STATE_RUNNING;
+    this.updateSyncButton(state);
+    this.updateRefreshButton(state);
   }
 
   private showError() {
@@ -288,6 +291,6 @@ export class FullInventoryComponent {
     this.latestInteractionTimestamp = error;
     this.updateSyncButton();
     this.updateRefreshButton();
-    this.updateLastCompletion(null);
+    this.updateLastCompletion();
   }
 }
