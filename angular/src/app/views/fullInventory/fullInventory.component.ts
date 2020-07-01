@@ -35,6 +35,12 @@ export class FullInventoryComponent {
    */
   private static readonly REFRESH_INTERVAL = 300000;
 
+  /**
+   * The amount of time before we warn about overdue sync
+   * (One day)
+   */
+  private static readonly OVERDUE_PERIOD = 1000 * 60 * 60 * 24;
+
   @Language()
   public lang: string;
 
@@ -231,15 +237,15 @@ export class FullInventoryComponent {
     if (dateObj instanceof Date && !isNaN(dateObj.valueOf())) {
       this.successfulServiceCompletionTimestamp = dateObj.toLocaleString();
 
-      let now = new Date();
-      let dueDate = new Date();
-      dueDate.setDate(dateObj.getDate() + 1);
-
-      this.syncOverdue = dueDate < now;
+      // check if there is over a day between the last sync and now
+      this.syncOverdue =
+        Date.now() - dateObj.getTime() > FullInventoryComponent.OVERDUE_PERIOD;
     } else {
       this.successfulServiceCompletionTimestamp = this.translation.translate(
         FullInventoryComponent.TRANSLATION_KEY_UNKNOWN
       );
+
+      this.syncOverdue = true;
     }
   }
 
