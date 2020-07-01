@@ -65,7 +65,7 @@ export class FullInventoryComponent {
 
   private syncSubscription = null;
 
-  public syncOverdue: boolean = false;
+  public lastGoodSyncWithinWindow: boolean = false;
 
   public constructor(
     private fullInventoryService: FullInventoryService,
@@ -238,14 +238,14 @@ export class FullInventoryComponent {
       this.successfulServiceCompletionTimestamp = dateObj.toLocaleString();
 
       // check if there is over a day between the last sync and now
-      this.syncOverdue =
-        Date.now() - dateObj.getTime() > FullInventoryComponent.OVERDUE_PERIOD;
+      this.lastGoodSyncWithinWindow =
+        Date.now() - dateObj.getTime() < FullInventoryComponent.OVERDUE_PERIOD;
     } else {
       this.successfulServiceCompletionTimestamp = this.translation.translate(
         FullInventoryComponent.TRANSLATION_KEY_UNKNOWN
       );
 
-      this.syncOverdue = true;
+      this.lastGoodSyncWithinWindow = false;
     }
   }
 
@@ -288,5 +288,6 @@ export class FullInventoryComponent {
     this.latestInteractionTimestamp = error;
     this.updateSyncButton();
     this.updateRefreshButton();
+    this.updateLastCompletion(null);
   }
 }
