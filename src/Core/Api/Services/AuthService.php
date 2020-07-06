@@ -23,6 +23,7 @@ class AuthService implements AuthContract
   const STORAGE_KEY_TOKEN = 'token';
 
   const LOG_KEY_ATTEMPTING_AUTH = 'attemptingAuthentication';
+  const LOG_KEY_NEW_TOKEN = 'gotNewAuthToken';
 
   const HEADER_KEY_CONTENT_TYPE = "Content-Type";
 
@@ -172,18 +173,42 @@ class AuthService implements AuthContract
       throw new AuthException("Unable to authorize user: " . $responseArray['error']);
     }
 
-    $this->saveToken($responseArray);
+    $tokenArray = [];
+    try {
+      $tokenArray = $this->saveToken($responseArray);
+    } catch (\Exception $e) {
+      throw new AuthException("Unable to save Auth Token", 0, $e);
+    }
+
+    if (!self::validateToken($tokenArray)) {
+      throw new AuthException("Did not receive valid auth token data");
+    }
+
+    $this->loggerContract
+    ->debug(
+      TranslationHelper::getLoggerKey(self::LOG_KEY_NEW_TOKEN),
+      [
+        'additionalInfo' =>
+        [
+          'maskedToken' => StringHelper::mask($tokenArray[self::ACCESS_TOKEN]);
+        ],
+        'method' => __METHOD__
+      ]
+    );
   }
 
   /**
+   * Set the token's save time, save it, and return it.
    * @param array $token
    *
-   * @return void
+   * @return array
    */
   private function saveToken($token)
   {
     $token[self::STORE_TIME] = time();
     $this->store->set(self::STORAGE_KEY_TOKEN, json_encode($token));
+
+    return $token;
   }
 
   /**
