@@ -143,6 +143,9 @@ class OrderService
     if (count($orders)) {
       $this->process($externalLogs, $circle + 1);
     }
+
+    // do NOT send $externalLogs to Wayfair.
+    // The caller MUST send the external logs, due to the recursive nature of this function.
   }
 
   /**
