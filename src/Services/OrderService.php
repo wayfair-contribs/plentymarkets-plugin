@@ -20,6 +20,7 @@ class OrderService
   const LOG_KEY_FAILED_TO_CREATE_ORDER = 'failedToCreateOrder';
   const LOG_KEY_ORDER_CREATION_INCOMPLETE = 'orderCreatedButIncomplete';
   const LOG_KEY_FETCH_FAILED = 'failedToFetchOrders';
+  const LOG_KEY_STARTING_FETCH = 'fetchingOrders';
 
   /**
    * @var FetchOrderService
@@ -82,17 +83,28 @@ class OrderService
     $timeStartFetch = TimeHelper::getMilliseconds();
     $orders = [];
     try {
+
+      $this->loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_STARTING_FETCH), [
+        'method' => __METHOD__
+      ]);
+
       $orders = $this->fetchOrderService->fetch($circle);
       $receivedOrdersDuration = TimeHelper::getMilliseconds() - $timeStartFetch;
       $externalLogs->addPurchaseOrderLog('PO fetching', 'poReceived', count($orders), $receivedOrdersDuration);
     } catch (\Exception $e) {
 
-      $this->loggerContract->error(TranslationHelper::getLoggerKey(self::LOG_KEY_FETCH_FAILED), [
-        'exception' => $e,
-        'exceptionType' => get_class($e),
-        'exceptionMessage' => $e->getMessage(),
-        'method' => __METHOD__
-      ]);
+      $this->loggerContract->error(
+        TranslationHelper::getLoggerKey(self::LOG_KEY_FETCH_FAILED),
+        [
+          'additionalInfo' =>
+          [
+            'exception' => $e,
+            'exceptionType' => get_class($e),
+            'exceptionMessage' => $e->getMessage(),
+          ],
+          'method' => __METHOD__
+        ]
+      );
 
       $receiveFailedOrdersDuration = TimeHelper::getMilliseconds() - $timeStartFetch;
       $externalLogs->addErrorLog($e->getMessage());
