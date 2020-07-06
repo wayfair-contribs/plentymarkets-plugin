@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright 2020 Wayfair LLC - All rights reserved
  */
@@ -37,6 +38,7 @@ use Wayfair\Repositories\WarehouseSupplierRepository;
 class CreateOrderService
 {
   const LOG_KEY_ORDERS_ALREADY_EXIST = 'createOrderAlreadyExists';
+  const LOG_KEY_CREATING_ORDER = 'creatingNewOrder';
 
   /**
    * @var PurchaseOrderMapper
@@ -127,8 +129,7 @@ class CreateOrderService
     PendingOrdersRepository $pendingOrdersRepository,
     SavePackingSlipService $savePackingSlipService,
     AddressService $addressService
-  )
-  {
+  ) {
     $this->purchaseOrderMapper = $purchaseOrderMapper;
     $this->addressMapper = $addressMapper;
     $this->orderRepositoryContract = $orderRepositoryContract;
@@ -150,17 +151,18 @@ class CreateOrderService
    *  - Wayfair data from APIs (packing slips, etc)
    *  - Stored values in the plentymarkets system
    *
-   * If an order already exists for the Wayfair PO, returns false.
-   * Otherwise, attempts to create all Plentymarkets artifacts for an order, then creates the order and returns true.
+   * If an order already exists for the Wayfair PO, returns a negative number.
+   * If an order cannot be created, returns 0.
+   * Otherwise, attempts to create all Plentymarkets artifacts for an order, then creates the order and returns the Order's positive ID
    *
    * If the order cannot be created for any reason, throws an Exception.
    *
    * @param ResponseDTO $dto
    *
-   * @return bool
+   * @return int
    * @throws \Exception
    */
-  public function create(ResponseDTO $dto): bool
+  public function create(ResponseDTO $dto): int
   {
     /**
      * @var AbstractConfigHelper $configHelper
@@ -202,14 +204,19 @@ class CreateOrderService
       $numberOfOrdersForPO = $orderList->getTotalCount();
       if ($numberOfOrdersForPO > 0) {
         // orders exist for the Wayfair PO. Do not create another one.
-        $loggerContract->info(TranslationHelper::getLoggerKey(self::LOG_KEY_ORDERS_ALREADY_EXIST), [
+        $loggerContract->warning(TranslationHelper::getLoggerKey(self::LOG_KEY_ORDERS_ALREADY_EXIST), [
           'additionalInfo' => ['poNumber' => $poNumber, 'orders' => $orderList->getResult()],
           'method' => __METHOD__
         ]);
 
         $externalLogs->addInfoLog("Order creation skipped - found " . $numberOfOrdersForPO . " already created for PO " . $poNumber);
-        return false;
+        return -1;
       }
+
+      $loggerContract->info(TranslationHelper::getLoggerKey(self::LOG_KEY_CREATING_ORDER), [
+        'additionalInfo' => ['poNumber' => $poNumber],
+        'method' => __METHOD__
+      ]);
 
       // Get payment method id
       // Create billing address and delivery address
@@ -266,8 +273,13 @@ class CreateOrderService
       }
 
       $orderData = $this->purchaseOrderMapper->map(
-        $dto, $billing['addressId'], $billing['contactId'], $delivery['addressId'], $referrerId, $warehouseId,
-        (string)AbstractConfigHelper::PAYMENT_METHOD_INVOICE
+        $dto,
+        $billing['addressId'],
+        $billing['contactId'],
+        $delivery['addressId'],
+        $referrerId,
+        $warehouseId,
+        (string) AbstractConfigHelper::PAYMENT_METHOD_INVOICE
       );
 
       if (!isset($orderData) || empty($orderData)) {
@@ -287,6 +299,7 @@ class CreateOrderService
        */
 
       if (!$this->createPendingOrder($dto)) {
+        // FIXME: Plentymarkets Order exists but it can never be accepted, or operated on.
         throw new \Exception("Unable to create pending order entry for order " . $order . " PO: " . $poNumber);
       }
 
@@ -301,8 +314,7 @@ class CreateOrderService
 
       // Create order payment relation
       $paymentRelation = $this->paymentOrderRelationRepositoryContract->createOrderRelation($payment, $order);
-      if (!isset($paymentRelation) || !$paymentRelation->id)
-      {
+      if (!isset($paymentRelation) || !$paymentRelation->id) {
         throw new \Exception("Unable to relate payment " . $paymentID . " with order " . $orderId);
       }
 
@@ -318,7 +330,7 @@ class CreateOrderService
         throw new \Exception("Unable to add packing slip to order " . $order . " PO: " . $poNumber);
       }
 
-      return true;
+      return $orderId;
     } finally {
       if (count($externalLogs->getLogs())) {
         /** @var LogSenderService $logSenderService */
@@ -361,5 +373,4 @@ class CreateOrderService
 
     return $this->paymentRepositoryContract->createPayment($data);
   }
-
 }

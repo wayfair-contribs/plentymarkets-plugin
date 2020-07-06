@@ -8,7 +8,6 @@ namespace Wayfair\Core\Api\Services;
 use Wayfair\Core\Api\APIService;
 use Wayfair\Core\Dto\PurchaseOrder\ResponseDTO;
 use Wayfair\Core\Exceptions\GraphQLQueryException;
-use Wayfair\Helpers\TranslationHelper;
 
 class FetchOrderService extends APIService {
   const FETCH_LIMIT = 50;
