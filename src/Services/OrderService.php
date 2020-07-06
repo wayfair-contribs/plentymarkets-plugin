@@ -109,6 +109,7 @@ class OrderService
 
         $logInfo = [
           'exception' => $e,
+          'exceptionType' => get_class($e),
           'message' => $e->getMessage(),
           'stackTrace' => $e->getTrace(),
           'po' => $order->getPoNumber(),
