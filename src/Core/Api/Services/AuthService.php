@@ -241,7 +241,7 @@ class AuthService implements AuthContract
     }
 
     // previous check proved that the two timestamps are set
-    if (!count($issues) && ($token[self::EXPIRES_IN] + $token[self::STORE_TIME]) > time())
+    if (!count($issues) && ($token[self::EXPIRES_IN] + $token[self::STORE_TIME]) <= time())
     {
       $issues[] = 'Token has expired';
     }
