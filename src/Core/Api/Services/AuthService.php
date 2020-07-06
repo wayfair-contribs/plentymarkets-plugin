@@ -190,7 +190,7 @@ class AuthService implements AuthContract
       [
         'additionalInfo' =>
         [
-          'maskedToken' => StringHelper::mask($tokenArray[self::ACCESS_TOKEN]);
+          'maskedToken' => StringHelper::mask($tokenArray[self::ACCESS_TOKEN])
         ],
         'method' => __METHOD__
       ]
