@@ -39,6 +39,7 @@ class CreateOrderService
 {
   const LOG_KEY_ORDERS_ALREADY_EXIST = 'createOrderAlreadyExists';
   const LOG_KEY_CREATING_ORDER = 'creatingNewOrder';
+  const LOG_KEY_PENDING_ORDER_MAY_EXIST = 'pendingOrderMayExist';
 
   /**
    * @var PurchaseOrderMapper
@@ -210,6 +211,11 @@ class CreateOrderService
         ]);
 
         $externalLogs->addInfoLog("Order creation skipped - found " . $numberOfOrdersForPO . " already created for PO " . $poNumber);
+
+        // make sure that we (re)accept this order,
+        // as the presence of the Plentymarkets Order means it should no longer be "open."
+        $this->createPendingOrder($dto);
+
         return -1;
       }
 
@@ -341,12 +347,36 @@ class CreateOrderService
   }
 
   /**
+   * Create a Pending Order record for a Purchase Order,
+   * if not already existing.
    * @param ResponseDTO $dto
    *
    * @return void
    */
   private function createPendingOrder(ResponseDTO $dto): bool
   {
+    $poNumber = $dto->getPoNumber();
+    $pendingOrder = null;
+    try {
+      $pendingOrder = $this->pendingOrdersRepository->get($poNumber);
+    } catch (\Exception $e) {
+      /** @var LoggerContract $loggerContract */
+      $loggerContract = pluginApp(LoggerContract::class);
+
+      $loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_PENDING_ORDER_MAY_EXIST), [
+        'exception' => $e,
+        'exceptionType' => get_class($e),
+        'exceptionMessage' => $e->getMessage(),
+        'additionalInfo' => ['poNumber' => $poNumber],
+        'method' => __METHOD__
+      ]);
+    }
+
+    if (isset($pendingOrder)) {
+      // PO already queued for acceptance
+      return true;
+    }
+
     $pendingOrder = $this->pendingPurchaseOrderMapper->map($dto);
     return $this->pendingOrdersRepository->insert($pendingOrder);
   }
