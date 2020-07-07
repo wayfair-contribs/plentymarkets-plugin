@@ -52,15 +52,15 @@ class RegisterPurchaseOrderService extends APIService implements RegisterPurchas
 
       $responseBody = $response->getBodyAsArray();
       $this->loggerContract
-        ->info(TranslationHelper::getLoggerKey('registerMutationQueryResponse'), ['additionalInfo' => ['responseBody' => $responseBody], 'method' => __METHOD__]);
+        ->debug(TranslationHelper::getLoggerKey('registerMutationQueryResponse'), ['additionalInfo' => ['responseBody' => $responseBody], 'method' => __METHOD__]);
 
-      // FIXME: use $response->getError()
-      if (isset($responseBody['errors']) || empty($responseBody['data']['purchaseOrders']['register'])) {
+      $errors = $response->getError();
+      if ((isset($errors) && !empty($errors)) || empty($responseBody['data']['purchaseOrders']['register'])) {
         $this->loggerContract
           ->error(
             TranslationHelper::getLoggerKey(self::LOG_KEY_UNABLE_TO_REGISTER_ORDER),
             [
-              'additionalInfo' => ['error' => $responseBody['errors']],
+              'additionalInfo' => ['error' => $errors],
               'method' => __METHOD__,
               'referenceType' => 'poNumber',
               'referenceValue' => $requestDTO->getPoNumber()

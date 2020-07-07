@@ -33,12 +33,12 @@ class FetchOrderService extends APIService
     }
 
     $body = $response->getBodyAsArray();
-    if ($response->getStatusCode() != 200 || isset($body['errors']) || !isset($body['data']['purchaseOrders'])) {
+    $errors = $response->getError();
+    if ($response->getStatusCode() != 200 || (isset($errors) && !empty($errors)) || !isset($body['data']['purchaseOrders'])) {
       $message = 'Failed to fetch purchase orders. Status code: ' . $response->getStatusCode();
 
-      // FIXME: use $response->getError()
-      if (isset($body['errors'])) {
-        $message .= ' Errors: ' . json_encode($body['errors']);
+      if (isset($errors) && !empty($errors)) {
+        $message .= ' Errors: ' . json_encode($errors);
       }
 
       throw new \Exception($message);

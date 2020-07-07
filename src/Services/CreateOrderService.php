@@ -305,7 +305,6 @@ class CreateOrderService
        */
 
       if (!$this->createPendingOrder($dto)) {
-        // FIXME: Plentymarkets Order exists but it can never be accepted, or operated on.
         throw new \Exception("Unable to create pending order entry for order " . $order . " PO: " . $poNumber);
       }
 
