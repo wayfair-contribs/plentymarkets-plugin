@@ -277,7 +277,7 @@ class CreateOrderService
 
       if (!isset($supplierID))
       {
-        throw new \Exception("PO's Warehouse information is missing a Supplier ID" . $poNumber);
+        throw new \Exception("PO " . $poNumber . " contains Warehouse information that is missing an ID: " . json_encode($warehouse));
       }
 
       $plentyWarehouseId = $this->warehouseSupplierRepository->findBySupplierId($supplierID);
