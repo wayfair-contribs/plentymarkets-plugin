@@ -101,6 +101,8 @@ class ProductMapper
      * @var LoggerContract $loggerContract
      */
     $loggerContract = pluginApp(LoggerContract::class);
+
+    // FIXME: the poNumber is 0 when this log appears
     $loggerContract
       ->warning(
         TranslationHelper::getLoggerKey('variationNotFound'),

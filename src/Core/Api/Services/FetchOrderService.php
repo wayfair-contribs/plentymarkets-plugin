@@ -128,6 +128,8 @@ class FetchOrderService extends APIService
       . 'estShipDate, '
       . 'fillDate, '
       . 'sku, '
+      // TODO: include 'isCancelled' after it stops causing issues (2020-Jul-07)
+      // . 'isCancelled, '
       . 'twoDayGuaranteeDeliveryDeadline, '
       . 'customComment '
       . '}, '
