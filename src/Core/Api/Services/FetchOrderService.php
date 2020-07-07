@@ -27,13 +27,13 @@ class FetchOrderService extends APIService {
     $query = $this->getQuery($circle);
 
     $response = $this->query($query);
-    $loggerContract->debug('Test',
-    // $loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_UNABLE_TO_REGISTER_ORDER),
+    // $loggerContract->debug('Test',
+    $loggerContract->debug(TranslationHelper::getLoggerKey('Test'),
           [
             'query' => $query,
             'response' => $response,
             'method' => __METHOD__
-          ],
+          ]
         );
 
     if (!isset($response))
