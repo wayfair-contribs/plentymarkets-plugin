@@ -49,7 +49,7 @@ class OrderAcceptCron extends Cron {
     $loggerContract->debug(TranslationHelper::getLoggerKey('cronStartedMessage'), ['method' => __METHOD__]);
     try{
       $this->orderService->accept($externalLogs, 1);
-      $loggerContract->debug(TranslationHelper::getLoggerKey('In try block of Order Accept cron'), ['additionalInfo'=> $this->orderService->accept($externalLogs, 1),'method' => __METHOD__]);
+      // $loggerContract->debug(TranslationHelper::getLoggerKey('test'), ['additionalInfo'=> $this->orderService->accept($externalLogs, 1),'method' => __METHOD__]);
     }
     finally {
       if (count($externalLogs->getLogs())) {
