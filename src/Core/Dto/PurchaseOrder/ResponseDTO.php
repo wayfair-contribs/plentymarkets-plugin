@@ -10,96 +10,96 @@ use Wayfair\Core\Dto\General\WarehouseDTO;
 use Wayfair\Core\Dto\General\ProductDTO;
 use Wayfair\Core\Dto\General\AddressDTO;
 
-class ResponseDTO implements \JsonSerializable {
+class ResponseDTO {
   /**
    * @var string
    */
-  private $storePrefix;
+  public $storePrefix;
 
   /**
    * @var string
    */
-  private $poNumber;
+  public $poNumber;
 
   /**
    * @var string
    */
-  private $poDate;
+  public $poDate;
 
   /**
    * @var string
    */
-  private $estimatedShipDate;
+  public $estimatedShipDate;
 
   /**
    * @var string
    */
-  private $deliveryMethodCode;
+  public $deliveryMethodCode;
 
   /**
    * @var string
    */
-  private $customerName;
+  public $customerName;
 
   /**
    * @var string
    */
-  private $customerAddress1;
+  public $customerAddress1;
 
   /**
    * @var string
    */
-  private $customerAddress2;
+  public $customerAddress2;
 
   /**
    * @var string
    */
-  private $customerCity;
+  public $customerCity;
 
   /**
    * @var string
    */
-  private $customerState;
+  public $customerState;
 
   /**
    * @var string
    */
-  private $customerPostalCode;
+  public $customerPostalCode;
 
   /**
    * @var string
    */
-  private $salesChannelName;
+  public $salesChannelName;
 
   /**
    * @var string
    */
-  private $orderType;
+  public $orderType;
 
   /**
    * @var string
    */
-  private $packingSlipUrl;
+  public $packingSlipUrl;
 
   /**
    * @var WarehouseDTO
    */
-  private $warehouse;
+  public $warehouse;
 
   /**
    * @var ProductDTO[]
    */
-  private $products;
+  public $products;
 
   /**
    * @var AddressDTO
    */
-  private $shipTo;
+  public $shipTo;
 
   /**
    * @var BillingInfoDTO
    */
-  private $billingInfo;
+  public $billingInfo;
 
   /**
    * @return string
@@ -420,10 +420,5 @@ class ResponseDTO implements \JsonSerializable {
     $dto->setShipTo($params['shipTo'] ?? []);
     $dto->setBillingInfo($params['billingInfo'] ?? []);
     return $dto;
-  }
-
-  public function jsonSerialize()
-  {
-    return get_object_vars($this);
   }
 }
