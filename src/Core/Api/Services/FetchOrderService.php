@@ -111,7 +111,7 @@ class FetchOrderService extends APIService {
           . 'estShipDate, '
           . 'fillDate, '
           . 'sku, '
-          . 'isCancelled, '
+          // . 'isCancelled, '
           . 'twoDayGuaranteeDeliveryDeadline, '
           . 'customComment '
         . '}, '
