@@ -119,8 +119,6 @@ class OrderService
       $plentyOrderId = 0;
       try {
 
-        // TODO: add plenty log about starting to create an order for PO
-
         $plentyOrderId = $this->createOrderService->create($order);
         if ($plentyOrderId < 0) {
           $externalLogs->addErrorLog('Order already exists, PO: ' . $order->getPoNumber());

@@ -220,7 +220,10 @@ class CreateOrderService
       }
 
       $loggerContract->info(TranslationHelper::getLoggerKey(self::LOG_KEY_CREATING_ORDER), [
-        'additionalInfo' => ['poNumber' => $poNumber],
+        'additionalInfo' => [
+          'poNumber' => $poNumber,
+          'dto' => $dto
+        ],
         'method' => __METHOD__
       ]);
 
@@ -275,8 +278,7 @@ class CreateOrderService
 
       $supplierID = $warehouse->getId();
 
-      if (!isset($supplierID))
-      {
+      if (!isset($supplierID)) {
         throw new \Exception("PO " . $poNumber . " contains Warehouse information that is missing an ID: " . json_encode($warehouse));
       }
 
