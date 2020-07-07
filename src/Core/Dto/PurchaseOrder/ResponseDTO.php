@@ -14,92 +14,92 @@ class ResponseDTO {
   /**
    * @var string
    */
-  public $storePrefix;
+  private $storePrefix;
 
   /**
    * @var string
    */
-  public $poNumber;
+  private $poNumber;
 
   /**
    * @var string
    */
-  public $poDate;
+  private $poDate;
 
   /**
    * @var string
    */
-  public $estimatedShipDate;
+  private $estimatedShipDate;
 
   /**
    * @var string
    */
-  public $deliveryMethodCode;
+  private $deliveryMethodCode;
 
   /**
    * @var string
    */
-  public $customerName;
+  private $customerName;
 
   /**
    * @var string
    */
-  public $customerAddress1;
+  private $customerAddress1;
 
   /**
    * @var string
    */
-  public $customerAddress2;
+  private $customerAddress2;
 
   /**
    * @var string
    */
-  public $customerCity;
+  private $customerCity;
 
   /**
    * @var string
    */
-  public $customerState;
+  private $customerState;
 
   /**
    * @var string
    */
-  public $customerPostalCode;
+  private $customerPostalCode;
 
   /**
    * @var string
    */
-  public $salesChannelName;
+  private $salesChannelName;
 
   /**
    * @var string
    */
-  public $orderType;
+  private $orderType;
 
   /**
    * @var string
    */
-  public $packingSlipUrl;
+  private $packingSlipUrl;
 
   /**
    * @var WarehouseDTO
    */
-  public $warehouse;
+  private $warehouse;
 
   /**
    * @var ProductDTO[]
    */
-  public $products;
+  private $products;
 
   /**
    * @var AddressDTO
    */
-  public $shipTo;
+  private $shipTo;
 
   /**
    * @var BillingInfoDTO
    */
-  public $billingInfo;
+  private $billingInfo;
 
   /**
    * @return string

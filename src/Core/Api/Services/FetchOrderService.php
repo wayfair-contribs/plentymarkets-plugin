@@ -7,12 +7,16 @@
 namespace Wayfair\Core\Api\Services;
 
 use Wayfair\Core\Api\APIService;
+use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\PurchaseOrder\ResponseDTO;
 use Wayfair\Core\Exceptions\GraphQLQueryException;
+use Wayfair\Helpers\TranslationHelper;
 
 class FetchOrderService extends APIService
 {
   const FETCH_LIMIT = 50;
+
+  const LOG_KEY_INCOMING_PO = 'incomingPurchaseOrder';
 
   /**
    * @param int $circle
@@ -24,6 +28,9 @@ class FetchOrderService extends APIService
    */
   public function fetch(int $circle): array
   {
+    /** @var LoggerContract $loggerContract */
+    $loggerContract = pluginApp(LoggerContract::class);
+
     $query = $this->getQuery($circle);
 
     $response = $this->query($query);
@@ -47,6 +54,16 @@ class FetchOrderService extends APIService
     $result = [];
     $purchaseOrders = $body['data']['purchaseOrders'];
     foreach ($purchaseOrders as $purchaseOrder) {
+      $loggerContract->debug(
+        TranslationHelper::getLoggerKey(self::LOG_KEY_INCOMING_PO),
+        [
+          'additionalInfo' => [
+            'PO' => $purchaseOrder
+          ],
+          'method' => __METHOD__
+        ]
+      );
+
       $result[] = ResponseDTO::createFromArray($purchaseOrder);
     }
 
