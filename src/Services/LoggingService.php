@@ -140,9 +140,9 @@ class LoggingService implements LoggerContract
 
       if (strlen(json_encode($loggingInfo)) > self::STRING_LIMIT) {
         $logForKibana = [];
-        $shortMessage['message'] = self::LOG_KEY_MESSAGE_TO_LONG . $clientID . '-' . date('M d Y H:i:s');
+        $shortMessage['message'] = self::LOG_KEY_MESSAGE_TO_LONG . ':' . $clientID . '-' . date('M d Y H:i:s');
         $additionalInfo = $shortMessage;
-        $logForKibana['message'] = self::LOG_KEY_MESSAGE_TO_LONG . $clientID . '-' . date('D, d M Y H:i:s');
+        $logForKibana['message'] = self::LOG_KEY_MESSAGE_TO_LONG . ':' . $clientID . '-' . date('D, d M Y H:i:s');
         $logForKibana['details'] = $loggingInfo;
         $externalLogs->addErrorLog(json_encode($logForKibana));
       }

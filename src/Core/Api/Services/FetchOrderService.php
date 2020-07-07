@@ -9,6 +9,7 @@ use Wayfair\Core\Api\APIService;
 use Wayfair\Core\Dto\PurchaseOrder\ResponseDTO;
 use Wayfair\Core\Exceptions\GraphQLQueryException;
 use Wayfair\Helpers\TranslationHelper;
+use Wayfair\Core\Contracts\LoggerContract;
 
 class FetchOrderService extends APIService {
   const FETCH_LIMIT = 50;
@@ -22,9 +23,17 @@ class FetchOrderService extends APIService {
    * @throws \Exception
    */
   public function fetch(int $circle): array {
+    $loggerContract = pluginApp(LoggerContract::class);
     $query = $this->getQuery($circle);
 
     $response = $this->query($query);
+    loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_UNABLE_TO_REGISTER_ORDER),
+          [
+            'query' => $query,
+            'response' => $response,
+            'method' => __METHOD__
+          ],
+        );
 
     if (!isset($response))
     {
