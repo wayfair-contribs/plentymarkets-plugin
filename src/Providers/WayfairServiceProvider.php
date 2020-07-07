@@ -76,7 +76,7 @@ class WayfairServiceProvider extends ServiceProvider
     EventProceduresService $eventProceduresService
   ) {
     // register crons
-    $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, OrderImportCron::class);
+    $cronContainer->add(CronContainer::EVERY_FIVE_MINUTES, OrderImportCron::class);
     $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, InventorySyncCron::class);
     $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, OrderAcceptCron::class);
     $cronContainer->add(CronContainer::DAILY, InventoryFullCron::class);
