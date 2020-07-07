@@ -118,6 +118,9 @@ class OrderService
     foreach ($orders as $order) {
       $plentyOrderId = 0;
       try {
+
+        // TODO: add plenty log about starting to create an order for PO
+
         $plentyOrderId = $this->createOrderService->create($order);
         if ($plentyOrderId < 0) {
           $externalLogs->addErrorLog('Order already exists, PO: ' . $order->getPoNumber());
@@ -159,6 +162,9 @@ class OrderService
       }
     }
     $createdOrdersDuration = TimeHelper::getMilliseconds() - $timeStartCreation;
+
+    // TODO: add plenty log about finished fetching + creating orders
+
     $externalLogs->addPurchaseOrderLog('PO creating', 'poCreated', $createdOrdersCount, $createdOrdersDuration);
     $externalLogs->addPurchaseOrderLog('PO creating', 'poFailed', $failedOrdersCount, $createdOrdersDuration);
     if (count($orders)) {
@@ -188,8 +194,13 @@ class OrderService
     foreach ($pendingOrders as $pendingOrder) {
       $poNum = $pendingOrder->poNum;
       $items = \json_decode($pendingOrder->items, true);
+
+      // TODO: add plenty log about attempting to accept order
+
       if ($this->acceptOrderService->accept($poNum, $items)) {
         $acceptedOrders[] = $poNum;
+
+        // TODO: add plenty log about finished accepting order
       } else {
         $externalLogs->addPurchaseOrderLog('PO accept failed', 'poAcceptFailed', 1, TimeHelper::getMilliseconds() - $ms);
         $externalLogs->addErrorLog('Failed to accept PO: ' . $poNum);

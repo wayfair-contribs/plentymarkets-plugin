@@ -150,6 +150,7 @@ class InventoryService extends APIService
 
       $responseBody = $response->getBodyAsArray();
 
+      // FIXME: use $response->getError()
       if (isset($responseBody['errors'])) {
         throw new \Exception("Unable to update inventory due to errors." .
           " Response from  Wayfair: " . \json_encode($responseBody));

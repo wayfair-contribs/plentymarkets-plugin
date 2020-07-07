@@ -35,6 +35,8 @@ class FetchOrderService extends APIService
     $body = $response->getBodyAsArray();
     if ($response->getStatusCode() != 200 || isset($body['errors']) || !isset($body['data']['purchaseOrders'])) {
       $message = 'Failed to fetch purchase orders. Status code: ' . $response->getStatusCode();
+
+      // FIXME: use $response->getError()
       if (isset($body['errors'])) {
         $message .= ' Errors: ' . json_encode($body['errors']);
       }
@@ -108,7 +110,6 @@ class FetchOrderService extends APIService
       . 'estShipDate, '
       . 'fillDate, '
       . 'sku, '
-      . 'isCancelled, '
       . 'twoDayGuaranteeDeliveryDeadline, '
       . 'customComment '
       . '}, '
