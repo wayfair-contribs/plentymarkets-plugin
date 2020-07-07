@@ -72,11 +72,12 @@ class InventoryMapper
 
         $variationId = $variationStock->variationId;
 
-        $loggerContract->warning(
+        $loggerContract->info(
           TranslationHelper::getLoggerKey(self::LOG_KEY_NORMALIZING_INVENTORY),
           [
             'additionalInfo' => [
               'variationId' => $variationId,
+              'originalNetStock' => $netStock
             ],
             'method' => __METHOD__
           ]
