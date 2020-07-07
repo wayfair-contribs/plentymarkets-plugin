@@ -52,9 +52,9 @@ class OrderImportCron extends Cron {
       $this->loggerContract->debug(TranslationHelper::getLoggerKey('cronStartedMessage'), ['method' => __METHOD__]);
       $this->orderService->process($externalLogs, 1);
     }
-    // catch(\Exception $e) {
-    //   $this->loggerContract->error();
-    //   }
+    catch(\Exception $e) {
+      $this->loggerContract->error('Import Cron Error', ['addtionalInfo'=> $this->orderService->process($externalLogs, 1) ,'message' => $e->message, 'method' => __METHOD__]);
+      }
     finally {
       if (count($externalLogs->getLogs())) {
         $this->logSenderService->execute($externalLogs->getLogs());
