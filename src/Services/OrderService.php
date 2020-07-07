@@ -74,6 +74,7 @@ class OrderService {
     $ms = TimeHelper::getMilliseconds();
     try {
       $orders = $this->fetchOrderService->fetch($circle);
+      $this->loggerContract->debug('OrderService', ['additionalInfo' => $orders, 'method' => __METHOD__]);
       $receivedOrdersDuration = TimeHelper::getMilliseconds() - $ms;
       $externalLogs->addPurchaseOrderLog('PO fetching','poReceived', count($orders), $receivedOrdersDuration);
     } catch (\Exception $e) {

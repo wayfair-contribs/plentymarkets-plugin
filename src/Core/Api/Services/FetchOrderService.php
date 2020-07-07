@@ -28,7 +28,7 @@ class FetchOrderService extends APIService {
 
     $response = $this->query($query);
     // $loggerContract->debug('Test',
-    $loggerContract->debug(TranslationHelper::getLoggerKey('Test'),
+    $loggerContract->debug(TranslationHelper::getLoggerKey('test'),
           [
             'query' => $query,
             'response' => $response,
