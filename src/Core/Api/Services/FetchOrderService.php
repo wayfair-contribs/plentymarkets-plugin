@@ -43,6 +43,7 @@ class FetchOrderService extends APIService
 
       throw new \Exception($message);
     }
+
     $result = [];
     $purchaseOrders = $body['data']['purchaseOrders'];
     foreach ($purchaseOrders as $purchaseOrder) {

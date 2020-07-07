@@ -10,7 +10,7 @@ use Wayfair\Core\Dto\General\WarehouseDTO;
 use Wayfair\Core\Dto\General\ProductDTO;
 use Wayfair\Core\Dto\General\AddressDTO;
 
-class ResponseDTO {
+class ResponseDTO implements \JsonSerializable {
   /**
    * @var string
    */
@@ -420,5 +420,10 @@ class ResponseDTO {
     $dto->setShipTo($params['shipTo'] ?? []);
     $dto->setBillingInfo($params['billingInfo'] ?? []);
     return $dto;
+  }
+
+  public function jsonSerialize()
+  {
+    return get_object_vars($this);
   }
 }
