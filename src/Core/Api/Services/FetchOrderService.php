@@ -27,7 +27,8 @@ class FetchOrderService extends APIService {
     $query = $this->getQuery($circle);
 
     $response = $this->query($query);
-    loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_UNABLE_TO_REGISTER_ORDER),
+    $loggerContract->debug('Test',
+    // $loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_UNABLE_TO_REGISTER_ORDER),
           [
             'query' => $query,
             'response' => $response,
