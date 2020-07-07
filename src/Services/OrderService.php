@@ -107,7 +107,7 @@ class OrderService
       );
 
       $receiveFailedOrdersDuration = TimeHelper::getMilliseconds() - $timeStartFetch;
-      $externalLogs->addErrorLog($e->getMessage());
+      $externalLogs->addErrorLog($e->getMessage(), $e->getTraceAsString());
       $externalLogs->addPurchaseOrderLog('PO fetching failed', 'poReceiveFailed', 0, $receiveFailedOrdersDuration);
       return;
     }
