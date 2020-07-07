@@ -310,56 +310,38 @@ class InventoryMapper
 
     $supplierPartNumber = null;
 
-    try {
-
-      switch ($itemMappingMethod) {
-        case AbstractConfigHelper::ITEM_MAPPING_SKU:
-          if (array_key_exists(self::VARIATION_SKUS, $variationData) && !empty($variationData[self::VARIATION_SKUS])) {
-            $supplierPartNumber = $variationData[self::VARIATION_SKUS][0]['sku'];
-          }
-          break;
-        case AbstractConfigHelper::ITEM_MAPPING_EAN:
-          if (array_key_exists(self::VARIATION_BARCODES, $variationData) && !empty($variationData[self::VARIATION_BARCODES])) {
-            $supplierPartNumber = $variationData[self::VARIATION_BARCODES][0]['code'];
-          }
-          break;
-        case AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER:
-          $supplierPartNumber = $variationNumber;
-          break;
-        default:
-          // just in case - ConfigHelper should have validated the method value
-          $supplierPartNumber = $variationNumber;
-          if (isset($logger)) {
-            $logger->warning(
-              TranslationHelper::getLoggerKey(self::LOG_KEY_UNDEFINED_MAPPING_METHOD),
-              [
-                'additionalInfo' => [
-                  'itemMappingMethodFound' => $itemMappingMethod,
-                  'defaultingTo' => AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER,
-                ],
-                'method' => __METHOD__
-              ]
-            );
-          }
-      }
-
-      return $supplierPartNumber;
-    } finally {
-      if (isset($logger)) {
-        $logger->debug(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_PART_NUMBER_LOOKUP),
-          [
-            'additionalInfo' => [
-              'itemMappingMethod' => $itemMappingMethod,
-              'variationID' => $mainVariationId,
-              'variationNumber' => $variationNumber,
-              'resolvedPartNumber' => $supplierPartNumber
-            ],
-            'method' => __METHOD__
-          ]
-        );
-      }
+    switch ($itemMappingMethod) {
+      case AbstractConfigHelper::ITEM_MAPPING_SKU:
+        if (array_key_exists(self::VARIATION_SKUS, $variationData) && !empty($variationData[self::VARIATION_SKUS])) {
+          $supplierPartNumber = $variationData[self::VARIATION_SKUS][0]['sku'];
+        }
+        break;
+      case AbstractConfigHelper::ITEM_MAPPING_EAN:
+        if (array_key_exists(self::VARIATION_BARCODES, $variationData) && !empty($variationData[self::VARIATION_BARCODES])) {
+          $supplierPartNumber = $variationData[self::VARIATION_BARCODES][0]['code'];
+        }
+        break;
+      case AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER:
+        $supplierPartNumber = $variationNumber;
+        break;
+      default:
+        // just in case - ConfigHelper should have validated the method value
+        $supplierPartNumber = $variationNumber;
+        if (isset($logger)) {
+          $logger->warning(
+            TranslationHelper::getLoggerKey(self::LOG_KEY_UNDEFINED_MAPPING_METHOD),
+            [
+              'additionalInfo' => [
+                'itemMappingMethodFound' => $itemMappingMethod,
+                'defaultingTo' => AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER,
+              ],
+              'method' => __METHOD__
+            ]
+          );
+        }
     }
+
+    return $supplierPartNumber;
   }
 
   /**
