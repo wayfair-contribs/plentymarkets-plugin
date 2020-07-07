@@ -270,12 +270,19 @@ class CreateOrderService
 
       $warehouse = $dto->getWarehouse();
       if (!isset($warehouse)) {
-        throw new \Exception("Warehouse information for PO " . $poNumber);
+        throw new \Exception("No warehouse information for PO " . $poNumber);
       }
 
-      $warehouseId = $this->warehouseSupplierRepository->findBySupplierId($warehouse->getId());
-      if (!isset($warehouseId) || empty($warehouseId)) {
-        throw new \Exception("Warehouse ID is missing for PO " . $poNumber);
+      $supplierID = $warehouse->getId();
+
+      if (!isset($supplierID))
+      {
+        throw new \Exception("PO's Warehouse information is missing a Supplier ID" . $poNumber);
+      }
+
+      $plentyWarehouseId = $this->warehouseSupplierRepository->findBySupplierId($supplierID);
+      if (!isset($plentyWarehouseId) || empty($plentyWarehouseId)) {
+        throw new \Exception("Could not find Warehouse ID for PO " . $poNumber . " for supplier " . $supplierID);
       }
 
       $orderData = $this->purchaseOrderMapper->map(
@@ -284,7 +291,7 @@ class CreateOrderService
         $billing['contactId'],
         $delivery['addressId'],
         $referrerId,
-        $warehouseId,
+        $plentyWarehouseId,
         (string) AbstractConfigHelper::PAYMENT_METHOD_INVOICE
       );
 
