@@ -134,8 +134,7 @@ class OrderService
           'exceptionType' => get_class($e),
           'message' => $e->getMessage(),
           'stackTrace' => $e->getTrace(),
-          'poNumber' => $order->getPoNumber(),
-          'poData' => json_encode($order)
+          'poNumber' => $order->getPoNumber()
         ];
 
         $logKey = self::LOG_KEY_FAILED_TO_CREATE_ORDER;

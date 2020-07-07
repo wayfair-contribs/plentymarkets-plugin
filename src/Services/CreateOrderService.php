@@ -221,8 +221,7 @@ class CreateOrderService
 
       $loggerContract->info(TranslationHelper::getLoggerKey(self::LOG_KEY_CREATING_ORDER), [
         'additionalInfo' => [
-          'poNumber' => $poNumber,
-          'dto' => json_encode($dto)
+          'poNumber' => $poNumber
         ],
         'method' => __METHOD__
       ]);
