@@ -83,20 +83,11 @@ class OrderService
     $timeStartFetch = TimeHelper::getMilliseconds();
     $orders = [];
     try {
-
-      $this->loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_STARTING_FETCH), [
-        'method' => __METHOD__
-      ]);
+      $this->loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_STARTING_FETCH), ['method' => __METHOD__]);
 
       $orders = $this->fetchOrderService->fetch($circle);
-<<<<<<< HEAD
-      $this->loggerContract->debug('OrderService', ['additionalInfo' => $orders, 'method' => __METHOD__]);
-      $receivedOrdersDuration = TimeHelper::getMilliseconds() - $ms;
-      $externalLogs->addPurchaseOrderLog('PO fetching','poReceived', count($orders), $receivedOrdersDuration);
-=======
       $receivedOrdersDuration = TimeHelper::getMilliseconds() - $timeStartFetch;
       $externalLogs->addPurchaseOrderLog('PO fetching', 'poReceived', count($orders), $receivedOrdersDuration);
->>>>>>> origin/jhoule_improve_order_logging
     } catch (\Exception $e) {
 
       $this->loggerContract->error(
