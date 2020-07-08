@@ -153,10 +153,7 @@ class ShipmentRegisterService
    * @return bool
    */
   private function shipmentIsRegistered(
-    ShippingInformation $shippingInformation,
-    int $orderId,
-    string $poNumber,
-    ExternalLogs $externalLogs
+    ShippingInformation $shippingInformation
   ): bool {
     return $shippingInformation !== null
       && $shippingInformation->shippingServiceProvider === AbstractConfigHelper::PLUGIN_NAME
@@ -272,7 +269,7 @@ class ShipmentRegisterService
         try {
           $shippingInformation = $this->getOrderShippingInformation($orderId);
 
-          if ($this->shipmentIsRegistered($shippingInformation, $orderId, $poNumber, $externalLogs)) {
+          if ($this->shipmentIsRegistered($shippingInformation)) {
 
             // If order has already been registered with Wayfair, ignore and alert supplier.
             $registerResult[$orderId] =
