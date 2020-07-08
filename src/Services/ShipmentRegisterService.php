@@ -20,7 +20,6 @@ use Wayfair\Core\Helpers\ShippingLabelHelper;
 use Wayfair\Core\Helpers\TimeHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Models\ExternalLogs;
-use Wayfair\Repositories\WarehouseSupplierRepository;
 
 /**
  * Class ShipmentPrintService
@@ -71,11 +70,6 @@ class ShipmentRegisterService
   private $storageRepositoryContract;
 
   /**
-   * @var WarehouseSupplierRepository
-   */
-  private $warehouseSupplierRepository;
-
-  /**
    * @var FetchDocumentContract
    */
   private $fetchShippingLabelContract;
@@ -84,11 +78,6 @@ class ShipmentRegisterService
    * @var OrderPropertyService
    */
   private $orderPropertyService;
-
-  /**
-   * @var array
-   */
-  private $registerResult = [];
 
   /**
    * @var LoggerContract
@@ -103,7 +92,6 @@ class ShipmentRegisterService
    * @param OrderShippingPackageRepositoryContract $orderShippingPackageRepositoryContract
    * @param ShippingInformationRepositoryContract $shippingInformationRepositoryContract
    * @param StorageRepositoryContract $storageRepositoryContract
-   * @param WarehouseSupplierRepository $warehouseSupplierRepository
    * @param FetchDocumentContract $fetchShippingLabelContract
    * @param OrderPropertyService $orderPropertyService
    * @param LoggerContract $loggerContract
@@ -114,7 +102,6 @@ class ShipmentRegisterService
     OrderShippingPackageRepositoryContract $orderShippingPackageRepositoryContract,
     ShippingInformationRepositoryContract $shippingInformationRepositoryContract,
     StorageRepositoryContract $storageRepositoryContract,
-    WarehouseSupplierRepository $warehouseSupplierRepository,
     FetchDocumentContract $fetchShippingLabelContract,
     OrderPropertyService $orderPropertyService,
     LoggerContract $loggerContract
@@ -125,7 +112,6 @@ class ShipmentRegisterService
     $this->orderShippingPackageRepositoryContract = $orderShippingPackageRepositoryContract;
     $this->shippingInformationRepositoryContract = $shippingInformationRepositoryContract;
     $this->storageRepositoryContract = $storageRepositoryContract;
-    $this->warehouseSupplierRepository = $warehouseSupplierRepository;
     $this->fetchShippingLabelContract = $fetchShippingLabelContract;
     $this->orderPropertyService = $orderPropertyService;
     $this->loggerContract = $loggerContract;
@@ -175,7 +161,7 @@ class ShipmentRegisterService
 
     if ($already_registered) {
       //If order has already been registered with Wayfair, ignore and alert supplier.
-      $this->registerResult[$orderId] =
+      $registerResult[$orderId] =
         $this->buildResultMessage(false,
           sprintf(TranslationHelper::translate(self::LOG_KEY_ALREADY_REGISTERED),
             $shippingInformation->shippingServiceProvider, $orderId), []);
@@ -252,7 +238,7 @@ class ShipmentRegisterService
    */
   public function register(array $orderIds): array
   {
-    $this->registerResult = [];
+    $registerResult = [];
     if (empty($orderIds)) {
       $this->loggerContract
         ->error(
@@ -262,7 +248,7 @@ class ShipmentRegisterService
           ]
         );
 
-      return $this->registerResult;
+      return $registerResult;
     }
 
     /** @var ExternalLogs $externalLogs */
@@ -525,7 +511,7 @@ class ShipmentRegisterService
             $externalLogs->addInfoLog("Saved information for shipment " . $shipmentNumber .
               " for order with ID " . $orderId);
 
-            $this->registerResult[$orderId] = $this->buildResultMessage(
+            $registerResult[$orderId] = $this->buildResultMessage(
               true,
               TranslationHelper::translate('shippingRegisterMessage') . $orderId,
               false,
@@ -536,7 +522,7 @@ class ShipmentRegisterService
           $externalLogs->addErrorLog('Registration process failed, PO:' . $poNumber . ' - '
             . get_class($exception) . ': ' . $exception->getMessage());
           $errorMessage = sprintf(TranslationHelper::translate(self::LOG_KEY_SHIPPING_ERROR_REGISTERED_SHIPMENT), $orderId);
-          $this->registerResult[$orderId] = $this->buildResultMessage(false, $errorMessage, []);
+          $registerResult[$orderId] = $this->buildResultMessage(false, $errorMessage, []);
 
           $this->loggerContract
             ->error(
@@ -557,7 +543,7 @@ class ShipmentRegisterService
         }
       }
 
-      return $this->registerResult;
+      return $registerResult;
     } finally {
       if ($purchaseOrdersToRegister > 0) {
         $externalLogs->addShippingLabelLog('Purchase order register', 'purchaseOrderRegister',
@@ -592,8 +578,7 @@ class ShipmentRegisterService
     /** @var ExternalLogs $externalLogs */
     $externalLogs = pluginApp(ExternalLogs::class);
     try {
-      // FIXME: this is throwing away ALL registration data, even for orders not in the request parameter
-      $this->registerResult = [];
+      $registerResult = [];
       if (empty($orderIds)) {
 
         $this->loggerContract
@@ -604,7 +589,7 @@ class ShipmentRegisterService
             ]
           );
 
-        return $this->registerResult;
+        return $registerResult;
       }
 
       foreach ($orderIds as $orderId) {
@@ -613,7 +598,7 @@ class ShipmentRegisterService
         //Check if shipping information is correct
 
         if (isset($shippingInformation)) {
-          $this->registerResult[$orderId] = $this->buildResultMessage(true,
+          $registerResult[$orderId] = $this->buildResultMessage(true,
             sprintf(TranslationHelper::translate('shippingUnregisterSuccessfully'), $orderId), []);
           $this->shippingInformationRepositoryContract->resetShippingInformation($orderId);
         } else {
@@ -634,7 +619,7 @@ class ShipmentRegisterService
         }
       }
 
-      return $this->registerResult;
+      return $registerResult;
     } finally {
       if (count($externalLogs->getLogs())) {
         /** @var LogSenderService $logSenderService */
@@ -729,7 +714,7 @@ class ShipmentRegisterService
     if (empty($poNumber)) {
       $errorMessage = sprintf(TranslationHelper::translate(self::LOG_KEY_SHIPPING_CANNOT_FIND_PO_NUMBER), $poNumber);
 
-      $this->registerResult[$orderId] = $this->buildResultMessage(false, $errorMessage, []);
+      $registerResult[$orderId] = $this->buildResultMessage(false, $errorMessage, []);
 
       $this->loggerContract
         ->debug(
