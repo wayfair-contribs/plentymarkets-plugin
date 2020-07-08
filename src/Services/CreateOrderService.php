@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright 2020 Wayfair LLC - All rights reserved
  */
@@ -37,6 +38,8 @@ use Wayfair\Repositories\WarehouseSupplierRepository;
 class CreateOrderService
 {
   const LOG_KEY_ORDERS_ALREADY_EXIST = 'createOrderAlreadyExists';
+  const LOG_KEY_CREATING_ORDER = 'creatingNewOrder';
+  const LOG_KEY_PENDING_ORDER_MAY_EXIST = 'pendingOrderMayExist';
 
   /**
    * @var PurchaseOrderMapper
@@ -127,8 +130,7 @@ class CreateOrderService
     PendingOrdersRepository $pendingOrdersRepository,
     SavePackingSlipService $savePackingSlipService,
     AddressService $addressService
-  )
-  {
+  ) {
     $this->purchaseOrderMapper = $purchaseOrderMapper;
     $this->addressMapper = $addressMapper;
     $this->orderRepositoryContract = $orderRepositoryContract;
@@ -150,17 +152,18 @@ class CreateOrderService
    *  - Wayfair data from APIs (packing slips, etc)
    *  - Stored values in the plentymarkets system
    *
-   * If an order already exists for the Wayfair PO, returns false.
-   * Otherwise, attempts to create all Plentymarkets artifacts for an order, then creates the order and returns true.
+   * If an order already exists for the Wayfair PO, returns a negative number.
+   * If an order cannot be created, returns 0.
+   * Otherwise, attempts to create all Plentymarkets artifacts for an order, then creates the order and returns the Order's positive ID
    *
    * If the order cannot be created for any reason, throws an Exception.
    *
    * @param ResponseDTO $dto
    *
-   * @return bool
+   * @return int
    * @throws \Exception
    */
-  public function create(ResponseDTO $dto): bool
+  public function create(ResponseDTO $dto): int
   {
     /**
      * @var AbstractConfigHelper $configHelper
@@ -202,14 +205,26 @@ class CreateOrderService
       $numberOfOrdersForPO = $orderList->getTotalCount();
       if ($numberOfOrdersForPO > 0) {
         // orders exist for the Wayfair PO. Do not create another one.
-        $loggerContract->info(TranslationHelper::getLoggerKey(self::LOG_KEY_ORDERS_ALREADY_EXIST), [
+        $loggerContract->warning(TranslationHelper::getLoggerKey(self::LOG_KEY_ORDERS_ALREADY_EXIST), [
           'additionalInfo' => ['poNumber' => $poNumber, 'orders' => $orderList->getResult()],
           'method' => __METHOD__
         ]);
 
         $externalLogs->addInfoLog("Order creation skipped - found " . $numberOfOrdersForPO . " already created for PO " . $poNumber);
-        return false;
+
+        // make sure that we (re)accept this order,
+        // as the presence of the Plentymarkets Order means it should no longer be "open."
+        $this->createPendingOrder($dto);
+
+        return -1;
       }
+
+      $loggerContract->info(TranslationHelper::getLoggerKey(self::LOG_KEY_CREATING_ORDER), [
+        'additionalInfo' => [
+          'poNumber' => $poNumber
+        ],
+        'method' => __METHOD__
+      ]);
 
       // Get payment method id
       // Create billing address and delivery address
@@ -257,17 +272,28 @@ class CreateOrderService
 
       $warehouse = $dto->getWarehouse();
       if (!isset($warehouse)) {
-        throw new \Exception("Warehouse information for PO " . $poNumber);
+        throw new \Exception("No warehouse information for PO " . $poNumber);
       }
 
-      $warehouseId = $this->warehouseSupplierRepository->findBySupplierId($warehouse->getId());
-      if (!isset($warehouseId) || empty($warehouseId)) {
-        throw new \Exception("Warehouse ID is missing for PO " . $poNumber);
+      $supplierID = $warehouse->getId();
+
+      if (!isset($supplierID)) {
+        throw new \Exception("PO " . $poNumber . " contains Warehouse information that is missing an ID.");
+      }
+
+      $plentyWarehouseId = $this->warehouseSupplierRepository->findBySupplierId($supplierID);
+      if (!isset($plentyWarehouseId) || empty($plentyWarehouseId)) {
+        throw new \Exception("Could not find Warehouse ID for PO " . $poNumber . " for supplier " . $supplierID);
       }
 
       $orderData = $this->purchaseOrderMapper->map(
-        $dto, $billing['addressId'], $billing['contactId'], $delivery['addressId'], $referrerId, $warehouseId,
-        (string)AbstractConfigHelper::PAYMENT_METHOD_INVOICE
+        $dto,
+        $billing['addressId'],
+        $billing['contactId'],
+        $delivery['addressId'],
+        $referrerId,
+        $plentyWarehouseId,
+        (string) AbstractConfigHelper::PAYMENT_METHOD_INVOICE
       );
 
       if (!isset($orderData) || empty($orderData)) {
@@ -301,8 +327,7 @@ class CreateOrderService
 
       // Create order payment relation
       $paymentRelation = $this->paymentOrderRelationRepositoryContract->createOrderRelation($payment, $order);
-      if (!isset($paymentRelation) || !$paymentRelation->id)
-      {
+      if (!isset($paymentRelation) || !$paymentRelation->id) {
         throw new \Exception("Unable to relate payment " . $paymentID . " with order " . $orderId);
       }
 
@@ -318,7 +343,7 @@ class CreateOrderService
         throw new \Exception("Unable to add packing slip to order " . $order . " PO: " . $poNumber);
       }
 
-      return true;
+      return $orderId;
     } finally {
       if (count($externalLogs->getLogs())) {
         /** @var LogSenderService $logSenderService */
@@ -329,12 +354,36 @@ class CreateOrderService
   }
 
   /**
+   * Create a Pending Order record for a Purchase Order,
+   * if not already existing.
    * @param ResponseDTO $dto
    *
    * @return void
    */
   private function createPendingOrder(ResponseDTO $dto): bool
   {
+    $poNumber = $dto->getPoNumber();
+    $pendingOrder = null;
+    try {
+      $pendingOrder = $this->pendingOrdersRepository->get($poNumber);
+    } catch (\Exception $e) {
+      /** @var LoggerContract $loggerContract */
+      $loggerContract = pluginApp(LoggerContract::class);
+
+      $loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_PENDING_ORDER_MAY_EXIST), [
+        'exception' => $e,
+        'exceptionType' => get_class($e),
+        'exceptionMessage' => $e->getMessage(),
+        'additionalInfo' => ['poNumber' => $poNumber],
+        'method' => __METHOD__
+      ]);
+    }
+
+    if (isset($pendingOrder)) {
+      // PO already queued for acceptance
+      return true;
+    }
+
     $pendingOrder = $this->pendingPurchaseOrderMapper->map($dto);
     return $this->pendingOrdersRepository->insert($pendingOrder);
   }
@@ -361,5 +410,4 @@ class CreateOrderService
 
     return $this->paymentRepositoryContract->createPayment($data);
   }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright 2020 Wayfair LLC - All rights reserved
  */
@@ -60,7 +61,6 @@ class InventoryService extends APIService
       }
 
       return $response;
-
     } catch (\Exception $e) {
 
       $this->loggerContract->error(
@@ -149,10 +149,10 @@ class InventoryService extends APIService
       }
 
       $responseBody = $response->getBodyAsArray();
+      $errors = $response->getError();
 
-      if (isset($responseBody['errors'])) {
-        throw new \Exception("Unable to update inventory due to errors." .
-          " Response from  Wayfair: " . \json_encode($responseBody));
+      if (isset($errors) && !empty($errors)) {
+        throw new \Exception("Unable to update inventory due to errors: " . json_encode($errors));
       }
 
       if (!isset($responseBody['data'])) {

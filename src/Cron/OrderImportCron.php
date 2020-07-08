@@ -47,6 +47,7 @@ class OrderImportCron extends Cron {
    * @return void
    */
   public function handle() {
+    /** @var ExternalLogs */
     $externalLogs = pluginApp(ExternalLogs::class);
     try {
       $this->loggerContract->debug(TranslationHelper::getLoggerKey('cronStartedMessage'), ['method' => __METHOD__]);

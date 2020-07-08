@@ -1,10 +1,22 @@
 ﻿# Release notes for Wayfair
 
-## v1.1.2 (2020-05-15)
-- Add support for paginated inventory synchronization
-- Fixed downloading empty documents to plentymarkets
-- Increased logging
-- Increased telemetry
+## v1.1.2-beta.6 (2020-07-07)
+- see https://github.com/wayfair-contribs/plentymarkets-plugin/releases/tag/v1.1.2-beta.6
+
+## v1.1.2-beta.5 (2020-06-29)
+- see https://github.com/wayfair-contribs/plentymarkets-plugin/releases/tag/v1.1.2-beta.5
+
+## v1.1.2-beta.4 (2020-06-27)
+- Intermediate release, replaced by `v1.1.2-beta.5`
+
+## v1.1.2-beta.3 (2020-06-09)
+- see https://github.com/wayfair-contribs/plentymarkets-plugin/releases/tag/v1.1.2-beta.3
+
+## v1.1.2-beta.2 (2020-04-23)
+- see https://github.com/wayfair-contribs/plentymarkets-plugin/releases/tag/v1.1.2-beta.2
+
+## v1.1.2-beta (2020-04-08)
+- see https://github.com/wayfair-contribs/plentymarkets-plugin/releases/tag/v1.1.2-beta
 
 ## v1.1.1 (2020-01-08)
 - Fixed inventory mapping using SKU
@@ -22,7 +34,7 @@
 - Critical fix for full inventory update
 
 ## v1.0.7 (2019-10-23)
-- Add packing slip to the order 
+- Add packing slip to the order
 - Add the option of choosing to send all items inventory data
 
 ## v1.0.6 (2019-09-06)

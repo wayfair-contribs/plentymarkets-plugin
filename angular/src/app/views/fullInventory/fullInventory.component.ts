@@ -35,6 +35,12 @@ export class FullInventoryComponent {
    */
   private static readonly REFRESH_INTERVAL = 300000;
 
+  /**
+   * The amount of time before we warn about overdue sync
+   * (One day)
+   */
+  private static readonly OVERDUE_PERIOD = 1000 * 60 * 60 * 24;
+
   @Language()
   public lang: string;
 
@@ -58,6 +64,8 @@ export class FullInventoryComponent {
   private timeoutForSync = null;
 
   private syncSubscription = null;
+
+  public lastGoodSyncWithinWindow: boolean = false;
 
   public constructor(
     private fullInventoryService: FullInventoryService,
@@ -120,7 +128,7 @@ export class FullInventoryComponent {
   }
 
   /**
-   * Logic called when the sync subsrciption returns
+   * Logic called when the sync subscription returns
    * in the allotted amount of time
    * @param data data from Sync service
    */
@@ -208,27 +216,36 @@ export class FullInventoryComponent {
       }
     }
 
-    this.lastResult = {text: this.translation.translate(text), type: style};
+    this.lastResult = { text: this.translation.translate(text), type: style };
 
     this.updateLastCompletion(data.lastCompletion);
 
     this.updateSyncButton(data.status);
-    this.updateRefreshButton();
+    this.updateRefreshButton(data.status);
 
     return data.status;
   }
 
-  private updateLastCompletion(rawDate: string)
-  {
+  private updateLastCompletion(rawDate: string = null) {
+    let dateObj = null;
     if (rawDate) {
-      this.successfulServiceCompletionTimestamp = new Date(rawDate).toLocaleString();
-      return;
+      dateObj = new Date(rawDate);
+    } else if (this.successfulServiceCompletionTimestamp) {
+      dateObj = new Date(this.successfulServiceCompletionTimestamp);
     }
 
-    if (!this.successfulServiceCompletionTimestamp) {
+    if (dateObj instanceof Date && !isNaN(dateObj.valueOf())) {
+      this.successfulServiceCompletionTimestamp = dateObj.toLocaleString();
+
+      // check if there is over a day between the last sync and now
+      this.lastGoodSyncWithinWindow =
+        Date.now() - dateObj.getTime() < FullInventoryComponent.OVERDUE_PERIOD;
+    } else {
       this.successfulServiceCompletionTimestamp = this.translation.translate(
         FullInventoryComponent.TRANSLATION_KEY_UNKNOWN
       );
+
+      this.lastGoodSyncWithinWindow = false;
     }
   }
 
@@ -242,8 +259,10 @@ export class FullInventoryComponent {
       type: FullInventoryComponent.TEXT_CLASS_INFO,
     };
     this.latestInteractionTimestamp = loading;
-    this.updateSyncButton();
-    this.updateRefreshButton(FullInventoryComponent.STATE_LOADING);
+    let state = FullInventoryComponent.STATE_LOADING;
+    this.updateSyncButton(state);
+    this.updateRefreshButton(state);
+    this.updateLastCompletion();
   }
 
   private showRunning() {
@@ -256,8 +275,9 @@ export class FullInventoryComponent {
       type: FullInventoryComponent.TEXT_CLASS_INFO,
     };
     this.latestInteractionTimestamp = new Date().toLocaleString();
-    this.updateSyncButton(FullInventoryComponent.STATE_RUNNING);
-    this.updateRefreshButton(FullInventoryComponent.STATE_RUNNING);
+    let state = FullInventoryComponent.STATE_RUNNING;
+    this.updateSyncButton(state);
+    this.updateRefreshButton(state);
   }
 
   private showError() {
@@ -271,5 +291,6 @@ export class FullInventoryComponent {
     this.latestInteractionTimestamp = error;
     this.updateSyncButton();
     this.updateRefreshButton();
+    this.updateLastCompletion();
   }
 }
