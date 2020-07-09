@@ -1,10 +1,22 @@
 ﻿# Versionshinweise für Wayfair
 
-## v1.1.2 (2020-05-15)
-- Unterstützung für die Synchronisierung paginierter Bestände hinzufügen
-- Das Herunterladen leerer Dokumente auf Plentymärkte wurde behoben
-- Erhöhte Protokollierung
-- Erhöhte Telemetrie
+## v1.1.2-beta.6 (2020-07-07)
+- Informationen finden Sie unter diesem Link: https://github.com/wayfair-contribs/plentymarkets-plugin/releases/tag/v1.1.2-beta.6
+
+## v1.1.2-beta.5 (2020-06-29)
+- Informationen finden Sie unter diesem Link: https://github.com/wayfair-contribs/plentymarkets-plugin/releases/tag/v1.1.2-beta.5
+
+## v1.1.2-beta.4 (2020-06-27)
+- Storniert, ersetzt durch `v1.1.2-beta.5`
+
+## v1.1.2-beta.3 (2020-06-09)
+- Informationen finden Sie unter diesem Link: https://github.com/wayfair-contribs/plentymarkets-plugin/releases/tag/v1.1.2-beta.3
+
+## v1.1.2-beta.2 (2020-04-23)
+- Informationen finden Sie unter diesem Link: https://github.com/wayfair-contribs/plentymarkets-plugin/releases/tag/v1.1.2-beta.2
+
+## v1.1.2-beta (2020-04-08)
+- Informationen finden Sie unter diesem Link: https://github.com/wayfair-contribs/plentymarkets-plugin/releases/tag/v1.1.2-beta
 
 ## v1.1.1 (2020-01-08)
 - Inventar Abgleich Problem ist behoben

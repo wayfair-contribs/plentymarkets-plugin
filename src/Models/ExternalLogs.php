@@ -39,38 +39,42 @@ class ExternalLogs {
 
   /**
    * @param string $message
+   * @param string $details
    *
    * @return void
    */
-  public function addErrorLog(string $message) {
-    $this->addCustomLog('ERROR', $message);
+  public function addErrorLog(string $message, string $details = null) {
+    $this->addCustomLog('ERROR', $message, $details);
   }
 
   /**
    * @param string $message
+   * @param string $details
    *
    * @return void
    */
-  public function addWarningLog(string $message) {
-    $this->addCustomLog('WARNING', $message);
+  public function addWarningLog(string $message, string $details = null) {
+    $this->addCustomLog('WARNING', $message, $details);
   }
 
   /**
    * @param string $message
+   * @param string $details
    *
    * @return void
    */
-  public function addInfoLog(string $message) {
-    $this->addCustomLog('INFO', $message);
+  public function addInfoLog(string $message, string $details = null) {
+    $this->addCustomLog('INFO', $message, $details);
   }
 
   /**
    * @param string $message
+   * @param string $details
    *
    * @return void
    */
-  public function addDebugLog(string $message) {
-    $this->addCustomLog('DEBUG', $message);
+  public function addDebugLog(string $message, string $details = null) {
+    $this->addCustomLog('DEBUG', $message, $details);
   }
 
   /**
@@ -160,12 +164,19 @@ class ExternalLogs {
    * @param string $level
    * @param string $message
    */
-  private function addCustomLog(string $level, string $message) {
-    $this->logs[] = [
+  private function addCustomLog(string $level, string $message, $details = null) {
+    $log = [
       'message' => $message,
       'level' => $level,
       'logType' => 'OTHER',
       'time_stamp' => TimeHelper::getMilliseconds()
     ];
+
+    if (isset($details))
+    {
+      $log['details'] = $details;
+    }
+
+    $this->logs[] = $log;
   }
 }

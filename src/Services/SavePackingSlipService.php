@@ -195,6 +195,7 @@ class SavePackingSlipService
           'additionalInfo' => [
             'orderId' => $orderId,
             'po' => $poNumber,
+            'docType' => Document::DELIVERY_NOTE
           ],
           'method' => __METHOD__
         ]
@@ -208,6 +209,7 @@ class SavePackingSlipService
           'additionalInfo' => [
             'orderId' => $orderId,
             'po' => $poNumber,
+            'docType' => Document::DELIVERY_NOTE
           ],
           'method' => __METHOD__
         ]
@@ -225,7 +227,7 @@ class SavePackingSlipService
           'additionalInfo' => [
             'exception' => $exception,
             'message' => $exception->getMessage(),
-            'stackTrace' => $exception->getTrace(),
+            'stackTrace' => $exception->getTraceAsString(),
             'orderId' => $orderId,
             'po' => $poNumber,
           ],
