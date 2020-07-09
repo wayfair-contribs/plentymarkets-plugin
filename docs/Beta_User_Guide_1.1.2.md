@@ -231,15 +231,11 @@ You may contact us at [ERPSupport@wayfair.com] for support with installing and u
 
 2. Click on the name of the plugin set that contains the Beta Wayfair plugin
 
-3. Click on the name "Wayfair" in the list. A blank page will open, with a menu on the left.
+3. Locate the Wayfair row of the plugin set. The "installed version" value will start with `release_1_1_2_beta`
 
-4. Click "Git" in the menu.
+4. Click on the "Pull Branch" button [git pull button](shared/images/pm7_button_git_pull.png) on in the Wayfair row. A message should appear, starting with "Branch Pulled."
 
-5. Click "Pull".
+5. Click the save button ![save button](shared/images/pm7_button_save.png) above the list, and wait for the progress bar to complete - a timestamp will display at completion.
 
-6. Go back to **Plugins > Plugin Overview**
-
-7. Click on the name of the plugin set that contains the Beta Wayfair plugin
-
-8. Click the save button ![save button](shared/images/pm7_button_save.png) above the list, and wait for the progress bar to complete - a timestamp will display at completion. Though the "version" of the Wayfair plugin may not update, even after reloading the Plugin Overview page, the latest changes to the git branch have now been applied.
+6. To ensure all updates take effect, log out of Plentymarkets, then log back in to Plentymarkets.
 
