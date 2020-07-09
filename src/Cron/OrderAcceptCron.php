@@ -41,6 +41,7 @@ class OrderAcceptCron extends Cron {
    * @return void
    */
   public function handle() {
+    /**@var ExternalLogs */
     $externalLogs = pluginApp(ExternalLogs::class);
     /**
      * @var LoggerContract $loggerContract
