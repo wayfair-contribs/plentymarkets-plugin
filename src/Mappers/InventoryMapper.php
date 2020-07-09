@@ -22,7 +22,7 @@ class InventoryMapper
   const LOG_KEY_PART_NUMBER_LOOKUP = 'partNumberLookup';
   const LOG_KEY_PART_NUMBER_MISSING = 'partNumberMissing';
   const LOG_KEY_INVALID_INVENTORY_AMOUNT = 'invalidInventoryAmount';
-  const LOG_KEY_INVALID_STOCK_BUFFER = 'invalidStockBufferValue';
+  const LOG_KEY_NORMALIZING_INVENTORY = 'normalizingInventoryAmount';
 
   const VARIATION_BARCODES = 'variationBarcodes';
   const VARIATION_SKUS = 'variationSkus';
@@ -53,12 +53,11 @@ class InventoryMapper
    * Determine the "Quantity On Hand" to report to Wayfair,
    * based on a VariationStock
    * @param VariationStock $variationStock
-   * @param AbstractConfigHelper $configHelper
    * @param LoggerContract $loggerContract
    *
    * @return int|mixed
    */
-  static function getQuantityOnHand($variationStock, $configHelper = null, $loggerContract = null)
+  static function getQuantityOnHand($variationStock, $loggerContract = null)
   {
     if (!isset($variationStock) || !isset($variationStock->netStock)) {
       // API did not return a net stock
@@ -69,44 +68,27 @@ class InventoryMapper
     $netStock = $variationStock->netStock;
 
     if ($netStock <= -1) {
-      // Wayfair doesn't understand values below -1
-      return -1;
-    }
-
-    $stockBuffer = null;
-    if (isset($configHelper)) {
-      $stockBuffer = $configHelper->getStockBufferValue();
-    }
-
-    if (!isset($stockBuffer)) {
-      // no buffer to apply
-      return $netStock;
-    }
-
-
-    if ($stockBuffer < 0) {
-      // invalid value for buffer
-
       if (isset($loggerContract)) {
-        $loggerContract->warning(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_STOCK_BUFFER),
+
+        $variationId = $variationStock->variationId;
+
+        $loggerContract->info(
+          TranslationHelper::getLoggerKey(self::LOG_KEY_NORMALIZING_INVENTORY),
           [
-            'additionalInfo' => ['stockBuffer' => $stockBuffer],
+            'additionalInfo' => [
+              'variationId' => $variationId,
+              'originalNetStock' => $netStock
+            ],
             'method' => __METHOD__
           ]
         );
       }
 
-      return $netStock;
+      // Wayfair doesn't understand values below -1
+      return -1;
     }
 
-    if ($netStock > $stockBuffer) {
-      // report stock, considering buffer
-      return $netStock - $stockBuffer;
-    }
-
-    // stock is less than or equal buffer, so Wayfair should see this as no stock.
-    return 0;
+    return $netStock;
   }
 
   /**
@@ -114,16 +96,14 @@ class InventoryMapper
    * Returns a DTO for each supplier ID that has stock information for the variation.
    * @param array $variationData
    * @param string $itemMappingMethod
+   * @param int $stockBuffer
    *
    * @return RequestDTO[]
    */
-  public function createInventoryDTOsFromVariation($variationData, $itemMappingMethod)
+  public function createInventoryDTOsFromVariation($variationData, $itemMappingMethod, $stockBuffer)
   {
     /** @var LoggerContract $loggerContract */
     $loggerContract = pluginApp(LoggerContract::class);
-
-    /**@var AbstractConfigHelper $configHelper */
-    $configHelper = pluginApp(AbstractConfigHelper::class);
 
     /** @var array<string,RequestDTO> $requestDtosBySuID */
     $requestDtosBySuID = [];
@@ -191,7 +171,7 @@ class InventoryMapper
       }
 
       // Avl Immediately. ADJUSTED Net Stock (see Stock Buffer setting in Wayfair plugin).
-      $onHand = self::getQuantityOnHand($stock, $configHelper, $loggerContract);
+      $onHand = self::getQuantityOnHand($stock, $loggerContract);
 
       if (!isset($onHand)) {
         // null value is NOT a valid input for quantity on hand - do NOT send to Wayfair.
@@ -245,7 +225,47 @@ class InventoryMapper
       $requestDtosBySuID[$dtoKey] = RequestDTO::createFromArray($dtoData);
     }
 
-    return array_values($requestDtosBySuID);
+    // all stock amounts are now visited
+    $inventoryDTOs = array_values($requestDtosBySuID);
+
+    // apply the stock buffer setting to each DTO sent to Wayfair, not to each warehouse
+    foreach ($inventoryDTOs as $idx => $oneDTO) {
+      $dtos[$idx] = self::applyStockBuffer($oneDTO, $stockBuffer);
+    }
+
+    return $inventoryDTOs;
+  }
+
+  /**
+   * Apply stock buffer value to the DTO
+   *
+   * @param RequestDTO $dto
+   * @return RequestDTO
+   */
+  static function applyStockBuffer($dto, $stockBuffer)
+  {
+    if (!isset($dto) || !isset($stockBuffer) || $stockBuffer <= 0) {
+      // no buffer to apply
+      return $dto;
+    }
+
+    $netStock = $dto->getQuantityOnHand();
+
+    if (!isset($netStock) || $netStock < 0) {
+      // preserve negative stock value
+      return $dto;
+    }
+
+    $netStock -= $stockBuffer;
+
+    if ($netStock < 0) {
+      // normalize to zero because stock was not negative before applying buffer
+      $netStock = 0;
+    }
+
+    $dto->setQuantityOnHand($netStock);
+
+    return $dto;
   }
 
   /**
@@ -254,7 +274,7 @@ class InventoryMapper
    * @param int $warehouseId
    * @return mixed
    */
-  private function getSupplierIDForWarehouseID($warehouseId)
+  private static function getSupplierIDForWarehouseID($warehouseId)
   {
     /**
      * @var WarehouseSupplierRepository $warehouseSupplierRepository
@@ -280,8 +300,7 @@ class InventoryMapper
    */
   static function getSupplierPartNumberFromVariation($variationData, $itemMappingMethod, $logger = null)
   {
-    if (!isset($variationData))
-    {
+    if (!isset($variationData)) {
       return null;
     }
 
@@ -292,58 +311,38 @@ class InventoryMapper
 
     $supplierPartNumber = null;
 
-    try {
-
-      switch ($itemMappingMethod) {
-        case AbstractConfigHelper::ITEM_MAPPING_SKU:
-          if (array_key_exists(self::VARIATION_SKUS, $variationData) && !empty($variationData[self::VARIATION_SKUS]))
-          {
-            $supplierPartNumber = $variationData[self::VARIATION_SKUS][0]['sku'];
-          }
-          break;
-        case AbstractConfigHelper::ITEM_MAPPING_EAN:
-          if (array_key_exists(self::VARIATION_BARCODES, $variationData) && !empty($variationData[self::VARIATION_BARCODES]))
-          {
-            $supplierPartNumber = $variationData[self::VARIATION_BARCODES][0]['code'];
-          }
-          break;
-        case AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER:
-          $supplierPartNumber = $variationNumber;
-          break;
-        default:
-          // just in case - ConfigHelper should have validated the method value
-          $supplierPartNumber = $variationNumber;
-          if (isset($logger)) {
-            $logger->warning(
-              TranslationHelper::getLoggerKey(self::LOG_KEY_UNDEFINED_MAPPING_METHOD),
-              [
-                'additionalInfo' => [
-                  'itemMappingMethodFound' => $itemMappingMethod,
-                  'defaultingTo' => AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER,
-                ],
-                'method' => __METHOD__
-              ]
-            );
-          }
-      }
-
-      return $supplierPartNumber;
-    } finally {
-      if (isset($logger)) {
-        $logger->debug(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_PART_NUMBER_LOOKUP),
-          [
-            'additionalInfo' => [
-              'itemMappingMethod' => $itemMappingMethod,
-              'variationID' => $mainVariationId,
-              'variationNumber' => $variationNumber,
-              'resolvedPartNumber' => $supplierPartNumber
-            ],
-            'method' => __METHOD__
-          ]
-        );
-      }
+    switch ($itemMappingMethod) {
+      case AbstractConfigHelper::ITEM_MAPPING_SKU:
+        if (array_key_exists(self::VARIATION_SKUS, $variationData) && !empty($variationData[self::VARIATION_SKUS])) {
+          $supplierPartNumber = $variationData[self::VARIATION_SKUS][0]['sku'];
+        }
+        break;
+      case AbstractConfigHelper::ITEM_MAPPING_EAN:
+        if (array_key_exists(self::VARIATION_BARCODES, $variationData) && !empty($variationData[self::VARIATION_BARCODES])) {
+          $supplierPartNumber = $variationData[self::VARIATION_BARCODES][0]['code'];
+        }
+        break;
+      case AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER:
+        $supplierPartNumber = $variationNumber;
+        break;
+      default:
+        // just in case - ConfigHelper should have validated the method value
+        $supplierPartNumber = $variationNumber;
+        if (isset($logger)) {
+          $logger->warning(
+            TranslationHelper::getLoggerKey(self::LOG_KEY_UNDEFINED_MAPPING_METHOD),
+            [
+              'additionalInfo' => [
+                'itemMappingMethodFound' => $itemMappingMethod,
+                'defaultingTo' => AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER,
+              ],
+              'method' => __METHOD__
+            ]
+          );
+        }
     }
+
+    return $supplierPartNumber;
   }
 
   /**
