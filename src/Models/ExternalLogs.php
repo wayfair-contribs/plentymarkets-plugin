@@ -176,5 +176,7 @@ class ExternalLogs {
     {
       $log['details'] = $details;
     }
+
+    $this->logs[] = $log;
   }
 }
