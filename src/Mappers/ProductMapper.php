@@ -16,6 +16,8 @@ use Wayfair\Helpers\TranslationHelper;
 class ProductMapper
 {
 
+  const LOG_KEY_VARIATION_NOT_FOUND = 'variationNotFound';
+
   /**
    * @var VariationSearchRepositoryContract
    */
@@ -106,7 +108,7 @@ class ProductMapper
 
     $this->loggerContract
       ->warning(
-        TranslationHelper::getLoggerKey('variationNotFound'),
+        TranslationHelper::getLoggerKey(self::LOG_KEY_VARIATION_NOT_FOUND),
         [
           'additionalInfo' => [
             'itemMappingMethod' => $itemMappingMethod,
