@@ -11,7 +11,6 @@ use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\General\ProductDTO;
 use Plenty\Modules\Order\Models\OrderItemType;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
-use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
 
 class ProductMapper
@@ -20,7 +19,10 @@ class ProductMapper
   /**
    * @var VariationSearchRepositoryContract
    */
-  public $variationSearchRepositoryContract;
+  private $variationSearchRepositoryContract;
+
+  /** @var LoggerContract */
+  private $loggerContract;
 
   /**
    * ProductMapper constructor.
@@ -28,9 +30,11 @@ class ProductMapper
    * @param VariationSearchRepositoryContract $variationSearchRepositoryContract
    */
   public function __construct(
-    VariationSearchRepositoryContract $variationSearchRepositoryContract
+    VariationSearchRepositoryContract $variationSearchRepositoryContract,
+    LoggerContract $loggerContract
   ) {
     $this->variationSearchRepositoryContract = $variationSearchRepositoryContract;
+    $this->loggerContract = $loggerContract;
   }
 
   /**
@@ -45,8 +49,8 @@ class ProductMapper
   {
     $partNumber = $dto->getPartNumber();
 
-    $filters = [$itemMappingMethod => $partNumber];
-    $variationId = $this->getVariationId((string) $partNumber, $filters, $poNumber);
+
+    $variationId = $this->getVariationId((string) $partNumber, $itemMappingMethod, $poNumber);
 
     // Init amounts
     $amounts = [
@@ -86,30 +90,31 @@ class ProductMapper
 
   /**
    * @param string $partNumber
+   * @param string @itemMappingMethod
    * @param string $poNumber
    *
    * @return int
    */
-  public function getVariationId(string $partNumber, array $filters, string $poNumber): int
+  public function getVariationId(string $partNumber, string $itemMappingMethod, string $poNumber): int
   {
+    $filters = [$itemMappingMethod => $partNumber];
     $this->variationSearchRepositoryContract->setFilters($filters);
     $result = $this->variationSearchRepositoryContract->search();
     foreach ($result->getResult() as $variation) {
       return $variation['id'];
     }
-    /**
-     * @var LoggerContract $loggerContract
-     */
-    $loggerContract = pluginApp(LoggerContract::class);
 
-    // FIXME: the poNumber is 0 when this log appears
-    $loggerContract
+    $this->loggerContract
       ->warning(
         TranslationHelper::getLoggerKey('variationNotFound'),
         [
-          'additionalInfo' => ['partNumber' => $partNumber],
-          'referenceType' => 'poNumber',
-          'referenceValue' => $poNumber,
+          'additionalInfo' => [
+            'itemMappingMethod' => $itemMappingMethod,
+            'partNumber' => $partNumber,
+            'poNumber' => $poNumber
+          ],
+          'referenceType' => $itemMappingMethod,
+          'referenceValue' => $partNumber,
           'method' => __METHOD__
         ]
       );
