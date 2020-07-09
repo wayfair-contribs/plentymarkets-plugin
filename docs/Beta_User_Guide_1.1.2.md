@@ -233,7 +233,7 @@ You may contact us at [ERPSupport@wayfair.com] for support with installing and u
 
 3. Locate the Wayfair row of the plugin set. The "installed version" value will start with `release_1_1_2_beta`
 
-4. Click on the "Pull Branch" button [git pull button](shared/images/pm7_button_git_pull.png) on in the Wayfair row. A message should appear, starting with "Branch Pulled."
+4. Click on the "Pull Branch" button ![git pull button](shared/images/pm7_button_git_pull.png) on in the Wayfair row. A message should appear, starting with "Branch Pulled."
 
 5. Click the save button ![save button](shared/images/pm7_button_save.png) above the list, and wait for the progress bar to complete - a timestamp will display at completion.
 
