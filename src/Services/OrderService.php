@@ -83,7 +83,10 @@ class OrderService
     $timeStartFetch = TimeHelper::getMilliseconds();
     $orders = [];
     try {
-      $this->loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_STARTING_FETCH), ['method' => __METHOD__]);
+
+      $this->loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_STARTING_FETCH), [
+        'method' => __METHOD__
+      ]);
 
       $orders = $this->fetchOrderService->fetch($circle);
       $receivedOrdersDuration = TimeHelper::getMilliseconds() - $timeStartFetch;

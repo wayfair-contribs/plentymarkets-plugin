@@ -369,7 +369,7 @@ class ShipmentNotificationService
 
       //Decide how to get tracking and package information.
       // if ($this->shipmentProviderService->isShippingWithWayfair()) {
-      if ($this->shipmentProviderService->isShippingWithWayfair() || empty($plentymarketsShippingInformation->shippingServiceProvider)) {
+      if ($this->shipmentProviderService->isShippingWithWayfair()){ //|| empty($plentymarketsShippingInformation->shippingServiceProvider)) {
         // shipping on wayfair account
         $this->loggerContract->info(
           TranslationHelper::getLoggerKey(self::LOG_KEY_SHIPPING_ON_WAYFAIR), [

@@ -11,7 +11,6 @@ use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\PurchaseOrder\ResponseDTO;
 use Wayfair\Core\Exceptions\GraphQLQueryException;
 use Wayfair\Helpers\TranslationHelper;
-use Wayfair\Core\Contracts\LoggerContract;
 
 class FetchOrderService extends APIService
 {

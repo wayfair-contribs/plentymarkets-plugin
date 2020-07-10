@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright 2020 Wayfair LLC - All rights reserved
  */
@@ -20,7 +21,6 @@ use Wayfair\Core\Helpers\ShippingLabelHelper;
 use Wayfair\Core\Helpers\TimeHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Models\ExternalLogs;
-use Wayfair\Repositories\WarehouseSupplierRepository;
 
 /**
  * Class ShipmentPrintService
@@ -72,11 +72,6 @@ class ShipmentRegisterService
   private $storageRepositoryContract;
 
   /**
-   * @var WarehouseSupplierRepository
-   */
-  private $warehouseSupplierRepository;
-
-  /**
    * @var FetchDocumentContract
    */
   private $fetchShippingLabelContract;
@@ -85,11 +80,6 @@ class ShipmentRegisterService
    * @var OrderPropertyService
    */
   private $orderPropertyService;
-
-  /**
-   * @var array
-   */
-  private $registerResult = [];
 
   /**
    * @var LoggerContract
@@ -104,7 +94,6 @@ class ShipmentRegisterService
    * @param OrderShippingPackageRepositoryContract $orderShippingPackageRepositoryContract
    * @param ShippingInformationRepositoryContract $shippingInformationRepositoryContract
    * @param StorageRepositoryContract $storageRepositoryContract
-   * @param WarehouseSupplierRepository $warehouseSupplierRepository
    * @param FetchDocumentContract $fetchShippingLabelContract
    * @param OrderPropertyService $orderPropertyService
    * @param LoggerContract $loggerContract
@@ -115,18 +104,15 @@ class ShipmentRegisterService
     OrderShippingPackageRepositoryContract $orderShippingPackageRepositoryContract,
     ShippingInformationRepositoryContract $shippingInformationRepositoryContract,
     StorageRepositoryContract $storageRepositoryContract,
-    WarehouseSupplierRepository $warehouseSupplierRepository,
     FetchDocumentContract $fetchShippingLabelContract,
     OrderPropertyService $orderPropertyService,
     LoggerContract $loggerContract
-  )
-  {
+  ) {
     $this->saveOrderDocumentService = $saveOrderDocumentService;
     $this->registerPurchaseOrderContract = $registerPurchaseOrderContract;
     $this->orderShippingPackageRepositoryContract = $orderShippingPackageRepositoryContract;
     $this->shippingInformationRepositoryContract = $shippingInformationRepositoryContract;
     $this->storageRepositoryContract = $storageRepositoryContract;
-    $this->warehouseSupplierRepository = $warehouseSupplierRepository;
     $this->fetchShippingLabelContract = $fetchShippingLabelContract;
     $this->orderPropertyService = $orderPropertyService;
     $this->loggerContract = $loggerContract;
@@ -167,41 +153,20 @@ class ShipmentRegisterService
    * @param ExternalLogs $externalLogs
    * @return bool
    */
-  private function shipmentIsRegistered(ShippingInformation $shippingInformation, int $orderId,
-                                        string $poNumber, ExternalLogs $externalLogs): bool
-  {
-    $already_registered = $shippingInformation !== null
+  private function shipmentIsRegistered(
+    ShippingInformation $shippingInformation
+  ): bool {
+    return $shippingInformation !== null
       && $shippingInformation->shippingServiceProvider === AbstractConfigHelper::PLUGIN_NAME
       && $shippingInformation->shippingStatus === self::SHIPPING_REGISTERED_STATUS;
-
-    if ($already_registered) {
-      //If order has already been registered with Wayfair, ignore and alert supplier.
-      $this->registerResult[$orderId] =
-        $this->buildResultMessage(false,
-          sprintf(TranslationHelper::translate(self::LOG_KEY_ALREADY_REGISTERED),
-            $shippingInformation->shippingServiceProvider, $orderId), []);
-
-      $this->loggerContract->info(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_ALREADY_REGISTERED),
-        [
-          'additionalInfo' => [
-            'orderId' => $orderId,
-            'po' => $poNumber,
-          ],
-          'method' => __METHOD__
-        ]
-      );
-
-      $externalLogs->addInfoLog('Already registered PO: ' . $poNumber .
-        ' . Order:' . $orderId);
-    }
-
-    return $already_registered;
   }
 
-  private function getTrackingNumberForPackage($trackingNumbers, $packageIndex, string $poNumber,
-                                               ExternalLogs $externalLogs): string
-  {
+  private function getTrackingNumberForPackage(
+    $trackingNumbers,
+    $packageIndex,
+    string $poNumber,
+    ExternalLogs $externalLogs
+  ): string {
     // FIXME: tracking numbers may not match packages - using arbitrary indexes?
     // v 1.1.1 uses array index from plentymarkets to lookup tracking number in array from Wayfair.
     // when there is more than one package in the PO,
@@ -219,7 +184,8 @@ class ShipmentRegisterService
         // objects in $trackingNumbers are Label_Generation_Event_Type, not plain tracking numbers.
         // TODO: if/when FetchDocumentService is fixed/replaced, update this "get tracking number" logic
         if ((!array_key_exists(self::GENERATED_SHIPPING_LABELS, $label_generation_event)) ||
-          empty($label_generation_event[self::GENERATED_SHIPPING_LABELS])) {
+          empty($label_generation_event[self::GENERATED_SHIPPING_LABELS])
+        ) {
 
           $externalLogs->addErrorLog('No label information in tracking info for package at index '
             . $packageIndex . ' PO:' . $poNumber);
@@ -227,10 +193,10 @@ class ShipmentRegisterService
           $generated_label = $label_generation_event[0];
 
           if ((!array_key_exists(self::TRACKING_NUMBER, $generated_label)) ||
-            empty($generated_label[self::TRACKING_NUMBER])) {
+            empty($generated_label[self::TRACKING_NUMBER])
+          ) {
             $externalLogs->addErrorLog('No tracking number in label info for package at index '
               . $packageIndex . '. Using PO number as tracking number! PO:' . $poNumber);
-
           } else {
             return $generated_label[self::TRACKING_NUMBER];
           }
@@ -253,17 +219,18 @@ class ShipmentRegisterService
    */
   public function register(array $orderIds): array
   {
-    $this->registerResult = [];
+    $registerResult = [];
     if (empty($orderIds)) {
       $this->loggerContract
         ->error(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_EMPTY_ORDER_IDS_PROCESS), [
+          TranslationHelper::getLoggerKey(self::LOG_KEY_EMPTY_ORDER_IDS_PROCESS),
+          [
             'additionalInfo' => ['orderIds' => $orderIds],
             'method' => __METHOD__
           ]
         );
 
-      return $this->registerResult;
+      return $registerResult;
     }
 
     /** @var ExternalLogs $externalLogs */
@@ -280,10 +247,25 @@ class ShipmentRegisterService
       foreach ($orderIds as $orderId) {
         $poNumber = $this->orderPropertyService->getCheckedPoNumber($orderId);
 
-        if ($this->checkEmptyPoNumber($poNumber, $orderId, $externalLogs)) {
+        if (!isset($poNumber) || empty($poNumber)) {
+
+          $errorMessage = sprintf(TranslationHelper::translate(self::LOG_KEY_SHIPPING_CANNOT_FIND_PO_NUMBER), $poNumber);
+
+          $registerResult[$orderId] = $this->buildResultMessage(false, $errorMessage, []);
+
+          $this->loggerContract
+            ->debug(
+              TranslationHelper::getLoggerKey(self::LOG_KEY_SHIPPING_CANNOT_FIND_PO_NUMBER),
+              [
+                'additionalInfo' => ['orderId' => $orderId],
+                'method' => __METHOD__
+              ]
+            );
+
+          $externalLogs->addErrorLog('Cannot register shipment! Cannot find the PO number. Plentymarkets Order:' . $orderId);
+
           continue;
         }
-
 
         try {
           $shippingInformation = $this->getOrderShippingInformation($orderId);
@@ -299,7 +281,34 @@ class ShipmentRegisterService
             ]
           );
 
-          if ($this->shipmentIsRegistered($shippingInformation, $orderId, $poNumber, $externalLogs)) {
+          if ($this->shipmentIsRegistered($shippingInformation)) {
+
+            // If order has already been registered with Wayfair, ignore and alert supplier.
+            $registerResult[$orderId] =
+              $this->buildResultMessage(
+                false,
+                sprintf(
+                  TranslationHelper::translate(self::LOG_KEY_ALREADY_REGISTERED),
+                  $shippingInformation->shippingServiceProvider,
+                  $orderId
+                ),
+                []
+              );
+
+            $this->loggerContract->info(
+              TranslationHelper::getLoggerKey(self::LOG_KEY_ALREADY_REGISTERED),
+              [
+                'additionalInfo' => [
+                  'orderId' => $orderId,
+                  'po' => $poNumber,
+                ],
+                'method' => __METHOD__
+              ]
+            );
+
+            $externalLogs->addInfoLog('Already registered PO: ' . $poNumber .
+              ' . Order:' . $orderId);
+
             continue;
           }
 
@@ -344,8 +353,7 @@ class ShipmentRegisterService
           $requestDto->setPoNumber($poNumber);
           $warehouseId = $this->orderPropertyService->getWarehouseId($orderId);
 
-          if (!isset($warehouseId) || empty($warehouseId))
-          {
+          if (!isset($warehouseId) || empty($warehouseId)) {
             $externalLogs->addErrorLog('Warehouse ID missing' . ' Order:' . $orderId . 'PO:' . $poNumber);
 
             $this->loggerContract
@@ -409,7 +417,6 @@ class ShipmentRegisterService
               throw new \Exception("Registration response is missing the PO number");
             }
             $trackingNumbers = $this->fetchShippingLabelContract->getTrackingNumber($poNumberWithoutPrefix);
-
           } catch (\Exception $exception) {
             $externalLogs->addErrorLog('Unable to get the tracking number, PO:' . $poNumber . ' - ' . get_class($exception) . ': ' . $exception->getMessage());
             $this->loggerContract->error(TranslationHelper::getLoggerKey(self::LOG_KEY_UNABLE_TO_GET_TRACKING_NUMBER), [
@@ -469,9 +476,12 @@ class ShipmentRegisterService
                 (TimeHelper::getMilliseconds() - $msSaveStart);
             } catch (\Exception $e) {
               $shippingLabelsGenerateFailed++;
-              $externalLogs->addShippingLabelLog('Shipping label retrieve failed',
-                'shippingLabelRetrieveFailed', $shippingLabelsGenerateFailed,
-                TimeHelper::getMilliseconds() - $msSaveStart);
+              $externalLogs->addShippingLabelLog(
+                'Shipping label retrieve failed',
+                'shippingLabelRetrieveFailed',
+                $shippingLabelsGenerateFailed,
+                TimeHelper::getMilliseconds() - $msSaveStart
+              );
               $externalLogs->addErrorLog('Shipping label retrieval failed. PO:' . $poNumber .
                 " " . get_class($e) . ": " . $e->getMessage());
 
@@ -505,15 +515,18 @@ class ShipmentRegisterService
               $index . ' from PO ' . $poNumber);
 
             $this->orderShippingPackageRepositoryContract->updateOrderShippingPackage(
-              $packageId, [
+              $packageId,
+              [
                 'packageNumber' => $trackingNumber,
                 'label' => $storageObject->key,
                 'labelPath' => $storageObject->key
               ]
             );
 
-            $objectUrl = $this->storageRepositoryContract->getObjectUrl(AbstractConfigHelper::PLUGIN_NAME,
-              $packageFileName);
+            $objectUrl = $this->storageRepositoryContract->getObjectUrl(
+              AbstractConfigHelper::PLUGIN_NAME,
+              $packageFileName
+            );
 
             $shipmentNumber = ShippingLabelHelper::generateShipmentNumber($poNumber, $packageId);
 
@@ -526,7 +539,8 @@ class ShipmentRegisterService
 
             $this->loggerContract
               ->info(
-                TranslationHelper::getLoggerKey(self::LOG_KEY_SAVED_SHIPMENT), [
+                TranslationHelper::getLoggerKey(self::LOG_KEY_SAVED_SHIPMENT),
+                [
                   'additionalInfo' => ['shipmentItems' => $shipmentItems],
                   'method' => __METHOD__,
                   'referenceType' => 'poNumber',
@@ -537,7 +551,7 @@ class ShipmentRegisterService
             $externalLogs->addInfoLog("Saved information for shipment " . $shipmentNumber .
               " for order with ID " . $orderId);
 
-            $this->registerResult[$orderId] = $this->buildResultMessage(
+            $registerResult[$orderId] = $this->buildResultMessage(
               true,
               TranslationHelper::translate('shippingRegisterMessage') . $orderId,
               false,
@@ -548,7 +562,7 @@ class ShipmentRegisterService
           $externalLogs->addErrorLog('Registration process failed, PO:' . $poNumber . ' - '
             . get_class($exception) . ': ' . $exception->getMessage());
           $errorMessage = sprintf(TranslationHelper::translate(self::LOG_KEY_SHIPPING_ERROR_REGISTERED_SHIPMENT), $orderId);
-          $this->registerResult[$orderId] = $this->buildResultMessage(false, $errorMessage, []);
+          $registerResult[$orderId] = $this->buildResultMessage(false, $errorMessage, []);
 
           $this->loggerContract
             ->error(
@@ -569,19 +583,35 @@ class ShipmentRegisterService
         }
       }
 
-      return $this->registerResult;
+      return $registerResult;
     } finally {
       if ($purchaseOrdersToRegister > 0) {
-        $externalLogs->addShippingLabelLog('Purchase order register', 'purchaseOrderRegister',
-          $purchaseOrdersToRegister, $purchaseOrdersRegisterDuration);
-        $externalLogs->addShippingLabelLog('Purchase order registered', 'purchaseOrderRegistered',
-          $purchaseOrdersToRegister - $purchaseOrdersRegisterFailed, $purchaseOrdersRegisterDuration);
+        $externalLogs->addShippingLabelLog(
+          'Purchase order register',
+          'purchaseOrderRegister',
+          $purchaseOrdersToRegister,
+          $purchaseOrdersRegisterDuration
+        );
+        $externalLogs->addShippingLabelLog(
+          'Purchase order registered',
+          'purchaseOrderRegistered',
+          $purchaseOrdersToRegister - $purchaseOrdersRegisterFailed,
+          $purchaseOrdersRegisterDuration
+        );
       }
       if ($shippingLabelsToGenerate > 0) {
-        $externalLogs->addShippingLabelLog('Shipping label retrieve', 'shippingLabelRetrieve',
-          $shippingLabelsToGenerate, $shippingLabelsGenerateDuration);
-        $externalLogs->addShippingLabelLog('Shipping label retrieved', 'shippingLabelRetrieved',
-          $shippingLabelsToGenerate - $shippingLabelsGenerateFailed, $shippingLabelsGenerateDuration);
+        $externalLogs->addShippingLabelLog(
+          'Shipping label retrieve',
+          'shippingLabelRetrieve',
+          $shippingLabelsToGenerate,
+          $shippingLabelsGenerateDuration
+        );
+        $externalLogs->addShippingLabelLog(
+          'Shipping label retrieved',
+          'shippingLabelRetrieved',
+          $shippingLabelsToGenerate - $shippingLabelsGenerateFailed,
+          $shippingLabelsGenerateDuration
+        );
       }
 
       if (count($externalLogs->getLogs())) {
@@ -604,19 +634,19 @@ class ShipmentRegisterService
     /** @var ExternalLogs $externalLogs */
     $externalLogs = pluginApp(ExternalLogs::class);
     try {
-      // FIXME: this is throwing away ALL registration data, even for orders not in the request parameter
-      $this->registerResult = [];
+      $registerResult = [];
       if (empty($orderIds)) {
 
         $this->loggerContract
           ->warning(
-            TranslationHelper::getLoggerKey(self::LOG_KEY_EMPTY_ORDER_IDS_UNREGISTER), [
+            TranslationHelper::getLoggerKey(self::LOG_KEY_EMPTY_ORDER_IDS_UNREGISTER),
+            [
               'additionalInfo' => ['orderIds' => $orderIds],
               'method' => __METHOD__
             ]
           );
 
-        return $this->registerResult;
+        return $registerResult;
       }
 
       foreach ($orderIds as $orderId) {
@@ -625,8 +655,11 @@ class ShipmentRegisterService
         //Check if shipping information is correct
 
         if (isset($shippingInformation)) {
-          $this->registerResult[$orderId] = $this->buildResultMessage(true,
-            sprintf(TranslationHelper::translate('shippingUnregisterSuccessfully'), $orderId), []);
+          $registerResult[$orderId] = $this->buildResultMessage(
+            true,
+            sprintf(TranslationHelper::translate('shippingUnregisterSuccessfully'), $orderId),
+            []
+          );
           $this->shippingInformationRepositoryContract->resetShippingInformation($orderId);
         } else {
           $this->loggerContract
@@ -646,7 +679,7 @@ class ShipmentRegisterService
         }
       }
 
-      return $this->registerResult;
+      return $registerResult;
     } finally {
       if (count($externalLogs->getLogs())) {
         /** @var LogSenderService $logSenderService */
@@ -671,8 +704,7 @@ class ShipmentRegisterService
     $statusMessage = '',
     $newShippingPackage = false,
     $shipmentItems = []
-  ): array
-  {
+  ): array {
     return [
       'success' => $success,
       'message' => $statusMessage,
@@ -728,35 +760,4 @@ class ShipmentRegisterService
 
     return $shippingInformation;
   }
-
-  /**
-   * @param string $poNumber
-   * @param mixed $orderId
-   * @param ExternalLogs $externalLogs
-   *
-   * @return bool
-   */
-  private function checkEmptyPoNumber(string $poNumber, $orderId, ExternalLogs $externalLogs): bool
-  {
-    if (empty($poNumber)) {
-      $errorMessage = sprintf(TranslationHelper::translate(self::LOG_KEY_SHIPPING_CANNOT_FIND_PO_NUMBER), $poNumber);
-
-      $this->registerResult[$orderId] = $this->buildResultMessage(false, $errorMessage, []);
-
-      $this->loggerContract
-        ->debug(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_SHIPPING_CANNOT_FIND_PO_NUMBER), [
-            'additionalInfo' => ['orderId' => $orderId],
-            'method' => __METHOD__
-          ]
-        );
-
-      $externalLogs->addErrorLog('Cannot register shipment! Cannot find the PO number. Plentymarkets Order:' . $orderId);
-
-      return true;
-    }
-
-    return false;
-  }
-
 }
