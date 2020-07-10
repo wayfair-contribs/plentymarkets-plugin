@@ -285,6 +285,7 @@ class ShipmentNotificationService
       /** @var RequestDTO $requestDto */
       $requestDto = pluginApp(RequestDTO::class);
 
+      $scacCode = '';
       $orderId = $order->id;
       $poNumber = $this->orderPropertyService->getCheckedPoNumber($orderId);
 
@@ -331,8 +332,8 @@ class ShipmentNotificationService
         return null;
       }
 
-      $plentymarketsShippingInformation = $this->shippingInformationRepositoryContract->getShippingInformationByOrderId($orderId);
-      if (!isset($plentymarketsShippingInformation)) { //|| empty($plentymarketsShippingInformation)){ //|| empty($plentymarketsShippingInformation->shippingServiceProvider)) {
+      $plentymarketsShippingInformation = json_encode ($this->shippingInformationRepositoryContract->getShippingInformationByOrderId($orderId));
+      if (!isset($plentymarketsShippingInformation) || empty($plentymarketsShippingInformation) || empty($plentymarketsShippingInformation->shippingServiceProvider)) {
         $this->loggerContract->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_PM_MISSING_SHIPPING_INFO), [
             'additionalInfo' => [
