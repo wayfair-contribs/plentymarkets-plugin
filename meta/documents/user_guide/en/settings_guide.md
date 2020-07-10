@@ -1,6 +1,6 @@
 # Wayfair Plugin: Wayfair Market Settings
 The Wayfair plugin comes with a collection of settings for controlling the plugin's behavior.
-These settings should only be configured after the authorization settings for the plugin have been entered in the active Plugin Set.
+These settings should only be configured after the authorization settings for the plugin have been configured in the active Plugin Set.
 
 To locate the settings:
 1. Log in to Plentymarkets as a user with administrative rights
@@ -8,10 +8,10 @@ To locate the settings:
 3. Click `Markets` in the left navigation bar of the `Settings` interface
 4. Click `Wayfair` in the list of `Markets`. It may appear at the bottom, rather than being alphabetically situated.
 5. Click `Home` under `Wayfair`
-6. You may now use the Wayfair navigation bar to choose a settings page such as `Warehouses`.
+6. You may now use the Wayfair navigation bar to choose a settings page such as [`Warehouses`](#warehouses-page).
 
 ## Warehouses page
-The Warehouses page is used for associating the Warehouses that the supplier is using in Plentymarkets with the Wayfair Supplier IDs that have been issued to the supplier. The mappings are utilized by the Wayfair plugin when it reports inventory to Wayfair and also when ti is processing Wayfair orders coming into Plentymarkets.
+The Warehouses page is used for associating the Warehouses that the supplier is using in Plentymarkets with the Wayfair Supplier IDs that have been issued to the supplier. The mappings are utilized by the Wayfair plugin when it reports inventory to Wayfair and also when it is processing Wayfair orders coming into Plentymarkets.
 
 The topography of the Plentymarkets system may not match the amount of Wayfair Supplier IDs. It is acceptable to use a Warehouse Supplier ID for more than one of the Plentymarkets Warehouses. Beware the [Stock Buffer](#stock-buffer) setting.
 
