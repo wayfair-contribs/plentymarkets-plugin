@@ -51,6 +51,7 @@ class ShipmentNotificationService
   const MISSING_TRACKING_NUMBER_FOR_ASN = 'ASN for Order %d - PO %s - is being sent without a tracking number';
   const GENERATED_SHIPPING_LABELS = 'generatedShippingLabels';
 
+
   /**
    * @var ASNService
    */
@@ -333,7 +334,7 @@ class ShipmentNotificationService
       }
 
       $plentymarketsShippingInformation = json_encode ($this->shippingInformationRepositoryContract->getShippingInformationByOrderId($orderId));
-      if (!isset($plentymarketsShippingInformation) || empty($plentymarketsShippingInformation) || empty($plentymarketsShippingInformation->shippingServiceProvider)) {
+      if (!isset($plentymarketsShippingInformation) || empty($plentymarketsShippingInformation->shippingServiceProvider)) {
         $this->loggerContract->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_PM_MISSING_SHIPPING_INFO), [
             'additionalInfo' => [
@@ -348,7 +349,7 @@ class ShipmentNotificationService
 
         $externalLogs->addErrorLog("Unable to get shipping data from Plentymarkets for Order with ID " . $orderId
           . '. PO: ' . $poNumber);
-        return null;
+        // return null;
       }
 
       $this->loggerContract->debug(
@@ -494,8 +495,20 @@ class ShipmentNotificationService
             'method' => __METHOD__
           ]
         );
-
-        $scacCode = $this->carrierScacRepository->findScacByCarrierId($plentymarketsShippingInformation->shippingServiceProvider->id);
+        if (!empty($plentymarketsShippingInformation->shippingServiceProvider->id)) {
+          $scacCode = $this->carrierScacRepository->findScacByCarrierId($plentymarketsShippingInformation->shippingServiceProvider->id);
+        }
+        $this->loggerContract->error(
+          TranslationHelper::getLoggerKey(self::LOG_KEY_PM_MISSING_SHIPPING_INFO),
+          [
+            'additionalInfo' => [
+              'PoNumber' => $poNumber,
+              'order' => $order,
+              'message' => 'Shipping service provider ID is null',
+            ],
+            'method' => __METHOD__
+          ]
+        );
         $orderShippingPackages = $this->orderShippingPackageRepositoryContract->listOrderShippingPackages($orderId);
         $orderTrackingNumbers = $this->orderRepositoryContract->getPackageNumbers($orderId);
         $requestDto->setPackageCount(count($orderShippingPackages) > 0 ? count($orderShippingPackages) : 1);
