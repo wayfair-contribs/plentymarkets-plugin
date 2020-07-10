@@ -105,18 +105,8 @@ class ProductMapper
     foreach ($result->getResult() as $variation) {
       return $variation['id'];
     }
-<<<<<<< HEAD
-    /**
-     * @var LoggerContract $loggerContract
-     */
-    $loggerContract = pluginApp(LoggerContract::class);
-
-    // FIXME: the poNumber is 0 when this log appears
-    $loggerContract
-=======
 
     $this->loggerContract
->>>>>>> origin/master
       ->warning(
         TranslationHelper::getLoggerKey(self::LOG_KEY_VARIATION_NOT_FOUND),
         [
