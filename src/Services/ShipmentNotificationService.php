@@ -495,20 +495,22 @@ class ShipmentNotificationService
             'method' => __METHOD__
           ]
         );
-        if (!empty($plentymarketsShippingInformation->shippingServiceProvider->id)) {
-          $scacCode = $this->carrierScacRepository->findScacByCarrierId($plentymarketsShippingInformation->shippingServiceProvider->id);
-        }
-        $this->loggerContract->error(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_PM_MISSING_SHIPPING_INFO),
-          [
-            'additionalInfo' => [
-              'PoNumber' => $poNumber,
-              'order' => $order,
-              'message' => 'Shipping service provider ID is null',
-            ],
-            'method' => __METHOD__
-          ]
-        );
+        if (empty($plentymarketsShippingInformation->shippingServiceProvider->id)) {
+          $this->loggerContract->error(
+            TranslationHelper::getLoggerKey(self::LOG_KEY_PM_MISSING_SHIPPING_INFO),
+            [
+              'additionalInfo' => [
+                'PoNumber' => $poNumber,
+                'order' => $order,
+                'message' => 'Shipping service provider ID is null',
+              ],
+              'method' => __METHOD__
+              ]
+            );
+          }
+          else {
+            $scacCode = $this->carrierScacRepository->findScacByCarrierId($plentymarketsShippingInformation->shippingServiceProvider->id);
+          }
         $orderShippingPackages = $this->orderShippingPackageRepositoryContract->listOrderShippingPackages($orderId);
         $orderTrackingNumbers = $this->orderRepositoryContract->getPackageNumbers($orderId);
         $requestDto->setPackageCount(count($orderShippingPackages) > 0 ? count($orderShippingPackages) : 1);
