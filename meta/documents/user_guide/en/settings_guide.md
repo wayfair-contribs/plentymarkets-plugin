@@ -3,7 +3,7 @@
 ## Warehouses page
 The Warehouses page is used for associating the Warehouses that the supplier is using in Plentymarkets with the Wayfair Supplier IDs that have been issued to the supplier. The mappings are utilized by the Wayfair plugin when it reports inventory to Wayfair and also when ti is processing Wayfair orders coming into Plentymarkets.
 
-The topography of the Plentymarkets system may not match the amount of Wayfair Supplier IDs. It is acceptable to use a Warehouse Supplier ID for more than one of the Plentymarkets Warehouses. Beware the [Stock Buffer]($stock-buffer) setting.
+The topography of the Plentymarkets system may not match the amount of Wayfair Supplier IDs. It is acceptable to use a Warehouse Supplier ID for more than one of the Plentymarkets Warehouses. Beware the [Stock Buffer](#stock-buffer) setting.
 
 ### Adding a Warehouse mapping
 1. Click on the `Add Mapping` button
