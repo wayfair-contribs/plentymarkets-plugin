@@ -1,4 +1,14 @@
-# Wayfair Plugin: Settings
+# Wayfair Plugin: Wayfair Market Settings
+The Wayfair plugin comes with a collection of settings for controlling the plugin's behavior.
+These settings should only be configured after the authorization settings for the plugin have been entered in the active Plugin Set.
+
+To locate the settings:
+1. Log in to Plentymarkets as a user with administrative rights
+2. Click `Setup` in the top navigation bar of Plentymarkets
+3. Click `Markets` in the left navigation bar of the `Settings` interface
+4. Click `Wayfair` in the list of `Markets`. It may appear at the bottom, rather than being alphabetically situated.
+5. Click `Home` under `Wayfair`
+6. You may now use the Wayfair navigation bar to choose a settings page such as `Warehouses`.
 
 ## Warehouses page
 The Warehouses page is used for associating the Warehouses that the supplier is using in Plentymarkets with the Wayfair Supplier IDs that have been issued to the supplier. The mappings are utilized by the Wayfair plugin when it reports inventory to Wayfair and also when ti is processing Wayfair orders coming into Plentymarkets.
@@ -26,4 +36,17 @@ The `Stock Buffer` setting is a non-negative integer that sets a reserved amount
 To disable the `Stock Buffer`, leave this setting empty, or set it to `0`.
 
 ### Default Order Status
+...
+
+### Default Shipping Provider **(deprecated)**
+The `Default Shipping Provider` setting is a legacy setting that no longer impacts the behavior of the plugin. **If this setting appears in your system, Wayfair strongly recommends that you upgrade your plugin to a newer version.**
+
+
+### Item Mapping Method
+...
+
+### Import orders since
+...
+
+### Send all inventory items to Wayfair?
 ...
