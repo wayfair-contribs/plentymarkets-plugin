@@ -60,3 +60,45 @@ When `Send all inventory items to Wayfair?` is disabled, selling an Item on Wayf
 ![item with Wayfair Market](../../../images/item_wayfair_market.png)
 
 Enabling `Send all inventory items to Wayfair?` will allow Wayfair to list any item that is determined to be currently in stock, including those Items for which "Wayfair" is **not** present in the `Markets` list.
+
+
+## Full Inventory page
+The `Full Inventory` page does not contain any settings to configure.
+It is used for checking the status of syncing the Plentymarkets inventory with Wayfair, or manually initiating a synchronization of all inventory items.
+The page's data will automatically refresh over time, but you may also manually refresh it.
+
+### Fields
+* The `Time of last successful inventory synchronization` fields keep track of the daily synchronizations that are normally preformed automatically.
+    * A "check mark" icon will appear if it has been less than 24 hours since the last successful synchronization. This indicates that no actions are required.
+    * A "warning" icon will appear if it has been over 24 hours since the last successful synchronization. Consider using the `Start Synchronization` button as described below.
+
+* The `Status of last attempt` fields are used to see if a full inventory synchronization is currently underway. Check this field after using the `Start Synchronization` button.
+    * The status `COMPLETE` indicates that the last automatic or manual synchronization was successful.
+    * The status `FAILED` indicates that the last automatic or manual synchronization was not successful. Check the Plentymarkets logs for issues.
+
+### Buttons
+* The `Start Synchronization` button is used for manually synchronizing all inventory. The status of the process will be displayed in the fields above the buttons.
+* The `Refresh` button is used for updating the fields above the buttons to match the most recent results of automatic full inventory synchronization.
+
+
+## Ship Confirmation (ASN) page
+The `Ship Confirmation (ASN)` page is used for configuring the shipment interactions between Plentymarkets, the Wayfair Plugin, and Wayfair.
+The information set here will inform the `Send Ship Confirmation (ASN) to Wayfair` Order Procedure that the Wayfair Plugin provides.
+
+### Shipping type radio button
+The radio button at the top of the page has these options.
+During Wayfair plugin onboarding, Wayfair will instruct on which option is appropriate for the Plentymarkets user.
+* `Wayfair shipping`
+    * Your orders are shipped by Wayfair
+    * You only need to tell Wayfair when the order is ready for shipment
+    * You need to get tracking information back from Wayfair into Plentymarkets
+
+* `Own account shipping`
+    * You ship your own orders via your own carriers
+    * You need to tell Wayfair when you are shipping an order
+    * You need to tell Wayfair the tracking information (carrier and tracking number)
+
+### Matching Plentymarkets Carriers to Wayfair Carriers
+When you choose the `Own Account shipping` option, Wayfair needs to translate the Plentymarkets shipping information into data it understands.
+1. Locate the carrier information provided by Wayfair. Contact [ERPSupport@wayfair.com](mailto:ERPSupport@wayfair.com) if required.
+2. For each Plentymarkets-side `Shipping Carrier` listed on the left-side column, enter the Wayfair-provided "SCAC code" in the right-side `Wayfair carrier` column.
