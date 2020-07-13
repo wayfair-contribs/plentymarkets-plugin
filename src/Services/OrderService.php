@@ -21,6 +21,7 @@ class OrderService
   const LOG_KEY_ORDER_CREATION_INCOMPLETE = 'orderCreatedButIncomplete';
   const LOG_KEY_FETCH_FAILED = 'failedToFetchOrders';
   const LOG_KEY_STARTING_FETCH = 'fetchingOrders';
+  const LOG_KEY_TEST = 'test';
 
   /**
    * @var FetchOrderService
@@ -123,6 +124,16 @@ class OrderService
         if ($plentyOrderId < 0) {
           $externalLogs->addErrorLog('Order already exists, PO: ' . $order->getPoNumber());
         } else if ($plentyOrderId > 0) {
+          $test = pluginApp(OrderPropertyService::class);
+          $pmWarehouseId = $test->getWarehouseId($plentyOrderId);
+          $this->loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_TEST), [
+            'additionalInfo' => [
+              'message' => 'Retrieving the warehouse id from PM order',
+              'pmOrderID' => $plentyOrderId,
+              '$pmWarehouseId' => $pmWarehouseId
+            ],
+        'method' => __METHOD__]);
+
           $createdOrdersCount++;
         }
       } catch (\Exception $e) {
