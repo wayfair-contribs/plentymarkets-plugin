@@ -333,7 +333,7 @@ class ShipmentNotificationService
       }
 
       $plentyMarketsShippingInformation = $this->shippingInformationRepositoryContract->getShippingInformationByOrderId($orderId);
-      if (!isset($plentyMarketsShippingInformation) || empty($plentyMarketsShippingInformation->shippingServiceProvider)) {
+      if (!isset($plentyMarketsShippingInformation) || empty($plentyMarketsShippingInformation)){//->shippingServiceProvider)) {
         $this->loggerContract->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_PM_MISSING_SHIPPING_INFO), [
             'additionalInfo' => [
