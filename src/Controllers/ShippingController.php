@@ -17,6 +17,10 @@ use Wayfair\Services\ShipmentRegisterService;
  * @package Wayfair\Controllers
  */
 class ShippingController extends Controller {
+  const LOG_KEY_REGISTER_SHIPMENT_FOR_ORDERS = 'registerShipmentForOrders';
+  const LOG_KEY_GENERATE_LABELS = 'getGeneratedLabels';
+  const LOG_KEY_DELETE_SHIPMENT_ORDER = 'deleteShipmentForOrders';
+
   /**
    * @var ShipmentRegisterService
    */
@@ -50,14 +54,8 @@ class ShippingController extends Controller {
     $orderIds = $this->processOrderIds($request, $orderIds);
     $this->loggerContract
         ->info(
-            TranslationHelper::getLoggerKey('registerShipmentForOrders'), [
+            TranslationHelper::getLoggerKey(self::LOG_KEY_REGISTER_SHIPMENT_FOR_ORDERS), [
             'additionalInfo' => ['orderIds' => $orderIds],
-            'method' => __METHOD__
-            ]
-        );
-    $this->loggerContract->debug(
-            TranslationHelper::getLoggerKey('debugRegisterShipmentForOrders'), [
-            'additionalInfo' => ['orderIds' => $orderIds, 'request' => $request],
             'method' => __METHOD__
             ]
         );
@@ -77,7 +75,7 @@ class ShippingController extends Controller {
     $orderIds = $this->processOrderIds($request, $orderIds);
     $this->loggerContract
         ->info(
-            TranslationHelper::getLoggerKey('getGeneratedLabels'), [
+            TranslationHelper::getLoggerKey(self::LOG_KEY_GENERATE_LABELS), [
             'additionalInfo' => ['orderIds' => $orderIds],
             'method' => __METHOD__
             ]
@@ -98,7 +96,7 @@ class ShippingController extends Controller {
     $orderIds = $this->processOrderIds($request, $orderIds);
     $this->loggerContract
         ->info(
-            TranslationHelper::getLoggerKey('deleteShipmentForOrders'), [
+            TranslationHelper::getLoggerKey(self::LOG_KEY_DELETE_SHIPMENT_ORDER), [
             'additionalInfo' => ['orderIds' => $orderIds],
             'method' => __METHOD__
             ]

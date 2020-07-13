@@ -17,6 +17,7 @@ class FetchOrderService extends APIService
   const FETCH_LIMIT = 50;
 
   const LOG_KEY_INCOMING_PO = 'incomingPurchaseOrder';
+  const LOG_KEY_DEBUG_TESTING = 'test';
 
   /**
    * @param int $circle
@@ -34,9 +35,9 @@ class FetchOrderService extends APIService
     $query = $this->getQuery($circle);
 
     $response = $this->query($query);
-    // $loggerContract->debug('Test',
-    $loggerContract->debug(TranslationHelper::getLoggerKey('test'),
+    $loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG_TESTING),
           [
+            'message' => 'The request and response for fetching orders',
             'query' => $query,
             'response' => $response,
             'method' => __METHOD__

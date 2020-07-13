@@ -23,6 +23,7 @@ class OrderPropertyService {
   const LOG_KEY_CANNOT_OBTAIN_PO_NUMBER = 'obtainPoNumber';
   const LOG_KEY_WAREHOUSE_ID_NOT_FOUND = 'warehouseIdNotFound';
   const LOG_KEY_NO_SUPPLIER_ID_FOR_WAREHOUSE = 'noSupplierIDForWarehouse';
+  const LOG_KEY_TEST = 'test';
 
   /**
    * @var OrderPropertyRepositoryContract
@@ -98,12 +99,12 @@ class OrderPropertyService {
   public function getWarehouseId(int $orderId): string {
     $orderProperties = $this->orderPropertyRepositoryContract->findByOrderId($orderId, OrderPropertyType::WAREHOUSE);
     $this->loggerContract->debug(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_WAREHOUSE_ID_NOT_FOUND),
+        TranslationHelper::getLoggerKey(self::LOG_KEY_TEST),
         [
           'additionalInfo' => [
             'orderId' => $orderId,
             'typeId' => OrderPropertyType::WAREHOUSE,
-          'order properties' => $orderProperties
+          'orderProperties' => $orderProperties
           ],
           'method' => __METHOD__
         ]

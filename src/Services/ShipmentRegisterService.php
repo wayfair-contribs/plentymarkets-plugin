@@ -274,7 +274,6 @@ class ShipmentRegisterService
             [
               'additionalInfo' => [
                 'orderID' => $orderId,
-                'message' => 'ShipmentRegister service line 294',
                 'shippingInformation' => $shippingInformation
               ],
               'method' => __METHOD__

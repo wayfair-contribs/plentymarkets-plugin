@@ -51,7 +51,6 @@ class ShipmentNotificationService
   const MISSING_TRACKING_NUMBER_FOR_ASN = 'ASN for Order %d - PO %s - is being sent without a tracking number';
   const GENERATED_SHIPPING_LABELS = 'generatedShippingLabels';
 
-
   /**
    * @var ASNService
    */
@@ -333,8 +332,8 @@ class ShipmentNotificationService
         return null;
       }
 
-      $plentymarketsShippingInformation = json_encode ($this->shippingInformationRepositoryContract->getShippingInformationByOrderId($orderId));
-      if (!isset($plentymarketsShippingInformation) || empty($plentymarketsShippingInformation->shippingServiceProvider)) {
+      $plentyMarketsShippingInformation = $this->shippingInformationRepositoryContract->getShippingInformationByOrderId($orderId);
+      if (!isset($plentyMarketsShippingInformation) || empty($plentyMarketsShippingInformation->shippingServiceProvider)) {
         $this->loggerContract->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_PM_MISSING_SHIPPING_INFO), [
             'additionalInfo' => [
@@ -349,7 +348,7 @@ class ShipmentNotificationService
 
         $externalLogs->addErrorLog("Unable to get shipping data from Plentymarkets for Order with ID " . $orderId
           . '. PO: ' . $poNumber);
-        // return null;
+        return null;
       }
 
       $this->loggerContract->debug(
@@ -357,8 +356,8 @@ class ShipmentNotificationService
           'additionalInfo' => [
             'order' => $order,
             'po' => $purchaseOrderInfo,
-            'shippingInformation' => $plentymarketsShippingInformation,
-            'ShippingOnWayfair' => $this->shipmentProviderService->isShippingWithWayfair()
+            'shippingInformation' => $plentyMarketsShippingInformation,
+            'shippingOnWayfair' => $this->shipmentProviderService->isShippingWithWayfair()
           ],
           'method' => __METHOD__
         ]
@@ -371,7 +370,7 @@ class ShipmentNotificationService
 
       //Decide how to get tracking and package information.
       // if ($this->shipmentProviderService->isShippingWithWayfair()) {
-      if ($this->shipmentProviderService->isShippingWithWayfair()){ //|| empty($plentymarketsShippingInformation->shippingServiceProvider)) {
+      if ($this->shipmentProviderService->isShippingWithWayfair()){ //|| empty($plentyMarketsShippingInformation->shippingServiceProvider)) {
         // shipping on wayfair account
         $this->loggerContract->info(
           TranslationHelper::getLoggerKey(self::LOG_KEY_SHIPPING_ON_WAYFAIR), [
@@ -490,12 +489,12 @@ class ShipmentNotificationService
               'order' => $order,
               'TrackingNumber' => $orderTrackingNumbers = $this->orderRepositoryContract->getPackageNumbers($orderId),
               'packages' => $this->orderShippingPackageRepositoryContract->listOrderShippingPackages($orderId),
-              'shippingInfo' => $plentymarketsShippingInformation->shippingServiceProvider
+              'shippingInfo' => $plentyMarketsShippingInformation->shippingServiceProvider
             ],
             'method' => __METHOD__
           ]
         );
-        if (empty($plentymarketsShippingInformation->shippingServiceProvider->id)) {
+        if (empty($plentyMarketsShippingInformation->shippingServiceProvider->id)) {
           $this->loggerContract->error(
             TranslationHelper::getLoggerKey(self::LOG_KEY_PM_MISSING_SHIPPING_INFO),
             [
@@ -509,12 +508,13 @@ class ShipmentNotificationService
             );
           }
           else {
-            $scacCode = $this->carrierScacRepository->findScacByCarrierId($plentymarketsShippingInformation->shippingServiceProvider->id);
+            $scacCode = $this->carrierScacRepository->findScacByCarrierId($plentyMarketsShippingInformation->shippingServiceProvider->id);
           }
         $orderShippingPackages = $this->orderShippingPackageRepositoryContract->listOrderShippingPackages($orderId);
         $orderTrackingNumbers = $this->orderRepositoryContract->getPackageNumbers($orderId);
         $requestDto->setPackageCount(count($orderShippingPackages) > 0 ? count($orderShippingPackages) : 1);
 
+        // This log will be remove before this file is merged in to master
         $this->loggerContract->debug(
           TranslationHelper::getLoggerKey(self::LOG_KEY_SHIPPING_ON_OWN_ACCOUNT),
           [
@@ -573,7 +573,7 @@ class ShipmentNotificationService
       $requestDto->setVolume($asnTotalVolume);
 
       $requestDto->setShipSpeed($wayfairShippingInformation['shipSpeed']);
-      $requestDto->setShipDate($plentymarketsShippingInformation->shipmentAt);
+      $requestDto->setShipDate($plentyMarketsShippingInformation->shipmentAt);
 
       $plentyBillingAddress = $order->billingAddress;
       if (!isset($plentyBillingAddress)) {
