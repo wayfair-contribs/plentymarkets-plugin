@@ -157,7 +157,7 @@ class OrderPropertyService
       return $props;
     }
 
-    throw new \Exception("Order is missing properties: " . $orderId)
+    throw new \Exception("Order is missing properties: " . $orderId);
   }
 
   /**
