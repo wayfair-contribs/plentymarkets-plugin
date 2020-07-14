@@ -26,7 +26,5 @@ Steps to reproduce the behavior:
 **Actual behavior:**
 [ie: New Warehouse mapping disappears after refreshing the page]
 
-**Actual behavior:**
-
 **Screenshots:**
 [If applicable, add screenshots to help explain your problem.]
