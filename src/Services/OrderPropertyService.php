@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Services;
@@ -25,6 +25,9 @@ class OrderPropertyService
   const LOG_KEY_CANNOT_OBTAIN_PO_NUMBER = 'obtainPoNumber';
   const LOG_KEY_WAREHOUSE_ID_NOT_FOUND = 'warehouseIdNotFound';
   const LOG_KEY_NO_SUPPLIER_ID_FOR_WAREHOUSE = 'noSupplierIDForWarehouse';
+
+  const ORDER_PROP_KEY_TYPE_ID = 'typeId';
+  const ORDER_PROP_KEY_VALUE = 'value';
 
   /**
    * @var OrderRepositoryContract
@@ -74,31 +77,24 @@ class OrderPropertyService
    */
   public function getCheckedPoNumber(int $orderId): string
   {
-    $plentyOrder = $this->orderRepositoryContract->findOrderById($orderId);
 
-    if (!isset($plentyOrder)) {
-      throw new \Exception("Order not found : " . (string)$orderId);
+    $externalOrderID = $this->getOrderPropertyValue($orderId, OrderPropertyType::EXTERNAL_ORDER_ID);
+
+    if (!isset($externalOrderID) || empty($externalOrderID)) {
+      $this->loggerContract
+        ->error(
+          TranslationHelper::getLoggerKey(self::LOG_KEY_CANNOT_OBTAIN_PO_NUMBER),
+          [
+            'method' => __METHOD__,
+            'referenceType' => 'orderId',
+            'referenceValue' => $orderId
+          ]
+        );
+
+      return '';
     }
 
-    $orderProperties = $plentyOrder->properties;
-
-    if (isset($orderProperties) && !empty($orderProperties) && array_key_exists(OrderPropertyType::EXTERNAL_ORDER_ID, $orderProperties)) {
-
-      // TODO: add check of PO number against Wayfair API in future release?
-      return $orderProperties[OrderPropertyType::EXTERNAL_ORDER_ID];
-    }
-
-    $this->loggerContract
-      ->error(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_CANNOT_OBTAIN_PO_NUMBER),
-        [
-          'method' => __METHOD__,
-          'referenceType' => 'orderId',
-          'referenceValue' => $orderId
-        ]
-      );
-
-    return '';
+    return $externalOrderID;
   }
 
   /**
@@ -110,20 +106,8 @@ class OrderPropertyService
    */
   public function getWarehouseId(int $orderId): string
   {
-    $plentyOrder = $this->orderRepositoryContract->findOrderById($orderId);
-
-    if (!isset($plentyOrder)) {
-      throw new \Exception("Order not found : " . (string)$orderId);
-    }
-
-    $orderProperties = $plentyOrder->properties;
-
-    $warehouseId = null;
+    $warehouseId = $this->getOrderPropertyValue($orderId, OrderPropertyType::WAREHOUSE);
     $mapping = null;
-
-    if (isset($orderProperties) && !empty($orderProperties) && array_key_exists(OrderPropertyType::WAREHOUSE, $orderProperties)) {
-      $warehouseId = $orderProperties[OrderPropertyType::WAREHOUSE];
-    }
 
     if (isset($warehouseId) && !empty($warehouseId)) {
       $mapping = $this->warehouseSupplierRepository->findByWarehouseId($warehouseId);
@@ -161,5 +145,29 @@ class OrderPropertyService
     }
 
     return $plentyOrder->properties;
+  }
+
+  /**
+   * Get the value for an order's property
+   *
+   * @param integer $orderId
+   * @param integer $propertyType
+   * @return mixed
+   */
+  function getOrderPropertyValue(int $orderId, int $propertyType)
+  {
+    $orderProperties = $this->getAllOrderProperties($orderId);
+
+    if (!isset($orderProperties) || empty($orderProperties)) {
+      return null;
+    }
+
+    foreach ($orderProperties as $prop) {
+      if ($prop[self::ORDER_PROP_KEY_TYPE_ID] == $propertyType) {
+        return $prop[self::ORDER_PROP_KEY_VALUE];
+      }
+    }
+
+    return null;
   }
 }
