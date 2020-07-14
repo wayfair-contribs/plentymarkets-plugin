@@ -73,6 +73,16 @@ class OrderPropertyService {
    */
   public function getCheckedPoNumber(int $orderId): string {
     $orderProperties = $this->orderPropertyRepositoryContract->findByOrderId($orderId, OrderPropertyType::EXTERNAL_ORDER_ID);
+
+    $this->loggerContract->debug(
+        TranslationHelper::getLoggerKey('test'),
+        [
+          'additionalInfo' => ['properties' => $orderProperties],
+          'method' => __METHOD__,
+          'referenceType' => 'orderId',
+          'referenceValue' => $orderId
+        ]
+      );
     if (empty($orderProperties) || empty($orderProperties[0]->value)) {
       $this->loggerContract
           ->error(
