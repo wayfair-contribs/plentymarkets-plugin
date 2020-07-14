@@ -1,3 +1,7 @@
-# the following users will be considered owners of all files and added as reviewers for all Pull Requests
-* @jhoule86 @mcloughlin77 @jathmel @dFed17
+# people that approve documentation
+*.md   @FelixEkwuemeC
 /meta/ @FelixEkwuemeC
+
+# the following users will be considered owners of ALL files and added as reviewers for ALL Pull Requests
+* @jhoule86 @mcloughlin77 @jathmel @dFed17
+
