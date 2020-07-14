@@ -286,6 +286,13 @@ class CreateOrderService
         throw new \Exception("Could not find Warehouse ID for PO " . $poNumber . " for supplier " . $supplierID);
       }
 
+      $loggerContract->debug(TranslationHelper::getLoggerKey('test'), [
+        'additionalInfo' => [
+          'message' => 'in createOrderService module',
+          'warehouseData' => $plentyWarehouseId
+        ],
+        'method' => __METHOD__
+      ]);
       $orderData = $this->purchaseOrderMapper->map(
         $dto,
         $billing['addressId'],
