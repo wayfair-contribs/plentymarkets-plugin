@@ -145,7 +145,14 @@ class OrderPropertyService
       throw new \Exception("Order not found : " . (string)$orderId);
     }
 
-    return $plentyOrder->properties;
+    $props = $plentyOrder->properties;
+
+    if (isset($props) && is_array($props) && !empty($props))
+    {
+      return $props;
+    }
+
+    throw new \Exception("Order is missing properties: " . $orderId)
   }
 
   /**
