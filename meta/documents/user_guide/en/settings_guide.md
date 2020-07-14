@@ -33,7 +33,7 @@ When choosing a relationship between Warehouses and Supplier IDs that is not one
 
 ## Settings page
 The Settings page contains general settings for the operation of the Wayfair plugin.
-Changes do not automatically save when changed. Use the `Save` button at the bottom of the page.
+Settings do not automatically save when changed. Use the `Save` button at the bottom of the page.
 
 ### Stock Buffer
 The `Stock Buffer` setting is a non-negative integer that sets a reserved amount of stock for each Item Variation, for each Wayfair Supplier ID. The buffer amount is subtracted after all other stock calculations are made, including aggregating the stocks for multiple Plentymarkets Warehouses that have been assigned the same Wayfair Supplier ID.
