@@ -1,11 +1,12 @@
 <?php
+
 /**
  * @copyright 2019 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Services;
 
-use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
+use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Order\Shipping\Information\Contracts\ShippingInformationRepositoryContract;
 use Wayfair\Core\Contracts\LoggerContract;
@@ -18,16 +19,17 @@ use Wayfair\Repositories\WarehouseSupplierRepository;
  *
  * @package Wayfair\Services
  */
-class OrderPropertyService {
+class OrderPropertyService
+{
 
   const LOG_KEY_CANNOT_OBTAIN_PO_NUMBER = 'obtainPoNumber';
   const LOG_KEY_WAREHOUSE_ID_NOT_FOUND = 'warehouseIdNotFound';
   const LOG_KEY_NO_SUPPLIER_ID_FOR_WAREHOUSE = 'noSupplierIDForWarehouse';
 
   /**
-   * @var OrderPropertyRepositoryContract
+   * @var OrderRepositoryContract
    */
-  private $orderPropertyRepositoryContract;
+  private $orderRepositoryContract;
 
   /**
    * @var WarehouseSupplierRepository
@@ -46,18 +48,18 @@ class OrderPropertyService {
   /**
    * OrderPropertyService constructor.
    *
-   * @param OrderPropertyRepositoryContract       $orderPropertyRepositoryContract
+   * @param OrderRepositoryContract               $orderRepositoryContract
    * @param WarehouseSupplierRepository           $warehouseSupplierRepository
    * @param ShippingInformationRepositoryContract $shippingInformationRepositoryContract
    * @param LoggerContract                        $loggerContract
    */
   public function __construct(
-      OrderPropertyRepositoryContract $orderPropertyRepositoryContract,
-      WarehouseSupplierRepository $warehouseSupplierRepository,
-      ShippingInformationRepositoryContract $shippingInformationRepositoryContract,
-      LoggerContract $loggerContract
+    OrderRepositoryContract $orderRepositoryContract,
+    WarehouseSupplierRepository $warehouseSupplierRepository,
+    ShippingInformationRepositoryContract $shippingInformationRepositoryContract,
+    LoggerContract $loggerContract
   ) {
-    $this->orderPropertyRepositoryContract = $orderPropertyRepositoryContract;
+    $this->OrderRepositoryContract = $orderRepositoryContract;
     $this->warehouseSupplierRepository = $warehouseSupplierRepository;
     $this->shippingInformationRepositoryContract = $shippingInformationRepositoryContract;
     $this->loggerContract = $loggerContract;
@@ -70,22 +72,33 @@ class OrderPropertyService {
    *
    * @return string
    */
-  public function getCheckedPoNumber(int $orderId): string {
-    $orderProperties = $this->orderPropertyRepositoryContract->findByOrderId($orderId, OrderPropertyType::EXTERNAL_ORDER_ID);
-    if (empty($orderProperties) || empty($orderProperties[0]->value)) {
-      $this->loggerContract
-          ->error(
-              TranslationHelper::getLoggerKey(self::LOG_KEY_CANNOT_OBTAIN_PO_NUMBER), [
-              'method' => __METHOD__,
-              'referenceType' => 'orderId',
-              'referenceValue' => $orderId
-              ]
-          );
+  public function getCheckedPoNumber(int $orderId): string
+  {
+    $plentyOrder = $this->orderRepositoryContract->findOrderById($orderId);
 
-      return '';
+    if (!isset($plentyOrder)) {
+      throw new \Exception("Order not found : " . (string)$orderId);
     }
 
-    return $orderProperties[0]->value;
+    $orderProperties = $plentyOrder->properties;
+
+    if (isset($orderProperties) && !empty($orderProperties) && array_key_exists(OrderPropertyType::EXTERNAL_ORDER_ID, $orderProperties)) {
+
+      // TODO: add check of PO number against Wayfair API in future release?
+      return $orderProperties[OrderPropertyType::EXTERNAL_ORDER_ID];
+    }
+
+    $this->loggerContract
+      ->error(
+        TranslationHelper::getLoggerKey(self::LOG_KEY_CANNOT_OBTAIN_PO_NUMBER),
+        [
+          'method' => __METHOD__,
+          'referenceType' => 'orderId',
+          'referenceValue' => $orderId
+        ]
+      );
+
+    return '';
   }
 
   /**
@@ -95,30 +108,32 @@ class OrderPropertyService {
    *
    * @return string
    */
-  public function getWarehouseId(int $orderId): string {
-    $orderProperties = $this->orderPropertyRepositoryContract->findByOrderId($orderId, OrderPropertyType::WAREHOUSE);
-    if (empty($orderProperties) || empty($orderProperties[0]->value)) {
-      $this->loggerContract
-          ->error(
-              TranslationHelper::getLoggerKey(self::LOG_KEY_WAREHOUSE_ID_NOT_FOUND), [
-              'additionalInfo' => [
-                'orderId' => $orderId
-              ],
-              'method' => __METHOD__,
-              'referenceType' => 'orderId',
-              'referenceValue' => $orderId
-              ]
-          );
+  public function getWarehouseId(int $orderId): string
+  {
+    $plentyOrder = $this->orderRepositoryContract->findOrderById($orderId);
 
-      return '';
+    if (!isset($plentyOrder)) {
+      throw new \Exception("Order not found : " . (string)$orderId);
     }
 
-    $warehouseId = $orderProperties[0]->value;
-    $mapping = $this->warehouseSupplierRepository->findByWarehouseId($warehouseId);
-    if (! isset($mapping) || empty($mapping->supplierId)) {
+    $orderProperties = $plentyOrder->properties;
+
+    $warehouseId = null;
+    $mapping = null;
+
+    if (isset($orderProperties) && !empty($orderProperties) && array_key_exists(OrderPropertyType::WAREHOUSE, $orderProperties)) {
+      $warehouseId = $orderProperties[OrderPropertyType::WAREHOUSE];
+    }
+
+    if (isset($warehouseId) && !empty($warehouseId)) {
+      $mapping = $this->warehouseSupplierRepository->findByWarehouseId($warehouseId);
+    }
+
+    if (!isset($mapping) || empty($mapping->supplierId)) {
       $this->loggerContract
         ->error(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_NO_SUPPLIER_ID_FOR_WAREHOUSE), [
+          TranslationHelper::getLoggerKey(self::LOG_KEY_NO_SUPPLIER_ID_FOR_WAREHOUSE),
+          [
             'method' => __METHOD__,
             'referenceType' => 'warehouseId',
             'referenceValue' => $warehouseId
@@ -137,11 +152,14 @@ class OrderPropertyService {
    *
    * @return array
    */
-  public function getAllOrderProperties(int $orderId): array {
-    $orderProperties = $this->orderPropertyRepositoryContract->findByOrderId($orderId);
+  public function getAllOrderProperties(int $orderId): array
+  {
+    $plentyOrder = $this->orderRepositoryContract->findOrderById($orderId);
 
-    return $orderProperties;
+    if (!isset($plentyOrder)) {
+      throw new \Exception("Order not found : " . (string)$orderId);
+    }
+
+    return $plentyOrder->properties;
   }
-
-
 }
