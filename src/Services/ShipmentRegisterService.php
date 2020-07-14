@@ -443,7 +443,9 @@ class ShipmentRegisterService
                 'orderId' => $orderId,
                 'po' => $poNumber,
                 'amtTrackingNumbers' => $amtTrackingNumbers,
-                'amtPackages' => $amtPackages
+                'amtPackages' => $amtPackages,
+                'trackingNumbers' => $trackingNumbers,
+                'packages' => $packages
               ],
               'method' => __METHOD__
             ]);
