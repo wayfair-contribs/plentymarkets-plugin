@@ -147,8 +147,13 @@ class OrderPropertyService
 
     $props = $plentyOrder->properties;
 
-    if (isset($props) && is_array($props) && !empty($props))
+    if (isset($props) && !empty($props))
     {
+      if (!is_array($props))
+      {
+        throw new \Exception("Order properties are not an array. They are " . get_class($props));
+      }
+
       return $props;
     }
 
