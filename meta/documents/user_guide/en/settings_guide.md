@@ -33,6 +33,7 @@ When choosing a relationship between Warehouses and Supplier IDs that is not one
 
 ## Settings page
 The Settings page contains general settings for the operation of the Wayfair plugin.
+Settings do not automatically save when changed. Use the `Save` button at the bottom of the page.
 
 ### Stock Buffer
 The `Stock Buffer` setting is a non-negative integer that sets a reserved amount of stock for each Item Variation, for each Wayfair Supplier ID. The buffer amount is subtracted after all other stock calculations are made, including aggregating the stocks for multiple Plentymarkets Warehouses that have been assigned the same Wayfair Supplier ID.
@@ -102,3 +103,4 @@ During Wayfair plugin onboarding, Wayfair will instruct on which option is appro
 When you choose the `Own Account shipping` option, Wayfair needs to translate the Plentymarkets shipping information into data it understands.
 1. Locate the carrier information provided by Wayfair. Contact [ERPSupport@wayfair.com](mailto:ERPSupport@wayfair.com) if required.
 2. For each Plentymarkets-side `Shipping Carrier` listed on the left-side column, enter the Wayfair-provided "SCAC code" in the right-side `Wayfair carrier` column.
+3. Click `Save` at the bottom of the page

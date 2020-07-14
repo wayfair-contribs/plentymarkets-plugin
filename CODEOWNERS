@@ -1,3 +1,12 @@
-# the following users will be considered owners of all files and added as reviewers for all Pull Requests
+# default owners, overridden by any matches below
 * @jhoule86 @mcloughlin77 @jathmel @dFed17
-/meta/ @FelixEkwuemeC
+
+# people that own documentation and images
+*.md                                @jhoule86 @mcloughlin77 @jathmel @dFed17 @FelixEkwuemeC
+/meta/                              @jhoule86 @mcloughlin77 @jathmel @dFed17 @FelixEkwuemeC
+/angular/source/app/assets/images/  @jhoule86 @mcloughlin77 @jathmel @dFed17 @FelixEkwuemeC
+plugin.json                         @jhoule86 @mcloughlin77 @jathmel @dFed17 @FelixEkwuemeC
+
+# people that own translations
+/resources/lang/                    @jhoule86 @mcloughlin77 @jathmel @dFed17 @FelixEkwuemeC
+/angular/source/app/assets/lang/    @jhoule86 @mcloughlin77 @jathmel @dFed17 @FelixEkwuemeC
