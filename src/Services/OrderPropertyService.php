@@ -131,6 +131,7 @@ class OrderPropertyService
 
   /**
    * Get all order properties by order id.
+   * NOTE: OrderPropertyRepositoryContract was retired in the plentymarkets backend in 2020
    *
    * @param int $orderId
    *
@@ -149,6 +150,7 @@ class OrderPropertyService
 
   /**
    * Get the value for an order's property
+   * NOTE: OrderPropertyRepositoryContract was retired in the plentymarkets backend in 2020
    *
    * @param integer $orderId
    * @param integer $propertyType
