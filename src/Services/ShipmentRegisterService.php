@@ -454,7 +454,9 @@ class ShipmentRegisterService
                 'orderId' => $orderId,
                 'po' => $poNumber,
                 'amtTrackingNumbers' => $amtTrackingNumbers,
-                'amtPackages' => $amtPackages
+                'amtPackages' => $amtPackages,
+                'trackingNumbers' => $trackingNumbers,
+                'packages' => $packages
               ],
               'method' => __METHOD__
             ]);
@@ -540,10 +542,14 @@ class ShipmentRegisterService
               ->info(
                 TranslationHelper::getLoggerKey(self::LOG_KEY_SAVED_SHIPMENT),
                 [
-                  'additionalInfo' => ['shipmentItems' => $shipmentItems],
+                  'additionalInfo' => [
+                    'orderId' => $orderId,
+                    'shipmentItems' => $shipmentItems,
+                    'poNumber' => $poNumber,
+                    'trackingNumber' => $trackingNumber,
+                    'shipmentNumber' => $shipmentNumber
+                  ],
                   'method' => __METHOD__,
-                  'referenceType' => 'poNumber',
-                  'referenceValue' => $poNumber
                 ]
               );
 

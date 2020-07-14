@@ -2,7 +2,7 @@
 <div class="container-toc"></div>
 
 ## 1. Registering with Wayfair
-Wayfair is a closed marketplace. In order to use this plugin, you have to be a registered supplier with Wayfair. 
+Wayfair is a closed marketplace. In order to use this plugin, you have to be a registered supplier with Wayfair.
 
 Please send us an email to ERPSupport@wayfair.com
 
@@ -42,7 +42,7 @@ Click on "Save", then you should be shown a ClientID and Client Secret, which ar
 
 5. If “Already purchased” appears on the page, skip to step 8
 
-6. Click the **go to checkout** button 
+6. Click the **go to checkout** button
 7. Complete the purchasing form
     1. Accept terms and conditions
     2. Click **order now**
@@ -77,11 +77,8 @@ Click on "Save", then you should be shown a ClientID and Client Secret, which ar
 20. If an error symbol appears, check the Plentymarkets logs for plugin build and deployment failures
 
 
-### Authentication
-
-After the plugin is installed in your Plentymarkets system, carry out the authentication to enable access to the Wayfair interfaces.
-
-#### Activating the access to the Wayfair interfaces
+### Authorizing the Plugin to access the Wayfair interfaces
+After the plugin is installed in your Plentymarkets system, enter the application credentials required for accessing Wayfair:
 
 1. Go to **Plugins >> Plugin Overview**
 
@@ -240,7 +237,7 @@ In order to update the inventory data in Wayfair's system, you need to map the w
 
 5. Click on **Save**
 
-## 8. Send Confirmation of Delivery (ASN) to Wayfair
+## 8. Configuring Plentymarkets to send Confirmation of Delivery (ASN) to Wayfair
 
 ### Update Settings for carrier if shipping on own account
 
@@ -280,6 +277,11 @@ In order to update the inventory data in Wayfair's system, you need to map the w
 
 The final settings result should look similar to this:
 ![Add Procedure Result](https://i.ibb.co/GJPF3ZV/asn-06.png "Add Procedure Result")
+
+
+## 9. Customizing and monitoring
+The Wayfair plugin presents Plentymarkets users with the ability to customize and monitor its behavior.
+[Click here to view the latest instructions](https://github.com/wayfair-contribs/plentymarkets-plugin/blob/master/meta/documents/user_guide/en/settings_guide.md).
 
 ## Tips and tricks
 

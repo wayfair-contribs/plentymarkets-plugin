@@ -172,15 +172,18 @@ class SaveOrderDocumentService
       throw new \Exception("Cannot check for Plentymarkets order - no PO Number provided.");
     }
 
-    $this->orderRepositoryContract->setFilters(['externalOrderId' => $poNumber]);
-    $orderList = $this->orderRepositoryContract->searchOrders();
+    $orderId = null;
 
-    if ($orderList->getTotalCount() >= 1) {
-      $result_item = $orderList->getResult();
+    $plentyOrder = $this->orderRepositoryContract->findOrderByExternalOrderId($poNumber);
 
-      if (isset($result_item) && array_key_exists(0, $result_item) && array_key_exists('id', $result_item[0])) {
-        return $result_item[0]['id'];
-      }
+    if (isset($plentyOrder))
+    {
+      $orderId = $plentyOrder->id;
+    }
+
+    if (isset($orderId))
+    {
+      return $orderId;
     }
 
     throw new \Exception('Plentymarkets Order does not exist for Wayfair poNumber: ' . $poNumber);
