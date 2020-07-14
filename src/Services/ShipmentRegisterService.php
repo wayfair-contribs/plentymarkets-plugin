@@ -435,10 +435,10 @@ class ShipmentRegisterService
           }
 
           if ($amtTrackingNumbers != $amtPackages) {
-            $externalLogs->addErrorLog('Amount of tracking numbers(' . $amtTrackingNumbers .
+            $externalLogs->addDebugLog('Amount of tracking numbers(' . $amtTrackingNumbers .
               ') does not match amount of packages (' . $amtPackages . ') PO:' . $poNumber);
 
-            $this->loggerContract->error(TranslationHelper::getLoggerKey(self::LOG_KEY_LABELS_SIZE_DOES_NOT_MATCH_PACKAGES_SIZE), [
+            $this->loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_LABELS_SIZE_DOES_NOT_MATCH_PACKAGES_SIZE), [
               'additionalInfo' => [
                 'orderId' => $orderId,
                 'po' => $poNumber,
