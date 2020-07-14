@@ -62,7 +62,7 @@ class OrderPropertyService
     ShippingInformationRepositoryContract $shippingInformationRepositoryContract,
     LoggerContract $loggerContract
   ) {
-    $this->OrderRepositoryContract = $orderRepositoryContract;
+    $this->orderRepositoryContract = $orderRepositoryContract;
     $this->warehouseSupplierRepository = $warehouseSupplierRepository;
     $this->shippingInformationRepositoryContract = $shippingInformationRepositoryContract;
     $this->loggerContract = $loggerContract;
