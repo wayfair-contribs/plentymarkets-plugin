@@ -6,7 +6,9 @@
 
 namespace Wayfair\Services;
 
+use Illuminate\Support\Collection;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
+use Plenty\Modules\Order\Property\Models\OrderProperty;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Order\Shipping\Information\Contracts\ShippingInformationRepositoryContract;
 use Wayfair\Core\Contracts\LoggerContract;
@@ -27,7 +29,6 @@ class OrderPropertyService
   const LOG_KEY_NO_SUPPLIER_ID_FOR_WAREHOUSE = 'noSupplierIDForWarehouse';
 
   const ORDER_PROP_KEY_TYPE_ID = 'typeId';
-  const ORDER_PROP_KEY_VALUE = 'value';
 
   /**
    * @var OrderRepositoryContract
@@ -130,14 +131,13 @@ class OrderPropertyService
   }
 
   /**
-   * Get all order properties by order id.
-   * NOTE: OrderPropertyRepositoryContract was retired in the plentymarkets backend in 2020
+   * Lookup the order and get a pointer to its Properties
    *
    * @param int $orderId
    *
-   * @return array
+   * @return Collection
    */
-  public function getAllOrderProperties(int $orderId): array
+  private function getOrderPropertiesCollection(int $orderId)
   {
     $plentyOrder = $this->orderRepositoryContract->findOrderById($orderId);
 
@@ -145,24 +145,34 @@ class OrderPropertyService
       throw new \Exception("Order not found : " . (string)$orderId);
     }
 
-    $props = $plentyOrder->properties;
+    /** @var Collection */
+    return $plentyOrder->properties;
+  }
 
-    if (isset($props) && !empty($props))
+  /**
+   * Get all order properties by order id.
+   * NOTE: OrderPropertyRepositoryContract was retired in the plentymarkets backend (Summer 2020).
+   *
+   * @param int $orderId
+   *
+   * @return array
+   */
+  public function getAllOrderProperties(int $orderId): array
+  {
+    /** @var Collection */
+    $props = $this->getOrderPropertiesCollection($orderId);
+
+    if (!isset($props))
     {
-      if (!is_array($props))
-      {
-        throw new \Exception("Order properties are not an array. They are " . get_class($props));
-      }
-
-      return $props;
+      throw new \Exception("Order is missing properties: " . $orderId);
     }
 
-    throw new \Exception("Order is missing properties: " . $orderId);
+    return $props->all();
   }
 
   /**
    * Get the value for an order's property
-   * NOTE: OrderPropertyRepositoryContract was retired in the plentymarkets backend in 2020
+   * NOTE: OrderPropertyRepositoryContract was retired in the plentymarkets backend (Summer 2020).
    *
    * @param integer $orderId
    * @param integer $propertyType
@@ -170,16 +180,17 @@ class OrderPropertyService
    */
   function getOrderPropertyValue(int $orderId, int $propertyType)
   {
-    $orderProperties = $this->getAllOrderProperties($orderId);
+    $orderProperties = $this->getOrderPropertiesCollection($orderId);
 
     if (!isset($orderProperties) || empty($orderProperties)) {
       return null;
     }
 
-    foreach ($orderProperties as $prop) {
-      if ($prop[self::ORDER_PROP_KEY_TYPE_ID] == $propertyType) {
-        return $prop[self::ORDER_PROP_KEY_VALUE];
-      }
+    /**@var OrderProperty */
+    $prop = $orderProperties->firstWhere(self::ORDER_PROP_KEY_TYPE_ID, '=', $propertyType);
+    if (isset($prop))
+    {
+      return $prop->value;
     }
 
     return null;
