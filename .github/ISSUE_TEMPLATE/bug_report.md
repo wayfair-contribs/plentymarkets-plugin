@@ -9,6 +9,7 @@ assignees: ''
 
 **Date first encountered**:
 **Supplier's client ID (if known):**
+**Wayfair plugin Version (view in Plentymarkets Pluign Set)**
 **Plentymarkets Version / release channel:**
 
 **Short description:**
