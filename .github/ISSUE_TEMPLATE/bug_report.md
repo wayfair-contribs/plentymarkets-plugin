@@ -2,7 +2,7 @@
 name: Bug report
 about: Report an issue with the Wayfair plugin
 title: "[New Bug]"
-labels: bug
+labels: bug, new
 assignees: ''
 
 ---
