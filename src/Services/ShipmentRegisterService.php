@@ -529,10 +529,14 @@ class ShipmentRegisterService
               ->info(
                 TranslationHelper::getLoggerKey(self::LOG_KEY_SAVED_SHIPMENT),
                 [
-                  'additionalInfo' => ['shipmentItems' => $shipmentItems],
+                  'additionalInfo' => [
+                    'orderId' => $orderId,
+                    'shipmentItems' => $shipmentItems,
+                    'poNumber' => $poNumber,
+                    'trackingNumber' => $trackingNumber,
+                    'shipmentNumber' => $shipmentNumber
+                  ],
                   'method' => __METHOD__,
-                  'referenceType' => 'poNumber',
-                  'referenceValue' => $poNumber
                 ]
               );
 
