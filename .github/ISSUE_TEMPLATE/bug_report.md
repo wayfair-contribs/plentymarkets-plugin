@@ -15,7 +15,7 @@ assignees: ''
 [ie: Cannot save Warehouse mapping]
 
 **To Reproduce**
-Steps to reproduce the behavior:
+Steps to reproduce the behavior (if repeatable, please perform with the Wayfair logging in Plentymarkets set to the `Debug` level):
 1. [ie: Go to Warehouses settings page]
 2. [ie: Add new Warehouse mapping]
 3. [Ie: Click save]
@@ -28,3 +28,6 @@ Steps to reproduce the behavior:
 
 **Screenshots:**
 [If applicable, add screenshots to help explain your problem.]
+
+**Related logs:**
+[Please attach logs as files, and describe them here.]
