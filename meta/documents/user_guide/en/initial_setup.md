@@ -141,13 +141,17 @@ If Wayfair's shipping services are to be used, the Wayfair plugin's ASN settings
 7.	You should automatically be redirected to the newly created **event procedure**. In the **settings** section of the event procedure, place a checkmark next to **Active**.
 
 8.  Click on **Add Filter**, and go to **Order >> Referrer** to add the referrer as a filter (see screenshot below)
+
 ![Event Referrer](https://i.ibb.co/TwKLvJ5/asn-03.png "Event Referrer")
 
 9.	In the **Filter** section, a box should appear with a list of all available Order referrers. Place a checkmark next to all **Wayfair** order referrers.
+
 ![Wayfair Referrer](https://i.ibb.co/yYpLp8q/asn-04.png "Wayfair Referrer")
 
 10. Click on **Add procedure**, and go to **Plugins >> Send Ship Confirmation (ASN) to Wayfair**. Click on **+ add**.
+
 ![Add Procedure](https://i.ibb.co/xfGrhFP/asn-05.png "Add Procedure")
 
 The final settings result should look similar to this:
+
 ![Add Procedure Result](https://i.ibb.co/GJPF3ZV/asn-06.png "Add Procedure Result")
