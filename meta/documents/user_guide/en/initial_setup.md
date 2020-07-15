@@ -7,6 +7,7 @@
 
 * [Installation](plugin_installation.md) of the Wayfair plugin - [view release notes](https://github.com/wayfair-contribs/plentymarkets-plugin/releases)
 
+
 ## 1. Authorizing the Wayfair Plugin to access Wayfair interfaces
 After the plugin is installed in your Plentymarkets system, the plugin must be configured to use the correct credentials when connecting to Wayfair's interfaces:
 
@@ -155,3 +156,8 @@ If Wayfair's shipping services are to be used, the Wayfair plugin's ASN settings
 The final settings result should look similar to this:
 
 ![Add Procedure Result](https://i.ibb.co/GJPF3ZV/asn-06.png "Add Procedure Result")
+
+## 9. Performing the first Inventory Synchronization
+Once everything has been set up, the it is time to start listing items for sale on Wayfair.
+
+Finalize the setup by initiating a full inventory synchronization on the [Full Inventory](settings_guide.md#full-inventory-page) page of the [Wayfair Market Settings](settings_guide.md)

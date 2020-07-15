@@ -2,6 +2,7 @@
 The Wayfair plugin comes with a collection of settings for controlling the plugin's behavior.
 These settings should only be configured after the authorization settings for the plugin have been configured in the active Plugin Set.
 
+# Opening the settings page
 To locate the settings:
 1. Log in to Plentymarkets as a user with administrative rights
 2. Click `Setup` in the top navigation bar of Plentymarkets
@@ -9,6 +10,9 @@ To locate the settings:
 4. Click `Wayfair` in the list of `Markets`. It may appear at the bottom, rather than being alphabetically situated.
 5. Click `Home` under `Wayfair`
 6. You may now use the Wayfair navigation bar to choose a settings page such as [`Warehouses`](#warehouses-page).
+
+# Home page
+The `Home` page is activated by clicking `Home` in the left-side menu or by clicking `Wayfair` in the Wayfair navigation bar. Currently, it provides no information.
 
 ## Warehouses page
 The Warehouses page is used for associating the Warehouses that the supplier is using in Plentymarkets with the Wayfair Supplier IDs that have been issued to the supplier. The mappings are utilized by the Wayfair plugin when it reports inventory to Wayfair and also when it is processing Wayfair orders coming into Plentymarkets.
