@@ -1,103 +1,47 @@
-## Authorizing the Wayfair Plugin to access Wayfair interfaces
-After the plugin is installed in your Plentymarkets system, the plugin must be configured to use the correct credentials when connecting to Wayfair's interfaces.
+# Wayfair plugin: Initial Setup
 
-1. Go to **Plugins >> Plugin Overview**
+## Prerequisites
+* [Wayfair API credentials](obtaining_credentials.md).
 
-2. Select the plugin set that contains the Wayfair plugin
+* Administrative rights on the Plentymarkets system
 
-3. Click on the "Wayfair " name in the plugin set details
+* [Installation](plugin_installation.md) of the Wayfair plugin - [view release notes](https://github.com/wayfair-contribs/plentymarkets-plugin/releases)
 
-4. Go to **Configuration >> Global Settings**
+## 1. Authorizing the Wayfair Plugin to access Wayfair interfaces
+After the plugin is installed in your Plentymarkets system, the plugin must be configured to use the correct credentials when connecting to Wayfair's interfaces:
 
-5. Enter the Client ID and Client Secret you received when creating the application in Extranet into the fields **Client ID** and **Client Secret**.
+1. From the main Plentymarkets page, go to `Plugins` >> `Plugin set overview`
 
-6. Change **Mode** to **Live**.
-7. **Save** the settings.
+2. Locate the Plugin Set that is linked to the client with which Wayfair will be used.
 
-## 4. Activating the order referrer
+3. Click on the `Edit` button for the desired Plugin set
 
-An order referrer indicates the sales channel on which an order was generated. You have to activate the Wayfair order referrer in order to link items, properties etc. with Wayfair.
+4. In the Wayfair row of the Plugin set, click on the `Settings` button.
 
-### Activating the order referrer for Wayfair:
+4. In the left-side menu, go to `Configuration` >> `Global Settings`.
 
-1. Go to **System >> Orders >> Order referrer**.
+5. In the `Supplier Settings` area, enter the `Client ID` and `Client Secret` values that correspond with your Wayfair API credentials
+
+6. Change the `Mode` setting to `Live` - see [information on `Test` mode](test_mode.md)
+
+7. Click the `Save` button in the toolbar above the settings
+
+## 2. Activating the order referrer
+An order referrer in Plentymarkets denotes the sales channel on which an order was generated. To get the Plentymarkets system to properly import orders from the Wayfair API, the Wayfair order referrer must be activated:
+
+1. From the main Plentymarkets page, go to `Setup` >> `Orders` >> `Order referrer`.
 
 2. Place a check mark next to the **Wayfair** order referrer.
 
 3. Click on **Save**.
 
-## 5. Making an item available for Wayfair.
+## 3. Creating a new shipping profile for shipping through Wayfair
+**TODO: when and why**
 
-Items that you want to sell on the Wayfair website have to be active and available for Wayfair. These settings are carried out in the **Item >> Edit item >> Open item>> Tab: Variation ID**. Please keep in mind that you have to carry out these settings for all the items that you wish to sell on Wayfair.
+**TODO: what comes with the plugin**
 
-### Setting the item availability for Wayfair:
+**TODO: what needs to be manually created - ???different for "Wayfair shipping" VS "Own account" shipping???**
 
-1. Go to **Item >> Edit Item** then click on the **Item ID** of the item that you wish to make available for Wayfair.
-
-2. You will be redirected to the **Settings** tab of the chosen item. In this tab, there is a section called **Availability**. Place a check mark next to the option **Active** in this section.
-
-3. Click on the tab **Availability**.
-
-4. Click in the selection field in the **Markets** section. A list with all available markets is displayed.
-
-5. Place a check mark next to the option **Wayfair**.
-
-6. Click on **Add**. The market is now added.
-
-7. Click on **Save**. The item is now available for Wayfair.
-
-### 6. Matching an incoming order with your items in Plentymarkets:
-In order to match an item in Wayfair's database, which is defined by the Supplier Part Number you have provided to Wayfair, with your items in Plentymarkets, you need to configure which Plentymarkets field the Wayfair Supplier Part Number should match with.
-
-To do so, follow the instructions below:
-
-1. Go to **Setup >> System >> Markets >> Wayfair >> Home**.
-
-2. Once the homepage of the plugin has loaded, click on **Settings**.
-
-3. Under **Item Mapping Method**, choose Plentymarkets field from which the Supplier Part Number you provided to Wayfair comes from. You can choose from these three fields:
-           **a.** *Variation No.*
-           **b.**  *EAN*
-           **c.** *Marketplace-specific SKU*: choose this option only if none of the two Plentymarkets fields above match with the Supplier Part Number you provided to Wayfair. If you choose this option, please follow the instructions below (Matching an incoming order using the marketplace-specific SKU).
-
-4. Click **Save**.
-
-#### Matching an incoming order using the marketplace-specific SKU.
-
-1. Go to **Item >> Edit Item** and click on the **Item ID** of the item that you wish to match with incoming Wayfair orders.
-
-2. You will be redirected to the **Settings** tab of the chosen item. Click on the tab **Availability**.
-
-3. In this tab, there are four different sections. The one that we want is the **SKU** section.
-
-4. Click on the **Add** button (the with cross in grey background)
-
-5. A new window will be opened. In the first field(**Referrer**), choose the **Wayfair** order referrer from the dropdown menu.
-
-6. In the third field (**SKU**), enter the **Supplier Part Number**.
-7. Click on **Add**.
-
-8. Click on **Save**.
-
-9. Repeat the same process for all items that you are selling on Wayfair.
-
-## Setting up the order fulfillment.
-
-A working order fulfillment with the Wayfair plugin requires to set up **Shipping Profile Mappings** and **Event Procedures**. Carry out the following instructions:
-
-### Create a new shipping service provider
-
-1. Go to **System >> Orders >> Shipping >> Settings >> Tab: Shipping service provider**
-
-2. Click on **+ New** in order to create a new **shipping service provider**.
-
-3. Enter **Wayfair Shipping** in the fields **Name (de)** and **Name (backend)**.
-
-4. Click in the field **Shipping service provider** and choose **WayfairShipping**.
-
-5. Click on **Save**.
-
-### Create a new shipping profile
 
 1. Go to **System >> Orders >> Shipping >> Settings >> Tab: Shipping Profiles**
 
@@ -117,8 +61,7 @@ A working order fulfillment with the Wayfair plugin requires to set up **Shippin
 
 9. Scroll to the top of the page, and click on the **save** button. All the other rows and their respective data entries can be left empty.
 
-### Creating a new event procedure
-
+## 4. Automatically selecting the Wayfair Shipping Profile for Wayfair orders
 
 1. Go to **System >> Orders >> Events**
 
@@ -144,23 +87,43 @@ A working order fulfillment with the Wayfair plugin requires to set up **Shippin
 
 12. Click on the **save** button.
 
-## 7. Configuring the warehouse mapping.
+### 5. Matching items ordered on Wayfair with Item Variations in Plentymarkets:
+In order to properly handle incoming orders from Wayfair, the Wayfair plugin must match the Supplier Part Numbers in Wayfair's systems with a specific field of Item Variations in Plentymarkets. By default, the Wayfair plugin operates on the assumption that the `Variation Number` **(not to be confused with the Variation's ID)** of an Item's Variation in Plentymarkets will match the Wayfair Supplier Part Number.
 
-In order to update the inventory data in Wayfair's system, you need to map the warehouse ID's in your Plentymarkets system to the warehouse ID in Wayfair's system.
+If the Wayfair Supplier Part Numbers for your organization are to be reflected in an alternative field in your Plentymarkets Item Variations, change the value of [the `Item Mapping Method` setting](settings_guide.md#item-mapping-method) and update the Variations accordingly.
 
-1. Go to **System >> Markets >> Wayfair >> Home >> Tab: Warehouses**
+## 5. Making items available for sale on Wayfair
+Items that you want to sell on the Wayfair market must be considered active in Plentymarkets. The Plentymarkets user may also choose limit which Items are for sale on Wayfair. **Note that Inventory and ordered items are controlled at the `Variation` level.**
 
-2. Click on **Add mapping**
+To ensure that an Item is available for sale, follow these instructions:
 
-3. In the field **Warehouse** select the warehouse you want to map.
+1. From the main Plentymarkets page, go to `Item` >> `Edit item`
 
-4. In the field **Supplier ID**, enter your corresponding Wayfair Supplier ID.
+2. Search for item(s) and open them
 
-5. Click on **Save**
+3. **For each item**, click `Variations` and open them
 
-## 8. Configuring Plentymarkets to send Confirmation of Delivery (ASN) to Wayfair
+4. **For each Variation**:
 
-### 8.1 Create Event for Plentymarkets Orders that sends shipment information to Wayfair
+    1. On the `Settings` tab, make sure that the `Active` checkbox in the `Availability Section`is checked.
+
+    2. If [the `Send all inventory items to Wayfair?` setting](settings_guide.md#send-all-inventory-items-to-wayfair) is **disabled**, go to the `Availability` tab of the Variation and add "Wayfair" to the list in the `Markets` area.
+
+    3. Click the `Save` button next to the Variation `ID` (not the higher-up button for the Item).
+
+
+## 6. Configuring the Warehouse mappings to match Wayfair Supplier IDs.
+
+In order to update the inventory data in Wayfair's system, you need to map the Warehouses in your Plentymarkets system to the Supplier IDs in Wayfair's system, on the [Warehouses](settings_guide.md#warehouses-page) page of the plugin's settings.
+
+## 7. Configuring Plentymarkets to send Confirmation of Delivery (ASN) to Wayfair
+
+### 7.1 Setting the Wayfair Plugin to send the correct shipping information to Wayfair
+Wayfair Plugin users that wish to ship orders by using their own accounts (rather than using Wayfair's shipping services) must update the [Ship Confirmation (ASN) configuration settings](https://github.com/wayfair-contribs/plentymarkets-plugin/blob/master/meta/documents/user_guide/en/settings_guide.md#ship-confirmation-asn-page) to reflect their specific configuration.
+
+If Wayfair's shipping services are to be used, the Wayfair plugin's ASN settings should be left in their default (`Wayfair Shipping`) state.
+
+### 7.2 Creating an Event for Plentymarkets Orders that sends shipment information to Wayfair
 
 1. Click **Setup** in the top navigation bar then go to **Orders >> Events**
 ![Create Event](https://i.ibb.co/NjDtY05/asn-02.png "Create Event")
@@ -188,8 +151,3 @@ In order to update the inventory data in Wayfair's system, you need to map the w
 
 The final settings result should look similar to this:
 ![Add Procedure Result](https://i.ibb.co/GJPF3ZV/asn-06.png "Add Procedure Result")
-
-### 8.2 Set the Wayfair Plugin to use the correct information
-Wayfair Plugin users that wish to ship orders by using their own accounts (rather than using Wayfair's shipping services) must update [the Ship Confirmation (ASN) configuration settings](https://github.com/wayfair-contribs/plentymarkets-plugin/blob/master/meta/documents/user_guide/en/settings_guide.md#ship-confirmation-asn-page) to reflect their specific configuration.
-
-If Wayfair's shipping services are to be used, the Wayfair plugin's ASN settings should be left in their default (`Wayfair Shipping`) state.

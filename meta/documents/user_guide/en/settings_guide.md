@@ -50,7 +50,37 @@ The `Default Shipping Provider` setting is a legacy setting that no longer impac
 **If this setting appears in your system, Wayfair strongly recommends that you upgrade your plugin to a newer version.**
 
 ### Item Mapping Method
-The `Item Mapping Method` setting determines the behavior for matching the Plentymarkets Item Variations to the Wayfair Products. It is used when the inventory listings are sent to Wayfair, and also to select the requested products in a Wayfair Purchase Order.
+The `Item Mapping Method` setting determines the behavior for matching the Plentymarkets Item Variations to the Wayfair Products. It is used when the inventory listings are sent to Wayfair, and also to select the requested products in a Wayfair Purchase Order. The Plentymarkets user should configure this setting to match the way their Item Variations are populated.
+
+By default, the `Variation Number` field is used for mapping Wayfair Orders' items to Plentymarkets Item Variations.
+The other options are `EAN` (Barcode) and `SKU`.
+
+#### Using EAN (Barcode) as the Item Mapping Method
+When the `Item Mapping Method` is set to `EAN`, each Item Variation in Plentymarkets should be set up to have a Barcode that mirrors the Wayfair Supplier Part Number that Wayfair will send in incoming order data:
+1. From the main Plentymarkets page, go to `Item` >> `Edit Item`
+
+2. Search for items to be sold on Wayfair
+
+3. **For each Item**, click on the item in the search results, then click `Variations`
+
+3. **For each Variation**:
+    1. Click on the `Settings` tab
+    2. In the `Barcode` section, pick a barcode type, then click the `Add` button, then enter the barcode value in the `Code` field. The Barcode should match the Wayfair Supplier Part Number.
+    3. Click the `Save` button at the Variation level (not to be confused with the `Save` button for the Item, a few rows above)
+
+#### Using SKU as the Item Mapping Method
+When the `Item Mapping Method` is set to `SKU`, each Item Variation in Plentymarkets should be set up to have a Wayfair-specific SKU that mirrors the Wayfair Supplier Part Number that Wayfair will send in incoming order data:
+1. From the main Plentymarkets page, go to `Item` >> `Edit Item`
+
+2. Search for items to be sold on Wayfair
+
+3. **For each Item**, click on the item in the search results, then click `Variations`
+
+3. **For each Variation**:
+    1. Click on the `Availability` tab
+    2. In the `SKU` section, click the `Add` button
+    3. In the pop-up window, choose `Wayfair` for the `Referrer` then enter the Wayfair Supplier Part Number in the `SKU` field, then click `Add`
+    4. Click the `Save` button at the Variation level (not to be confused with the `Save` button for the Item, a few rows above)
 
 ### Import orders since
 The optional `Import orders since` setting determines a date on which new Wayfair purchase orders are considered eligible for being imported into the Plentymarkets system. This setting can improve performance by preventing the Wayfair plugin from requesting orders created before the specified date. It can also be used to prevent the Plentymarkets system from accepting Orders prior to the desired "go-live date."
@@ -86,7 +116,7 @@ The page's data will automatically refresh over time, but you may also manually 
 The `Ship Confirmation (ASN)` page is used for configuring the shipment interactions between Plentymarkets, the Wayfair Plugin, and Wayfair.
 The information set here will inform the `Send Ship Confirmation (ASN) to Wayfair` Order Procedure that the Wayfair Plugin provides.
 
-### Shipping type radio button
+### Shipping type
 The radio button at the top of the page has these options.
 During Wayfair plugin onboarding, Wayfair will instruct on which option is appropriate for the Plentymarkets user.
 * `Wayfair shipping`
