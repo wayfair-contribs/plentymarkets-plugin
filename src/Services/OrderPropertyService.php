@@ -77,28 +77,12 @@ class OrderPropertyService
    *
    * @return string
    */
-<<<<<<< HEAD
-  public function getCheckedPoNumber(int $orderId): string {
-    $orderProperties = $this->orderPropertyRepositoryContract->findByOrderId($orderId, OrderPropertyType::EXTERNAL_ORDER_ID);
-
-    $this->loggerContract->debug(
-        TranslationHelper::getLoggerKey('test'),
-        [
-          'additionalInfo' => ['properties' => $orderProperties],
-          'method' => __METHOD__,
-          'referenceType' => 'orderId',
-          'referenceValue' => $orderId
-        ]
-      );
-    if (empty($orderProperties) || empty($orderProperties[0]->value)) {
-=======
   public function getCheckedPoNumber(int $orderId): string
   {
 
     $externalOrderID = $this->getOrderPropertyValue($orderId, OrderPropertyType::EXTERNAL_ORDER_ID);
 
     if (!isset($externalOrderID) || empty($externalOrderID)) {
->>>>>>> origin/master
       $this->loggerContract
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_CANNOT_OBTAIN_PO_NUMBER),
@@ -122,38 +106,10 @@ class OrderPropertyService
    *
    * @return string
    */
-<<<<<<< HEAD
-  public function getWarehouseId(int $orderId): string {
-    $orderProperties = $this->orderPropertyRepositoryContract->findByOrderId($orderId, OrderPropertyType::WAREHOUSE);
-    $this->loggerContract->debug(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_TEST),
-        [
-          'additionalInfo' => [
-            'orderId' => $orderId,
-            'typeId' => OrderPropertyType::WAREHOUSE,
-          'orderProperties' => $orderProperties
-          ],
-          'method' => __METHOD__
-        ]
-      );
-    if (empty($orderProperties) || empty($orderProperties[0]->value)) {
-      $this->loggerContract
-          ->error(
-              TranslationHelper::getLoggerKey(self::LOG_KEY_WAREHOUSE_ID_NOT_FOUND), [
-              'additionalInfo' => [
-                'orderId' => $orderId
-              ],
-              'method' => __METHOD__,
-              'referenceType' => 'orderId',
-              'referenceValue' => $orderId
-              ]
-          );
-=======
   public function getWarehouseId(int $orderId): string
   {
     $warehouseId = $this->getOrderPropertyValue($orderId, OrderPropertyType::WAREHOUSE);
     $mapping = null;
->>>>>>> origin/master
 
     if (isset($warehouseId) && !empty($warehouseId)) {
       $mapping = $this->warehouseSupplierRepository->findByWarehouseId($warehouseId);
