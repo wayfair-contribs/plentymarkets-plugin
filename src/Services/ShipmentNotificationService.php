@@ -267,7 +267,6 @@ class ShipmentNotificationService
     }
   }
 
-
   /**
    * Prepare ASN message body.
    *
@@ -489,7 +488,7 @@ class ShipmentNotificationService
             'method' => __METHOD__
           ]
         );
-        if (empty($plentyMarketsShippingInformation->shippingServiceProvider->id)) {
+        if (!isset($plentyMarketsShippingInformation) || empty($plentyMarketsShippingInformation->shippingServiceProvider->id)) {
           $this->loggerContract->error(
             TranslationHelper::getLoggerKey(self::LOG_KEY_PM_MISSING_SHIPPING_INFO),
             [
