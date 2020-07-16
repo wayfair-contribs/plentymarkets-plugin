@@ -51,7 +51,7 @@ class ShippingController extends Controller {
     $this->loggerContract
         ->info(
             TranslationHelper::getLoggerKey('registerShipmentForOrders'), [
-            'additionalInfo' => ['orderIds' => $orderIds],
+            'additionalInfo' => ['orderIds' => $orderIds, 'request'=>$request],
             'method' => __METHOD__
             ]
         );
