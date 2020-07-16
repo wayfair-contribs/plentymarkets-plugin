@@ -590,20 +590,18 @@ class ShipmentRegisterService
             );
         }
       }
-
       return $registerResult;
-    // } catch (\Exception $e) {
-    //   $this->loggerContract->error(TranslationHelper::getLoggerKey(self::TEST),
-    //     [
-    //       'additionalInfo' => [
-
-    //         'exception' => $e,
-    //         'message' => $e->getMessage(),
-    //         'stacktrace' => $e->getTrace()
-    //       ],
-    //       'method' => __METHOD__
-    //     ]
-    //   );
+    } catch (\Exception $e) {
+      $this->loggerContract->error(TranslationHelper::getLoggerKey(self::TEST),
+        [
+          'additionalInfo' => [
+            'exception' => $e,
+            'message' => $e->getMessage(),
+            'stacktrace' => $e->getTrace()
+          ],
+          'method' => __METHOD__
+        ]
+      );
     } finally {
       if ($purchaseOrdersToRegister > 0) {
         $externalLogs->addShippingLabelLog(
