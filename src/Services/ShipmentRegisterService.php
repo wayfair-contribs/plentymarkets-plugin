@@ -556,6 +556,19 @@ class ShipmentRegisterService
           $externalLogs->addErrorLog('Registration process failed, PO:' . $poNumber . ' - '
             . get_class($exception) . ': ' . $exception->getMessage());
           $errorMessage = sprintf(TranslationHelper::translate(self::LOG_KEY_SHIPPING_ERROR_REGISTERED_SHIPMENT), $orderId);
+          $this->loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_SHIPPING_ERROR_REGISTERED_SHIPMENT),
+              [
+                'additionalInfo' => [
+                  'orderId' => $orderId,
+                  'po' => $poNumber,
+                  'exception' => $exception,
+                  'message' => $errorMessage,
+                ],
+                'method' => __METHOD__,
+                'referenceType' => 'orderId',
+                'referenceValue' => $orderId
+              ]
+            );
           $registerResult[$orderId] = $this->buildResultMessage(false, $errorMessage, []);
 
           $this->loggerContract
@@ -578,6 +591,21 @@ class ShipmentRegisterService
       }
 
       return $registerResult;
+    } catch (\Exception $exception) {
+      $this->loggerContract->debug(
+        TranslationHelper::getLoggerKey(self::LOG_KEY_SHIPPING_ERROR_REGISTERED_SHIPMENT),
+        [
+          'additionalInfo' => [
+            // 'orderId' => $orderId,
+            // 'po' => $poNumber,
+            'exception' => $exception,
+            // 'message' => $errorMessage,
+          ],
+          'method' => __METHOD__,
+          // 'referenceType' => 'orderId',
+          // 'referenceValue' => $orderId
+        ]
+      );
     } finally {
       if ($purchaseOrdersToRegister > 0) {
         $externalLogs->addShippingLabelLog(
