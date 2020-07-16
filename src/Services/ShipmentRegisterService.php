@@ -556,7 +556,6 @@ class ShipmentRegisterService
           $externalLogs->addErrorLog('Registration process failed, PO:' . $poNumber . ' - '
             . get_class($exception) . ': ' . $exception->getMessage());
           $errorMessage = sprintf(TranslationHelper::translate(self::LOG_KEY_SHIPPING_ERROR_REGISTERED_SHIPMENT), $orderId);
-
           $registerResult[$orderId] = $this->buildResultMessage(false, $errorMessage, []);
 
           $this->loggerContract
@@ -577,6 +576,7 @@ class ShipmentRegisterService
             );
         }
       }
+
       return $registerResult;
     } finally {
       if ($purchaseOrdersToRegister > 0) {
