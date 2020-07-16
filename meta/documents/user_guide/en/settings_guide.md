@@ -1,6 +1,6 @@
 # Wayfair Plugin: Wayfair Market Settings
 The Wayfair plugin comes with a collection of settings for controlling the plugin's behavior.
-These settings should only be configured after the authorization settings for the plugin have been configured in the active Plugin Set.
+These settings should only be configured after the [authorization settings for the plugin](initial_setup.md#1-authorizing-the-wayfair-plugin-to-access-wayfair-interfaces) have been configured for the active Plugin Set.
 
 # Opening the settings page
 To locate the settings:

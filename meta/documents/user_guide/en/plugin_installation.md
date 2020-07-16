@@ -1,3 +1,5 @@
+# Wayfair plugin: Installation instructions
+
 1. Login to the Plentymarkets system
 
 2. Go to **plugins >> plentyMarketplace**, which will use the system owner’s credentials to log you in on the Marketplace

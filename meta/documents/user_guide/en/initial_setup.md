@@ -9,8 +9,13 @@
 
 
 ## 1. Authorizing the Wayfair Plugin to access Wayfair interfaces
-After the plugin is installed in your Plentymarkets system, the plugin must be configured to use the correct credentials when connecting to Wayfair's interfaces:
+After the plugin is installed in your Plentymarkets Plugin Set, the plugin must be configured to use the correct credentials when connecting to Wayfair's interfaces.
 
+* **The authorization procedure must be performed for any Plugin Set that contains the Wayfair plugin**.
+* Copying a Plugin Set will copy the authorization information to the new plugin set.
+* An exported or imported Plugin set may include the authorization information.
+
+The authorization steps are as follows:
 1. From the main Plentymarkets page, go to `Plugins` >> `Plugin set overview`
 
 2. Locate the Plugin Set that is linked to the client with which Wayfair will be used.
@@ -36,57 +41,8 @@ An order referrer in Plentymarkets denotes the sales channel on which an order w
 
 3. Click on **Save**.
 
-## 3. Creating a new shipping profile for shipping through Wayfair
-**TODO: when and why**
-
-**TODO: what comes with the plugin**
-
-**TODO: what needs to be manually created - ???different for "Wayfair shipping" VS "Own account" shipping???**
-
-
-1. Go to **System >> Orders >> Shipping >> Settings >> Tab: Shipping Profiles**
-
-2. Click on **+ New** to create a new shipping profile.
-
-3. You will see a table in which you have to enter data.
-
-4. In the first row, click on the dropdown menu, and choose the *Shipping service provider** you have just created (should be **WayfairShipping** if you followed our instructions)
-
-5. In the second and third row, enter a name (we recommend **WayfairShipping** for simplicity). You should also choose a language in the second row, third column.
-
-6. In the fourth row, choose the flag number 6 or 126 (which represent the Wayfair colors).
-
-7. In the fifth column, choose **priority n1** (the two stars).
-
-8. In the seventeenth column (**Order referrer**), place a check mark next to **Wayfair** (if there are more than one, choose all).
-
-9. Scroll to the top of the page, and click on the **save** button. All the other rows and their respective data entries can be left empty.
-
-## 4. Automatically selecting the Wayfair Shipping Profile for Wayfair orders
-
-1. Go to **System >> Orders >> Events**
-
-2. Click on **Add event procedure** (the "+" button on the left of the page).
-
-3. Enter the name **Wayfair order Shipping Mapping**.
-
-4. Select the event **New order** from the dropdown menu.
-
-5. Click on the **save** button.
-
-6. You should automatically be redirected to the newly created **event procedure**. In the **settings** section of the event procedure, place a check mark next to **Active**.
-
-7. Click on **Add filter**, and go to **Order >> Referrer** to add the referrer as a filter.
-
-8. In the **Filter** section, a box should appear with a list of all available **Order referrers**. Place a check mark next to all **Wayfair** order referrers.
-
-9. Click on **Add procedure**, and go to **Order >> Change shipping profile**. Click on **+ add**.
-
-10. In the **Procedures** section, click on the **expand** button next to **change shipping profile** (left-most arrow).
-
-11. Choose the **shipping profile** you created before (should be **WayfairShipping** if you followed our instructions).
-
-12. Click on the **save** button.
+## 3. Setting up Plentymarkets for shipping through Wayfair
+To ensure proper integrations with Wayfair when shipping order items, follow the procedures outlined in  [the Wayfair Shipping instructions](wayfair_shipping.md).
 
 ## 5. Matching items ordered on Wayfair with Item Variations in Plentymarkets:
 In order to properly handle incoming orders from Wayfair, the Wayfair plugin must match the Supplier Part Numbers in Wayfair's systems with a specific field of Item Variations in Plentymarkets. By default, the Wayfair plugin operates on the assumption that the `Variation Number` **(not to be confused with the Variation's ID)** of an Item's Variation in Plentymarkets will match the Wayfair Supplier Part Number.
