@@ -42,7 +42,6 @@ class ShipmentRegisterService
   const LOG_KEY_SHIPPING_LABEL_RETRIEVAL_FAILED = 'shippingLabelRetrievalFailed';
   const LOG_KEY_NO_SHIPPING_INFO_FOR_UNREGISTER = 'noShippingInformationForUnregister';
   const LOG_KEY_WAREHOUSE_MISSING_FOR_ORDER = 'warehouseMissingForOrder';
-  const TEST = 'test';
 
   const SHIPPING_REGISTERED_STATUS = 'registered';
   const SHIPPING_WAYFAIR_COST = 0.00;
@@ -557,19 +556,7 @@ class ShipmentRegisterService
           $externalLogs->addErrorLog('Registration process failed, PO:' . $poNumber . ' - '
             . get_class($exception) . ': ' . $exception->getMessage());
           $errorMessage = sprintf(TranslationHelper::translate(self::LOG_KEY_SHIPPING_ERROR_REGISTERED_SHIPMENT), $orderId);
-          $this->loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_SHIPPING_ERROR_REGISTERED_SHIPMENT),
-              [
-                'additionalInfo' => [
-                  'orderId' => $orderId,
-                  'po' => $poNumber,
-                  'exception' => $exception,
-                  'message' => $errorMessage,
-                ],
-                'method' => __METHOD__,
-                'referenceType' => 'orderId',
-                'referenceValue' => $orderId
-              ]
-            );
+
           $registerResult[$orderId] = $this->buildResultMessage(false, $errorMessage, []);
 
           $this->loggerContract
@@ -591,17 +578,6 @@ class ShipmentRegisterService
         }
       }
       return $registerResult;
-    } catch (\Exception $e) {
-      $this->loggerContract->error(TranslationHelper::getLoggerKey(self::TEST),
-        [
-          'additionalInfo' => [
-            'exception' => $e,
-            'message' => $e->getMessage(),
-            'stacktrace' => $e->getTrace()
-          ],
-          'method' => __METHOD__
-        ]
-      );
     } finally {
       if ($purchaseOrdersToRegister > 0) {
         $externalLogs->addShippingLabelLog(
