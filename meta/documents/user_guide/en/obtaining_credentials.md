@@ -15,16 +15,14 @@ Send an email to ERPSupport@wayfair.com to request assistance:
     - Date when you are ready to use the Wayfair Plentymarkets Plugin.
 
 You will promptly receive a response containing these details:
-- Confirmation of your API access being set up
-- Supplier ID(s) for your Warehouses
+- Confirmation of your API access being set up.
+- Supplier ID(s) for your Warehouses.
 
 ## 2. Generate Application Credentials
 
-1. Log in to your Partner Home account at partners.wayfair.com
+1. Go to https://partners.wayfair.com/developer/applications
 
-2. Find the `Developer` menu. It may be on the top banner of the page. Otherwise, it is accessible in the `More` menu in the banner.
-
-3. Activate the `Developer` menu, and click on `Application`. You should be redirected to a new page.
+2. Enter your Wayfair Partner Home credentials. You should be redirected to the `Application Management` page for Wayfair.
 
 4. On the `Application Management` page, click the `+ New Application` button at the bottom.
 
