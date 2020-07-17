@@ -80,7 +80,7 @@ When the `Item Mapping Method` is set to `SKU`, each Item Variation in Plentymar
 
 3. **For each Item**, click on the item in the search results, then click `Variations`
 
-3. **For each Variation**:
+4. **For each Variation**:
     1. Click on the `Availability` tab
     2. In the `SKU` section, click the `Add` button
     3. In the pop-up window, choose `Wayfair` for the `Referrer` then enter the Wayfair Supplier Part Number in the `SKU` field, then click `Add`
