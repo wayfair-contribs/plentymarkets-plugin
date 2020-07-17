@@ -9,7 +9,7 @@ Follow these steps to make it available for use:
 
 2. From the main Plentymarkets page, go to `plugins` >> `plentyMarketplace`, which will use the Plentymarkets system's owner’s credentials to log you in on the plentyMarketplace website.
 
-3. Click the search button  in the top-right corner of the page.
+3. Click the search button in the top-right corner of the page.
 
 4. Enter "Wayfair" into the box and press enter.
 
