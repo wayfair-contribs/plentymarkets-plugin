@@ -1,7 +1,8 @@
 # Wayfair Plugin: Wayfair Market Settings
 The Wayfair plugin comes with a collection of settings for controlling the plugin's behavior.
-These settings should only be configured after the authorization settings for the plugin have been configured in the active Plugin Set.
+These settings should only be configured after the [authorization settings for the plugin](initial_setup.md#1-authorizing-the-wayfair-plugin-to-access-wayfair-interfaces) have been configured for the active Plugin Set.
 
+# Opening the settings page
 To locate the settings:
 1. Log in to Plentymarkets as a user with administrative rights
 2. Click `Setup` in the top navigation bar of Plentymarkets
@@ -9,6 +10,9 @@ To locate the settings:
 4. Click `Wayfair` in the list of `Markets`. It may appear at the bottom, rather than being alphabetically situated.
 5. Click `Home` under `Wayfair`
 6. You may now use the Wayfair navigation bar to choose a settings page such as [`Warehouses`](#warehouses-page).
+
+# Home page
+The `Home` page is activated by clicking `Home` in the left-side menu or by clicking `Wayfair` in the Wayfair navigation bar. Currently, it provides no information.
 
 ## Warehouses page
 The Warehouses page is used for associating the Warehouses that the supplier is using in Plentymarkets with the Wayfair Supplier IDs that have been issued to the supplier. The mappings are utilized by the Wayfair plugin when it reports inventory to Wayfair and also when it is processing Wayfair orders coming into Plentymarkets.
@@ -50,7 +54,37 @@ The `Default Shipping Provider` setting is a legacy setting that no longer impac
 **If this setting appears in your system, Wayfair strongly recommends that you upgrade your plugin to a newer version.**
 
 ### Item Mapping Method
-The `Item Mapping Method` setting determines the behavior for matching the Plentymarkets Item Variations to the Wayfair Products. It is used when the inventory listings are sent to Wayfair, and also to select the requested products in a Wayfair Purchase Order.
+The `Item Mapping Method` setting determines the behavior for matching the Plentymarkets Item Variations to the Wayfair Products. It is used when the inventory listings are sent to Wayfair, and also to select the requested products in a Wayfair Purchase Order. The Plentymarkets user should configure this setting to match the way their Item Variations are populated.
+
+By default, the `Variation Number` field is used for mapping Wayfair Orders' items to Plentymarkets Item Variations.
+The other options are `EAN` (Barcode) and `SKU`.
+
+#### Using EAN (Barcode) as the Item Mapping Method
+When the `Item Mapping Method` is set to `EAN`, each Item Variation in Plentymarkets should be set up to have a Barcode that mirrors the Wayfair Supplier Part Number that Wayfair will send in incoming order data:
+1. From the main Plentymarkets page, go to `Item` >> `Edit Item`
+
+2. Search for items to be sold on Wayfair
+
+3. **For each Item**, click on the item in the search results, then click `Variations`
+
+4. **For each Variation**:
+    1. Click on the `Settings` tab
+    2. In the `Barcode` section, pick a barcode type, then click the `Add` button, then enter the barcode value in the `Code` field. The Barcode should match the Wayfair Supplier Part Number.
+    3. Click the `Save` button at the Variation level (not to be confused with the `Save` button for the Item, a few rows above)
+
+#### Using SKU as the Item Mapping Method
+When the `Item Mapping Method` is set to `SKU`, each Item Variation in Plentymarkets should be set up to have a Wayfair-specific SKU that mirrors the Wayfair Supplier Part Number that Wayfair will send in incoming order data:
+1. From the main Plentymarkets page, go to `Item` >> `Edit Item`
+
+2. Search for items to be sold on Wayfair
+
+3. **For each Item**, click on the item in the search results, then click `Variations`
+
+4. **For each Variation**:
+    1. Click on the `Availability` tab
+    2. In the `SKU` section, click the `Add` button
+    3. In the pop-up window, choose `Wayfair` for the `Referrer` then enter the Wayfair Supplier Part Number in the `SKU` field, then click `Add`
+    4. Click the `Save` button at the Variation level (not to be confused with the `Save` button for the Item, a few rows above)
 
 ### Import orders since
 The optional `Import orders since` setting determines a date on which new Wayfair purchase orders are considered eligible for being imported into the Plentymarkets system. This setting can improve performance by preventing the Wayfair plugin from requesting orders created before the specified date. It can also be used to prevent the Plentymarkets system from accepting Orders prior to the desired "go-live date."
@@ -67,6 +101,8 @@ Enabling `Send all inventory items to Wayfair?` will allow Wayfair to list any i
 The `Full Inventory` page does not contain any settings to configure.
 It is used for checking the status of syncing the Plentymarkets inventory with Wayfair, or manually initiating a synchronization of all inventory items.
 The page's data will automatically refresh over time, but you may also manually refresh it.
+
+**The Wayfair plugin periodically sends inventory updates to Wayfair, without any further manual activations. The Full Inventory page only displays information about the daily updates that include all items in the inventory.**
 
 ### Fields
 * The `Time of last successful inventory synchronization` fields keep track of the daily synchronizations that are normally preformed automatically.
@@ -86,7 +122,7 @@ The page's data will automatically refresh over time, but you may also manually 
 The `Ship Confirmation (ASN)` page is used for configuring the shipment interactions between Plentymarkets, the Wayfair Plugin, and Wayfair.
 The information set here will inform the `Send Ship Confirmation (ASN) to Wayfair` Order Procedure that the Wayfair Plugin provides.
 
-### Shipping type radio button
+### Shipping type
 The radio button at the top of the page has these options.
 During Wayfair plugin onboarding, Wayfair will instruct on which option is appropriate for the Plentymarkets user.
 * `Wayfair shipping`

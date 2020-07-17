@@ -128,7 +128,7 @@ Please enquire with Wayfair ERP Support <ERPSupport [at] wayfair.com> with any q
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [releases of this repository](https://github.com/wayfair/plentymarkets-plugin/releases).
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [releases of this repository](https://github.com/wayfair-contribs/plentymarkets-plugin/releases).
 
 ## Authors
 
