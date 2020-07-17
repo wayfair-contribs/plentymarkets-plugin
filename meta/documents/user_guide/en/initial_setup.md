@@ -1,11 +1,20 @@
 # Wayfair plugin: Initial Setup
 
 ## Prerequisites
+
+* [A Plentymarkets system](https://www.plentymarkets.co.uk).
+
+* Administrative rights on the Plentymarkets system where the Wayfair plugin will be used
+    - The Plentymarkets user's `Access` setting must be `Admin`
+    - The Plentymarkets user must be able to modify Plugin Sets
+
+* Active Wayfair supplier status
+    * A Wayfair Supplier ID is required
+    * [Information for prospective suppliers](https://partners.wayfair.com/d/onboarding/sell-on-wayfair)
+
 * [Wayfair API credentials](obtaining_credentials.md).
 
-* Administrative rights on the Plentymarkets system
-
-* [Installation](plugin_installation.md) of the Wayfair plugin - [view release notes](https://github.com/wayfair-contribs/plentymarkets-plugin/releases)
+* [Installation of the Wayfair plugin](plugin_installation.md).
 
 
 ## 1. Authorizing the Wayfair Plugin to access Wayfair interfaces
@@ -13,7 +22,7 @@ After the plugin is installed in your Plentymarkets Plugin Set, the plugin must 
 
 * **The authorization procedure must be performed for any Plugin Set that contains the Wayfair plugin**.
 * Copying a Plugin Set will copy the authorization information to the new plugin set.
-* An exported or imported Plugin set may include the authorization information.
+* An exported or imported Plugin Set may include the authorization information.
 
 The authorization steps are as follows:
 1. From the main Plentymarkets page, go to `Plugins` >> `Plugin set overview`
@@ -33,7 +42,7 @@ The authorization steps are as follows:
 7. Click the `Save` button in the toolbar above the settings
 
 ## 2. Activating the order referrer
-An order referrer in Plentymarkets denotes the sales channel on which an order was generated. To get the Plentymarkets system to properly import orders from the Wayfair API, the Wayfair order referrer must be activated:
+An order referrer in Plentymarkets identifies the sales channel on which an order was generated. To get the Plentymarkets system to properly import orders from the Wayfair API, the Wayfair order referrer must be activated:
 
 1. From the main Plentymarkets page, go to `Setup` >> `Orders` >> `Order referrer`.
 
@@ -50,7 +59,7 @@ In order to properly handle incoming orders from Wayfair, the Wayfair plugin mus
 If the Wayfair Supplier Part Numbers for your organization are to be reflected in an alternative field in your Plentymarkets Item Variations, change the value of [the `Item Mapping Method` setting](settings_guide.md#item-mapping-method) and update the Variations accordingly.
 
 ## 5. Making items available for sale on Wayfair
-Items that you want to sell on the Wayfair market must be considered active in Plentymarkets. The Plentymarkets user may also choose limit which Items are for sale on Wayfair. **Note that Inventory and ordered items are controlled at the `Variation` level.**
+Items that you want to sell on the Wayfair market must be considered active in Plentymarkets. The Plentymarkets user may also choose to limit which Items are for sale on Wayfair. **Note that Inventory and ordered items are controlled at the `Variation` level.**
 
 To ensure that an Item is available for sale, follow these instructions:
 
@@ -71,7 +80,7 @@ To ensure that an Item is available for sale, follow these instructions:
 
 ## 6. Configuring the Warehouse mappings to match Wayfair Supplier IDs.
 
-In order to update the inventory data in Wayfair's system, you need to map the Warehouses in your Plentymarkets system to the Supplier IDs in Wayfair's system, on the [Warehouses](settings_guide.md#warehouses-page) page of the plugin's settings.
+In order to update the inventory data in Wayfair's system, you need to map the Warehouses in your Plentymarkets system to the Supplier IDs in Wayfair's system, on the [Warehouses](settings_guide.md#warehouses-page) page of [the plugin's settings](settings_guide.md).
 
 ## 7. Configuring Plentymarkets to send Confirmation of Delivery (ASN) to Wayfair
 

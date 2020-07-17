@@ -30,7 +30,7 @@
 14. Click the **install** button in the Wayfair row
 
 15. Complete the pop-up modal
-    1. (Optional) in the drop-down, choose a different version to install - you probably should be using the newest one.
+    1. In the drop-down, choose [the newest plugin version](https://github.com/wayfair-contribs/plentymarkets-plugin/releases).
 
     2. Click **install**
 

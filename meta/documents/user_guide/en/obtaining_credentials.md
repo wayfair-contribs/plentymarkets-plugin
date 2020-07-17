@@ -8,11 +8,11 @@ To receive the API credentials for you organization, follow these steps:
 
 Send an email to ERPSupport@wayfair.com to request assistance:
 
-- Subject : Access to Plentymarkets plugin / "Name of your company" (SuID)
+- Subject : Access to Plentymarkets plugin / (Name of your company) (Wayfair Supplier ID)
 - Body:
-    - Contact information
-    - Descriptions of your organizations' plans and needs
-    - Any important dates regarding Plentymarkets >> Wayfair integrations.
+    - Your contact information.
+    - Short description of how you intend to use the Plentymarkets plugin.
+    - Date when you are ready to use the Wayfair Plentymarkets Plugin.
 
 You will promptly receive a response containing these details:
 - Confirmation of access to
@@ -28,7 +28,9 @@ You will promptly receive a response containing these details:
 
 4. On the `Application Management` page, click the `+ New Application` button at the bottom.
 
-5. Provide a `Name` and `Description` for the new Application
+5. On the `New Application` form, provide the new application's details:
+    *  `Name`: A useful identifier such as "[My Supplier] Plentymarkets Plugin."
+    * `Description`: any information to make your organization and Wayfair of the application's purpose.
 
 6. Use the slider switch at the bottom of dialog to set it to `Production`, unless otherwise instructed by Wayfair.
 
