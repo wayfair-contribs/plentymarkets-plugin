@@ -488,7 +488,7 @@ class ShipmentNotificationService
             'method' => __METHOD__
           ]
         );
-        if (!isset($plentyMarketsShippingInformation) || empty($plentyMarketsShippingInformation->shippingServiceProvider->id)) {
+        if (!isset($plentymarketsShippingInformation) || empty($plentymarketsShippingInformation->shippingServiceProvider->id)) {
           $this->loggerContract->error(
             TranslationHelper::getLoggerKey(self::LOG_KEY_PM_MISSING_SHIPPING_INFO),
             [
@@ -504,7 +504,7 @@ class ShipmentNotificationService
 
           throw new \Exception('Shipping service provider ID is null');
         }
-        $scacCode = $this->carrierScacRepository->findScacByCarrierId($plentyMarketsShippingInformation->shippingServiceProvider->id);
+        $scacCode = $this->carrierScacRepository->findScacByCarrierId($plentymarketsShippingInformation->shippingServiceProvider->id);
         $orderShippingPackages = $this->orderShippingPackageRepositoryContract->listOrderShippingPackages($orderId);
         $orderTrackingNumbers = $this->orderRepositoryContract->getPackageNumbers($orderId);
         $requestDto->setPackageCount(count($orderShippingPackages) > 0 ? count($orderShippingPackages) : 1);
