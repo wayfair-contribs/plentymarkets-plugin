@@ -267,6 +267,18 @@ class ShipmentNotificationService
     }
   }
 
+  protected function prepareRequestDtoHelper(
+    $order,
+    $orderPropertyService,
+    $purchaseOrderService,
+    $shippingInformationRepository,
+    $fetchingShippingLabelContract,
+    $carrierScacRepository,
+    $orderRepositoryContract
+  ) {
+    return;
+  }
+
   /**
    * Prepare ASN message body.
    *
@@ -712,4 +724,28 @@ class ShipmentNotificationService
 
     return $packages;
   }
+
+  /**
+   * @param Order $order
+   * @param  $orderPropertyService,
+    * @param $purchaseOrderService,
+    * @param $shippingInformationRepository,
+    * @param $fetchingShippingLabelContract,
+    * @param $carrierScacRepository,
+    * @param $orderRepositoryContract
+   *
+
+   * @return array
+   */
+  // protected function prepareRequestDtoHelper(
+  //   $order,
+  //   $orderPropertyService,
+  //   $purchaseOrderService,
+  //   $shippingInformationRepository,
+  //   $fetchingShippingLabelContract,
+  //   $carrierScacRepository,
+  //   $orderRepositoryContract
+  // ) {
+  //   return;
+  // }
 }
