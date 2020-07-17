@@ -15,8 +15,8 @@ Send an email to ERPSupport@wayfair.com to request assistance:
     - Date when you are ready to use the Wayfair Plentymarkets Plugin.
 
 You will promptly receive a response containing these details:
-- Confirmation of access to
-- Supplier ID(s)
+- Confirmation of your API access being set up
+- Supplier ID(s) for your Warehouses
 
 ## 2. Generate Application Credentials
 
