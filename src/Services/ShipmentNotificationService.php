@@ -365,7 +365,6 @@ class ShipmentNotificationService
       $asnTotalVolume = 0.0;
       $asnTrackingNumbers = [];
       $products = $purchaseOrderInfo['products'];
-      $scacCode = '';
 
       //Decide how to get tracking and package information.
       if ($this->shipmentProviderService->isShippingWithWayfair() || empty($plentymarketsShippingInformation->shippingServiceProvider)) {
