@@ -113,7 +113,9 @@ The final settings result should look similar to this:
 
 ![Add Procedure Result](https://i.ibb.co/GJPF3ZV/asn-06.png "Add Procedure Result")
 
-## 9. Performing the first Inventory Synchronization
+## 9. Performing the first inventory synchronization
 Once everything has been set up, the it is time to start listing items for sale on Wayfair.
 
-Finalize the setup by initiating a full inventory synchronization on the [Full Inventory](settings_guide.md#full-inventory-page) page of the [Wayfair Market Settings](settings_guide.md)
+Finalize the setup by initiating a full inventory synchronization on the [Full Inventory](settings_guide.md#full-inventory-page) page of the [Wayfair Market Settings](settings_guide.md).
+
+**After this first inventory synchronization, the Wayfair plugin will periodically send inventory updates to Wayfair, without any further manual activations.**
