@@ -9,6 +9,17 @@ The plugin allows for the following automatic processes to take place:
 * Product stock synchronization
 * Shipping label retrieval and printing
 
+## Using the Wayfair plugin / So verwenden Sie das Plugin
+
+**EN:** This document is meant for developers. If you are a Plentymarkets user looking to use the Wayfair plugin, check out these links:
+
+**DE:** Dieses Dokument richtet sich an Softwareentwickler. Wenn Sie ein Plentymarkets-Benutzer sind und das Wayfair-Plugin verwenden möchten, verwenden Sie diese Links:
+
+* [EN/DE: Wayfair on the plentyMarketplace / Wayfair auf dem plentyMarketplace ](https://marketplace.plentymarkets.com/en/plugins/integration/wayfair_6273)
+
+* [EN: User documentation](meta/documents/user_guide_en.md)
+
+* [DE: Benutzerhandbuch](meta/documents/user_guide_en.md)
 
 ## Getting Started
 

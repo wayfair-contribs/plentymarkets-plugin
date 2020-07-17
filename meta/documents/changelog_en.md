@@ -1,22 +1,7 @@
 ﻿# Release notes for Wayfair
 
-## v1.1.2-beta.6 (2020-07-07)
-- see https://github.com/wayfair-contribs/plentymarkets-plugin/releases/tag/v1.1.2-beta.6
-
-## v1.1.2-beta.5 (2020-06-29)
-- see https://github.com/wayfair-contribs/plentymarkets-plugin/releases/tag/v1.1.2-beta.5
-
-## v1.1.2-beta.4 (2020-06-27)
-- Intermediate release, replaced by `v1.1.2-beta.5`
-
-## v1.1.2-beta.3 (2020-06-09)
-- see https://github.com/wayfair-contribs/plentymarkets-plugin/releases/tag/v1.1.2-beta.3
-
-## v1.1.2-beta.2 (2020-04-23)
-- see https://github.com/wayfair-contribs/plentymarkets-plugin/releases/tag/v1.1.2-beta.2
-
-## v1.1.2-beta (2020-04-08)
-- see https://github.com/wayfair-contribs/plentymarkets-plugin/releases/tag/v1.1.2-beta
+## v1.1.2 (2020-07-17)
+- see https://github.com/wayfair-contribs/plentymarkets-plugin/releases/tag/v1.1.2
 
 ## v1.1.1 (2020-01-08)
 - Fixed inventory mapping using SKU
