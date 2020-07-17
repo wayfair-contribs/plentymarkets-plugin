@@ -67,7 +67,7 @@ When the `Item Mapping Method` is set to `EAN`, each Item Variation in Plentymar
 
 3. **For each Item**, click on the item in the search results, then click `Variations`
 
-3. **For each Variation**:
+4. **For each Variation**:
     1. Click on the `Settings` tab
     2. In the `Barcode` section, pick a barcode type, then click the `Add` button, then enter the barcode value in the `Code` field. The Barcode should match the Wayfair Supplier Part Number.
     3. Click the `Save` button at the Variation level (not to be confused with the `Save` button for the Item, a few rows above)
