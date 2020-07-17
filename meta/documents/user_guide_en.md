@@ -36,6 +36,9 @@ Install the plugin into the active Plugin Set in Plentymarkets. For guided instr
 ## Setting up the Wayfair plugin
 Prior to first use of the plugin, [use these instructions](https://github.com/wayfair-contribs/plentymarkets-plugin/blob/master/meta/documents/user_guide/en/initial_setup.md) to get the plugin properly connected to Wayfair and functioning as desired.
 
+## Updating the Wayfair plugin
+Wayfair may occasionally release free updates for the Wayfair plugin. [Click here for information on checking for updates and installing them](https://github.com/wayfair-contribs/plentymarkets-plugin/blob/master/meta/documents/updating.md).
+
 ## Customization and monitoring
 The Wayfair plugin presents Plentymarkets users with the ability to customize and monitor its behavior.
 [Click here to view the latest instructions](https://github.com/wayfair-contribs/plentymarkets-plugin/blob/master/meta/documents/user_guide/en/settings_guide.md).
