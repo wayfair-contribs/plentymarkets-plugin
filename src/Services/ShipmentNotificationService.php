@@ -267,7 +267,6 @@ class ShipmentNotificationService
     }
   }
 
-
   /**
    * Prepare ASN message body.
    *
@@ -489,8 +488,23 @@ class ShipmentNotificationService
             'method' => __METHOD__
           ]
         );
+        if (!isset($plentyMarketsShippingInformation) || empty($plentyMarketsShippingInformation->shippingServiceProvider->id)) {
+          $this->loggerContract->error(
+            TranslationHelper::getLoggerKey(self::LOG_KEY_PM_MISSING_SHIPPING_INFO),
+            [
+              'additionalInfo' => [
+                'PoNumber' => $poNumber,
+                'order' => $order,
+                'message' => 'Shipping service provider ID is null',
+              ],
+              'method' => __METHOD__
+            ]
+          );
+          $externalLogs->addErrorLog("Shipping service provider ID is null for PlentyMarkets order:  ". $orderId . ' - PO Number:' . $poNumber);
 
-        $scacCode = $this->carrierScacRepository->findScacByCarrierId($plentymarketsShippingInformation->shippingServiceProvider->id);
+          throw new \Exception('Shipping service provider ID is null');
+        }
+        $scacCode = $this->carrierScacRepository->findScacByCarrierId($plentyMarketsShippingInformation->shippingServiceProvider->id);
         $orderShippingPackages = $this->orderShippingPackageRepositoryContract->listOrderShippingPackages($orderId);
         $orderTrackingNumbers = $this->orderRepositoryContract->getPackageNumbers($orderId);
         $requestDto->setPackageCount(count($orderShippingPackages) > 0 ? count($orderShippingPackages) : 1);
