@@ -6,7 +6,7 @@ To receive the API credentials for you organization, follow these steps:
 
 ## 1. Send an Email to Wayfair
 
-Send an email to ERPSupport@wayfair.com to request assistance:
+Please send an email to your Wayfair Account Manager, and copy (CC) ERPSupport@wayfair.com to request assistance:
 
 - Subject : Access to Plentymarkets plugin / (Name of your company) (Wayfair Supplier ID)
 - Body:
