@@ -29,8 +29,8 @@ You will promptly receive a response containing these details:
 4. On the `Application Management` page, click the `+ New Application` button at the bottom.
 
 5. On the `New Application` form, provide the new application's details:
-    *  `Name`: A useful identifier such as "[My Supplier] Plentymarkets Plugin."
-    * `Description`: any information to make your organization and Wayfair of the application's purpose.
+    *  `Name`: A useful identifier such as "[My Supplier] Plentymarkets plugin."
+    * `Description`: something like "Plentymarkets plugin application for [My Supplier] Go-Live in Fall 2020".
 
 6. Use the slider switch at the bottom of dialog to set it to `Production`, unless otherwise instructed by Wayfair.
 
