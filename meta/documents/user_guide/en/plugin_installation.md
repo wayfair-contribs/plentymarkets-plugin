@@ -1,45 +1,71 @@
 # Wayfair plugin: Installation instructions
+The Wayfair plugin is available for **free** on the official plentyMarketplace from Plentymarkets. This document covers the steps required for making it available for use in a Plentymarkets system.
 
-1. Login to the Plentymarkets system
+## 1. Making the Wayfair plugin available in Plentymarkets
+Plentymarkets systems do not come with the Wayfair plugin by default.
+Follow these steps to make it available for use:
 
-2. Go to **plugins >> plentyMarketplace**, which will use the system owner’s credentials to log you in on the Marketplace
+1. Log in to the Plentymarkets system.
 
-3. Click the search button  in the top-right corner of the page
+2. From the main Plentymarkets page, go to `plugins` >> `plentyMarketplace`, which will use the Plentymarkets system's owner’s credentials to log you in on the plentyMarketplace website.
 
-4. Enter “Wayfair” into the box and press enter
+3. Click the search button  in the top-right corner of the page.
 
-5. If “Already purchased” appears on the page, skip to step 8
+4. Enter "Wayfair" into the box and press enter.
 
-6. Click the **go to checkout** button
-7. Complete the purchasing form
-    1. Accept terms and conditions
-    2. Click **order now**
+5. If a `You have purchased this plugin` banner appears on the top page and/or an `Already purchased` appears on the page, skip to the instructions on [installing the plugin in a Plugin Set](#2-installing-the-wayfair-plugin-in-a-plugin-set).
 
-8. Return to the Plentymarkets system, and go to **Plugins >> Plugin Overview**.
+6. Click the `Go to checkout` button.
 
-9. Find/Create a Plugin Set where the plugin is to be installed - the proper plugin set will be marked as **Linked to** your "shop."
+7. Complete all fields on the purchasing form.
 
-10. Un-check the **installed** checkbox
+8. Accept terms and conditions.
 
-11. Check the **plentyMarketplace** checkbox
+9. Click `Order now` and await confirmation. The plugin will be soon be available in the system.
 
-12. Type “Wayfair” into the **name** field
+## 2. Installing the Wayfair plugin in a Plugin Set
+To use the functions of the Wayfair plugin, it must be installed in the Plentymarkets system's active plugin set(s). Follow these instructions to complete the installation:
 
-13. Click **search** to find the appropriate plugin - only one should appear, with the marketplace icon in the Source column.
+1. From the main Plentymarkets page, go to `Plugins` >> `Plugin set overview`
+    * **Do not select the deprecated, similarly named `Plugin overview` option, if it appears in the menu.**
 
-14. Click the **install** button in the Wayfair row
+    * The screen should show a list of plugin sets, with a set of buttons for each one.
 
-15. Complete the pop-up modal
-    1. In the drop-down, choose [the newest plugin version](https://github.com/wayfair-contribs/plentymarkets-plugin/releases).
+2. Create the Plugin Set where the plugin is to be installed, if it the desired Plugin Set does not yet exist.
 
-    2. Click **install**
+    * If you already have other plugins installed, you may wish to use a copy of an existing Plugin Set via its dedicated `Copy plugin set`.
 
-16. Refresh the Plugin Overview page
+    * Your Plentymarkets license may limit the number of Plugin Sets that can exist at one time.
 
-17. Click on the name of the plugin set where the plugin was installed
+3. Configure the Plugin Set(s) to be used by Plentymarkets
+    * The `Linked clients` field for the Plugin Set should contain the names of all Plentymarkets Shop(s) for which Wayfair plugin functionality is desired.
 
-18. Click the **Activate** button in the Wayfair plugin row of the plugin set
+    * Optionally use the `Link clients and plugin sets` to modify the linkages between clients and Plugin Sets.
 
-19. Click the save icon  above the list, and wait for the progress bar to complete. A timestamp will display at successful completion.
+4. Click the `Edit plugin set` button for the Plugin Set in which the Wayfair plugin is to be installed.
 
-20. If an error symbol appears, check the Plentymarkets logs for plugin build and deployment failures
+5. Click the `+ Add plugin` button
+
+6. `Wayfair` should appear in the list of plugins
+
+    * If there are many plugins, type "Wayfair" into the `Search` box
+
+7. Click on the `Wayfair` entry in the list. The Wayfair logo should appear, below an `Install` button.
+
+    * If you have previously installed the Wayfair plugin via the "git" channel, there may multiple entries for "Wayfair." Please select the entry that has the "Marketplace" source.
+
+8. Review the information on the page.
+
+9. In the `Select version` drop-down menu, choose [the newest plugin version](https://github.com/wayfair-contribs/plentymarkets-plugin/releases) if it is not already selected.
+
+10. Click the `Install` button at the top of the page. You will be redirected to the individual Plugin Set's details.
+
+11. Verify that a row exists on the page with the `Name` displayed as "Wayfair" and the `Installed` version showing as the desired version
+
+12. In the `Active` column for the "Wayfair" row, click on the switch so that it moves to the right-side, enabled position. **Failure to activate the Wayfair plugin will prevent its functionalities from being available**.
+
+13. Click the `Deploy plugin set` button (appears as a Save button) at the top of the page. A progress bar will appear while the plugin is installed.
+
+14. Confirm that the `Deployed` column for the "Wayfair" row is now populated, and it reflects the value in the `Installed` column.
+
+15. Log out of the Plentymarkets system, then log back in, to ensure that the changes are now in effect.
