@@ -102,6 +102,8 @@ The `Full Inventory` page does not contain any settings to configure.
 It is used for checking the status of syncing the Plentymarkets inventory with Wayfair, or manually initiating a synchronization of all inventory items.
 The page's data will automatically refresh over time, but you may also manually refresh it.
 
+**The Wayfair plugin periodically sends inventory updates to Wayfair, without any further manual activations. The Full Inventory page only displays information about the daily updates that include all items in the inventory.**
+
 ### Fields
 * The `Time of last successful inventory synchronization` fields keep track of the daily synchronizations that are normally preformed automatically.
     * A "check mark" icon will appear if it has been less than 24 hours since the last successful synchronization. This indicates that no actions are required.
