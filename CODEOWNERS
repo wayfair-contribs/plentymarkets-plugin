@@ -1,12 +1,12 @@
 # default owners, overridden by any matches below
-* @jhoule86 @mcloughlin77 @jathmel @dFed17
+* @jhoule86 @mcloughlin77 @jathmel @dFed17 @rickyklu @jiafanwu
 
 # people that own documentation and images
-*.md                                @jhoule86 @mcloughlin77 @jathmel @dFed17 @FelixEkwuemeC
-/meta/                              @jhoule86 @mcloughlin77 @jathmel @dFed17 @FelixEkwuemeC
-/angular/source/app/assets/images/  @jhoule86 @mcloughlin77 @jathmel @dFed17 @FelixEkwuemeC
-plugin.json                         @jhoule86 @mcloughlin77 @jathmel @dFed17 @FelixEkwuemeC
+*.md                                @jhoule86 @mcloughlin77 @jathmel @dFed17 @FelixEkwuemeC @rickyklu @jiafanwu
+/meta/                              @jhoule86 @mcloughlin77 @jathmel @dFed17 @FelixEkwuemeC @rickyklu @jiafanwu
+/angular/source/app/assets/images/  @jhoule86 @mcloughlin77 @jathmel @dFed17 @FelixEkwuemeC @rickyklu @jiafanwu
+plugin.json                         @jhoule86 @mcloughlin77 @jathmel @dFed17 @FelixEkwuemeC @rickyklu @jiafanwu
 
 # people that own translations
-/resources/lang/                    @jhoule86 @mcloughlin77 @jathmel @dFed17 @FelixEkwuemeC
-/angular/source/app/assets/lang/    @jhoule86 @mcloughlin77 @jathmel @dFed17 @FelixEkwuemeC
+/resources/lang/                    @jhoule86 @mcloughlin77 @jathmel @dFed17 @FelixEkwuemeC @rickyklu @jiafanwu
+/angular/source/app/assets/lang/    @jhoule86 @mcloughlin77 @jathmel @dFed17 @FelixEkwuemeC @rickyklu @jiafanwu
