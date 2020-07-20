@@ -85,7 +85,7 @@ Um die Inventardaten im Wayfair-System zu aktualisieren, müssen Sie die Lager i
 ## 7. Konfigurieren von Plentymarkets zum Senden der Lieferbestätigung (ASN) an Wayfair
 
 ### 7.1 Einstellen des Wayfair-Plugins, um die richtigen Versandinformationen an Wayfair zu senden
-Benutzer des Wayfair-Plugins, die Bestellungen über ihre eigenen Konten versenden möchten (anstatt die Versanddienste von Wayfair zu nutzen), müssen die Konfigurationseinstellungen für [Versandbestätigung (ASN)] (https://github.com/wayfair-contribs/plentymarkets-plugin/) aktualisieren. blob / master / meta / documents / user_guide / de / settings_guide.md # Schiffsbestätigung-asn-Seite), um ihre spezifische Konfiguration widerzuspiegeln.
+Benutzer des Wayfair-Plugins, die Bestellungen über ihre eigenen Konten versenden möchten (anstatt die Versanddienste von Wayfair zu nutzen), müssen die Konfigurationseinstellungen für [Versandbestätigung (ASN)](settings_guide.md#seite-versandsbestätigung), um ihre spezifische Konfiguration widerzuspiegeln.
 
 Wenn die Versanddienste von Wayfair verwendet werden sollen, sollten die ASN-Einstellungen des Wayfair-Plugins in ihrem Standardstatus ("Wayfair-Versand") belassen werden.
 

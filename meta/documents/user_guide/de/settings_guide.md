@@ -1,32 +1,46 @@
-# Wayfair Plugin: Wayfair Markteinstellungen
+# Wayfair Plugin: Einstellungen für Wayfair Markt
+
 Das Wayfair-Plugin enthält eine Sammlung von Einstellungen zur Steuerung des Plugin-Verhaltens.
 Diese Einstellungen sollten erst konfiguriert werden, nachdem die [Autorisierungseinstellungen für das Plugin] (initial_setup.md # 1-Autorisierung der Wayfair-Plugins für den Zugriff auf Wayfair-Schnittstellen) für das aktive Plugin-Set konfiguriert wurden.
 
-# Öffnen der Einstellungsseite
+## Öffnen der Einstellungsseite
+
 So suchen Sie die Einstellungen:
+
 1. Melden Sie sich bei Plentymarkets als Benutzer mit Administratorrechten an
-2. Klicken Sie in der oberen Navigationsleiste von Plentymarkets auf "Setup"
-3. Klicken Sie in der linken Navigationsleiste der Benutzeroberfläche auf "Märkte"
-4. Klicken Sie in der Liste der Märkte auf "Wayfair". Es wird möglicherweise unten angezeigt, anstatt alphabetisch geordnet zu sein.
-5. Klicken Sie unter "Wayfair" auf "Home"
-6. Sie können jetzt die Wayfair-Navigationsleiste verwenden, um eine Einstellungsseite wie [`Warehouses`] (# warehouses-page) auszuwählen.
 
-# Startseite
-Die "Home" -Seite wird durch Klicken auf "Home" im Menü auf der linken Seite oder durch Klicken auf "Wayfair" in der Wayfair-Navigationsleiste aktiviert. Derzeit werden keine Informationen bereitgestellt.
+2. Klicken Sie in der oberen Navigationsleiste von Plentymarkets auf `Einrichtung`
 
-## Lagerseite
-Die Seite Lager wird verwendet, um die Lager, die der Lieferant in Plentymarkets verwendet, mit den Wayfair-Lieferanten-IDs zu verknüpfen, die dem Lieferanten ausgestellt wurden. Die Zuordnungen werden vom Wayfair-Plugin verwendet, wenn es Inventar an Wayfair meldet und Wayfair-Bestellungen verarbeitet, die bei Plentymarkets eingehen.
+3. Klicken Sie in der linken Navigationsleiste der Benutzeroberfläche auf `Märkte`
+
+4. Klicken Sie in der Liste der Märkte auf `Wayfair`. Es wird möglicherweise unten angezeigt, anstatt alphabetisch geordnet zu sein.
+
+5. Klicken Sie unter `Wayfair` auf `Home`
+
+6. Sie können jetzt die Wayfair-Navigationsleiste verwenden, um eine Einstellungsseite wie [`Lager`](#die-seite-lager) auszuwählen.
+
+## Die Seite Home
+
+Die Seite Home wird durch Klicken auf `Home` im Menü auf der linken Seite oder durch Klicken auf `Wayfair` in der Wayfair-Navigationsleiste aktiviert. Derzeit werden keine Informationen bereitgestellt.
+
+## Die Seite Lager
+
+Die Seite Lager wird verwendet, um die Lager, die der Lieferant in Plentymarkets verwendet, mit den Wayfair Lieferanten IDs zu verknüpfen, die dem Lieferanten ausgestellt wurden. Die Zuordnungen werden vom Wayfair-Plugin verwendet, wenn es Inventar an Wayfair meldet und Wayfair-Bestellungen verarbeitet, die bei Plentymarkets eingehen.
 
 ### Hinweise zu mehreren Lagern pro Wayfair-Lieferanten-ID
-Die Topographie des Plentymarkets-Systems stimmt möglicherweise nicht mit der Anzahl der Wayfair-Lieferanten-IDs überein. Es ist akzeptabel, eine Wayfair-Lieferanten-ID für mehr als eines der Plentymarkets-Lagerhäuser zu verwenden. ** Dies kann jedoch zu unerwartetem Verhalten führen. ** Beispielsweise kann das Wayfair-Plugin möglicherweise nicht das richtige Lager für eingehende Waren ermitteln Bestellungen ** - Weitere Informationen finden Sie unter https://github.com/wayfair-contribs/plentymarkets-plugin/issues/92.
 
+Die Topographie des Plentymarkets-Systems stimmt möglicherweise nicht mit der Anzahl der Wayfair Lieferanten-IDs überein. Es ist akzeptabel, eine Wayfair-Lieferanten-ID für mehr als eines der Plentymarkets-Lagerhäuser zu verwenden. **Dies kann jedoch zu unerwartetem Verhalten führen. Beispielsweise kann das Wayfair plugin möglicherweise nicht das richtige Lager für eingehende Waren ermitteln Bestellungen** -Weitere Informationen finden Sie unter https://github.com/wayfair-contribs/plentymarkets-plugin/issues/92.
 
-Überprüfen Sie bei der Auswahl einer Beziehung zwischen Lagern und Lieferanten-IDs, die nicht eins zu eins ist, das Verhalten der Einstellung [Lagerpuffer] (# Lagerpuffer).
+Überprüfen Sie bei der Auswahl einer Beziehung zwischen Lagern und Lieferanten ID, die nicht eins zu eins ist, das Verhalten der Einstellung [Lagerpuffer] (#Lagerpuffer).
 
 ### Hinzufügen einer Warehouse-Zuordnung
+
 1. Klicken Sie auf die Schaltfläche "Mapping hinzufügen"
+
 2. Verwenden Sie die linke Spalte, um ein Plentymarkets Warehouse nach Namen auszuwählen
+
 3. Geben Sie in der rechten Spalte eine numerische Lieferanten-ID ein
+
 4. Klicken Sie auf die Schaltfläche "Speichern", sobald die neuen Zeilen abgeschlossen sind
 
 ### Entfernen einer Warehouse-Zuordnung
@@ -35,14 +49,14 @@ Die Topographie des Plentymarkets-Systems stimmt möglicherweise nicht mit der A
 3. Klicken Sie auf die Schaltfläche "Speichern", sobald die gewünschten Zeilen entfernt wurden
 
 
-## Einstellungsseite
+## Die Site Einstellungen
 Die Seite Einstellungen enthält allgemeine Einstellungen für den Betrieb des Wayfair-Plugins.
 Einstellungen werden bei Änderungen nicht automatisch gespeichert. Verwenden Sie die Schaltfläche "Speichern" unten auf der Seite.
 
-### Aktienpuffer
-Die Einstellung "Lagerpuffer" ist eine nicht negative Ganzzahl, die für jede Artikelvariante für jede Wayfair-Lieferanten-ID eine reservierte Lagermenge festlegt. Der Pufferbetrag wird abgezogen, nachdem alle anderen Bestandsberechnungen durchgeführt wurden, einschließlich der Aggregation der Bestände für mehrere Plentymarkets Warehouses, denen dieselbe Wayfair-Lieferanten-ID zugewiesen wurde.
+### Lagerpuffer
+Die Einstellung `Lagerpuffer` ist eine nicht negative Ganzzahl, die für jede Artikelvariante für jede Wayfair Lieferanten ID eine reservierte Lagermenge festlegt. Der Pufferbetrag wird abgezogen, nachdem alle anderen Bestandsberechnungen durchgeführt wurden, einschließlich der Aggregation der Bestände für mehrere Plentymarkets Warehouses, denen dieselbe Wayfair Lieferanten ID zugewiesen wurde.
 
-Um den "Lagerpuffer" zu deaktivieren, lassen Sie diese Einstellung leer oder setzen Sie sie auf "0".
+Um den `Lagerpuffer` zu deaktivieren, lassen Sie diese Einstellung leer oder setzen Sie sie auf `0`.
 
 ### Standardbestellstatus
 Die Einstellung "Standardbestellstatus" bestimmt, in welchem ​​Status sich eine neue Plentymarkets-Bestellung nach der Erstellung durch das Wayfair-Plugin befinden soll.
@@ -97,7 +111,7 @@ Wenn "Alle Inventargegenstände an Wayfair senden?" Deaktiviert ist, muss für d
 Durch Aktivieren von "Alle Inventargegenstände an Wayfair senden?" Kann Wayfair alle Artikel auflisten, von denen festgestellt wird, dass sie derzeit auf Lager sind, einschließlich der Artikel, für die "Wayfair" ** nicht ** in der "Märkte" -Liste enthalten ist.
 
 
-## Vollständige Inventarseite
+## Die Seite Voll Inventar
 Die Seite "Vollständiges Inventar" enthält keine zu konfigurierenden Einstellungen.
 Es wird verwendet, um den Status der Synchronisierung des Plentymarkets-Inventars mit Wayfair zu überprüfen oder um manuell eine Synchronisierung aller Inventarelemente zu initiieren.
 Die Daten der Seite werden im Laufe der Zeit automatisch aktualisiert. Sie können sie jedoch auch manuell aktualisieren.
@@ -118,9 +132,9 @@ Die Daten der Seite werden im Laufe der Zeit automatisch aktualisiert. Sie könn
 * Mit der Schaltfläche "Aktualisieren" werden die Felder über den Schaltflächen aktualisiert, um den neuesten Ergebnissen der automatischen vollständigen Inventarsynchronisierung zu entsprechen.
 
 
-## Seite Schiffsbestätigung (ASN)
-Die Seite "Ship Confirmation (ASN)" wird zum Konfigurieren der Versandinteraktionen zwischen Plentymarkets, dem Wayfair Plugin und Wayfair verwendet.
-Die hier festgelegten Informationen informieren über das Bestellverfahren "Schiffsbestätigung (ASN) an Wayfair senden", das das Wayfair-Plugin bereitstellt.
+## Die Seite Versandsbestätigung (ASN)
+Die Seite `Versandsbestätigung (ASN)` wird zum Konfigurieren der Versandinteraktionen zwischen Plentymarkets, dem Wayfair Plugin und Wayfair verwendet.
+Die hier bereitgestellten Informationen legen das Verhalten für die `Versandsbestätigung (ASN) an Wayfair senden` Prozess für Bestellungen fest.
 
 ### Versandart
 Das Optionsfeld oben auf der Seite enthält diese Optionen.
