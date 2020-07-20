@@ -13,13 +13,15 @@ The plugin allows for the following automatic processes to take place:
 
 **EN:** This document is meant for developers. If you are a Plentymarkets user looking to use the Wayfair plugin, check out these links:
 
+* [User documentation](meta/documents/user_guide_en.md)
+
+* [Wayfair on the plentyMarketplace](https://marketplace.plentymarkets.com/en/plugins/integration/wayfair_6273)
+
 **DE:** Dieses Dokument richtet sich an Softwareentwickler. Wenn Sie ein Plentymarkets-Benutzer sind und das Wayfair-Plugin verwenden möchten, verwenden Sie diese Links:
 
-* [EN/DE: Wayfair on the plentyMarketplace / Wayfair auf dem plentyMarketplace ](https://marketplace.plentymarkets.com/en/plugins/integration/wayfair_6273)
+* [Benutzerhandbuch](meta/documents/user_guide_en.md)
 
-* [EN: User documentation](meta/documents/user_guide_en.md)
-
-* [DE: Benutzerhandbuch](meta/documents/user_guide_en.md)
+* [Wayfair auf dem plentyMarketplace](https://marketplace.plentymarkets.com/plugins/integration/wayfair_6273)
 
 ## Getting Started
 
