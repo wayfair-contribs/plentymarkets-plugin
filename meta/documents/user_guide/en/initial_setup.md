@@ -85,7 +85,7 @@ In order to update the inventory data in Wayfair's system, you need to map the W
 ## 7. Configuring Plentymarkets to send Confirmation of Delivery (ASN) to Wayfair
 
 ### 7.1 Setting the Wayfair Plugin to send the correct shipping information to Wayfair
-Wayfair Plugin users that wish to ship orders by using their own accounts (rather than using Wayfair's shipping services) must update the [Ship Confirmation (ASN) configuration settings](https://github.com/wayfair-contribs/plentymarkets-plugin/blob/master/meta/documents/user_guide/en/settings_guide.md#ship-confirmation-asn-page) to reflect their specific configuration.
+Wayfair Plugin users that wish to ship orders by using their own accounts (rather than using Wayfair's shipping services) must update the [Ship Confirmation (ASN) configuration settings](settings_guide.md#ship-confirmation-asn-page) to reflect their specific configuration.
 
 If Wayfair's shipping services are to be used, the Wayfair plugin's ASN settings should be left in their default (`Wayfair Shipping`) state.
 
