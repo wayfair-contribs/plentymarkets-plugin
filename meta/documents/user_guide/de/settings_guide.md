@@ -1,7 +1,7 @@
 # Wayfair Plugin: Einstellungen für Wayfair Markt
 
 Das Wayfair-Plugin enthält eine Sammlung von Einstellungen zur Steuerung des Plugin-Verhaltens.
-Diese Einstellungen sollten erst konfiguriert werden, nachdem die [Autorisierungseinstellungen für das Plugin] (initial_setup.md # 1-Autorisierung der Wayfair-Plugins für den Zugriff auf Wayfair-Schnittstellen) für das aktive Plugin-Set konfiguriert wurden.
+Diese Einstellungen sollten erst konfiguriert werden, nachdem die [Autorisierungseinstellungen für das Plugin](initial_setup.md#1-autorisieren-des-wayfair-plugins-für-den-zugriff-auf-wayfair-schnittstellen) für das aktive Plugin-Set konfiguriert wurden.
 
 ## Öffnen der Einstellungsseite
 
@@ -35,37 +35,37 @@ Die Topographie des Plentymarkets-Systems stimmt möglicherweise nicht mit der A
 
 ### Hinzufügen einer Warehouse-Zuordnung
 
-1. Klicken Sie auf die Schaltfläche "Mapping hinzufügen"
+1. Klicken Sie auf die Schaltfläche `Zuordnung hinzufügen`.
 
-2. Verwenden Sie die linke Spalte, um ein Plentymarkets Warehouse nach Namen auszuwählen
+2. Verwenden Sie die linke Spalte, um ein Plentymarkets Warehouse nach Namen auszuwählen.
 
-3. Geben Sie in der rechten Spalte eine numerische Lieferanten-ID ein
+3. Geben Sie in der rechten Spalte eine numerische Lieferanten-ID ein.
 
-4. Klicken Sie auf die Schaltfläche "Speichern", sobald die neuen Zeilen abgeschlossen sind
+4. Klicken Sie auf die Schaltfläche `Speichern`, sobald die neuen Zeilen abgeschlossen sind.
 
 ### Entfernen einer Warehouse-Zuordnung
 1. Suchen Sie die zu entfernende Zeile
-2. Klicken Sie in der Zeile auf die Schaltfläche "Löschen"! [Symbol löschen] (../../../ images / icon_trash_can.png)
-3. Klicken Sie auf die Schaltfläche "Speichern", sobald die gewünschten Zeilen entfernt wurden
+2. Klicken Sie in der Zeile auf die Schaltfläche `Löschen` ![Symbol löschen](../../../images/icon_trash_can.png)
+3. Klicken Sie auf die Schaltfläche `Speichern`, sobald die gewünschten Zeilen entfernt wurden
 
 
 ## Die Site Einstellungen
 Die Seite Einstellungen enthält allgemeine Einstellungen für den Betrieb des Wayfair-Plugins.
-Einstellungen werden bei Änderungen nicht automatisch gespeichert. Verwenden Sie die Schaltfläche "Speichern" unten auf der Seite.
+Einstellungen werden bei Änderungen nicht automatisch gespeichert. Verwenden Sie die Schaltfläche `Speichern` unten auf der Seite.
 
 ### Lagerpuffer
 Die Einstellung `Lagerpuffer` ist eine nicht negative Ganzzahl, die für jede Artikelvariante für jede Wayfair Lieferanten ID eine reservierte Lagermenge festlegt. Der Pufferbetrag wird abgezogen, nachdem alle anderen Bestandsberechnungen durchgeführt wurden, einschließlich der Aggregation der Bestände für mehrere Plentymarkets Warehouses, denen dieselbe Wayfair Lieferanten ID zugewiesen wurde.
 
 Um den `Lagerpuffer` zu deaktivieren, lassen Sie diese Einstellung leer oder setzen Sie sie auf `0`.
 
-### Standardbestellstatus
-Die Einstellung "Standardbestellstatus" bestimmt, in welchem ​​Status sich eine neue Plentymarkets-Bestellung nach der Erstellung durch das Wayfair-Plugin befinden soll.
+### Standard-Bestellstatus
+Die Einstellung `Standard-Bestellstatus` bestimmt, in welchem ​​Status sich eine neue Plentymarkets-Bestellung nach der Erstellung durch das Wayfair-Plugin befinden soll.
 
-** Hinweis: ** Die Auftragserstellung gilt nicht als Änderung des Auftragsstatus. Wenn Sie den Standardbestellstatus auf einen höheren Wert als die konfigurierten Plentymarkets-Bestellaktionen setzen, wird möglicherweise verhindert, dass diese Aktionen ausgeführt werden!
+**Hinweis:** Die Auftragserstellung gilt nicht als Änderung des Auftragsstatus. Wenn Sie den Standardbestellstatus auf einen höher als die Statuswerte für konfigurierten Plentymarkets-Ereignisse setzen, Einige Ereignisse können fehlschlagen.
 
-### Standardversandanbieter ** (veraltet) **
-Die Einstellung "Standardversandanbieter" ist eine Legacy-Einstellung, die das Verhalten des Plugins nicht mehr beeinflusst.
-** Wenn diese Einstellung in Ihrem System angezeigt wird, empfiehlt Wayfair dringend, dass Sie Ihr Plugin auf eine neuere Version aktualisieren. **
+### Standardversandanbieter **(nicht benutzt)**
+Die Einstellung `Standardversandanbieter` ist eine Legacy-Einstellung, die das Verhalten des Plugins nicht mehr beeinflusst.
+**Wenn diese Einstellung in Ihrem System angezeigt wird, empfiehlt Wayfair dringend, dass Sie Ihr Plugin auf eine neuere Version aktualisieren.**
 
 ### Elementzuordnungsmethode
 Die Einstellung "Artikelzuordnungsmethode" bestimmt das Verhalten beim Abgleichen der Artikelvariationen von Plentymarkets mit den Wayfair-Produkten. Es wird verwendet, wenn die Bestandslisten an Wayfair gesendet werden und um die angeforderten Produkte in einer Wayfair-Bestellung auszuwählen. Der Benutzer von Plentymarkets sollte diese Einstellung so konfigurieren, dass sie der Art und Weise entspricht, in der die Elementvariationen ausgefüllt werden.
@@ -151,6 +151,6 @@ Während des Onboarding des Wayfair-Plugins weist Wayfair an, welche Option für
 
 ### Zuordnung von Plentymarkets Carriern zu Wayfair Carriern
 Wenn Sie die Option "Versand mit eigenem Konto" auswählen, muss Wayfair die Versandinformationen von Plentymarkets in Daten übersetzen, die es versteht.
-1. Suchen Sie die von Wayfair bereitgestellten Spediteurinformationen. Wenden Sie sich bei Bedarf an [ERPSupport@wayfair.com] (mailto: ERPSupport@wayfair.com).
+1. Suchen Sie die von Wayfair bereitgestellten Spediteurinformationen. Wenden Sie sich bei Bedarf an [ERPSupport@wayfair.com] (mailto:ERPSupport@wayfair.com).
 2. Geben Sie für jeden in der linken Spalte aufgeführten Plentymarkets-seitigen "Spediteur" den von Wayfair bereitgestellten "SCAC-Code" in die rechte Spalte "Wayfair-Spediteur" ein.
 3. Klicken Sie unten auf der Seite auf "Speichern"
