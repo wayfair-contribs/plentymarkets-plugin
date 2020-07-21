@@ -2,19 +2,19 @@
 
 ## Voraussetzungen
 
-* [Ein Plentymarkets-System] (https://www.plentymarkets.co.uk).
+* [Ein Plentymarkets System] (https://www.plentymarkets.eu).
 
-* Administratorrechte auf dem Plentymarkets-System, auf dem das Wayfair-Plugin verwendet wird
-    - Die Einstellung "Zugriff" des Plentymarkets-Benutzers muss "Admin" sein
+* Administratorrechte auf dem Plentymarkets-System, auf dem das Wayfair plugin verwendet wird
+    - Die Einstellung `Zugang` des Plentymarkets-Benutzers muss `Admin` sein
     - Der Plentymarkets-Benutzer muss in der Lage sein, Plugin-Sets zu ändern
 
 * Aktiver Wayfair-Lieferantenstatus
     * Eine Wayfair-Lieferanten-ID ist erforderlich
-    * [Informationen für potenzielle Lieferanten] (https://partners.wayfair.com/d/onboarding/sell-on-wayfair)
+    * [Informationen für potenzielle Lieferanten](https://partners.wayfair.com/d/onboarding/sell-on-wayfair)
 
-* [Wayfair API-Anmeldeinformationen] (Getting_credentials.md).
+* [Wayfair API-Anmeldeinformationen](obtaining_credentials.md).
 
-* [Installation des Wayfair-Plugins] (plugin_installation.md).
+* [Installation des Wayfair Plugins](plugin_installation.md).
 
 
 ## 1. Autorisieren des Wayfair-Plugins für den Zugriff auf Wayfair-Schnittstellen
