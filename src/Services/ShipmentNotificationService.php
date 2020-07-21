@@ -276,15 +276,15 @@ class ShipmentNotificationService
     $carrierScacRepository,
     $orderRepositoryContract
   ) {
-    $$orderDetails = [];
-    $$orderDetails['poNumber'] = $orderPropertyService->getCheckedPoNumber($orderID);
-    $$orderDetails['purchaseOrder'] = $purchaseOrderService->getPurchaseOrderInfo($$orderDetails['poNumber']);
-    $$orderDetails['plentyMarketsShippingInformation'] = $shippingInformationRepositoryContract->getShippingInformationByOrderId($orderID);
-    $$orderDetails['fetchingShippingLabelContract'] = $fetchShippingLabelContract->getTrackingNumber(ShippingLabelHelper::removePoNumberPrefix($$orderDetails['poNumber']));
-    $$orderDetails['carrierScac'] = $carrierScacRepository->findScacByCarrierId($$orderDetails['shippingInformationRepository']->shippingServiceProvider->id);
-    $$orderDetails['orderRepositoryContract'] = $orderRepositoryContract->getPackageNumbers($orderID);
+    $orderDetails = [];
+    $orderDetails['poNumber'] = $orderPropertyService->getCheckedPoNumber($orderID);
+    $orderDetails['purchaseOrder'] = $purchaseOrderService->getPurchaseOrderInfo($orderDetails['poNumber']);
+    $orderDetails['plentyMarketsShippingInformation'] = $shippingInformationRepositoryContract->getShippingInformationByOrderId($orderID);
+    $orderDetails['fetchingShippingLabelContract'] = $fetchShippingLabelContract->getTrackingNumber(ShippingLabelHelper::removePoNumberPrefix($orderDetails['poNumber']));
+    $orderDetails['carrierScac'] = $carrierScacRepository->findScacByCarrierId($orderDetails['shippingInformationRepository']->shippingServiceProvider->id);
+    $orderDetails['orderRepositoryContract'] = $orderRepositoryContract->getPackageNumbers($orderID);
 
-    return $$orderDetails;
+    return $orderDetails;
   }
 
   /**
@@ -366,7 +366,7 @@ class ShipmentNotificationService
       }
 
       // $plentymarketsShippingInformation = $this->shippingInformationRepositoryContract->getShippingInformationByOrderId($orderId);
-      $plentymarketsShippingInformation = $$orderDetails['plentyMarketsShippingInformation'];
+      $plentymarketsShippingInformation = $orderDetails['plentyMarketsShippingInformation'];
       if (!isset($plentymarketsShippingInformation) || empty($plentymarketsShippingInformation)) {
         $this->loggerContract
           ->error(
@@ -421,7 +421,7 @@ class ShipmentNotificationService
 
         try {
           // $fetchedTrackingNumbers = $this->fetchShippingLabelContract->getTrackingNumber(ShippingLabelHelper::removePoNumberPrefix($poNumber));
-          $fetchedTrackingNumbers = $$orderDetails['fetchingShippingLabelContract'];
+          $fetchedTrackingNumbers = $orderDetails['fetchingShippingLabelContract'];
         } catch (\Exception $exception) {
           // TODO: lower to warning if/when warning-level logs are working
           // because the lack of tracking information is not a fatal issue for ASNs,
@@ -542,10 +542,10 @@ class ShipmentNotificationService
           throw new \Exception('Shipping service provider ID is null');
         }
         // $scacCode = $this->carrierScacRepository->findScacByCarrierId($plentyMarketsShippingInformation->shippingServiceProvider->id);
-        $scacCode = $$orderDetails['carrierScac'];
+        $scacCode = $orderDetails['carrierScac'];
         $orderShippingPackages = $this->orderShippingPackageRepositoryContract->listOrderShippingPackages($orderId);
         // $orderTrackingNumbers = $this->orderRepositoryContract->getPackageNumbers($orderId);
-        $orderTrackingNumbers = $$orderDetails['orderRepositoryContract'];
+        $orderTrackingNumbers = $orderDetails['orderRepositoryContract'];
         $requestDto->setPackageCount(count($orderShippingPackages) > 0 ? count($orderShippingPackages) : 1);
 
         /** @var OrderShippingPackage $orderShippingPackage */
