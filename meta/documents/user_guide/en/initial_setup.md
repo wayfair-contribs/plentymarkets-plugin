@@ -46,9 +46,9 @@ An order referrer in Plentymarkets identifies the sales channel on which an orde
 
 1. From the main Plentymarkets page, go to `Setup` >> `Orders` >> `Order referrer`.
 
-2. Place a check mark next to the **Wayfair** order referrer.
+2. Place a check mark next to the `Wayfair` order referrer.
 
-3. Click on **Save**.
+3. Click the `Save` button.
 
 ## 3. Setting up Plentymarkets for shipping through Wayfair
 To ensure proper integrations with Wayfair when shipping order items, follow the procedures outlined in  [the Wayfair Shipping instructions](wayfair_shipping.md).
