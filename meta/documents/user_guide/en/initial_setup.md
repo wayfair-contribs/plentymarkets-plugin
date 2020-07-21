@@ -61,7 +61,7 @@ If the Wayfair Supplier Part Numbers for your organization are to be reflected i
 ## 5. Making items available for sale on Wayfair
 Items that you want to sell on the Wayfair market must be considered active in Plentymarkets. The Plentymarkets user may also choose to limit which Items are for sale on Wayfair. **Note that Inventory and ordered items are controlled at the `Variation` level.**
 
-To ensure that an Item is available for sale, follow these instructions:
+This procedure is required only if [the `Send all inventory items to Wayfair` setting](settings_guide.md#send-all-inventory-items-to-wayfair) is **disabled.**:
 
 1. From the main Plentymarkets page, go to `Item` >> `Edit item`
 
