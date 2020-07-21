@@ -126,9 +126,9 @@ The information set here will inform the `Send Ship Confirmation (ASN) to Wayfai
 The radio button at the top of the page has these options.
 During Wayfair plugin onboarding, Wayfair will instruct on which option is appropriate for the Plentymarkets user.
 * `Wayfair shipping`
-    * Your orders are shipped by Wayfair
-    * You only need to tell Wayfair when the order is ready for shipment
-    * You need to get tracking information back from Wayfair into Plentymarkets
+    * Your orders' shipments are arranged by Wayfair, to be shipped by a carrier chosen by Wayfair
+    * You need to tell Wayfair when the order is ready for shipment
+    * You need to get tracking information back from Wayfair into your Plentymarkets orders
 
 * `Own account shipping`
     * You ship your own orders via your own carriers
