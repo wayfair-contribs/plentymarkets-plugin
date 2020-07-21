@@ -140,17 +140,17 @@ Die hier bereitgestellten Informationen legen das Verhalten für die `Versandsbe
 Das Optionsfeld oben auf der Seite enthält diese Optionen.
 Wayfair gibt Lieferanten Anweisungen zur Auswahl des richtigen Werts.
 * `Wayfair Versand`
-    * Ihre Bestellungen werden von Wayfair versendet.
-    * Sie müssen Wayfair nur mitteilen, wenn die Bestellung versandbereit ist.
-    * Sie müssen Tracking-Informationen von Wayfair in Plentymarkets zurückerhalten.
+    * Die Sendungen Ihrer Bestellungen werden von Wayfair arrangiert und von einem von Wayfair ausgewählten Spediteur versendet.
+    * Das Plentymarkets-System muss Wayfair mitteilen, wann die Bestellung versandbereit ist.
+    * Das Plentymarkets-System muss Tracking-Informationen von Wayfair in Ihre Plentymarkets-Bestellungen zurückerhalten.
 
 * `Selbst Versende`
     * Sie versenden Ihre eigenen Bestellungen über Ihre eigenen Spediteure.
-    * Sie müssen Wayfair mitteilen, wenn Sie eine Bestellung versenden.
-    * Sie müssen Wayfair die Tracking-Informationen mitteilen (Spediteur und Tracking-Nummer).
+    * Das Plentymarkets-System muss Wayfair mitteilen, wenn Sie eine Bestellung versenden.
+    * Das Plentymarkets-System muss Wayfair die Tracking-Informationen mitteilen (Spediteur und Tracking-Nummer).
 
 ### Zuordnung von Plentymarkets Carriern zu Wayfair Carriern
-Wenn Sie die Option "Versand mit eigenem Konto" auswählen, muss Wayfair die Versandinformationen von Plentymarkets in Daten übersetzen, die es versteht.
+Wenn Sie die Option `Selbst Versende` auswählen, muss Wayfair die Versandinformationen von Plentymarkets in Daten übersetzen, die es versteht.
 1. Suchen Sie die von Wayfair bereitgestellten Spediteurinformationen. Wenden Sie sich bei Bedarf an [ERPSupport@wayfair.com] (mailto:ERPSupport@wayfair.com).
-2. Geben Sie für jeden in der linken Spalte aufgeführten Plentymarkets-seitigen "Spediteur" den von Wayfair bereitgestellten "SCAC-Code" in die rechte Spalte "Wayfair-Spediteur" ein.
+2. Geben Sie für jeden in der linken Spalte aufgeführten Plentymarkets `Shipping carrier` den von Wayfair bereitgestellten "SCAC Code" in die rechte Spalte `Wayfair carrier` ein.
 3. Klicken Sie unten auf der Seite auf "Speichern"
