@@ -92,9 +92,9 @@ If Wayfair's shipping services are to be used, the Wayfair plugin's ASN settings
 ### 7.2 Creating an Event for Plentymarkets Orders that sends shipment information to Wayfair
 
 1. Click **Setup** in the top navigation bar then go to **Orders >> Events**
-![Create Event](https://i.ibb.co/NjDtY05/asn-02.png "Create Event")
 
 2.	Click on **Add event procedure** (the "+" button on the left of the page)
+![Create Event](https://i.ibb.co/NjDtY05/asn-02.png "Create Event")
 
 3.	Enter any **Name**
 
