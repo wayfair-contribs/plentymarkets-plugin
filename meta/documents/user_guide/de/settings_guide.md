@@ -67,69 +67,69 @@ Die Einstellung `Standard-Bestellstatus` bestimmt, in welchem ​​Status sich 
 Die Einstellung `Standardversandanbieter` ist eine Legacy-Einstellung, die das Verhalten des Plugins nicht mehr beeinflusst.
 **Wenn diese Einstellung in Ihrem System angezeigt wird, empfiehlt Wayfair dringend, dass Sie Ihr Plugin auf eine neuere Version aktualisieren.**
 
-### Elementzuordnungsmethode
-Die Einstellung "Artikelzuordnungsmethode" bestimmt das Verhalten beim Abgleichen der Artikelvariationen von Plentymarkets mit den Wayfair-Produkten. Es wird verwendet, wenn die Bestandslisten an Wayfair gesendet werden und um die angeforderten Produkte in einer Wayfair-Bestellung auszuwählen. Der Benutzer von Plentymarkets sollte diese Einstellung so konfigurieren, dass sie der Art und Weise entspricht, in der die Elementvariationen ausgefüllt werden.
+### Item Mapping Method
+Die Einstellung `Item Mapping Method` bestimmt das Verhalten beim Abgleichen der Artikelvariationen von Plentymarkets mit den Wayfair-Produkten. Es wird verwendet, wenn die Bestandslisten an Wayfair gesendet werden und um die angeforderten Produkte in einer Wayfair-Bestellung auszuwählen. Der Benutzer von Plentymarkets sollte diese Einstellung so konfigurieren, dass sie der Art und Weise entspricht, in der die Elementvariationen ausgefüllt werden.
 
-Standardmäßig wird das Feld "Variationsnummer" zum Zuordnen der Artikel von Wayfair Orders zu Artikelvariationen von Plentymarkets verwendet.
-Die anderen Optionen sind "EAN" (Barcode) und "SKU".
+Standardmäßig wird das Feld `Variationsnummer` zum Zuordnen der Artikel von Wayfair Orders zu Artikelvariationen von Plentymarkets verwendet.
+Die anderen Optionen sind `EAN` (Barcode) und `SKU`.
 
 #### Verwenden von EAN (Barcode) als Elementzuordnungsmethode
-Wenn die "Artikelzuordnungsmethode" auf "EAN" eingestellt ist, sollte jede Artikelvariation in Plentymarkets so eingerichtet werden, dass sie einen Barcode enthält, der die Wayfair-Lieferanten-Teilenummer widerspiegelt, die Wayfair in eingehenden Bestelldaten sendet:
-1. Gehen Sie auf der Hauptseite von Plentymarkets zu `Item` >>` Edit Item`
+Wenn die `Item Mapping Method` auf `EAN` eingestellt ist, sollte jede Artikelvariation in Plentymarkets so eingerichtet werden, dass sie einen Barcode enthält, der die Wayfair-Lieferanten-Teilenummer widerspiegelt, die Wayfair in eingehenden Bestelldaten sendet:
+1. Gehen Sie auf der Hauptseite von Plentymarkets zu `Artikel` >>` Artikel bearbeiten`
 
 2. Suchen Sie nach Artikeln, die auf Wayfair verkauft werden sollen
 
-3. ** Klicken Sie für jedes Element ** auf das Element in den Suchergebnissen und dann auf "Variationen"
+3. **Klicken Sie für jedes Artikeln** auf das Artikeln in den Suchergebnissen und dann auf `Varianten`
 
-4. ** Für jede Variation **:
-    1. Klicken Sie auf die Registerkarte "Einstellungen"
-    2. Wählen Sie im Abschnitt "Barcode" einen Barcode-Typ aus, klicken Sie auf die Schaltfläche "Hinzufügen" und geben Sie den Barcode-Wert in das Feld "Code" ein. Der Barcode sollte mit der Wayfair-Lieferanten-Teilenummer übereinstimmen.
-    3. Klicken Sie auf der Variationsstufe auf die Schaltfläche "Speichern" (nicht zu verwechseln mit der Schaltfläche "Speichern" für das Objekt, einige Zeilen oben).
+4. **Für jede der Varianten**:
+    1. Klicken Sie auf die Registerkarte `Einstellungen`
+    2. Wählen Sie im Abschnitt "Barcode" einen Barcode-Typ aus, klicken Sie auf die Schaltfläche `Hinzufügen` und geben Sie den Barcode-Wert in das Feld `1`Code` ein. Der Barcode sollte mit der Wayfair-Lieferanten-Teilenummer übereinstimmen.
+    3. Klicken Sie auf der Variantenstufe auf die Schaltfläche `Speichern` (nicht zu verwechseln mit der Schaltfläche `Speichern` für das Artikel, einige Zeilen oben).
 
 #### Verwenden der SKU als Elementzuordnungsmethode
 Wenn die "Artikelzuordnungsmethode" auf "SKU" eingestellt ist, sollte jede Artikelvariation in Plentymarkets so eingerichtet werden, dass sie eine Wayfair-spezifische SKU enthält, die die Wayfair-Lieferanten-Teilenummer widerspiegelt, die Wayfair in eingehenden Bestelldaten sendet:
-1. Gehen Sie auf der Hauptseite von Plentymarkets zu `Item` >>` Edit Item`
+1. Gehen Sie auf der Hauptseite von Plentymarkets zu `Artikel` >>` Artikel bearbeiten`
 
 2. Suchen Sie nach Artikeln, die auf Wayfair verkauft werden sollen
 
-3. ** Klicken Sie für jedes Element ** auf das Element in den Suchergebnissen und dann auf "Variationen"
+3.  **Klicken Sie für jedes Artikeln** auf das Artikeln in den Suchergebnissen und dann auf `Varianten`
 
-4. ** Für jede Variation **:
-    1. Klicken Sie auf die Registerkarte "Verfügbarkeit"
-    2. Klicken Sie im Abschnitt "SKU" auf die Schaltfläche "Hinzufügen"
-    3. Wählen Sie im Popup-Fenster "Wayfair" für "Referrer", geben Sie die Wayfair-Lieferanten-Teilenummer in das Feld "SKU" ein und klicken Sie auf "Hinzufügen"
-    4. Klicken Sie auf der Variationsstufe auf die Schaltfläche "Speichern" (nicht zu verwechseln mit der Schaltfläche "Speichern" für das Objekt, einige Zeilen darüber).
+4. **Für jede der Varianten**:
+    1. Klicken Sie auf die Registerkarte `Verfügbarkeit`
+    2. Klicken Sie im Abschnitt `SKU` auf die Schaltfläche `Hinzufügen`
+    3. Wählen Sie im Popup-Fenster `Wayfair` für `Herkunft`, geben Sie die Wayfair-Lieferanten-Teilenummer in das Feld `SKU` ein und klicken Sie auf `Hinzufügen`
+    4. Klicken Sie auf der Variantenstufe auf die Schaltfläche `Speichern` (nicht zu verwechseln mit der Schaltfläche `Speichern` für das Artikel, einige Zeilen oben).
 
-### Bestellungen importieren seit
-Die optionale Einstellung "Bestellungen importieren seit" bestimmt ein Datum, an dem neue Wayfair-Bestellungen als für den Import in das Plentymarkets-System berechtigt gelten. Diese Einstellung kann die Leistung verbessern, indem verhindert wird, dass das Wayfair-Plugin Bestellungen anfordert, die vor dem angegebenen Datum erstellt wurden. Es kann auch verwendet werden, um zu verhindern, dass das Plentymarkets-System Bestellungen vor dem gewünschten "Go-Live-Datum" annimmt.
+### Aufträge importieren ab
+Die optionale Einstellung `Aufträge importieren ab` bestimmt ein Datum, an dem neue Wayfair-Bestellungen als für den Import in das Plentymarkets-System berechtigt gelten. Diese Einstellung kann die Leistung verbessern, indem verhindert wird, dass das Wayfair-Plugin Bestellungen anfordert, die vor dem angegebenen Datum erstellt wurden. Es kann auch verwendet werden, um zu verhindern, dass das Plentymarkets-System Bestellungen vor eine gewünschten "Go-Live-Datum" annimmt.
 
-### Alle Inventargegenstände an Wayfair senden?
-Die optionale Einstellung "Alle Inventargegenstände an Wayfair senden?" Legt fest, ob Plentymarkets-Artikelvariationen ausdrücklich als für den Verkauf auf Wayfair geeignet deklariert werden müssen oder nicht.
-Wenn "Alle Inventargegenstände an Wayfair senden?" Deaktiviert ist, muss für den Verkauf eines Gegenstands auf Wayfair "Wayfair" in der Liste "Märkte" auf der Registerkarte "Verfügbarkeit" eines Gegenstands vorhanden sein, wie in diesem Beispiel dargestellt:
-! [Artikel mit Wayfair Market] (../../../ images / item_wayfair_market.png)
+### Vollständigen Bestand an Wayfair senden?
+Die optionale Einstellung `Vollständigen Bestand an Wayfair senden?` Legt fest, ob Plentymarkets-Artikelvariationen ausdrücklich als für den Verkauf auf Wayfair geeignet deklariert werden müssen oder nicht.
+Wenn `Vollständigen Bestand an Wayfair senden?` Deaktiviert ist, "Wayfair" muss in der Liste "Märkte" der Artikel enthalten sein, die auf Wayfair verkauft werden sollen, wie in diesem Beispiel dargestellt:
+![Artikel mit Wayfair Market](../../../images/item_wayfair_market.png)
 
-Durch Aktivieren von "Alle Inventargegenstände an Wayfair senden?" Kann Wayfair alle Artikel auflisten, von denen festgestellt wird, dass sie derzeit auf Lager sind, einschließlich der Artikel, für die "Wayfair" ** nicht ** in der "Märkte" -Liste enthalten ist.
+Durch Aktivieren von `Vollständigen Bestand an Wayfair senden?` Kann Wayfair alle Artikel auflisten, von denen festgestellt wird, dass sie derzeit auf Lager sind, einschließlich der Artikel, für die "Wayfair" **nicht** in der "Märkte" -Liste enthalten ist.
 
 
 ## Die Seite Voll Inventar
-Die Seite "Vollständiges Inventar" enthält keine zu konfigurierenden Einstellungen.
+Die Seite `Voll Inventar` enthält keine zu konfigurierenden Einstellungen.
 Es wird verwendet, um den Status der Synchronisierung des Plentymarkets-Inventars mit Wayfair zu überprüfen oder um manuell eine Synchronisierung aller Inventarelemente zu initiieren.
-Die Daten der Seite werden im Laufe der Zeit automatisch aktualisiert. Sie können sie jedoch auch manuell aktualisieren.
+Die Daten der Seite werden im Laufe der Zeit automatisch aktualisiert. Sie können die daten jedoch manuell aktualisieren.
 
-** Das Wayfair-Plugin sendet regelmäßig Inventaraktualisierungen an Wayfair, ohne dass weitere manuelle Aktivierungen erforderlich sind. Auf der Seite "Vollständiges Inventar" werden nur Informationen zu den täglichen Aktualisierungen angezeigt, die alle Elemente im Inventar enthalten. **
+**Das Wayfair-Plugin sendet regelmäßig Inventaraktualisierungen an Wayfair, ohne dass weitere manuelle Aktivierungen erforderlich sind. Auf der Seite "Vollständiges Inventar" werden nur Informationen zu den täglichen Aktualisierungen angezeigt, die alle Elemente im Inventar enthalten.**
 
-### Felder
-* In den Feldern "Zeitpunkt der letzten erfolgreichen Inventarsynchronisierung" werden die täglichen Synchronisierungen aufgezeichnet, die normalerweise automatisch durchgeführt werden.
+### Datenfelder
+* Die felder für `Zeitpunkt der letzten erfolgreichen Synchronisation` sind für die Zeit zu der die vollständige Synchronisation aufgezeichnet wurde.
     * Ein "Häkchen" -Symbol wird angezeigt, wenn seit der letzten erfolgreichen Synchronisierung weniger als 24 Stunden vergangen sind. Dies zeigt an, dass keine Aktionen erforderlich sind.
-    * Ein "Warnsymbol" wird angezeigt, wenn seit der letzten erfolgreichen Synchronisierung mehr als 24 Stunden vergangen sind. Verwenden Sie die Schaltfläche "Synchronisierung starten" wie unten beschrieben.
+    * Ein "Warnsymbol" wird angezeigt, wenn seit der letzten erfolgreichen Synchronisierung mehr als 24 Stunden vergangen sind. Verwenden Sie die Schaltfläche `Jetzt synchronisieren` wie unten beschrieben.
 
-* In den Feldern "Status des letzten Versuchs" wird angezeigt, ob derzeit eine vollständige Inventarsynchronisierung durchgeführt wird. Aktivieren Sie dieses Feld, nachdem Sie die Schaltfläche "Synchronisierung starten" verwendet haben.
-    * Der Status "COMPLETE" zeigt an, dass die letzte automatische oder manuelle Synchronisierung erfolgreich war.
-    * Der Status "FAILED" zeigt an, dass die letzte automatische oder manuelle Synchronisierung nicht erfolgreich war. Überprüfen Sie die Plentymarkets-Protokolle auf Probleme.
+* Die felder für `Status des letzten Versuchs` wird angezeigt, ob derzeit eine vollständige Inventarsynchronisierung durchgeführt wird. Die Felder spiegeln die Verwendung der Schaltflächen wider.
+    * Der Status `Abgeschlossen` zeigt an, dass die letzte automatische oder manuelle Synchronisierung erfolgreich war.
+    * Der Status `Fehler` zeigt an, dass die letzte automatische oder manuelle Synchronisierung nicht erfolgreich war. Überprüfen Sie die Plentymarkets-Protokolle auf Fehlerinformationen.
 
-### Tasten
-* Die Schaltfläche "Synchronisierung starten" wird zum manuellen Synchronisieren des gesamten Inventars verwendet. Der Status des Prozesses wird in den Feldern über den Schaltflächen angezeigt.
-* Mit der Schaltfläche "Aktualisieren" werden die Felder über den Schaltflächen aktualisiert, um den neuesten Ergebnissen der automatischen vollständigen Inventarsynchronisierung zu entsprechen.
+### Schaltfläche
+* Die Schaltfläche `Jetzt synchronisieren` wird zum manuellen Synchronisieren des gesamten Inventars verwendet. Der Status des Prozesses wird in den Feldern über den Schaltflächen angezeigt.
+* Mit der Schaltfläche `Status aktualisieren` werden die Felder über den Schaltflächen aktualisiert, um den neuesten Ergebnissen der automatischen vollständigen Inventarsynchronisierung zu entsprechen.
 
 
 ## Die Seite Versandsbestätigung (ASN)
@@ -138,15 +138,15 @@ Die hier bereitgestellten Informationen legen das Verhalten für die `Versandsbe
 
 ### Versandart
 Das Optionsfeld oben auf der Seite enthält diese Optionen.
-Während des Onboarding des Wayfair-Plugins weist Wayfair an, welche Option für den Plentymarkets-Benutzer geeignet ist.
+Wayfair gibt Lieferanten Anweisungen zur Auswahl des richtigen Werts.
 * `Wayfair Versand`
-    * Ihre Bestellungen werden von Wayfair versendet
-    * Sie müssen Wayfair nur mitteilen, wenn die Bestellung versandbereit ist
-    * Sie müssen Tracking-Informationen von Wayfair in Plentymarkets zurückerhalten
+    * Ihre Bestellungen werden von Wayfair versendet.
+    * Sie müssen Wayfair nur mitteilen, wenn die Bestellung versandbereit ist.
+    * Sie müssen Tracking-Informationen von Wayfair in Plentymarkets zurückerhalten.
 
-* `Versand auf eigene Rechnung`
-    * Sie versenden Ihre eigenen Bestellungen über Ihre eigenen Spediteure
-    * Sie müssen Wayfair mitteilen, wenn Sie eine Bestellung versenden
+* `Selbst Versende`
+    * Sie versenden Ihre eigenen Bestellungen über Ihre eigenen Spediteure.
+    * Sie müssen Wayfair mitteilen, wenn Sie eine Bestellung versenden.
     * Sie müssen Wayfair die Tracking-Informationen mitteilen (Spediteur und Tracking-Nummer).
 
 ### Zuordnung von Plentymarkets Carriern zu Wayfair Carriern
