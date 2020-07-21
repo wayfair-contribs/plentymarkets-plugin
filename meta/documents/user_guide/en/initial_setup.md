@@ -91,35 +91,33 @@ If Wayfair's shipping services are to be used, the Wayfair plugin's ASN settings
 
 ### 7.2 Creating an Event for Plentymarkets Orders that sends shipment information to Wayfair
 
-1. Click **Setup** in the top navigation bar then go to **Orders >> Events**
+1. From the main Plentymarkets page, go to `Orders` >> `Events`
 
-2.	Click on **Add event procedure** (the `+` button on the bottom left-hand side of the page)
+2.	Click on `Add event procedure` (the `+` button on the bottom left-hand side of the page)
 ![Create Event](https://i.ibb.co/NjDtY05/asn-02.png "Create Event")
 
-3.	Enter any **Name**
+3.	Enter any `Name`
 
-4.	Select **Status change** (in the category **Order Change**) in the **Event** field.
+4.	Select `Status change` (in the category `Order Change`) in the `Event` field.
 
-5.	In the field below **Event** select the status change that should initiate the sending of an ASN to Wayfair, such as **in preparation for shipping**.
+5.	In the field below `Event` select the status change that should initiate the sending of an ASN to Wayfair, such as `in preparation for shipping`.
 
-6.	Click the **Save** button.
+6.	Click the `Save` button.
 
-7.	You should automatically be redirected to the newly created **event procedure**. In the **settings** section of the event procedure, place a checkmark next to **Active**.
+7.	You should automatically be redirected to the newly created event procedure. In the `settings` section of the event procedure, place a checkmark next to `Active`.
 
-8.  Click on **Add Filter**, and go to **Order >> Referrer** to add the referrer as a filter (see screenshot below)
-
+8.  Click on `Add Filter`, and go to `Order` >> `Referrer` to add the referrer as a filter:
 ![Event Referrer](https://i.ibb.co/TwKLvJ5/asn-03.png "Event Referrer")
 
-9.	In the **Filter** section, a box should appear with a list of all available Order referrers. Place a checkmark next to all **Wayfair** order referrers.
-
+9.	In the `Filter` section, a box should appear with a list of all available Order referrers. Place a checkmark next to all "Wayfair" order referrers:
 ![Wayfair Referrer](https://i.ibb.co/yYpLp8q/asn-04.png "Wayfair Referrer")
 
-10. Click on **Add procedure**, and go to **Plugins >> Send Ship Confirmation (ASN) to Wayfair**. Click on **+ add**.
-
+10. Click on `Add procedure`, and go to `Plugins` >> `Send Ship Confirmation (ASN) to Wayfair`. 
 ![Add Procedure](https://i.ibb.co/xfGrhFP/asn-05.png "Add Procedure")
 
-The final settings result should look similar to this:
+11. Click on `+ add`.
 
+The final settings result should look similar to this:
 ![Add Procedure Result](https://i.ibb.co/GJPF3ZV/asn-06.png "Add Procedure Result")
 
 ## 8. Performing the first inventory synchronization
