@@ -20,11 +20,9 @@ In order to create a Shipping Profile to be used for Orders, a Shipping Service 
 
 4. In the new row that is created, populate the `Name` fields (we recommend **"WayfairShipping"** for all names, for simplicity's sake).
 
-5. In the `Shipping service provider` field for the row, choose the `WayfairShipping` option - this reflects the type that is provided by the Wayfair plugin.
+5. In the `Shipping service provider` field for the row, choose the `WayfairShipping` option - this reflects the type that is provided by the Wayfair plugin. **All other fields in the row may be left blank.**
 
-6. You may leave all other fields on the row blank
-
-7. Click `Save`.
+6. Click `Save`.
 
 ## 2. Creating the Shipping Profile
 Each order has a Shipping Profile that is used for working with the shipping service provider to ship items from an order. Use these steps to set up the Wayfair-specific Shipping Profile.
@@ -45,7 +43,7 @@ Each order has a Shipping Profile that is used for working with the shipping ser
 
 8. In the `Priority` field, optionally change the priority (we recommend leaving it as the default, "highest" priority).
 
-9. In the `Order referrer` list, place a check mark next to any **Wayfair**-related entries.
+9. In the `Order referrer` list, place a check mark next to any **"Wayfair"**-related entries.
 
 10. Click on the `Save` button at the top of the page.
 
@@ -70,7 +68,7 @@ Each order has a Shipping Profile that is used for working with the shipping ser
 
 9. Click the `Add` button to complete the dialog. A `Referrer` filter will now appear on the form.
 
-10. In the `Referrer` list, activate the checkbox for all **Wayfair**-related Order Referrers
+10. In the `Referrer` list, activate the checkbox for all **"Wayfair"**-related Order Referrers
 
 11. Click the `Add procedure` button (the `+` button at the top of the `Procedures` section) to launch the `Add procedure` dialog.
 
