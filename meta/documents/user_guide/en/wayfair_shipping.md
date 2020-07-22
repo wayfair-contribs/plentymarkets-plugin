@@ -68,7 +68,7 @@ Each order has a Shipping Profile that is used for working with the shipping ser
 
 9. Click the `Add` button to complete the dialog. A `Referrer` filter will now appear on the form.
 
-10. In the `Referrer` list, activate the checkbox for all **Wayfair**-related Order Referrers
+10. In the `Referrer` list, activate the checkbox for all **"Wayfair"**-related Order Referrers
 
 11. Click the `Add procedure` button (the `+` button at the top of the `Procedures` section) to launch the `Add procedure` dialog.
 
