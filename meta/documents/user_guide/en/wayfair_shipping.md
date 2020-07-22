@@ -43,7 +43,7 @@ Each order has a Shipping Profile that is used for working with the shipping ser
 
 8. In the `Priority` field, optionally change the priority (we recommend leaving it as the default, "highest" priority).
 
-9. In the `Order referrer` list, place a check mark next to any **Wayfair**-related entries.
+9. In the `Order referrer` list, place a check mark next to any **"Wayfair"**-related entries.
 
 10. Click on the `Save` button at the top of the page.
 
