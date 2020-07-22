@@ -20,7 +20,7 @@ In order to create a Shipping Profile to be used for Orders, a Shipping Service 
 
 4. In the new row that is created, populate the `Name` fields (we recommend **"WayfairShipping"** for all names, for simplicity's sake).
 
-5. In the `Shipping service provider` field for the row, choose the `WayfairShipping` option - this reflects the type that is provided by the Wayfair plugin. **You may leave all other fields on the row blank.**
+5. In the `Shipping service provider` field for the row, choose the `WayfairShipping` option - this reflects the type that is provided by the Wayfair plugin. **All other fields in the row may be left blank.**
 
 6. Click `Save`.
 
