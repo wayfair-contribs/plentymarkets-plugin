@@ -73,7 +73,7 @@ Dieses Verfahren ist nur erforderlich, wenn [die Einstellung `Vollständigen Bes
 
     1. Stellen Sie auf der Registerkarte `Einstellungen` sicher, dass das Kontrollkästchen `Aktiv` im Abschnitt `Verfügbarkeit` aktiviert ist.
 
-    2. Wenn [die Einstellung `Vollständigen Bestand an Wayfair senden?`](settings_guide.md#vollständigen-bestand-an-wayfair-senden) **deaktiviert** ist, wechseln Sie zur Registerkarte "Verfügbarkeit" der Variation und fügen Sie "Wayfair" zur Liste im Bereich "Märkte" hinzu.
+    2. Wenn [die Einstellung `Vollständigen Bestand an Wayfair senden?`](settings_guide.md#vollständigen-bestand-an-wayfair-senden) **deaktiviert** ist, wechseln Sie zur Registerkarte `Verfügbarkeit` der Variation und fügen Sie `Wayfair` zur Liste im Bereich `Märkte` hinzu.
 
     3. Klicken Sie auf die Schaltfläche `Speichern` neben der Variations-ID (nicht auf die höhere Schaltfläche für das Artikel).
 
@@ -106,13 +106,13 @@ Wenn die Versanddienste von Wayfair verwendet werden sollen, sollten die ASN-Ein
 
 7. Sie sollten automatisch zur neu erstellten Ereignisaktion umgeleitet werden. Setzen Sie im Abschnitt `Einstellungen` der Ereignisprozedur ein Häkchen neben `Aktiv`.
 
-8. Klicken Sie auf "Filter hinzufügen" und gehen Sie zu `Auftrag` >> `Herkumft`, um den Herkumft als Filter hinzuzufügen:
+8. Klicken Sie auf `Filter hinzufügen` und gehen Sie zu `Auftrag` >> `Herkumft`, um den Herkumft als Filter hinzuzufügen:
 ![Herkumft für Ereignis](https://i.ibb.co/TwKLvJ5/asn-03.png "Herkumft für Ereignis")
 
-9. Im Abschnitt "Filter" sollte ein Feld mit einer Liste aller verfügbaren Auftragsverweise angezeigt werden. Setzen Sie ein Häkchen neben alle "Wayfair" -Bestellungsempfänger:
+9. Im Abschnitt `Filter` sollte ein Feld mit einer Liste aller verfügbaren Auftragsverweise angezeigt werden. Setzen Sie ein Häkchen neben alle "Wayfair" -Bestellungsempfänger:
 ! [Wayfair Referrer] (https://i.ibb.co/yYpLp8q/asn-04.png "Wayfair Referrer")
 
-10. Klicken Sie auf "Aktion hinzufügen" und gehen Sie zu `Plugins` >> `Send Ship Confirmation (ASN) to Wayfair`.
+10. Klicken Sie auf `Aktion hinzufügen` und gehen Sie zu `Plugins` >> `Versandsbestätigung (ASN) an Wayfair senden`.
 ! [Aktion hinzufüge] (https://i.ibb.co/xfGrhFP/asn-05.png "Aktion hinzufüge")
 
 11. Klicken Sie auf `+ Hinzufügen`.

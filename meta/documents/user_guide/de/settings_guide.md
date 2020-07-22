@@ -105,7 +105,7 @@ Die optionale Einstellung `Aufträge importieren ab` bestimmt ein Datum, an dem 
 
 ### Vollständigen Bestand an Wayfair senden?
 Die optionale Einstellung `Vollständigen Bestand an Wayfair senden?` Legt fest, ob Plentymarkets-Artikelvariationen ausdrücklich als für den Verkauf auf Wayfair geeignet deklariert werden müssen oder nicht.
-Wenn `Vollständigen Bestand an Wayfair senden?` Deaktiviert ist, "Wayfair" muss in der Liste "Märkte" der Artikel enthalten sein, die auf Wayfair verkauft werden sollen, wie in diesem Beispiel dargestellt:
+Wenn `Vollständigen Bestand an Wayfair senden?` Deaktiviert ist, `Wayfair` muss in der Liste `Märkte` der Artikel enthalten sein, die auf Wayfair verkauft werden sollen, wie in diesem Beispiel dargestellt:
 ![Artikel mit Wayfair Market](../../../images/item_wayfair_market.png)
 
 Durch Aktivieren von `Vollständigen Bestand an Wayfair senden?` Kann Wayfair alle Artikel auflisten, von denen festgestellt wird, dass sie derzeit auf Lager sind, einschließlich der Artikel, für die "Wayfair" **nicht** in der "Märkte" -Liste enthalten ist.
@@ -153,4 +153,4 @@ Wayfair gibt Lieferanten Anweisungen zur Auswahl des richtigen Werts.
 Wenn Sie die Option `Selbst Versende` auswählen, muss Wayfair die Versandinformationen von Plentymarkets in Daten übersetzen, die es versteht.
 1. Suchen Sie die von Wayfair bereitgestellten Spediteurinformationen. Wenden Sie sich bei Bedarf an [ERPSupport@wayfair.com] (mailto:ERPSupport@wayfair.com).
 2. Geben Sie für jeden in der linken Spalte aufgeführten Plentymarkets `Shipping carrier` den von Wayfair bereitgestellten "SCAC Code" in die rechte Spalte `Wayfair carrier` ein.
-3. Klicken Sie unten auf der Seite auf "Speichern"
+3. Klicken Sie unten auf der Seite auf `Speichern`
