@@ -29,11 +29,11 @@ After the plugin is installed in your Plentymarkets Plugin Set, the plugin must 
 The authorization steps are as follows:
 1. From the main Plentymarkets page, go to `Plugins` >> `Plugin set overview`:
 
-![plugins_menu_plugin_set_overview](../../../images/en/plugins_menu_plugin_set_overview.png)
+    ![plugins_menu_plugin_set_overview](../../../images/en/plugins_menu_plugin_set_overview.png)
 
 2. Locate the Plugin Set that is linked to the client with which Wayfair will be used:
 
-![linked clients](../../../images/en/plugin_sets_linked_clients.png)
+    ![linked clients](../../../images/en/plugin_sets_linked_clients.png)
 
 3. Click on the `Edit` button ![pencil button](../../../images/common/button_pencil.png) for the desired Plugin set.
 
@@ -41,13 +41,13 @@ The authorization steps are as follows:
 
 4. In the left-side menu, go to `Configuration` >> `Global Settings`:
 
-![global settings in menu](../../../images/en/menu_global_settings.png)
+    ![global settings in menu](../../../images/en/menu_global_settings.png)
 
 5. In the `Supplier Settings` area, enter the `Client ID` and `Client Secret` values that correspond with your Wayfair API credentials.
 
 6. Change the `Mode` setting to `Live` - see [information on `Test` mode](test_mode.md):
 
-![global settings live](../../../images/en/global_settings_live.png)
+    ![global settings live](../../../images/en/global_settings_live.png)
 
 7. Click the `Save` button ![save button](../../../images/common/button_save.png) in the toolbar above the settings
 
@@ -56,11 +56,11 @@ An order referrer in Plentymarkets identifies the sales channel on which an orde
 
 1. From the main Plentymarkets page, go to `Setup` >> `Orders` >> `Order referrer`:
 
-![order referrer menu](../../../images/en/menu_order_referrer.png)
+    ![order referrer menu](../../../images/en/menu_order_referrer.png)
 
 2. Place a check mark next to the `Wayfair` order referrer:
 
-![wayfair order referrer](../../../images/common/wayfair_referrer_checked.png)
+    ![wayfair order referrer](../../../images/common/wayfair_referrer_checked.png)
 
 3. Click the `Save` button ![save button](../../../images/common/button_save.png).
 
@@ -89,13 +89,15 @@ This procedure is required only if [the `Send all inventory items to Wayfair` se
 
     1. On the `Settings` tab, make sure that the `Active` checkbox in the `Availability` Section is checked:
 
-    ![variation active](../../../images/en/variation_active_field.png)
+        ![variation active](../../../images/en/variation_active_field.png)
 
-    2. If [the `Send all inventory items to Wayfair?` setting](settings_guide.md#send-all-inventory-items-to-wayfair) is **disabled**, go to the `Availability` tab of the Variation and add "Wayfair" to the list in the `Markets` area.
+    2. If [the `Send all inventory items to Wayfair?` setting](settings_guide.md#send-all-inventory-items-to-wayfair) is **disabled**, go to the `Availability` tab of the Variation and add "Wayfair" to the list in the `Markets` area:
+
+        ![adding wayfair market to variation](../../../images/en/variation_wayfair_market.png)
 
     3. Click the `Save` next to the Variation `ID` (not the higher-up button for the Item):
 
-    ![variation saving](../../../images/common/variation_save.png)
+        ![variation saving](../../../images/common/variation_save.png)
 
 
 ## 6. Configuring the Warehouse mappings to match Wayfair Supplier IDs.
@@ -113,55 +115,55 @@ If Wayfair's shipping services are to be used, the Wayfair plugin's ASN settings
 
 1. From the main Plentymarkets page, go to `Setup` >> `Orders` >> `Events`:
 
-![order events](../../../images/en/menu_order_events.png)
+    ![order events](../../../images/en/menu_order_events.png)
 
 2.	Click on `Add event procedure` (the `+` button on the bottom left-hand side of the page):
 
-![add order event](../../../images/en/add_order_event.png)
+    ![add order event](../../../images/en/add_order_event.png)
 
 3.	Enter any `Name` in the appropriate field.
 
 4.	Select `Status change` (in the category `Order Change`) in the `Event` field:
 
-![choose event](../../../images/en/send_asn/choose_event.png)
+    ![choose event](../../../images/en/send_asn/choose_event.png)
 
 5.	In the field below `Event` select the status change that should initiate the sending of an ASN to Wayfair, such as `In preparation for shipping`:
 
-![choose status](../../../images/en/send_asn/choose_status.png)
+    ![choose status](../../../images/en/send_asn/choose_status.png)
 
 6.	Click the `Save` button ![save button](../../../images/common/button_save.png).
 
 7.	You should automatically be redirected to the newly created event procedure. In the `settings` section of the event procedure, place a checkmark next to `Active`:
 
-![event active](../../../images/en/send_asn/event_active.png)
+    ![event active](../../../images/en/send_asn/event_active.png)
 
 8. Click on `Add Filter`:
 
-![add filter](../../../images/en/send_asn/add_filter.png)
+    ![add filter](../../../images/en/send_asn/add_filter.png)
 
 9.  Choose `Referrer` in the `Order` category:
 
-![choose filter](../../../images/en/send_asn/choose_filter.png)
+    ![choose filter](../../../images/en/send_asn/choose_filter.png)
 
 10. Click the `Add` button ![plus add button](../../../images/en/button_plus_add.png).
 
 11.	In the `Filter` section, a box should appear with a list of all available Order referrers. Place a checkmark next to all "Wayfair" order referrers:
 
-![wayfair selected](../../../images/en/send_asn/filter_wayfair_selected.png)
+    ![wayfair selected](../../../images/en/send_asn/filter_wayfair_selected.png)
 
 12. Click on `Add procedure`:
 
-![add procedure](../../../images/en/send_asn/add_procedure.png)
+    ![add procedure](../../../images/en/send_asn/add_procedure.png)
 
 13. Choose `Send Ship Confirmation (ASN) to Wayfair` in the `Plugins` category:
 
-![choose procedure](../../../images/en/send_asn/choose_procedure.png)
+    ![choose procedure](../../../images/en/send_asn/choose_procedure.png)
 
 14. Click the `Add` button ![plus add button](../../../images/en/button_plus_add.png).
 
 15. Verify that the Event's settings finally look similar to this:
 
-![finished event](../../../images/en/send_asn/finished_event.png)
+    ![finished event](../../../images/en/send_asn/finished_event.png)
 
 16. Click the `Save` button ![save button](../../../images/common/button_save.png).
 
