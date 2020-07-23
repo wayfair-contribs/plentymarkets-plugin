@@ -163,6 +163,8 @@ If Wayfair's shipping services are to be used, the Wayfair plugin's ASN settings
 
 ![finished event](../../../images/en/send_asn/finished_event.png)
 
+16. Click the `Save` button ![save button](../../../images/common/button_save.png).
+
 ## 8. Performing the first inventory synchronization
 Once everything has been set up, the it is time to start listing items for sale on Wayfair.
 
