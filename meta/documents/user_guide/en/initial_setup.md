@@ -21,40 +21,49 @@
 After the plugin is installed in your Plentymarkets Plugin Set, the plugin must be configured to use the correct credentials when connecting to Wayfair's interfaces.
 
 * **The authorization procedure must be performed for any Plugin Set that contains the Wayfair plugin**.
+
 * Copying a Plugin Set will copy the authorization information to the new plugin set.
+
 * An exported or imported Plugin Set may include the authorization information.
 
 The authorization steps are as follows:
 1. From the main Plentymarkets page, go to `Plugins` >> `Plugin set overview`
+![plugins_menu_plugin_set_overview](../../../images/en/plugins_menu_plugin_set_overview.png)
 
 2. Locate the Plugin Set that is linked to the client with which Wayfair will be used.
+![linked clients](../../../images/en/plugin_sets_linked_clients.png)
 
-3. Click on the `Edit` button for the desired Plugin set
+3. Click on the `Edit` button ![pencil button](../../../images/common/button_pencil.png) for the desired Plugin set.
 
-4. In the Wayfair row of the Plugin set, click on the `Settings` button.
+4. In the Wayfair row of the Plugin set, click on the `Settings` button ![gear button](../../../images/common/button_gear.png).
 
 4. In the left-side menu, go to `Configuration` >> `Global Settings`.
+![global settings in menu](../../../images/en/menu_global_settings.png)
 
-5. In the `Supplier Settings` area, enter the `Client ID` and `Client Secret` values that correspond with your Wayfair API credentials
+5. In the `Supplier Settings` area, enter the `Client ID` and `Client Secret` values that correspond with your Wayfair API credentials.
 
-6. Change the `Mode` setting to `Live` - see [information on `Test` mode](test_mode.md)
+6. Change the `Mode` setting to `Live` - see [information on `Test` mode](test_mode.md).
+![global settings live](../../../images/en/global_settings_live.png)
 
-7. Click the `Save` button in the toolbar above the settings
+7. Click the `Save` button ![save button](../../../images/common/button_save.png) in the toolbar above the settings
 
 ## 2. Activating the order referrer
 An order referrer in Plentymarkets identifies the sales channel on which an order was generated. To get the Plentymarkets system to properly import orders from the Wayfair API, the Wayfair order referrer must be activated:
 
 1. From the main Plentymarkets page, go to `Setup` >> `Orders` >> `Order referrer`.
+![order referrer menu](../../../images/en/menu_order_referrer.png)
 
 2. Place a check mark next to the `Wayfair` order referrer.
+![wayfair order referrer](../../../images/common/wayfair_referrer_checked.png)
 
-3. Click the `Save` button.
+3. Click the `Save` button ![save button](../../../images/common/button_save.png).
 
 ## 3. Setting up Plentymarkets for shipping through Wayfair
 To ensure proper integrations with Wayfair when shipping order items, follow the procedures outlined in  [the Wayfair Shipping instructions](wayfair_shipping.md).
 
 ## 4. Matching items ordered on Wayfair with Item Variations in Plentymarkets:
 In order to properly handle incoming orders from Wayfair, the Wayfair plugin must match the Supplier Part Numbers in Wayfair's systems with a specific field of Item Variations in Plentymarkets. By default, the Wayfair plugin operates on the assumption that the `Variation Number` **(not to be confused with the Variation's ID)** of an Item's Variation in Plentymarkets will match the Wayfair Supplier Part Number.
+![variation number field](../../../images/en/variation_number_field.png)
 
 If the Wayfair Supplier Part Numbers for your organization are to be reflected in an alternative field in your Plentymarkets Item Variations, change the value of [the `Item Mapping Method` setting](settings_guide.md#item-mapping-method) and update the Variations accordingly.
 
@@ -112,7 +121,7 @@ If Wayfair's shipping services are to be used, the Wayfair plugin's ASN settings
 9.	In the `Filter` section, a box should appear with a list of all available Order referrers. Place a checkmark next to all "Wayfair" order referrers:
 ![Wayfair Referrer](https://i.ibb.co/yYpLp8q/asn-04.png "Wayfair Referrer")
 
-10. Click on `Add procedure`, and go to `Plugins` >> `Send Ship Confirmation (ASN) to Wayfair`. 
+10. Click on `Add procedure`, and go to `Plugins` >> `Send Ship Confirmation (ASN) to Wayfair`.
 ![Add Procedure](https://i.ibb.co/xfGrhFP/asn-05.png "Add Procedure")
 
 11. Click on `+ add`.

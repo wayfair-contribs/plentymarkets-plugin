@@ -31,7 +31,7 @@ When choosing a relationship between Warehouses and Supplier IDs that is not one
 
 ### Removing a Warehouse mapping
 1. Locate the row to be removed
-2. Click on the `delete` button ![delete icon](../../../images/icon_trash_can.png) in the row
+2. Click on the `delete` button ![delete icon](../../../images/common/icon_trash_can.png) in the row
 3. Click the `Save` button once the desired row(s) have been removed
 
 
@@ -92,7 +92,7 @@ The optional `Import orders since` setting determines a date on which new Wayfai
 ### Send all inventory items to Wayfair?
 The optional `Send all inventory items to Wayfair?` setting determines if Plentymarkets Item Variations must be explicitly declared as eligible for sale on Wayfair or not.
 When `Send all inventory items to Wayfair?` is disabled, selling an Item on Wayfair requires having "Wayfair" present in the `Markets` list of the `Availability` tab of an Item, as seen in this example:
-![item with Wayfair Market](../../../images/item_wayfair_market.png)
+![item with Wayfair Market](../../../images/en/item_wayfair_market.png)
 
 Enabling `Send all inventory items to Wayfair?` will allow Wayfair to list any item that is determined to be currently in stock, including those Items for which "Wayfair" is **not** present in the `Markets` list.
 
@@ -129,7 +129,7 @@ During Wayfair plugin onboarding, Wayfair will instruct on which option is appro
     * Your orders' shipments are arranged by Wayfair, to be shipped by a carrier chosen by Wayfair
     * Your Plentymarkets system needs to Wayfair when the order is ready for shipment
     * You Plentymarkets system needs to get tracking information back from Wayfair
-    
+
 * `Own account shipping`
     * You ship your own orders via your own carriers
     * Your Plentymarkets system needs to tell Wayfair when you are shipping an order
