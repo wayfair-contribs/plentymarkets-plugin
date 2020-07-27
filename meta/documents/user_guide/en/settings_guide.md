@@ -36,20 +36,22 @@ The topography of the Plentymarkets system may not match the amount of Wayfair S
 When choosing a relationship between Warehouses and Supplier IDs that is not one-to-one, make sure to review the behavior of the [Stock Buffer](#stock-buffer) setting.
 
 ### Adding a Warehouse mapping
-1. Click on the `Add Mapping` button
+1. Click on the `Add Mapping` button ![add mapping](../../../images/en/wayfair_settings/warehouses/button_add_mapping.png).
+
 2. Use the left column to choose a Plentymarkets Warehouse by name
 3. Use the right column to enter a numeric Supplier ID
-4. Click the `Save` button once the new row(s) have been completed
+4. Click the `Save` button ![save](../../../images/en/wayfair_settings/button_save.png) once the new row(s) have been completed.
+
 
 ### Removing a Warehouse mapping
 1. Locate the row to be removed
 2. Click on the `delete` button ![delete icon](../../../images/common/icon_trash_can.png) in the row
-3. Click the `Save` button once the desired row(s) have been removed
+3. Click the `Save` button ![save](../../../images/en/wayfair_settings/button_save.png) once the desired row(s) have been removed.
 
 
 ## Settings page
 The Settings page contains general settings for the operation of the Wayfair plugin.
-Settings do not automatically save when changed. Use the `Save` button at the bottom of the page.
+Settings do not automatically save when changed. Use the `Save` button ![save button](../../../images/en/wayfair_settings/button_save.png) at the bottom of the page.
 
 ### Stock Buffer
 The `Stock Buffer` setting is a non-negative integer that sets a reserved amount of stock for each Item Variation, for each Wayfair Supplier ID. The buffer amount is subtracted after all other stock calculations are made, including aggregating the stocks for multiple Plentymarkets Warehouses that have been assigned the same Wayfair Supplier ID.
@@ -68,11 +70,18 @@ The `Default Shipping Provider` setting is a legacy setting that no longer impac
 ### Item Mapping Method
 The `Item Mapping Method` setting determines the behavior for matching the Plentymarkets Item Variations to the Wayfair Products. It is used when the inventory listings are sent to Wayfair, and also to select the requested products in a Wayfair Purchase Order. The Plentymarkets user should configure this setting to match the way their Item Variations are populated.
 
-By default, the `Variation Number` field is used for mapping Wayfair Orders' items to Plentymarkets Item Variations.
+### Using Variation Number as the Item Mapping Field
+By default, the `Variation Number` field is used for mapping Wayfair Orders' items to Plentymarkets Item Variations:
+
+![variation number field](../../../images/en/variation_number_field.png)
+
 The other options are `EAN` (Barcode) and `SKU`.
 
 #### Using EAN (Barcode) as the Item Mapping Method
 When the `Item Mapping Method` is set to `EAN`, each Item Variation in Plentymarkets should be set up to have a Barcode that mirrors the Wayfair Supplier Part Number that Wayfair will send in incoming order data:
+
+![barcode field](../../../images/en/variation_barcode_field.png)
+
 1. From the main Plentymarkets page, go to `Item` >> `Edit Item`
 
 2. Search for items to be sold on Wayfair
@@ -81,22 +90,34 @@ When the `Item Mapping Method` is set to `EAN`, each Item Variation in Plentymar
 
 4. **For each Variation**:
     1. Click on the `Settings` tab
-    2. In the `Barcode` section, pick a barcode type, then click the `Add` button, then enter the barcode value in the `Code` field. The Barcode should match the Wayfair Supplier Part Number.
-    3. Click the `Save` button at the Variation level (not to be confused with the `Save` button for the Item, a few rows above)
+
+    2. In the `Barcode` section, pick a barcode type.
+
+    3. Click the `Add` button ![plus button](../../../images/common/button_plus.png), then enter the barcode value in the `Code` field. The Barcode should match the Wayfair Supplier Part Number.
+
+    4. Click the `Save` button ![save button](../../../images/common/button_save.png) at the Variation level (not to be confused with the `Save` button for the Item, a few rows above)
 
 #### Using SKU as the Item Mapping Method
 When the `Item Mapping Method` is set to `SKU`, each Item Variation in Plentymarkets should be set up to have a Wayfair-specific SKU that mirrors the Wayfair Supplier Part Number that Wayfair will send in incoming order data:
-1. From the main Plentymarkets page, go to `Item` >> `Edit Item`
 
-2. Search for items to be sold on Wayfair
+![sku field](../../../images/en/variation_sku_field.png)
 
-3. **For each Item**, click on the item in the search results, then click `Variations`
+1. From the main Plentymarkets page, go to `Item` >> `Edit Item`.
+
+2. Search for items to be sold on Wayfair.
+
+3. **For each Item**, click on the item in the search results, then click `Variations`.
 
 4. **For each Variation**:
-    1. Click on the `Availability` tab
-    2. In the `SKU` section, click the `Add` button
-    3. In the pop-up window, choose `Wayfair` for the `Referrer` then enter the Wayfair Supplier Part Number in the `SKU` field, then click `Add`
-    4. Click the `Save` button at the Variation level (not to be confused with the `Save` button for the Item, a few rows above)
+    1. Click on the `Availability` tab.
+
+    2. In the `SKU` section, click the `Add` button button ![plus button](../../../images/common/button_plus.png).
+
+    3. In the pop-up window, choose `Wayfair` for the `Referrer` then enter the Wayfair Supplier Part Number in the `SKU` field.
+
+    4. Click `Add` ![add button with text](../../../images/en/button_plus_add.png).
+
+    5. Click the `Save` button ![save button](../../../images/common/button_save.png) at the Variation level (not to be confused with the `Save` button for the Item, a few rows above)
 
 ### Import orders since
 The optional `Import orders since` setting determines a date on which new Wayfair purchase orders are considered eligible for being imported into the Plentymarkets system. This setting can improve performance by preventing the Wayfair plugin from requesting orders created before the specified date. It can also be used to prevent the Plentymarkets system from accepting Orders prior to the desired "go-live date."
@@ -118,16 +139,16 @@ The page's data will automatically refresh over time, but you may also manually 
 
 ### Fields
 * The `Time of last successful inventory synchronization` fields keep track of the daily synchronizations that are normally preformed automatically.
-    * A "check mark" icon will appear if it has been less than 24 hours since the last successful synchronization. This indicates that no actions are required.
-    * A "warning" icon will appear if it has been over 24 hours since the last successful synchronization. Consider using the `Start Synchronization` button as described below.
+    * A "check mark" icon ![cloud with check](../../../images/common/icon_cloud_check.png) will appear if it has been less than 24 hours since the last successful synchronization. This indicates that no actions are required.
+    * A "warning" icon ![warning icon](../../../images/common/icon_warning.png) will appear if it has been over 24 hours since the last successful synchronization. Consider using the `Start Synchronization` button as described below.
 
 * The `Status of last attempt` fields are used to see if a full inventory synchronization is currently underway. Check this field after using the `Start Synchronization` button.
     * The status `COMPLETE` indicates that the last automatic or manual synchronization was successful.
     * The status `FAILED` indicates that the last automatic or manual synchronization was not successful. Check the Plentymarkets logs for issues.
 
 ### Buttons
-* The `Start Synchronization` button is used for manually synchronizing all inventory. The status of the process will be displayed in the fields above the buttons.
-* The `Refresh` button is used for updating the fields above the buttons to match the most recent results of automatic full inventory synchronization.
+* The `Start Synchronization` button ![start sync](../../../images/en/wayfair_settings/button_start_sync.png) is used for manually synchronizing all inventory. The status of the process will be displayed in the fields above the buttons.
+* The `Refresh` button ![refresh](../../../images/en/wayfair_settings/button_refresh_status.png) is used for updating the fields above the buttons to match the most recent results of automatic full inventory synchronization.
 
 
 ## Ship Confirmation (ASN) page
@@ -151,4 +172,4 @@ During Wayfair plugin onboarding, Wayfair will instruct on which option is appro
 When you choose the `Own Account shipping` option, Wayfair needs to translate the Plentymarkets shipping information into data it understands.
 1. Locate the carrier information provided by Wayfair. Contact [ERPSupport@wayfair.com](mailto:ERPSupport@wayfair.com) if required.
 2. For each Plentymarkets-side `Shipping Carrier` listed on the left-side column, enter the Wayfair-provided "SCAC code" in the right-side `Wayfair carrier` column.
-3. Click `Save` at the bottom of the page
+3. Click `Save` ![save button](../../../images/en/wayfair_settings/button_save.png) at the bottom of the page.
