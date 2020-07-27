@@ -5,11 +5,23 @@ These settings should only be configured after the [authorization settings for t
 ## Opening the settings page
 To locate the settings:
 1. Log in to Plentymarkets as a user with administrative rights
-2. Click `Setup` in the top navigation bar of Plentymarkets
+2. Click `Setup` in the top navigation bar of Plentymarkets:
+
+    ![Setup button](../../../images/en/menu_setup.png)
+
 3. Click `Markets` in the left navigation bar of the `Settings` interface
+
+    ![Markets button](../../../images/en/wayfair_settings/menu_markets.png)
+
 4. Click `Wayfair` in the list of `Markets`. It may appear at the bottom, rather than being alphabetically situated.
+
 5. Click `Home` under `Wayfair`
+
+    ![home button](../../../images/en/wayfair_settings/menu_markets_wayfair_home.png)
+
 6. You may now use the Wayfair navigation bar to choose a settings page such as [`Warehouses`](#warehouses-page).
+
+    ![wayfair nav bar](../../../images/en/wayfair_settings/wayfair_nav_bar.png)
 
 ## Home page
 The `Home` page is activated by clicking `Home` in the left-side menu or by clicking `Wayfair` in the Wayfair navigation bar. Currently, it provides no information.
