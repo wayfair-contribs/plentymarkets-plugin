@@ -125,45 +125,45 @@ If Wayfair's shipping services are to be used, the Wayfair plugin's ASN settings
 
 4.	Select `Status change` (in the category `Order Change`) in the `Event` field:
 
-    ![choose event](../../../images/en/send_asn/choose_event.png)
+    ![choose event](../../../images/en/shipping/choose_event.png)
 
 5.	In the field below `Event` select the status change that should initiate the sending of an ASN to Wayfair, such as `In preparation for shipping`:
 
-    ![choose status](../../../images/en/send_asn/choose_status.png)
+    ![choose status](../../../images/en/shipping/choose_status.png)
 
 6.	Click the `Save` button ![save button](../../../images/common/button_save.png).
 
 7.	You should automatically be redirected to the newly created event procedure. In the `settings` section of the event procedure, place a checkmark next to `Active`:
 
-    ![event active](../../../images/en/send_asn/event_active.png)
+    ![event active](../../../images/en/shipping/event_active.png)
 
 8. Click on `Add Filter`:
 
-    ![add filter](../../../images/en/send_asn/add_filter.png)
+    ![add filter](../../../images/en/shipping/add_filter.png)
 
 9.  Choose `Referrer` in the `Order` category:
 
-    ![choose filter](../../../images/en/send_asn/choose_filter.png)
+    ![choose filter](../../../images/en/shipping/choose_filter.png)
 
 10. Click the `Add` button ![plus add button](../../../images/en/button_plus_add.png).
 
 11.	In the `Filter` section, a box should appear with a list of all available Order referrers. Place a checkmark next to all "Wayfair" order referrers:
 
-    ![wayfair selected](../../../images/en/send_asn/filter_wayfair_selected.png)
+    ![wayfair selected](../../../images/en/shipping/filter_wayfair_selected.png)
 
 12. Click on `Add procedure`:
 
-    ![add procedure](../../../images/en/send_asn/add_procedure.png)
+    ![add procedure](../../../images/en/shipping/add_procedure.png)
 
 13. Choose `Send Ship Confirmation (ASN) to Wayfair` in the `Plugins` category:
 
-    ![choose procedure](../../../images/en/send_asn/choose_procedure.png)
+    ![choose procedure](../../../images/en/shipping/choose_procedure.png)
 
 14. Click the `Add` button ![plus add button](../../../images/en/button_plus_add.png).
 
 15. Verify that the Event's settings finally look similar to this:
 
-    ![finished event](../../../images/en/send_asn/finished_event.png)
+    ![finished event](../../../images/en/shipping/finished_event.png)
 
 16. Click the `Save` button ![save button](../../../images/common/button_save.png).
 

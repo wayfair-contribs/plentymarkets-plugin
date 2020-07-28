@@ -64,7 +64,11 @@ Each order has a Shipping Profile that is used for working with the shipping ser
 
     ![select referrer](../../../images/en/shipping/shipping_profile_select_referrer.png)
 
-11. Click on the `Save` button ![save button](../../../images/common/button_save.png). at the top of the page.
+11. Click on the `Save` button ![save button](../../../images/common/button_save.png). at the top of the page. **You may need to scroll up in order to reveal the button.**
+
+12. Observe that the new (or updated) Shipping Profile is listed:
+
+    ![wayfair shipping profile](../../../images/en/shipping/wayfair_shipping_profile.png)
 
 
 ## 3. Optionally selecting the Wayfair Shipping Profile automatically for Wayfair orders
@@ -78,28 +82,43 @@ Each order has a Shipping Profile that is used for working with the shipping ser
 
 3. Enter a `Name` such as **"Wayfair order Shipping Mapping"**.
 
-4. Select the event `New order` from the dropdown menu.
+4. Select the event `New order` from the dropdown menu:
 
-5. Click the `Save` button on the dialog. The new procedure will now be selected, with the `Settings` section in view.
+    ![select new order](../../../images/en/shipping/select_event_new_order.png)
 
-6. In the `Settings` section of the event procedure, check the `Active` checkbox.
+5. Click the `Save` button ![save button](../../../images/en/button_save.png) on the dialog. The new procedure will now be selected, with the `Settings` section in view.
 
-7. Click the ``Add filter`` button (the `+` button at the top of the `Filter` section), to launch the `Add filter` dialog.
+6. In the `Settings` section of the event procedure, check the `Active` checkbox:
+    ![set to active](../../../images/en/shipping/set_shipping_event_active.png)
 
-8. Select  `Order` >> `Referrer`
+7. Click on `Add Filter`:
 
-9. Click the `Add` button to complete the dialog. A `Referrer` filter will now appear on the form.
+    ![add filter](../../../images/en/shipping/add_filter.png)
 
-10. In the `Referrer` list, activate the checkbox for all **"Wayfair"**-related Order Referrers
+9.  Choose `Referrer` in the `Order` category:
 
-11. Click the `Add procedure` button (the `+` button at the top of the `Procedures` section) to launch the `Add procedure` dialog.
+    ![choose filter](../../../images/en/shipping/choose_filter.png)
 
-12. Select `Order` >> `Change shipping profile`.
+10. Click the `Add` button ![plus add button](../../../images/en/button_plus_add.png).
 
-13. Click the `Add` button to complete the dialog. A `Change shipping profile` Procedure will appear in the `Procedures` area.
+11.	In the `Filter` section, a box should appear with a list of all available Order referrers. Place a checkmark next to all "Wayfair" order referrers:
 
-12. Click on the left-most `^` (carat) icon on the left of the `Change shipping profile` Procedure's row **(this is NOT the large square button that also happens to have a carat icon on it)** to expand the Procedure's details.
+    ![wayfair selected](../../../images/en/shipping/filter_wayfair_selected.png)
 
-13. In the drop-down menu on the Procedure, choose the [Shipping Profile created for WayfairShipping](#2-creating-the-shipping-profile).
+12. Click on `Add procedure`:
 
-14. Click the `Save` button at the top of the page to complete the creation of the Event Procedure.
+    ![add procedure](../../../images/en/shipping/add_procedure.png)
+
+12. Select `Order` >> `Change shipping profile`:
+
+    ![select procedure](../../../images/en/shipping/add_procedure_change_shipping_profile.png)
+
+13. Click the `Add` button ![plus add button](../../../images/en/button_plus_add.png). to complete the dialog. A `Change shipping profile` Procedure will appear in the `Procedures` area.
+
+12. Click on the left-most carat icon ![collapsed carat](../../../images/common/icon_carat_down.png) on the left of the `Change shipping profile` Procedure's row **(this is NOT the large square button that also happens to have a carat icon on it)** to expand the Procedure's details:
+    ![expand carat](../../../images/en/shipping/change_shipping_profile_expand_carat.png)
+
+13. In the drop-down menu on the Procedure, choose the [Shipping Profile created for WayfairShipping](#2-creating-the-shipping-profile):
+    ![select wayfairshipping profile](../../../images/en/shipping/select_wayfairshipping_profile.png)
+
+14. Click the `Save` button ![save button](../../../images/common/button_save.png) at the top of the page to complete the creation of the Event Procedure.
