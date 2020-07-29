@@ -93,7 +93,20 @@ This procedure is required only if [the `Send all inventory items to Wayfair` se
 
     2. If the [`Send all inventory items to Wayfair?`](settings_guide.md#send-all-inventory-items-to-wayfair) setting is **disabled**, go to the `Availability` tab of the Variation and add "Wayfair" to the list in the `Markets` area:
 
-        ![adding wayfair market to variation](../../../images/en/variation_wayfair_market.png)
+        1. Click in the area that says `Click to select markets`.
+
+        2. Scroll down to the `Wayfair` entry
+
+        3. Place a check mark next to `Wayfair`
+
+        4. Click the `+` button ![add button](../../../images/common/button_plus.png) in the `Markets` area.
+
+            ![adding wayfair market to variation](../../../images/en/variation_wayfair_market.png)
+
+        5. Observe that a `Wayfair` row now exists in `Markets`
+
+            ![adding wayfair market to variation](../../../images/en/variation_wayfair_market_added.png)
+
 
     3. Click the `Save` left of the Variation `ID`, below the `Global` tab (not the higher-up button for the Item):
 
