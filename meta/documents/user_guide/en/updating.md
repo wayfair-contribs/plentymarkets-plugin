@@ -6,15 +6,12 @@ The Wayfair plugin may be updated at any time to ensure that it is providing the
 Prior to updating, review [the latest information on the Wayfair plugin's releases.](https://github.com/wayfair-contribs/plentymarkets-plugin/releases)
 
 ## Updating to the latest version of the Wayfair Plugin
-1. From the main Plentymarkets page, go to `Plugins` >> `Plugin set overview`:
+1. From the main Plentymarkets page, go to `Plugins` >> `Plugin set overview`.
+(**Do NOT select the deprecated, similarly named `Plugin overview` option, if it appears in the menu.**)
 
     ![plugins_menu_plugin_set_overview](../../../images/en/plugins_menu_plugin_set_overview.png)
 
-    * **Do not select the deprecated, similarly named `Plugin overview` option, if it appears in the menu.**
-
-    * The screen should show a list of plugin sets, with a set of buttons for each one.
-
-2. Locate the Plugin Set where the Wayfair plugin is installed.
+2. The screen will show a list of plugin sets, with a set of buttons for each one. Locate the Plugin Set where the Wayfair plugin is installed.
 
      ![linked clients](../../../images/en/plugin_sets_linked_clients.png)
 
