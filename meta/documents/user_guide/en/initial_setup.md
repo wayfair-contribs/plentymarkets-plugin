@@ -123,7 +123,7 @@ If Wayfair's shipping services are to be used, the Wayfair plugin's ASN settings
 
 3.	Enter any `Name` in the appropriate field.
 
-4.	Select `Status change` (in the category `Order Change`) in the `Event` field:
+4.	In the `Event` drop down, select `Status change` (in the category `Order Change`):
 
     ![choose event](../../../images/en/shipping/choose_event.png)
 
