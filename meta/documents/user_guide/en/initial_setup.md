@@ -72,7 +72,7 @@ In order to properly handle incoming orders from Wayfair, the Wayfair plugin mus
 
 ![variation number field](../../../images/en/variation_number_field.png)
 
-If the Wayfair Supplier Part Numbers for your organization are to be reflected in an alternative field in your Plentymarkets Item Variations, change the value of [the `Item Mapping Method` setting](settings_guide.md#item-mapping-method) and update the Variations accordingly.
+If the Wayfair Supplier Part Numbers for your organization are to be reflected in an alternative field in your Plentymarkets Item Variations, change the value of the  [`Item Mapping Method`](settings_guide.md#item-mapping-method) setting and update the Variations accordingly.
 
 ## 5. Making items available for sale on Wayfair
 Items that you want to sell on the Wayfair market must be considered active in Plentymarkets. The Plentymarkets user may also choose to limit which Items are for sale on Wayfair. **Note that Inventory and ordered items are controlled at the `Variation` level.**
@@ -91,11 +91,11 @@ This procedure is required only if [the `Send all inventory items to Wayfair` se
 
         ![variation active](../../../images/en/variation_active_field.png)
 
-    2. If [the `Send all inventory items to Wayfair?` setting](settings_guide.md#send-all-inventory-items-to-wayfair) is **disabled**, go to the `Availability` tab of the Variation and add "Wayfair" to the list in the `Markets` area:
+    2. If the [`Send all inventory items to Wayfair?`](settings_guide.md#send-all-inventory-items-to-wayfair) setting is **disabled**, go to the `Availability` tab of the Variation and add "Wayfair" to the list in the `Markets` area:
 
         ![adding wayfair market to variation](../../../images/en/variation_wayfair_market.png)
 
-    3. Click the `Save` next to the Variation `ID` (not the higher-up button for the Item):
+    3. Click the `Save` left of the Variation `ID`, below the `Global` tab (not the higher-up button for the Item):
 
         ![variation saving](../../../images/common/variation_save.png)
 
@@ -133,11 +133,12 @@ If Wayfair's shipping services are to be used, the Wayfair plugin's ASN settings
 
 6.	Click the `Save` button ![save button](../../../images/common/button_save.png).
 
-7.	You should automatically be redirected to the newly created event procedure. In the `settings` section of the event procedure, place a checkmark next to `Active`:
+7.	You should automatically be redirected to the newly created event procedure. In the `Settings` section of the event procedure, place a checkmark next to `Active`:
+
 
     ![event active](../../../images/en/shipping/event_active.png)
 
-8. Click on `Add Filter`:
+8. Click on the `+` symbol next to `Filter`:
 
     ![add filter](../../../images/en/shipping/add_filter.png)
 
@@ -151,7 +152,7 @@ If Wayfair's shipping services are to be used, the Wayfair plugin's ASN settings
 
     ![wayfair selected](../../../images/en/shipping/filter_wayfair_selected.png)
 
-12. Click on `Add procedure`:
+12. Click on the `+` next to `Procedures`:
 
     ![add procedure](../../../images/en/shipping/add_procedure.png)
 
