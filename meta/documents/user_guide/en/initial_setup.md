@@ -21,34 +21,48 @@
 After the plugin is installed in your Plentymarkets Plugin Set, the plugin must be configured to use the correct credentials when connecting to Wayfair's interfaces.
 
 * **The authorization procedure must be performed for any Plugin Set that contains the Wayfair plugin**.
+
 * Copying a Plugin Set will copy the authorization information to the new plugin set.
+
 * An exported or imported Plugin Set may include the authorization information.
 
 The authorization steps are as follows:
-1. From the main Plentymarkets page, go to `Plugins` >> `Plugin set overview`
+1. From the main Plentymarkets page, go to `Plugins` >> `Plugin set overview`:
 
-2. Locate the Plugin Set that is linked to the client with which Wayfair will be used.
+    ![plugins_menu_plugin_set_overview](../../../images/en/plugins_menu_plugin_set_overview.png)
 
-3. Click on the `Edit` button for the desired Plugin set
+2. Locate the Plugin Set that is linked to the client with which Wayfair will be used:
 
-4. In the Wayfair row of the Plugin set, click on the `Settings` button.
+    ![linked clients](../../../images/en/plugin_sets_linked_clients.png)
 
-4. In the left-side menu, go to `Configuration` >> `Global Settings`.
+3. Click on the `Edit` button ![pencil button](../../../images/common/button_pencil.png) for the desired Plugin set.
 
-5. In the `Supplier Settings` area, enter the `Client ID` and `Client Secret` values that correspond with your Wayfair API credentials
+4. In the Wayfair row of the Plugin set, click on the `Settings` button ![gear button](../../../images/common/button_gear.png).
 
-6. Change the `Mode` setting to `Live` - see [information on `Test` mode](test_mode.md)
+4. In the left-side menu, go to `Configuration` >> `Global Settings`:
 
-7. Click the `Save` button in the toolbar above the settings
+    ![global settings in menu](../../../images/en/menu_global_settings.png)
+
+5. In the `Supplier Settings` area, enter the `Client ID` and `Client Secret` values that correspond with your Wayfair API credentials.
+
+6. Change the `Mode` setting to `Live` - see [information on `Test` mode](test_mode.md):
+
+    ![global settings live](../../../images/en/global_settings_live.png)
+
+7. Click the `Save` button ![save button](../../../images/common/button_save.png) in the toolbar above the settings
 
 ## 2. Activating the order referrer
 An order referrer in Plentymarkets identifies the sales channel on which an order was generated. To get the Plentymarkets system to properly import orders from the Wayfair API, the Wayfair order referrer must be activated:
 
-1. From the main Plentymarkets page, go to `Setup` >> `Orders` >> `Order referrer`.
+1. From the main Plentymarkets page, go to `Setup` >> `Orders` >> `Order referrer`:
 
-2. Place a check mark next to the `Wayfair` order referrer.
+    ![order referrer menu](../../../images/en/menu_order_referrer.png)
 
-3. Click the `Save` button.
+2. Place a check mark next to the `Wayfair` order referrer:
+
+    ![wayfair order referrer](../../../images/common/wayfair_referrer_checked.png)
+
+3. Click the `Save` button ![save button](../../../images/common/button_save.png).
 
 ## 3. Setting up Plentymarkets for shipping through Wayfair
 To ensure proper integrations with Wayfair when shipping order items, follow the procedures outlined in  [the Wayfair Shipping instructions](wayfair_shipping.md).
@@ -56,7 +70,9 @@ To ensure proper integrations with Wayfair when shipping order items, follow the
 ## 4. Matching items ordered on Wayfair with Item Variations in Plentymarkets:
 In order to properly handle incoming orders from Wayfair, the Wayfair plugin must match the Supplier Part Numbers in Wayfair's systems with a specific field of Item Variations in Plentymarkets. By default, the Wayfair plugin operates on the assumption that the `Variation Number` **(not to be confused with the Variation's ID)** of an Item's Variation in Plentymarkets will match the Wayfair Supplier Part Number.
 
-If the Wayfair Supplier Part Numbers for your organization are to be reflected in an alternative field in your Plentymarkets Item Variations, change the value of [the `Item Mapping Method` setting](settings_guide.md#item-mapping-method) and update the Variations accordingly.
+![variation number field](../../../images/en/variation_number_field.png)
+
+If the Wayfair Supplier Part Numbers for your organization are to be reflected in an alternative field in your Plentymarkets Item Variations, change the value of the  [`Item Mapping Method`](settings_guide.md#item-mapping-method) setting and update the Variations accordingly.
 
 ## 5. Making items available for sale on Wayfair
 Items that you want to sell on the Wayfair market must be considered active in Plentymarkets. The Plentymarkets user may also choose to limit which Items are for sale on Wayfair. **Note that Inventory and ordered items are controlled at the `Variation` level.**
@@ -71,11 +87,30 @@ This procedure is required only if [the `Send all inventory items to Wayfair` se
 
 4. **For each Variation**:
 
-    1. On the `Settings` tab, make sure that the `Active` checkbox in the `Availability Section`is checked.
+    1. On the `Settings` tab, make sure that the `Active` checkbox in the `Availability` Section is checked:
 
-    2. If [the `Send all inventory items to Wayfair?` setting](settings_guide.md#send-all-inventory-items-to-wayfair) is **disabled**, go to the `Availability` tab of the Variation and add "Wayfair" to the list in the `Markets` area.
+        ![variation active](../../../images/en/variation_active_field.png)
 
-    3. Click the `Save` button next to the Variation `ID` (not the higher-up button for the Item).
+    2. If the [`Send all inventory items to Wayfair?`](settings_guide.md#send-all-inventory-items-to-wayfair) setting is **disabled**, go to the `Availability` tab of the Variation and add "Wayfair" to the list in the `Markets` area:
+
+        1. Click in the area that says `Click to select markets`.
+
+        2. Scroll down to the `Wayfair` entry
+
+        3. Place a check mark next to `Wayfair`
+
+        4. Click the `+` button ![add button](../../../images/common/button_plus.png) in the `Markets` area.
+
+            ![adding wayfair market to variation](../../../images/en/variation_wayfair_market.png)
+
+        5. Observe that a `Wayfair` row now exists in `Markets`
+
+            ![adding wayfair market to variation](../../../images/en/variation_wayfair_market_added.png)
+
+
+    3. Click the `Save` left of the Variation `ID`, below the `Global` tab (not the higher-up button for the Item):
+
+        ![variation saving](../../../images/common/variation_save.png)
 
 
 ## 6. Configuring the Warehouse mappings to match Wayfair Supplier IDs.
@@ -91,34 +126,60 @@ If Wayfair's shipping services are to be used, the Wayfair plugin's ASN settings
 
 ### 7.2 Creating an Event for Plentymarkets Orders that sends shipment information to Wayfair
 
-1. From the main Plentymarkets page, go to `Orders` >> `Events`
+1. From the main Plentymarkets page, go to `Setup` >> `Orders` >> `Events`:
 
-2.	Click on `Add event procedure` (the `+` button on the bottom left-hand side of the page)
-![Create Event](https://i.ibb.co/NjDtY05/asn-02.png "Create Event")
+    ![order events](../../../images/en/menu_order_events.png)
 
-3.	Enter any `Name`
+2.	Click on `Add event procedure` (the `+` button on the bottom left-hand side of the page):
 
-4.	Select `Status change` (in the category `Order Change`) in the `Event` field.
+    ![add order event](../../../images/en/add_order_event.png)
 
-5.	In the field below `Event` select the status change that should initiate the sending of an ASN to Wayfair, such as `in preparation for shipping`.
+3.	Enter any `Name` in the appropriate field.
 
-6.	Click the `Save` button.
+4.	In the `Event` drop down, select `Status change` (in the category `Order Change`):
 
-7.	You should automatically be redirected to the newly created event procedure. In the `settings` section of the event procedure, place a checkmark next to `Active`.
+    ![choose event](../../../images/en/shipping/choose_event.png)
 
-8.  Click on `Add Filter`, and go to `Order` >> `Referrer` to add the referrer as a filter:
-![Event Referrer](https://i.ibb.co/TwKLvJ5/asn-03.png "Event Referrer")
+5.	In the field below `Event` select the status change that should initiate the sending of an ASN to Wayfair, such as `In preparation for shipping`:
 
-9.	In the `Filter` section, a box should appear with a list of all available Order referrers. Place a checkmark next to all "Wayfair" order referrers:
-![Wayfair Referrer](https://i.ibb.co/yYpLp8q/asn-04.png "Wayfair Referrer")
+    ![choose status](../../../images/en/shipping/choose_status.png)
 
-10. Click on `Add procedure`, and go to `Plugins` >> `Send Ship Confirmation (ASN) to Wayfair`. 
-![Add Procedure](https://i.ibb.co/xfGrhFP/asn-05.png "Add Procedure")
+6.	Click the `Save` button ![save button](../../../images/common/button_save.png).
 
-11. Click on `+ add`.
+7.	You should automatically be redirected to the newly created event procedure. In the `Settings` section of the event procedure, place a checkmark next to `Active`:
 
-The final settings result should look similar to this:
-![Add Procedure Result](https://i.ibb.co/GJPF3ZV/asn-06.png "Add Procedure Result")
+
+    ![event active](../../../images/en/shipping/event_active.png)
+
+8. Click on the `+` symbol next to `Filter`:
+
+    ![add filter](../../../images/en/shipping/add_filter.png)
+
+9.  Choose `Referrer` in the `Order` category:
+
+    ![choose filter](../../../images/en/shipping/choose_filter.png)
+
+10. Click the `Add` button ![plus add button](../../../images/en/button_plus_add.png).
+
+11.	In the `Filter` section, a box should appear with a list of all available Order referrers. Place a checkmark next to all "Wayfair" order referrers:
+
+    ![wayfair selected](../../../images/en/shipping/filter_wayfair_selected.png)
+
+12. Click on the `+` next to `Procedures`:
+
+    ![add procedure](../../../images/en/shipping/add_procedure.png)
+
+13. Choose `Send Ship Confirmation (ASN) to Wayfair` in the `Plugins` category:
+
+    ![choose procedure](../../../images/en/shipping/choose_procedure.png)
+
+14. Click the `Add` button ![plus add button](../../../images/en/button_plus_add.png).
+
+15. Verify that the Event's settings finally look similar to this:
+
+    ![finished event](../../../images/en/shipping/finished_event.png)
+
+16. Click the `Save` button ![save button](../../../images/common/button_save.png).
 
 ## 8. Performing the first inventory synchronization
 Once everything has been set up, the it is time to start listing items for sale on Wayfair.
