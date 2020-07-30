@@ -36,7 +36,7 @@ The topography of the Plentymarkets system may not match the amount of Wayfair S
 When choosing a relationship between Warehouses and Supplier IDs that is not one-to-one, make sure to review the behavior of the [Stock Buffer](#stock-buffer) setting.
 
 ### Adding a Warehouse mapping
-1. Click on the `Add Mapping` button ![add mapping](../../../images/en/wayfair_settings/warehouses/button_add_mapping.png).
+1. Click on the `Add Mapping` button ![add mapping](../../../images/en/wayfair_settings/button_add_mapping.png).
 
 2. Use the left column to choose a Plentymarkets Warehouse by name
 3. Use the right column to enter a numeric Supplier ID
