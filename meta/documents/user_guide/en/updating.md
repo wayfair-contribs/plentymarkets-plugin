@@ -40,7 +40,7 @@ Prior to updating, review [the latest information on the Wayfair plugin's releas
 
     ![update selector](../../../images/en/installation/update_version_selection.png)
 
-10. Click the `Update` button ![update button](../../../images/en/shipping/update_button.png) at the top of the page. After a short pause, you will be redirected to the individual Plugin Set's details.
+10. Click the `Update` button ![update button](../../../images/en/installation/update_button.png) at the top of the page. After a short pause, you will be redirected to the individual Plugin Set's details.
 
 11. Verify that a row exists on the page with the `Name` displayed as "Wayfair" and the `Installed` version showing as the desired version.
 
