@@ -7,7 +7,8 @@ Follow these steps to make it available for use:
 
 1. Log in to the Plentymarkets system.
 
-2. From the main Plentymarkets page, go to `plugins` >> `plentyMarketplace`, which will use the Plentymarkets system's owner’s credentials to log you in on the plentyMarketplace website:
+2. From the main Plentymarkets page, go to `Plugins` >> `plentyMarketplace`, which will use the Plentymarkets system's owner’s credentials to log you in on the plentyMarketplace website:
+
 
     ![plentyMarketplace in menu](../../../images/en/menu_marketplace.png)
 
