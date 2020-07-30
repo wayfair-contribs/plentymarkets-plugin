@@ -76,7 +76,7 @@ To use the functions of the Wayfair plugin, it must be installed in the Plentyma
 
 12. In the `Active` column for the "Wayfair" row, click on the switch so that it moves to the right-side, enabled position. **Failure to activate the Wayfair plugin will prevent its functionalities from being available**.
 
-13. Verify that the Wayfair plugin's row looks like this:
+13. Verify that the Wayfair plugin's row looks the same as the screenshot below (your `Installed` version may be different).
 
     ![wayfair plugin not yet deployed](../../../images/en/installation/wayfair_plugin_not_yet_deployed.png)
 
@@ -86,7 +86,7 @@ To use the functions of the Wayfair plugin, it must be installed in the Plentyma
 
 15. A progress bar will appear while the plugin is installed.
 
-16. Confirm that the `Deployed` column for the "Wayfair" row is now populated, and it reflects the value in the `Installed` column:
+16. Confirm that the `Deployed` column for the "Wayfair" row is now populated, and it reflects the value in the `Installed` column (your `Installed` or `Deployed` version may be different).
 
     ![wayfair plugin deployed](../../../images/en/installation/wayfair_plugin_deployed.png)
 
