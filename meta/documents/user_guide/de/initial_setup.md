@@ -79,7 +79,7 @@ Dieses Verfahren ist nur erforderlich, wenn [die Einstellung `Vollständigen Bes
 
 1. Gehen Sie auf der Hauptseite von Plentymarkets zu `Artikel` >> `Artikel bearbeiten`.
 
-2. Suchen Sie nach Artikeln und öffnen Sie sie.
+2. Suchen Sie nach Artikeln und öffnen Sie sie
 
 3. **Klicken Sie für jedes Element** auf `Varianten` und öffnen Sie diese.
 
