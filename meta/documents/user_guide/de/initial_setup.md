@@ -54,7 +54,7 @@ Die Auftragsherkunft in Plentymarkets identifiziert den Vertriebskanal, in dem e
 
 1. Gehen Sie auf der Hauptseite von Plentymarkets zu `Einrichtung` >>` Aufträge` >> `Auftragsherkunft`.
 
-    ![order referrer menu](../../../images/en/menu_order_referrer.png)
+    ![order referrer menu](../../../images/de/menu_order_referrer.png)
 
 2. Setzen Sie ein Häkchen neben den Bestellempfänger `Wayfair`.
 
