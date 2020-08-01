@@ -1,5 +1,5 @@
 ﻿# Wayfair Plugin Benutzerhandbuch
-<div class = "container-toc"> </ div>
+<div class="container-toc"></div>
 
 Um sicherzustellen, dass Sie die neueste Version dieses Dokuments anzeigen, [klicken Sie hier](https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide_de.md).
 
