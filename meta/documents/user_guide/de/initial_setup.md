@@ -184,4 +184,4 @@ Sobald alles eingerichtet ist, ist es Zeit, Artikel zum Verkauf auf Wayfair zu l
 
 Schließen Sie das Setup ab, indem Sie eine vollständige Inventarsynchronisierung auf der Seite [Voll Inventar](settings_guide.md#die-seite-voll-inventar) der [Wayfair-Markteinstellungen](settings_guide.md) starten.
 
-** Nach dieser ersten Inventarsynchronisierung sendet das Wayfair-Plugin regelmäßig Inventaraktualisierungen an Wayfair, ohne dass weitere manuelle Aktivierungen erforderlich sind. **
+**Nach dieser ersten Inventarsynchronisierung sendet das Wayfair-Plugin regelmäßig Inventaraktualisierungen an Wayfair, ohne dass weitere manuelle Aktivierungen erforderlich sind.**
