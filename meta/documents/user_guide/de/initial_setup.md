@@ -31,7 +31,7 @@ Die Schritte Autorisierung sind wie folgt:
 
 2. Suchen Sie das Plugin-Set, welches mit dem Client verknüpft ist, mit dem Wayfair verwendet wird.
 
-    [linked clients](../../../images/de/plugin_sets_linked_clients.png)
+    ![linked clients](../../../images/de/plugin_sets_linked_clients.png)
 
 3. Klicken Sie auf die Schaltfläche `bearbeiten` ![pencil button](../../../images/common/button_pencil.png) für das gewünschte Plugin-Set.
 
