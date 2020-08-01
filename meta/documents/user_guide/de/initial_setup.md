@@ -96,7 +96,9 @@ Dieses Verfahren ist nur erforderlich, wenn [die Einstellung `Vollständigen Bes
 
         3. Setzen Sie ein Häkchen neben `Wayfair`
 
-        4. Klicken Sie auf die Schaltfläche `+` [add button](../../../images/common/button_plus.png) im Bereich "Märkte".
+        4. Klicken Sie auf die Schaltfläche `+` ![add button](../../../images/common/button_plus.png) im Bereich "Märkte".
+
+             ![adding wayfair market to variation](../../../images/de/variation_wayfair_market.png)
 
         5. Beachten Sie, dass in `Märkte` jetzt eine `Wayfair` -Reihe vorhanden ist
 
@@ -105,7 +107,7 @@ Dieses Verfahren ist nur erforderlich, wenn [die Einstellung `Vollständigen Bes
 
     3. Klicken Sie auf die Schaltfläche `Speichern` neben der Variations-ID (nicht auf die obere Schaltfläche für den Artikel).
 
-        ![variation active](../../../images/de/variation_active_field.png)
+        ![variation saving](../../../images/common/variation_save.png)
 
 
 ## 6. Konfigurieren der Lagerzuordnungen so, dass sie mit den Wayfair-Lieferanten-IDs übereinstimmen.
@@ -163,7 +165,7 @@ Wenn die Versanddienste von Wayfair verwendet werden sollen, sollten die ASN-Ein
 
 12. Klicken Sie auf das + neben `Prozeduren`:
 
-    [add procedure](../../../images/de/shipping/add_procedure.png)
+    ![add procedure](../../../images/de/shipping/add_procedure.png)
 
 13. Wählen Sie `Sende Versandbestätigungen (ASN) an Wayfair` in der Kategorie `Plugins`:
 
