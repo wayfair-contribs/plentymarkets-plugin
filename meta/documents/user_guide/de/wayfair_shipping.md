@@ -29,7 +29,7 @@ Um ein Versandprofil für Bestellungen zu erstellen, muss zunächst ein Versandd
 6. Stellen Sie sicher, dass die neue Zeile folgendermaßen aussieht:
     ![shipping service providers](../../../images/de/shipping/shipping_service_providers_with_wayfair.png)
 
-7. Klicken Sie auf "Speichern" ![save button](../../../images/de/button_save.png).
+7. Klicken Sie auf "Speichern" ![save button](../../../images/de/button_save1.png).
 
 ## 2. Versandprofil erstellen
 Jede Bestellung verfügt über ein Versandprofil, das für die Zusammenarbeit mit dem Versanddienstleister verwendet wird, um Artikel aus einer Bestellung zu versenden. Führen Sie diese Schritte aus, um das Wayfair-spezifische Versandprofil einzurichten.
@@ -57,14 +57,16 @@ Jede Bestellung verfügt über ein Versandprofil, das für die Zusammenarbeit mi
 
 8. Ändern Sie im Feld `Priorität` optional die Priorität (wir empfehlen, sie als Standardpriorität `höchste` zu belassen).
 
-9. Setzen Sie in der Liste `Auftragsherkunft` ein Häkchen neben alle **"Wayfair"** bezogenen Einträge.
+9. Stellen Sie im Feld Clients (Stores) sicher, dass Sie alle Stores auswählen, die für Wayfair eingerichtet werden können.
+
+10. Setzen Sie in der Liste `Auftragsherkunft` ein Häkchen neben alle **"Wayfair"** bezogenen Einträge.
 
   ![select referrer](../../../images/de/shipping/shipping_profile_select_referrer.png)
 
-10. Klicken Sie oben auf der Seite auf die Schaltfläche `Speichern` ![save button](../../../images/common/button_save.png).
+11. Klicken Sie oben auf der Seite auf die Schaltfläche `Speichern` ![save button](../../../images/common/button_save.png).
 
-11.Beachten Sie, dass das neue (oder aktualisierte) Versandprofil aufgeführt ist:
-   ![wayfair shipping profile](../../../images/de/shipping/wayfair_shipping_profile.png)
+12. Beachten Sie, dass das neue (oder aktualisierte) Versandprofil aufgeführt ist:
+    ![wayfair shipping profile](../../../images/de/shipping/wayfair_shipping_profile.png)
 
 ## 3. Optional kann das Versandprofil automatisch für Wayfair-Bestellungen festgelegt werden
 
@@ -82,7 +84,7 @@ Jede Bestellung verfügt über ein Versandprofil, das für die Zusammenarbeit mi
 
      ![select new order](../../../images/de/shipping/select_event_new_order.png)
 
-5. Klicken Sie im Dialogfeld auf die Schaltfläche `Speichern` ![save button](../../../images/de/button_save.png). Das neue Verfahren wird nun ausgewählt, wobei der Abschnitt `Einstellungen` angezeigt wird.
+5. Klicken Sie im Dialogfeld auf die Schaltfläche `Speichern` ![save button](../../../images/de/button_save1.png). Das neue Verfahren wird nun ausgewählt, wobei der Abschnitt `Einstellungen` angezeigt wird.
 
 6. Aktivieren Sie im Abschnitt `Einstellungen` der Ereignisaktion das Kontrollkästchen "Aktiv".
     ![set to active](../../../images/de/shipping/set_shipping_event_active.png)
@@ -92,27 +94,28 @@ Jede Bestellung verfügt über ein Versandprofil, das für die Zusammenarbeit mi
     ![add filter](../../../images/de/shipping/add_filter.png)
 
 8. Wählen Sie `Auftrag` >>` Herkunft`.
-![choose filter](../../../images/de/shipping/choose_filter.png)
+
+    ![choose filter](../../../images/de/shipping/choose_filter.png)
 
 9. Klicken Sie auf die Schaltfläche `Hinzufügen` ![plus add button](../../../images/de/button_plus_add.png), um den Dialog abzuschließen. Auf dem Formular wird nun ein "Herkunft"-Filter angezeigt.
 
 10. Aktivieren Sie in der Liste `Herkunft` das Kontrollkästchen für alle **"Wayfair"** bezogenen Herkunft.
-    ![wayfair selected](../../.de/shipping/filter_wayfair_selected.png)
+    ![wayfair selected](../../../images/de/shipping/filter_wayfair_selected.png)
 
 11. Klicken Sie auf die Schaltfläche "`Aktion hinzufügen` (die Schaltfläche "+" oben im Abschnitt `Aktionen`), um das Dialogfeld `Aktion hinzufügen` zu öffnen.
 
     ![add procedure](../../../images/de/shipping/add_procedure.png)
 
 12. Wählen Sie `Auftrag` >> `Versandprofil ändern`.
+
     ![select procedure](../../../images/de/shipping/add_procedure_change_shipping_profile.png)
 
-13. Klicken Sie auf die Schaltfläche `Hinzufügen` [plus add button](../../../images/de/button_plus_add.png), um den Dialog abzuschließen. Im Bereich `Aktionen` wird eine Aktion "Versandprofil ändern" angezeigt.
+13. Klicken Sie auf die Schaltfläche `Hinzufügen` ![plus add button](../../../images/de/button_plus_add.png), um den Dialog abzuschließen. Im Bereich `Aktionen` wird eine Aktion "Versandprofil ändern" angezeigt.
 
-12. Klicken Sie auf das Symbol `^` (Hochzeichen) ganz links in der Zeile "Versandprofil ändern" **- dies ist NICHT die große quadratische Schaltfläche, auf der sich auch ein Hochzeichen befindet -** um die Details der Prozedur zu erweitern.
-
+14. Klicken Sie auf das Symbol ![plus add button](../../../images/common/icon_carat_down.png) (Hochzeichen) ganz links in der Zeile "Versandprofil ändern" **- dies ist NICHT die große quadratische Schaltfläche, auf der sich auch ein Hochzeichen befindet -** um die Details der Prozedur zu erweitern.
     ![expand carat](../../../images/de/shipping/change_shipping_profile_expand_carat.png)
 
-13. Wählen Sie im Dropdown-Menü der Aktion das [für **Wayfair** erstellte Versandprofil](#2-versandprofil-erstellen).
+15. Wählen Sie im Dropdown-Menü der Aktion das [für **Wayfair** erstellte Versandprofil](#2-versandprofil-erstellen).
     ![select wayfairshipping profile](../../../images/de/shipping/select_wayfairshipping_profile.png)
 
-14. Klicken Sie oben auf der Seite auf die Schaltfläche `Speichern` ![save button](../../../images/common/button_save.png), um die Erstellung der Ereignisprozedur abzuschließen.
+16. Klicken Sie oben auf der Seite auf die Schaltfläche `Speichern` ![save button](../../../images/common/button_save.png), um die Erstellung der Ereignisprozedur abzuschließen.
