@@ -7,13 +7,15 @@ Befolgen Sie diese Schritte, um es zur Verwendung verfügbar zu machen:
 
 1. Melden Sie sich beim Plentymarkets-System an.
 
-2. Gehen Sie auf der Hauptseite von Plentymarkets zu `Plugins` >>` plentyMarketplace`. Die Anmeldeinformationen des Eigentümers des Plentymarkets-Systems werden verwendet, um auf die Website "plentyMarketplace" zuzugreifen.
+2. Gehen Sie auf der Hauptseite von Plentymarkets zu `Plugins` >>` plentyMarketplace`. Die Anmeldeinformationen des Eigentümers des Plentymarkets-Systems werden verwendet, um auf die Website "plentyMarketplace" zuzugreifen:
+
+    ![plentyMarketplace in menu](../../../images/de/menu_marketplace.png)
 
 3. Klicken Sie auf die Suchschaltfläche in der oberen rechten Ecke der Seite.
 
 4. Geben Sie "Wayfair" in das Feld ein und drücken Sie die Eingabetaste.
 
-5. Wenn auf der oberen Seite ein Banner "Sie haben dieses Plugin gekauft" und / oder ein Banner "Bereits gekauft" auf der Seite angezeigt wird, fahren Sie mit den Anweisungen unter [Installieren des Plugins in einem Plugin-Set](#2-installieren-des-wayfair-plugins-in-einem-plugin-set) fort.
+5. Wenn auf der oberen Seite ein Banner `Sie haben dieses Plugin gekauft` und / oder ein Banner `Bereits gekauft` auf der Seite angezeigt wird, fahren Sie mit den Anweisungen unter [Installieren des Plugins in einem Plugin-Set](#2-installieren-des-wayfair-plugins-in-einem-plugin-set) fort.
 
 6. Klicken Sie auf die Schaltfläche `Zur Kasse`.
 
@@ -28,7 +30,7 @@ Um die Funktionen des Wayfair-Plugins nutzen zu können, muss es in den aktiven 
 
 1. Gehen Sie auf der Hauptseite von Plentymarkets zu `Plugins` >>`Plugin-Set-Übersicht`. Auf dem Bildschirm sollte eine Liste der Plugin-Sets mit jeweils einer Reihe von Schaltflächen angezeigt werden.
 
-    ![plugins_menu_plugin_set_overview](../../../images/dn/plugins_menu_plugin_set_overview.png)
+    ![plugins_menu_plugin_set_overview](../../../images/de/plugins_menu_plugin_set_overview.png)
 
     * **Wählen Sie nicht die veraltete Option `Plugin-Übersicht` aus**.
 
