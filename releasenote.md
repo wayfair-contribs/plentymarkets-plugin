@@ -9,4 +9,4 @@ We have updated our user documentation to provide better ease of use.
 
 
 
-*Special Thanks to Falco Gress for the Deutsch translation.*
+*Special thanks to Falco Gress for the Deutsch translation.*
