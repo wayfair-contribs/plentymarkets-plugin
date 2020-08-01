@@ -18,10 +18,10 @@ Lesen Sie vor dem Aktualisieren [die neuesten Informationen zu den Versionen des
     * Die Liste der Plugins für das Plugin-Set ist hinter der Schaltfläche `Plugin-Set bearbeiten` versteckt.
         ![linked clients](../../../images/de/plugin_sets_linked_clients.png)
 
-3. Klicken Sie auf die Schaltfläche `Plugin-Set bearbeiten` [pencil button](../../../images/common/button_pencil.png) für das Plugin-Set.
+3. Klicken Sie auf die Schaltfläche `Plugin-Set bearbeiten` ![pencil button](../../../images/common/button_pencil.png) für das Plugin-Set.
 
 4. Stellen Sie sicher, dass auf der Seite eine Zeile mit dem Namen "Wayfair" vorhanden ist und dass auch die Spalte `Bereitgestellt` ausgefüllt ist, um anzuzeigen, dass das Plugin verwendet wird.
-    [wayfair plugin needs update](../../../images/de/installation/wayfair_plugin_needs_update.png)
+    ![wayfair plugin needs update](../../../images/de/installation/wayfair_plugin_needs_update.png)
 
 5. Bewegen Sie den Mauszeiger über die Schaltfläche `Aktualisieren` ![update button](../../../images/common/button_update.png) in der Spalte `Aktionen`.
 
@@ -45,15 +45,15 @@ Lesen Sie vor dem Aktualisieren [die neuesten Informationen zu den Versionen des
 
 12. Klicken Sie in der Spalte `Aktiv` für die Zeile `Wayfair` auf den Schalter, damit er sich in die aktivierte Position auf der rechten Seite bewegt. **Wenn das Wayfair-Plugin nicht aktiviert wird, sind dessen Funktionen nicht verfügbar**.
 
-13. Klicken Sie oben auf der Seite auf die Schaltfläche `Plugin-Set bereitstellen` (wird als Schaltfläche "Speichern" angezeigt). Während der Installation des Plugins wird ein Fortschrittsbalken angezeigt.
+13. Stellen Sie sicher, dass die Zeile des Wayfair-Plugins so aussieht.
 
     ![wayfair plugin not yet deployed](../../../images/de/installation/wayfair_plugin_not_yet_deployed.png)
 
-14. Vergewissern Sie sich, dass die Spalte `Bereitgestellt` für die Zeile `Wayfair` jetzt ausgefüllt ist und den Wert in der Spalte `Installiert` widerspiegelt.
+14. Klicken Sie oben auf der Seite auf die Schaltfläche `Plugin-Set bereitstellen` (wird als Schaltfläche "Speichern" angezeigt).
 
     ![deploy plugin set button](../../../images/de/installation/button_deploy_plugin_set.png)
 
-15. Melden Sie sich vom Plentymarkets System ab und dann wieder an, um sicherzustellen, dass die Änderungen wirksam werden.
+15. Während der Installation des Plugins wird ein Fortschrittsbalken angezeigt.
 
 16. Stellen Sie sicher, dass die Spalte für die Zeile `Wayfair` jetzt ausgefüllt ist und den Wert in der Spalte `Installiert` widerspiegelt:
 
