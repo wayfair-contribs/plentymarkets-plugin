@@ -55,4 +55,8 @@ Lesen Sie vor dem Aktualisieren [die neuesten Informationen zu den Versionen des
 
 15. Melden Sie sich vom Plentymarkets System ab und dann wieder an, um sicherzustellen, dass die Änderungen wirksam werden.
 
-#TODO: Add steps 16 and 17
+16. Stellen Sie sicher, dass die Spalte für die Zeile `Wayfair` jetzt ausgefüllt ist und den Wert in der Spalte `Installiert` widerspiegelt:
+
+    ![wayfair plugin deployed](../../../images/de/installation/wayfair_plugin_deployed.png)
+
+17. Melden Sie sich vom Plentymarkets System ab und dann wieder an, um sicherzustellen, dass die Änderungen wirksam werden.

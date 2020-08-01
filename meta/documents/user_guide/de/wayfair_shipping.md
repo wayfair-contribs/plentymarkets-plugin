@@ -97,7 +97,7 @@ Jede Bestellung verfügt über ein Versandprofil, das für die Zusammenarbeit mi
 9. Klicken Sie auf die Schaltfläche `Hinzufügen` ![plus add button](../../../images/de/button_plus_add.png), um den Dialog abzuschließen. Auf dem Formular wird nun ein "Herkunft"-Filter angezeigt.
 
 10. Aktivieren Sie in der Liste `Herkunft` das Kontrollkästchen für alle **"Wayfair"** bezogenen Herkunft.
-    ![wayfair selected](../../../images/en/shipping/filter_wayfair_selected.png)
+    ![wayfair selected](../../.de/shipping/filter_wayfair_selected.png)
 
 11. Klicken Sie auf die Schaltfläche "`Aktion hinzufügen` (die Schaltfläche "+" oben im Abschnitt `Aktionen`), um das Dialogfeld `Aktion hinzufügen` zu öffnen.
 

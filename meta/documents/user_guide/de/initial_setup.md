@@ -90,7 +90,19 @@ Dieses Verfahren ist nur erforderlich, wenn [die Einstellung `Vollständigen Bes
         ![variation active](../../../images/de/variation_active_field.png)
 
     2. Wenn [die Einstellung `Vollständigen Bestand an Wayfair senden?`](settings_guide.md#vollständigen-bestand-an-wayfair-senden) **deaktiviert** ist, wechseln Sie zur Registerkarte `Verfügbarkeit` der Variation und fügen Sie `Wayfair` zur Liste im Bereich `Märkte` hinzu.
-        #TODO : ADD steps 2.1 - 2.5
+        1. Klicken Sie in den Bereich `Klicken, um Märkte auszuwählen`.
+
+        2. Scrollen Sie nach unten zum Eintrag `Wayfair`
+
+        3. Setzen Sie ein Häkchen neben `Wayfair`
+
+        4. Klicken Sie auf die Schaltfläche `+` [add button](../../../images/common/button_plus.png) im Bereich "Märkte".
+
+        5. Beachten Sie, dass in `Märkte` jetzt eine `Wayfair` -Reihe vorhanden ist
+
+            ![adding wayfair market to variation](../../../images/de/variation_wayfair_market_added.png)
+
+
     3. Klicken Sie auf die Schaltfläche `Speichern` neben der Variations-ID (nicht auf die obere Schaltfläche für den Artikel).
 
         ![variation active](../../../images/de/variation_active_field.png)
@@ -149,7 +161,21 @@ Wenn die Versanddienste von Wayfair verwendet werden sollen, sollten die ASN-Ein
 
     ![wayfair selected](../../../images/de/shipping/filter_wayfair_selected.png)
 
-    #TODO: ADD steps 12 to 16
+12. Klicken Sie auf das + neben `Prozeduren`:
+
+    [add procedure](../../../images/de/shipping/add_procedure.png)
+
+13. Wählen Sie `Sende Versandbestätigungen (ASN) an Wayfair` in der Kategorie `Plugins`:
+
+    ![choose procedure](../../../images/de/shipping/choose_procedure.png)
+
+14. Klicken Sie auf die Schaltfläche `Hinzufügen` ![plus add button](../../../images/de/button_plus_add.png).
+
+15. Stellen Sie sicher, dass die Einstellungen des Ereignisses ungefähr so ​​aussehen:
+
+    ![finished event](../../../images/de/shipping/finished_event.png)
+
+16  Klicken Sie auf die Schaltfläche `Speichern` ![save button](../../../images/common/button_save.png).
 
 ## 8. Durchführen der ersten Inventarsynchronisation
 Sobald alles eingerichtet ist, ist es Zeit, Artikel zum Verkauf auf Wayfair zu listen.
