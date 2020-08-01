@@ -49,12 +49,12 @@ Die Topographie des Plentymarkets-Systems stimmt möglicherweise nicht mit der A
 
 3. Geben Sie in der rechten Spalte eine numerische Lieferanten-ID ein.
 
-4. Klicken Sie auf die Schaltfläche `Speichern` [save](../../../images/de/wayfair_settings/button_save.png), sobald die neuen Zeilen abgeschlossen sind.
+4. Klicken Sie auf die Schaltfläche `Speichern` ![save](../../../images/de/wayfair_settings/button_save.png), sobald die neuen Zeilen abgeschlossen sind.
 
 ### Entfernen einer Lager-Zuordnung
 1. Suchen Sie die zu entfernende Zeile
 2. Klicken Sie in der Zeile auf die Schaltfläche `Löschen` ![delete icon](../../../images/common/icon_trash_can.png)
-3. Klicken Sie auf die Schaltfläche `Speichern` [save](../../../images/de/wayfair_settings/button_save.png), sobald die gewünschten Zeilen entfernt wurden
+3. Klicken Sie auf die Schaltfläche `Speichern` ![save](../../../images/de/wayfair_settings/button_save.png), sobald die gewünschten Zeilen entfernt wurden
 
 
 ## Die Einstellungen-Seite
@@ -115,7 +115,7 @@ Wenn die "Artikelzuordnungsmethode" auf "SKU" eingestellt ist, sollte jede Artik
     1. Klicken Sie auf die Registerkarte `Verfügbarkeit`
     2. Klicken Sie im Abschnitt `SKU` auf die Schaltfläche `Hinzufügen` ![plus button](../../../images/common/button_plus.png)
     3. Wählen Sie im Popup-Fenster `Wayfair` für `Herkunft`, geben Sie die Wayfair-Lieferanten-Teilenummer in das Feld `SKU` ein und klicken Sie auf `Hinzufügen`
-    4. Klicken Sie auf "Hinzufügen" [add button with text](../../../images/de/button_plus_add.png)
+    4. Klicken Sie auf "Hinzufügen" ![add button with text](../../../images/de/button_plus_add.png)
     5. Klicken Sie auf der Variantenebene auf die Schaltfläche `Speichern` ![save button](../../../images/common/button_save.png) (nicht zu verwechseln mit der Schaltfläche `Speichern` für den Artikel, einige Zeilen darüber).
 
 
@@ -170,6 +170,6 @@ Wayfair gibt Lieferanten Anweisungen zur Auswahl des richtigen Werts.
 
 ### Zuordnung von Plentymarkets-Speditionen zu Wayfair-Speditionen
 Wenn Sie die Option `Selbst Versende` auswählen, muss Wayfair die Versandinformationen von Plentymarkets in Daten übersetzen, die es versteht.
-1. Suchen Sie die von Wayfair bereitgestellten Spediteurinformationen. Wenden Sie sich bei Bedarf an [ERPSupport@wayfair.com] (mailto:ERPSupport@wayfair.com).
+1. Suchen Sie die von Wayfair bereitgestellten Spediteurinformationen. Wenden Sie sich bei Bedarf an [ERPSupport@wayfair.com](mailto:ERPSupport@wayfair.com).
 2. Geben Sie für jeden in der linken Spalte aufgeführten Plentymarkets `Shipping carrier` den von Wayfair bereitgestellten "SCAC Code" in die rechte Spalte `Wayfair carrier` ein.
 3. Klicken Sie unten auf der Seite auf `Speichern` ![save button](../../../images/de/wayfair_settings/button_save.png)
