@@ -2,7 +2,7 @@
 
 ## Voraussetzungen
 
-* [Ein Plentymarkets-System] (https://www.plentymarkets.eu).
+* [Ein Plentymarkets-System](https://www.plentymarkets.eu).
 
 * Administratorrechte auf dem Plentymarkets-System, auf dem das Wayfair-Plugin verwendet wird
     - Die Einstellung `Zugang` des Plentymarkets-Benutzers muss `Admin` sein
