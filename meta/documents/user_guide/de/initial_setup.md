@@ -131,7 +131,7 @@ Wenn die Versanddienste von Wayfair verwendet werden sollen, sollten die ASN-Ein
 
     ![add order event](../../../images/de/add_order_event.png)
 
-3. Geben Sie einen beliebigen `Namen` ein
+3. Geben Sie einen beliebigen `Name` ein
 
 4. Wählen Sie im Feld `Ereignis` die Option `Statuswechsel` (in der Kategorie `Auftragsänderung`).
 
