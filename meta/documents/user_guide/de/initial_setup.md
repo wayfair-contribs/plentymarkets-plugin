@@ -167,7 +167,7 @@ Wenn die Versanddienste von Wayfair verwendet werden sollen, sollten die ASN-Ein
 
     ![add procedure](../../../images/de/shipping/add_procedure.png)
 
-13. Wählen Sie `Sende Versandbestätigungen (ASN) an Wayfair` in der Kategorie `Plugins`:
+13. Wählen Sie `Versandbestätigungen (ASN) an Wayfair senden` in der Kategorie `Plugins`:
 
     ![choose procedure](../../../images/de/shipping/choose_procedure.png)
 
