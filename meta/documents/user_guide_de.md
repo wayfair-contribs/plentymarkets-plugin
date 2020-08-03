@@ -28,23 +28,23 @@ Wenn Sie ein Wayfair-Lieferant sind, der das Wayfair Plentymarkets-Plugin verwen
 ## Vorbereitung zur Verwendung des Wayfair-Plugins
 Für die Verwendung des Wayfair-Plugins sind Wayfair-API-Anmeldeinformationen erforderlich, denen die entsprechenden Rechte erteilt wurden.
 
-Verwenden Sie vor der Installation [diese Anweisungen] (https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide/de/obtaining_credentials.md), um Wayfair zu kontaktieren und sich einzurichten.
+Verwenden Sie vor der Installation [diese Anweisungen](https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide/de/obtaining_credentials.md), um Wayfair zu kontaktieren und sich einzurichten.
 
 ## Installieren des Wayfair-Plugins
-Das Wayfair-Plugin ist kostenlos auf dem PlentyMarketplace erhältlich. [Klicken Sie hier] (https://marketplace.plentymarkets.com/de/plugins/integration/wayfair_6273), um die Seite der Wayfair Plugin anzuzeigen.
+Das Wayfair-Plugin ist kostenlos auf dem PlentyMarketplace erhältlich. [Klicken Sie hier](https://marketplace.plentymarkets.com/de/plugins/integration/wayfair_6273), um die Seite der Wayfair Plugin anzuzeigen.
 
-Installieren Sie das Plugin im aktiven Plugin-Set in Plentymarkets. Anleitungen von Wayfair finden Sie [hier] (https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide/de/plugin_installation.md).
+Installieren Sie das Plugin im aktiven Plugin-Set in Plentymarkets. Anleitungen von Wayfair finden Sie [hier](https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide/de/plugin_installation.md).
 
 
 ## Einrichten des Wayfair-Plugins
-Bevor Sie das Plugin zum ersten Mal verwenden, [verwenden Sie diese Anweisungen] (https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide/de/initial_setup.md),  um  zum installieren der Wayfair Plugin und mit Wayfair zu verbinden.
+Bevor Sie das Plugin zum ersten Mal verwenden, [verwenden Sie diese Anweisungen](https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide/de/initial_setup.md),  um  zum installieren der Wayfair Plugin und mit Wayfair zu verbinden.
 
 ## Aktualisierung der Wayfair Plugin
-Wayfair veröffentlicht gelegentlich kostenlose Updates für das Wayfair-Plugin. [Klicken Sie hier, um Informationen zum Suchen und Installieren von Updates zu erhalten] (https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide/de/updating.md).
+Wayfair veröffentlicht gelegentlich kostenlose Updates für das Wayfair-Plugin. [Klicken Sie hier, um Informationen zum Suchen und Installieren von Updates zu erhalten](https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide/de/updating.md).
 
 ## Anzupassen und Überwachung
 Das Wayfair-Plugin bietet Plentymarkets-Benutzern die Möglichkeit, das Verhalten anzupassen und zu überwachen.
-[Klicken Sie hier, um die neuesten Anweisungen anzuzeigen] (https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide/de/settings_guide.md).
+[Klicken Sie hier, um die neuesten Anweisungen anzuzeigen](https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide/de/settings_guide.md).
 
 ## Tipps und Tricks
-Sowohl bei Plentymarkets als auch bei Wayfair ändern sich die Dinge ständig. [Klicken Sie hier, um Informationen zur effizienten und sicheren Verwendung des Wayfair-Plugins zu erhalten] (https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide/de/tips_and_tricks.md).
+Sowohl bei Plentymarkets als auch bei Wayfair ändern sich die Dinge ständig. [Klicken Sie hier, um Informationen zur effizienten und sicheren Verwendung des Wayfair-Plugins zu erhalten](https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide/de/tips_and_tricks.md).
