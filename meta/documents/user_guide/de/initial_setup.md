@@ -163,7 +163,7 @@ Wenn die Versanddienste von Wayfair verwendet werden sollen, sollten die ASN-Ein
 
     ![wayfair selected](../../../images/de/shipping/filter_wayfair_selected.png)
 
-12. Klicken Sie auf das + neben `Prozeduren`:
+12. Klicken Sie auf das `+` neben `Aktionen`:
 
     ![add procedure](../../../images/de/shipping/add_procedure.png)
 
