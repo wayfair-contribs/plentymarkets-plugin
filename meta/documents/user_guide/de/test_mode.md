@@ -7,7 +7,7 @@ Das Wayfair Plugin verfügt über einen Testmodus zur Bewertung seiner Funktione
 
 ## Testmodus aktivieren
 
-1. Wenn Ihre Organisation keine **Wayfair API Sandbox**-Anwendungen hat, erstellen Sie eine neue. Die Prozedur entspricht [den Anweisungen zum Abrufen von Anmeldeinformationen] (Getting_credentials.md), mit der Ausnahme, dass der Schiebeschalter im Anwendungskonfigurationsdialog in der Position `Sandbox` belassen werden sollte. Sie können die Anmeldeinformationen für die neue Sandbox-Anwendung verwerfen. Das Wayfair-Plugin muss seine Produktionsanmeldeinformationen auch im `Test`-modus weiterhin für die ordnungsgemäße Funktionalität verwenden.
+1. Wenn Ihre Organisation keine **Wayfair API Sandbox**-Anwendungen hat, erstellen Sie eine neue. Die Prozedur entspricht [den Anweisungen zum Abrufen von Anmeldeinformationen](Getting_credentials.md), mit der Ausnahme, dass der Schiebeschalter im Anwendungskonfigurationsdialog in der Position `Sandbox` belassen werden sollte. Sie können die Anmeldeinformationen für die neue Sandbox-Anwendung verwerfen. Das Wayfair-Plugin muss seine Produktionsanmeldeinformationen auch im `Test`-modus weiterhin für die ordnungsgemäße Funktionalität verwenden.
 
 2. Verwenden Sie in den [Globale Einstellungen für das Wayfair Plugin](initial_setup.md#1-autorisieren-des-wayfair-plugins-für-den-zugriff-auf-wayfair-schnittstellen) im aktiven Plugin-Set den Einstellungswähler `Modus` zum Einstellen auf `Test`.
 

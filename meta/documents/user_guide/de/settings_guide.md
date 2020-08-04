@@ -39,7 +39,7 @@ Die Lager Seite wird verwendet, um die Lager, die der Lieferant in Plentymarkets
 
 Die Topographie des Plentymarkets-Systems stimmt möglicherweise nicht mit der Anzahl der Wayfair Lieferanten-IDs überein. Es ist akzeptabel, eine Wayfair-Lieferanten-ID für mehr als eines der Plentymarkets-Lagerhäuser zu verwenden. **Dies kann jedoch zu unerwartetem Verhalten führen. Beispielsweise kann das Wayfair plugin möglicherweise nicht das richtige Lager für eingehende Bestellungen ermitteln.** -Weitere Informationen finden Sie unter https://github.com/wayfair-contribs/plentymarkets-plugin/issues/92.
 
-Überprüfen Sie bei der Auswahl einer Beziehung zwischen Lagern und Lieferanten ID, die nicht eins zu eins übereinstimmt, das Verhalten der Einstellung [Lagerpuffer] (#Lagerpuffer).
+Überprüfen Sie bei der Auswahl einer Beziehung zwischen Lagern und Lieferanten ID, die nicht eins zu eins übereinstimmt, das Verhalten der Einstellung [Lagerpuffer](#Lagerpuffer).
 
 ### Hinzufügen einer Lager-Zuordnung
 
@@ -78,6 +78,7 @@ Die Einstellung `Standardversandanbieter` ist eine Legacy-Einstellung, die das V
 ### Item Mapping Method
 Die Einstellung `Item Mapping Method` bestimmt das Verhalten beim Abgleichen der Artikelvariationen von Plentymarkets mit den Wayfair-Produkten. Es wird verwendet, wenn die Bestandslisten an Wayfair gesendet werden und um die angeforderten Produkte in einer Wayfair-Bestellung auszuwählen. Der Benutzer von Plentymarkets sollte diese Einstellung so konfigurieren, dass sie der Art und Weise entspricht, in der die Elementvariationen ausgefüllt werden.
 
+### Verwenden der Variationsnummer als Elementzuordnungsfeld
 Standardmäßig wird das Feld `Variationsnummer` für die Zuordnung der Artikel von Wayfair-Bestellungen zu Artikelvariationen von Plentymarkets verwendet.
 
 ![variation number field](../../../images/de/variation_number_field.png)
@@ -93,12 +94,17 @@ Wenn die `Item Mapping Method` auf `EAN` eingestellt ist, sollte jede Artikelvar
 
 2. Suchen Sie nach Artikeln, die auf Wayfair verkauft werden sollen
 
-3. **Klicken Sie für jeden Artikel** auf den Artikel in den Suchergebnissen und dann auf `Varianten` ![plus button](../../../images/common/button_plus.png)
+3. **Klicken Sie für jeden Artikel** auf den Artikel in den Suchergebnissen und dann auf `Varianten`
 
 4. **Für jede der Varianten**:
     1. Klicken Sie auf die Registerkarte `Einstellungen`
-    2. Wählen Sie im Abschnitt "Barcode" einen Barcode-Typ aus, klicken Sie auf die Schaltfläche `Hinzufügen` und geben Sie den Barcode-Wert in das Feld `1`Code` ein. Der Barcode sollte mit der Wayfair-Lieferanten-Teilenummer übereinstimmen.
-    3. Klicken Sie auf der Variantenstufe auf die Schaltfläche `Speichern` ![save button](../../../images/common/button_save.png) (nicht zu verwechseln mit der Schaltfläche `Speichern` für den Artikel, einige Zeilen darüber).
+
+    2. Wählen Sie im Abschnitt `Barcode` einen Barcode-Typ aus,
+
+    3. Klicken Sie auf die Schaltfläche `Hinzufügen` ![plus button](../../../images/common/button_plus.png)
+    und geben Sie den Barcode-Wert in das Feld `1`Code` ein. Der Barcode sollte mit der Wayfair-Lieferanten-Teilenummer übereinstimmen.
+
+    4. Klicken Sie auf der Variantenstufe auf die Schaltfläche `Speichern` ![save button](../../../images/common/button_save.png) (nicht zu verwechseln mit der Schaltfläche `Speichern` für den Artikel, einige Zeilen darüber).
 
 #### Verwenden der SKU als Elementzuordnungsmethode
 Wenn die "Artikelzuordnungsmethode" auf "SKU" eingestellt ist, sollte jede Artikelvariation in Plentymarkets so eingerichtet werden, dass sie eine Wayfair-spezifische SKU enthält, die die Wayfair-Lieferanten-Teilenummer widerspiegelt, die Wayfair in eingehenden Bestelldaten sendet:

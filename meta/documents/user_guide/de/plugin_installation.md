@@ -75,16 +75,14 @@ Um die Funktionen des Wayfair-Plugins nutzen zu können, muss es in den aktiven 
 
 13. Klicken Sie oben auf der Seite auf die Schaltfläche `Plugin-Set bereitstellen` (wird als Schaltfläche "Speichern" angezeigt). Während der Installation des Plugins wird ein Fortschrittsbalken angezeigt.
 
-    ![wayfair plugin not yet deployed](../../../images/de/installation/wayfair_plugin_not_yet_deployed.png)
+    ![deploy plugin set button](../../../images/de/installation/button_deploy_plugin_set.png)
 
 14. Vergewissern Sie sich, dass die Spalte `Bereitgestellt` für die Zeile `Wayfair` jetzt ausgefüllt ist und den Wert in der Spalte `Installiert` widerspiegelt.
 
-    ![deploy plugin set button](../../../images/de/installation/button_deploy_plugin_set.png)
+    ![wayfair plugin not yet deployed](../../../images/de/installation/wayfair_plugin_not_yet_deployed.png)
 
-15. Melden Sie sich vom Plentymarkets-System ab und dann wieder an, um sicherzustellen, dass die Änderungen wirksam werden.
-
-16. Stellen Sie sicher, dass die Spalte `Bereitgestellt` für die Zeile `Wayfair` jetzt ausgefüllt ist und den Wert in der Spalte `Installiert` wiedergibt (Ihre Version `Installiert` oder `Bereitgestellt` kann unterschiedlich sein).
+15. Stellen Sie sicher, dass die Spalte `Bereitgestellt` für die Zeile `Wayfair` jetzt ausgefüllt ist und den Wert in der Spalte `Installiert` wiedergibt (Ihre Version `Installiert` oder `Bereitgestellt` kann unterschiedlich sein).
 
     ![wayfair plugin deployed](../../../images/de/installation/wayfair_plugin_deployed.png)
 
-17. Melden Sie sich vom Plentymarkets System ab und dann wieder an, um sicherzustellen, dass die Änderungen wirksam werden.
+16. Melden Sie sich vom Plentymarkets System ab und dann wieder an, um sicherzustellen, dass die Änderungen wirksam werden.

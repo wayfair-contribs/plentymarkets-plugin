@@ -22,29 +22,27 @@ Sie erhalten umgehend eine Antwort mit folgenden Angaben:
 
 1. Gehen Sie zu https://partners.wayfair.com/developer/applications
 
-2. Geben Sie Ihre Wayfair Partner Home-Anmeldeinformationen ein. Sie sollten zur Seite `Anwendungsverwaltung` für Wayfair weitergeleitet werden.
+2. Geben Sie Ihre Wayfair Partner Home-Anmeldeinformationen ein. Sie sollten zur Seite "Anwendungsverwaltung" für Wayfair weitergeleitet werden.
 
-3. Klicken Sie auf der Seite `Anwendungsverwaltung` unten auf die Schaltfläche `Neue Anwendung`. ![new application button](../../../images/common/wayfair_app_management/button_new_app.png)
+3. Klicken Sie auf der Seite "Anwendungsverwaltung" unten auf die Schaltfläche "+ Neue Anwendung". ![new application button](../../../images/de/wayfair_app_management/button_new_app.png)
 
-4. Geben Sie auf dem Formular `Neue Bewerbung` die Details der neuen Bewerbung an:
+4. Geben Sie auf dem Formular "Neue Bewerbung" die Details der neuen Bewerbung an:
     * `Name`: Eine nützliche Kennung wie "[Name des Lieferanten] Plentymarkets Plugin".
     * `Description`: so etwas wie "Plentymarkets Plugin-Anwendung für [Name des Lieferanten] Go-Live im Herbst 2020".
 
-5. Verwenden Sie den Schieberegler am unteren Rand des Dialogfelds, um ihn auf `Produktion` zu setzen, sofern Wayfair nichts anderes anordnet.
+5. Verwenden Sie den Schieberegler am unteren Rand des Dialogfelds, um ihn auf "Produktion" zu setzen, sofern Wayfair nichts anderes anordnet.
 
-6. Bestätigen Sie, dass die `Neue Bewerbung` sieht aus wie das
+6. Klicken Sie im Dialogfeld auf "Speichern", um die Anmeldeinformationen der Anwendung anzuzeigen - `Kunden-ID` und `Kundengeheimnis`.
 
-![create_application_filled_in](../../../images/common/wayfair_app_management/create_app_form.png)
+    ![create_application_filled_in](../../../images/de/wayfair_app_management/create_app_form.png)
 
-7. Klicken Sie im Dialogfeld auf `Speichern`, um die Anmeldeinformationen der Anwendung anzuzeigen - `Client-ID` und `Client-Secret`.
+7. Kopieren Sie die `Kunden-ID` und das `Kundengeheimnis`
+    ![create_application_filled_in](../../../images/de/wayfair_app_management/app_client_credentials.png)
 
-![create_application_filled_in](../../../images/common/wayfair_app_management/app_client_credentials.png)
+    * **Das `Kundengeheimnis` kann nach diesem Zeitpunkt nicht mehr abgerufen werden und es muss ein neues generiert werden, wenn das Original verloren geht.**
 
-8. Kopieren Sie die `Client ID` und das `Client Secret` an einen sicheren Ort.
-    * **Das `Client-Secret` kann nach diesem Zeitpunkt nicht mehr abgerufen werden und es muss ein neues generiert werden, wenn das Original verloren geht.**
+    * Diese Anmeldeinformationen werden für [die Autorisierung des Wayfair-Plugins](initial_setup.md#1-Autorisierung-des-Wayfair--Plugins-für-den-Zugriff-auf-Wayfair--Schnittstellen) für die Verwendung der Wayfair-Systeme verwendet.
 
-    * Diese Anmeldeinformationen werden für [die Autorisierung des Wayfair-Plugins] (initial_setup.md # 1-Autorisierung des Wayfair-Plugins für den Zugriff auf Wayfair-Schnittstellen) für die Verwendung der Wayfair-Systeme verwendet.
+8. Schließen Sie das Dialogfeld mit den Anmeldeinformationen, um die Informationen zu schützen.
 
-9. Schließen Sie das Dialogfeld mit den Anmeldeinformationen, um die Informationen zu schützen.
-
-10. Überprüfen Sie die [zusätzlichen Informationen zu Anmeldeinformationen] (tips_and_tricks.md # Schutz Ihrer Anmeldeinformationen).
+9. Überprüfen Sie die [zusätzlichen Informationen zu Anmeldeinformationen](tips_and_tricks.md#Schutz-Ihrer-Anmeldeinformationen).

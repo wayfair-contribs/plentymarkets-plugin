@@ -16,6 +16,7 @@ Lesen Sie vor dem Aktualisieren [die neuesten Informationen zu den Versionen des
 2. Suchen Sie das Plugin-Set, in dem das Wayfair-Plugin installiert ist.
 
     * Die Liste der Plugins für das Plugin-Set ist hinter der Schaltfläche `Plugin-Set bearbeiten` versteckt.
+
         ![linked clients](../../../images/de/plugin_sets_linked_clients.png)
 
 3. Klicken Sie auf die Schaltfläche `Plugin-Set bearbeiten` ![pencil button](../../../images/common/button_pencil.png) für das Plugin-Set.

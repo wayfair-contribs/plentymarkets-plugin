@@ -24,27 +24,27 @@ You will promptly receive a response containing these details:
 
 2. Enter your Wayfair Partner Home credentials. You should be redirected to the `Application Management` page for Wayfair.
 
-4. On the `Application Management` page, click the `New Application` button at the bottom of the page: ![new application button](../../../images/common/wayfair_app_management/button_new_app.png)
+3. On the `Application Management` page, click the `New Application` button at the bottom of the page: ![new application button](../../../images/en/wayfair_app_management/button_new_app.png)
 
-5. On the `Create Application` form, provide the new application's details:
+4. On the `Create Application` form, provide the new application's details:
     *  `Name`: A useful identifier such as "[My Supplier] Plentymarkets plugin."
     * `Description`: something like "Plentymarkets plugin application for [My Supplier] Go-Live in Fall 2020".
 
-6. Use the slider switch at the bottom of dialog to set it to `Production`, unless otherwise instructed by Wayfair.
+5. Use the slider switch at the bottom of dialog to set it to `Production`, unless otherwise instructed by Wayfair.
 
-7. Confirm that the `Create Application` form looks like this:
+6. Confirm that the `Create Application` form looks like this:
 
-![create_application_filled_in](../../../images/common/wayfair_app_management/create_app_form.png)
+![create_application_filled_in](../../../images/en/wayfair_app_management/create_app_form.png)
 
-8. Click `Save` on the `Create Application` dialog, which will display the application's credentials - `Client ID` and `Client Secret`:
+7. Click `Save` on the `Create Application` dialog, which will display the application's credentials - `Client ID` and `Client Secret`:
 
-![create_application_filled_in](../../../images/common/wayfair_app_management/app_client_credentials.png)
+![create_application_filled_in](../../../images/en/wayfair_app_management/app_client_credentials.png)
 
-9. Copy the `Client ID` and `Client Secret` to a secure location.
+8. Copy the `Client ID` and `Client Secret` to a secure location.
     * **The `Client Secret` cannot be retrieved after this point and a new one must be generated if the original is lost.**
 
     * These credentials will be used for [authorizing the Wayfair plugin](initial_setup.md#1-authorizing-the-wayfair-plugin-to-access-wayfair-interfaces) for use of Wayfair's systems.
 
-10. Close the credentials dialog to protect the information.
+9. Close the credentials dialog to protect the information.
 
-11. Review the [supplementary information on credentials](tips_and_tricks.md#protecting-your-credentials).
+10. Review the [supplementary information on credentials](tips_and_tricks.md#protecting-your-credentials).

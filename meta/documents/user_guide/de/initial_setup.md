@@ -151,33 +151,31 @@ Wenn die Versanddienste von Wayfair verwendet werden sollen, sollten die ASN-Ein
 
     ![add filter](../../../images/de/shipping/add_filter.png)
 
-9. Im Abschnitt `Filter` sollte ein Feld mit einer Liste aller verfügbaren Auftragsverweise angezeigt werden. Setzen Sie ein Häkchen neben alle "Wayfair" -Auftragsempfänger:
-
     ![choose filter](../../../images/de/shipping/choose_filter.png)
 
-10. Klicken Sie auf `Aktion hinzufügen` und gehen Sie zu `Plugins` >> `Versandsbestätigung (ASN) an Wayfair senden`.
+9. Klicken Sie auf `+ Hinzufügen`.
 
     ![plus add button](../../../images/de/button_plus_add.png)
 
-11. Klicken Sie auf `+ Hinzufügen`.
+10. Im Abschnitt `Filter` sollte ein Feld mit einer Liste aller verfügbaren Auftragsverweise angezeigt werden. Setzen Sie ein Häkchen neben alle "Wayfair" -Auftragsempfänger:
 
     ![wayfair selected](../../../images/de/shipping/filter_wayfair_selected.png)
 
-12. Klicken Sie auf das `+` neben `Aktionen`:
+11. Klicken Sie auf das `+` neben `Aktionen`:
 
     ![add procedure](../../../images/de/shipping/add_procedure.png)
 
-13. Wählen Sie `Versandbestätigungen (ASN) an Wayfair senden` in der Kategorie `Plugins`:
+12. Wählen Sie `Versandbestätigungen (ASN) an Wayfair senden` in der Kategorie `Plugins`:
 
     ![choose procedure](../../../images/de/shipping/choose_procedure.png)
 
-14. Klicken Sie auf die Schaltfläche `Hinzufügen` ![plus add button](../../../images/de/button_plus_add.png).
+13. Klicken Sie auf die Schaltfläche `Hinzufügen` ![plus add button](../../../images/de/button_plus_add.png).
 
-15. Stellen Sie sicher, dass die Einstellungen des Ereignisses ungefähr so ​​aussehen:
+14. Stellen Sie sicher, dass die Einstellungen des Ereignisses ungefähr so ​​aussehen:
 
     ![finished event](../../../images/de/shipping/finished_event.png)
 
-16  Klicken Sie auf die Schaltfläche `Speichern` ![save button](../../../images/common/button_save.png).
+16. Klicken Sie auf die Schaltfläche `Speichern` ![save button](../../../images/common/button_save.png).
 
 ## 8. Durchführen der ersten Inventarsynchronisation
 Sobald alles eingerichtet ist, ist es Zeit, Artikel zum Verkauf auf Wayfair zu listen.
