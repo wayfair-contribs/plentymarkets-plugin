@@ -9,8 +9,6 @@ Lesen Sie vor dem Aktualisieren [die neuesten Informationen zu den Versionen des
 1. Gehen Sie auf der Hauptseite von Plentymarkets zu `Plugins` >>` Plugin Set Übersicht`
     * **Wählen Sie nicht die veraltete Option `Plugin-Übersicht.`**
 
-    * Auf dem Bildschirm sollte eine Liste der Plugin-Sets mit jeweils einer Reihe von Schaltflächen angezeigt werden.
-
         ![plugins_menu_plugin_set_overview](../../../images/de/plugins_menu_plugin_set_overview.png)
 
 2. Suchen Sie das Plugin-Set, in dem das Wayfair-Plugin installiert ist.

@@ -78,7 +78,7 @@ Jede Bestellung verfügt über ein Versandprofil, das für die Zusammenarbeit mi
 
      ![add order event](../../../images/de/add_order_event.png)
 
-3. Geben Sie einen Namen ein, z.B. **"Wayfair Order Shipping Mapping"**.
+3. Geben Sie einen Namen ein, z.B. **"Wayfair order Shipping Mapping"**.
 
 4. Wählen Sie das Ereignis `Neuer Auftrag` aus dem Dropdown-Menü.
 
