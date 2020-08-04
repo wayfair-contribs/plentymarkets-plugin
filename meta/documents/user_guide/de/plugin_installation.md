@@ -28,11 +28,12 @@ Befolgen Sie diese Schritte, um es zur Verwendung verfügbar zu machen:
 ## 2. Installieren des Wayfair-Plugins in einem Plugin-Set
 Um die Funktionen des Wayfair-Plugins nutzen zu können, muss es in den aktiven Plugin-Sets des Plentymarkets-Systems installiert sein. Befolgen Sie diese Anweisungen, um die Installation abzuschließen:
 
-1. Gehen Sie auf der Hauptseite von Plentymarkets zu `Plugins` >>`Plugin-Set-Übersicht`. Auf dem Bildschirm sollte eine Liste der Plugin-Sets mit jeweils einer Reihe von Schaltflächen angezeigt werden.
+1. Gehen Sie auf der Hauptseite von Plentymarkets zu `Plugins` >>`Plugin-Set-Übersicht`.
 
     ![plugins_menu_plugin_set_overview](../../../images/de/plugins_menu_plugin_set_overview.png)
 
     * **Wählen Sie nicht die veraltete Option `Plugin-Übersicht` aus**.
+    * Auf dem Bildschirm sollte eine Liste der Plugin-Sets mit jeweils einer Reihe von Schaltflächen angezeigt werden.
 
 2. Erstellen Sie das Plugin-Set, in dem das Plugin installiert werden soll, falls das gewünschte Plugin-Set noch nicht vorhanden ist.
 
