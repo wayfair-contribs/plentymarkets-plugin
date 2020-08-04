@@ -9,7 +9,9 @@ The Wayfair plugin comes with a `Test` mode for use in evaluating its features w
 
 1. If your organization does not have any **Wayfair API Sandbox** applications, create a new one. The procedure matches [the instructions provided for obtaining credentials](obtaining_credentials.md), except that the slider switch in the creation dialog should be left in the `Sandbox` position.  You may discard the credentials for the new Sandbox application. The Wayfair plugin must continue to use its Production credentials for proper functionality, even in `Test` mode.
 
-2. In the [Global Settings for the Wayfair plugin](initial_setup.md#1-authorizing-the-wayfair-plugin-to-access-wayfair-interfaces) in the active Plugin Set, use the `Mode` setting selector to set it to `Test`
+2. In the [Global Settings for the Wayfair plugin](initial_setup.md#1-authorizing-the-wayfair-plugin-to-access-wayfair-interfaces) in the active Plugin Set, use the `Mode` setting's menu to set it to `Test`:
+
+    ![global settings in test mode](../../../images/en/global_settings_test_mode.png)
 
 3. Save the Global Settings for the Wayfair plugin
 
