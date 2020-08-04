@@ -54,10 +54,7 @@ Um die Funktionen des Wayfair-Plugins nutzen zu können, muss es in den aktiven 
 5. Klicken Sie auf die Schaltfläche `+ Plugin hinzufügen`
     ![add plugin button](../../../images/de/installation/button_add_plugin.png)
 
-6. `Wayfair` sollte in der Liste der Plugins erscheinen
-
-    * Wenn es viele Plugins gibt, geben Sie "Wayfair" in das Feld `Suchen` ein
-
+6. `Wayfair` sollte in der Liste der Plugins erscheinen. Wenn es viele Plugins gibt, geben Sie "Wayfair" in das Feld `Suchen` ein
     ![search_for_wayfair_plugin](../../../images/de/installation/search_for_wayfair_plugin.png)
 
 7. Klicken Sie in der Liste auf den Eintrag `Wayfair`. Das Wayfair-Logo sollte mit einer Schaltfläche `Installieren` angezeigt werden. (![marketplace icon](../../../images/common/icon_marketplace.png))
