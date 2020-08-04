@@ -13,9 +13,9 @@ Prior to updating, review [the latest information on the Wayfair plugin's releas
 
 2. The screen will show a list of plugin sets, with a set of buttons for each one. Locate the Plugin Set where the Wayfair plugin is installed.
 
-     ![linked clients](../../../images/en/plugin_sets_linked_clients.png)
-
     * The list of plugins for the Plugin Set are hidden behind the `Edit plugin set` button.
+
+        ![linked clients](../../../images/en/plugin_sets_linked_clients.png)
 
 3. Click on the `Edit` button ![pencil button](../../../images/common/button_pencil.png) button for the Plugin Set.
 
