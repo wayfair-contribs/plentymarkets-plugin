@@ -29,7 +29,7 @@ Um ein Versandprofil für Bestellungen zu erstellen, muss zunächst ein Versandd
 6. Stellen Sie sicher, dass die neue Zeile folgendermaßen aussieht:
     ![shipping service providers](../../../images/de/shipping/shipping_service_providers_with_wayfair.png)
 
-7. Klicken Sie auf "Speichern" ![save button](../../../images/de/button_save1.png).
+7. Klicken Sie auf "Speichern" ![save button](../../../images/de/button_save.png).
 
 ## 2. Versandprofil erstellen
 Jede Bestellung verfügt über ein Versandprofil, das für die Zusammenarbeit mit dem Versanddienstleister verwendet wird, um Artikel aus einer Bestellung zu versenden. Führen Sie diese Schritte aus, um das Wayfair-spezifische Versandprofil einzurichten.
@@ -84,7 +84,7 @@ Jede Bestellung verfügt über ein Versandprofil, das für die Zusammenarbeit mi
 
      ![select new order](../../../images/de/shipping/select_event_new_order.png)
 
-5. Klicken Sie im Dialogfeld auf die Schaltfläche `Speichern` ![save button](../../../images/de/button_save1.png). Das neue Verfahren wird nun ausgewählt, wobei der Abschnitt `Einstellungen` angezeigt wird.
+5. Klicken Sie im Dialogfeld auf die Schaltfläche `Speichern` ![save button](../../../images/de/button_save.png). Das neue Verfahren wird nun ausgewählt, wobei der Abschnitt `Einstellungen` angezeigt wird.
 
 6. Aktivieren Sie im Abschnitt `Einstellungen` der Ereignisaktion das Kontrollkästchen "Aktiv".
     ![set to active](../../../images/de/shipping/set_shipping_event_active.png)
