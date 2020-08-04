@@ -157,7 +157,7 @@ Wenn die Versanddienste von Wayfair verwendet werden sollen, sollten die ASN-Ein
 
     ![plus add button](../../../images/de/button_plus_add.png)
 
-10. Im Abschnitt `Filter` sollte ein Feld mit einer Liste aller verfügbaren Auftragsverweise angezeigt werden. Setzen Sie ein Häkchen neben alle `Wayfair` -Auftragsempfänger:
+10. Im Abschnitt `Filter` sollte ein Feld mit einer Liste aller verfügbaren Auftragsverweise angezeigt werden. Setzen Sie ein Häkchen neben alle **"Wayfair"** -Auftragsempfänger:
 
     ![wayfair selected](../../../images/de/shipping/filter_wayfair_selected.png)
 
