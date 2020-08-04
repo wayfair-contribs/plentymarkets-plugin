@@ -29,7 +29,8 @@ Lesen Sie vor dem Aktualisieren [die neuesten Informationen zu den Versionen des
 
       ![no update](../../../images/de/installation/no_update.png)
 
-6. Klicken Sie auf die Schaltfläche `Aktualisieren`. Es wird eine Seite mit dem Wayfair-Logo, Informationen zum Wayfair-Plugin und einer Schaltfläche `Aktualisieren` oben angezeigt.
+6. Klicken Sie auf die Schaltfläche `Aktualisieren` ![update button](../../../images/common/button_update.png). Es wird eine Seite mit dem Wayfair-Logo, Informationen zum Wayfair-Plugin und einer Schaltfläche `Aktualisieren` oben angezeigt.
+
 
     ![update page](../../../images/de/installation/update_page.png)
 
