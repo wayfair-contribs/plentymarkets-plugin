@@ -22,14 +22,14 @@ Um ein Versandprofil für Bestellungen zu erstellen, muss zunächst ein Versandd
 
 3. Klicken Sie auf die Schaltfläche `+ Neu` ![new button](../../../images/de/button_plus_new.png), um der Tabelle eine neue Zeile hinzuzufügen.
 
-4. Füllen Sie in der neu erstellten Zeile das Feld `Name` aus (der Einfachheit halber empfehlen wir **"WayfairShipping"** für alle Namen).
+4. Füllen Sie in der neu erstellten Zeile das Feld `Name` aus (der Einfachheit halber empfehlen wir **`WayfairShipping`** für alle Namen).
 
 5. Wählen Sie im Feld `Versanddienstleister` für die Zeile die Option `WayfairShipping` aus. Dies entspricht dem Typ, der vom Wayfair-Plugin bereitgestellt wird. **Alle anderen Felder in der Zeile können leer bleiben.**
 
 6. Stellen Sie sicher, dass die neue Zeile folgendermaßen aussieht:
     ![shipping service providers](../../../images/de/shipping/shipping_service_providers_with_wayfair.png)
 
-7. Klicken Sie auf "Speichern" ![save button](../../../images/de/button_save.png).
+7. Klicken Sie auf `Speichern` ![save button](../../../images/de/button_save.png).
 
 ## 2. Versandprofil erstellen
 Jede Bestellung verfügt über ein Versandprofil, das für die Zusammenarbeit mit dem Versanddienstleister verwendet wird, um Artikel aus einer Bestellung zu versenden. Führen Sie diese Schritte aus, um das Wayfair-spezifische Versandprofil einzurichten.
@@ -42,14 +42,14 @@ Jede Bestellung verfügt über ein Versandprofil, das für die Zusammenarbeit mi
 
     ![shipping profiles](../../../images/de/shipping/shipping_profiles_without_wayfair.png)
 
-3. Wenn bereits eine "Wayfair"-Zeile vorhanden ist, klicken Sie auf diese Zeile. Andernfalls klicken Sie auf die Schaltfläche `Neu`![new button](../../../images/de/button_plus_new.png). Die Einstellungen des Versandprofils werden angezeigt.
+3. Wenn bereits eine `Wayfair`-Zeile vorhanden ist, klicken Sie auf diese Zeile. Andernfalls klicken Sie auf die Schaltfläche `Neu`![new button](../../../images/de/button_plus_new.png). Die Einstellungen des Versandprofils werden angezeigt.
 
 4. Wählen Sie Ihren Wayfair-Versanddienstleister aus dem bereitgestellten Menü aus (es wird wahrscheinlich **"WayfairShipping"** sein, wenn Sie [den vorgeschlagenen Versanddienstleister](#1-erstellen-des-versanddienstleisters) erstellt haben.
 
     ![select wayfairshipping provider](../../../images/de/shipping/select_wayfairshipping_provider.png)
 
 
-5. Füllen Sie die Felder aus, welche sich auf `Name` beziehen. (der Einfachheit halber empfehlen wir **"WayfairShipping"** für alle Namen).
+5. Füllen Sie die Felder aus, welche sich auf `Name` beziehen. (der Einfachheit halber empfehlen wir **`WayfairShipping`** für alle Namen).
 
 6. Stellen Sie die Sprache über das Menü rechts neben dem Feld `Name` ein.
 
@@ -59,7 +59,7 @@ Jede Bestellung verfügt über ein Versandprofil, das für die Zusammenarbeit mi
 
 9. Stellen Sie im Feld Clients (Stores) sicher, dass Sie alle Stores auswählen, die für Wayfair eingerichtet werden können.
 
-10. Setzen Sie in der Liste `Auftragsherkunft` ein Häkchen neben alle **"Wayfair"** bezogenen Einträge.
+10. Setzen Sie in der Liste `Auftragsherkunft` ein Häkchen neben alle **`Wayfair`** bezogenen Einträge.
 
   ![select referrer](../../../images/de/shipping/shipping_profile_select_referrer.png)
 
@@ -78,7 +78,7 @@ Jede Bestellung verfügt über ein Versandprofil, das für die Zusammenarbeit mi
 
      ![add order event](../../../images/de/add_order_event.png)
 
-3. Geben Sie einen Namen ein, z.B. **"Wayfair order Shipping Mapping"**.
+3. Geben Sie einen Namen ein, z.B. **`Wayfair order Shipping Mapping`**.
 
 4. Wählen Sie das Ereignis `Neuer Auftrag` aus dem Dropdown-Menü.
 
@@ -86,7 +86,7 @@ Jede Bestellung verfügt über ein Versandprofil, das für die Zusammenarbeit mi
 
 5. Klicken Sie im Dialogfeld auf die Schaltfläche `Speichern` ![save button](../../../images/de/button_save.png). Das neue Verfahren wird nun ausgewählt, wobei der Abschnitt `Einstellungen` angezeigt wird.
 
-6. Aktivieren Sie im Abschnitt `Einstellungen` der Ereignisaktion das Kontrollkästchen "Aktiv".
+6. Aktivieren Sie im Abschnitt `Einstellungen` der Ereignisaktion das Kontrollkästchen `Aktiv`.
     ![set to active](../../../images/de/shipping/set_shipping_event_active.png)
 
 7. Klicken Sie auf die Schaltfläche `Filter hinzufügen` (die Schaltfläche `+` oben im Abschnitt `Filter`), um das Dialogfeld `Filter hinzufügen` zu öffnen.
@@ -99,10 +99,10 @@ Jede Bestellung verfügt über ein Versandprofil, das für die Zusammenarbeit mi
 
 9. Klicken Sie auf die Schaltfläche `Hinzufügen` ![plus add button](../../../images/de/button_plus_add.png), um den Dialog abzuschließen. Auf dem Formular wird nun ein "Herkunft"-Filter angezeigt.
 
-10. Aktivieren Sie in der Liste `Herkunft` das Kontrollkästchen für alle **"Wayfair"** bezogenen Herkunft.
+10. Aktivieren Sie in der Liste `Herkunft` das Kontrollkästchen für alle **`Wayfair'** bezogenen Herkunft.
     ![wayfair selected](../../../images/de/shipping/filter_wayfair_selected.png)
 
-11. Klicken Sie auf die Schaltfläche "`Aktion hinzufügen` (die Schaltfläche "+" oben im Abschnitt `Aktionen`), um das Dialogfeld `Aktion hinzufügen` zu öffnen.
+11. Klicken Sie auf die Schaltfläche `Aktion hinzufügen` (die Schaltfläche "+" oben im Abschnitt `Aktionen`), um das Dialogfeld `Aktion hinzufügen` zu öffnen.
 
     ![add procedure](../../../images/de/shipping/add_procedure.png)
 
@@ -110,7 +110,7 @@ Jede Bestellung verfügt über ein Versandprofil, das für die Zusammenarbeit mi
 
     ![select procedure](../../../images/de/shipping/add_procedure_change_shipping_profile.png)
 
-13. Klicken Sie auf die Schaltfläche `Hinzufügen` ![plus add button](../../../images/de/button_plus_add.png), um den Dialog abzuschließen. Im Bereich `Aktionen` wird eine Aktion "Versandprofil ändern" angezeigt.
+13. Klicken Sie auf die Schaltfläche `Hinzufügen` ![plus add button](../../../images/de/button_plus_add.png), um den Dialog abzuschließen. Im Bereich `Aktionen` wird eine Aktion `Versandprofil ändern` angezeigt.
 
 14. Klicken Sie auf das Symbol ![plus add button](../../../images/common/icon_carat_down.png) (Hochzeichen) ganz links in der Zeile "Versandprofil ändern" **- dies ist NICHT die große quadratische Schaltfläche, auf der sich auch ein Hochzeichen befindet -** um die Details der Prozedur zu erweitern.
     ![expand carat](../../../images/de/shipping/change_shipping_profile_expand_carat.png)

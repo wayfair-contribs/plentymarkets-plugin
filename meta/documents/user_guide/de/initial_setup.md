@@ -96,7 +96,7 @@ Dieses Verfahren ist nur erforderlich, wenn [die Einstellung `Vollständigen Bes
 
         3. Setzen Sie ein Häkchen neben `Wayfair`
 
-        4. Klicken Sie auf die Schaltfläche `+` ![add button](../../../images/common/button_plus.png) im Bereich "Märkte".
+        4. Klicken Sie auf die Schaltfläche `+` ![add button](../../../images/common/button_plus.png) im Bereich `Märkte`.
 
              ![adding wayfair market to variation](../../../images/de/variation_wayfair_market.png)
 
@@ -157,7 +157,7 @@ Wenn die Versanddienste von Wayfair verwendet werden sollen, sollten die ASN-Ein
 
     ![plus add button](../../../images/de/button_plus_add.png)
 
-10. Im Abschnitt `Filter` sollte ein Feld mit einer Liste aller verfügbaren Auftragsverweise angezeigt werden. Setzen Sie ein Häkchen neben alle "Wayfair" -Auftragsempfänger:
+10. Im Abschnitt `Filter` sollte ein Feld mit einer Liste aller verfügbaren Auftragsverweise angezeigt werden. Setzen Sie ein Häkchen neben alle `Wayfair` -Auftragsempfänger:
 
     ![wayfair selected](../../../images/de/shipping/filter_wayfair_selected.png)
 

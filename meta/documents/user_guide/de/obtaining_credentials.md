@@ -22,17 +22,17 @@ Sie erhalten umgehend eine Antwort mit folgenden Angaben:
 
 1. Gehen Sie zu https://partners.wayfair.com/developer/applications
 
-2. Geben Sie Ihre Wayfair Partner Home-Anmeldeinformationen ein. Sie sollten zur Seite "Anwendungsverwaltung" für Wayfair weitergeleitet werden.
+2. Geben Sie Ihre Wayfair Partner Home-Anmeldeinformationen ein. Sie sollten zur Seite `Anwendungsverwaltung` für Wayfair weitergeleitet werden.
 
-3. Klicken Sie auf der Seite "Anwendungsverwaltung" unten auf die Schaltfläche "+ Neue Anwendung". ![new application button](../../../images/de/wayfair_app_management/button_new_app.png)
+3. Klicken Sie auf der Seite `Anwendungsverwaltung` unten auf die Schaltfläche `+ Neue Anwendung`. ![new application button](../../../images/de/wayfair_app_management/button_new_app.png)
 
-4. Geben Sie auf dem Formular "Neue Bewerbung" die Details der neuen Bewerbung an:
+4. Geben Sie auf dem Formular `Neue Bewerbung` die Details der neuen Bewerbung an:
     * `Name`: Eine nützliche Kennung wie "[Name des Lieferanten] Plentymarkets Plugin".
     * `Description`: so etwas wie "Plentymarkets Plugin-Anwendung für [Name des Lieferanten] Go-Live im Herbst 2020".
 
-5. Verwenden Sie den Schieberegler am unteren Rand des Dialogfelds, um ihn auf "Produktion" zu setzen, sofern Wayfair nichts anderes anordnet.
+5. Verwenden Sie den Schieberegler am unteren Rand des Dialogfelds, um ihn auf `Produktion` zu setzen, sofern Wayfair nichts anderes anordnet.
 
-6. Klicken Sie im Dialogfeld auf "Speichern", um die Anmeldeinformationen der Anwendung anzuzeigen - `Kunden-ID` und `Kundengeheimnis`.
+6. Klicken Sie im Dialogfeld auf `Speichern`, um die Anmeldeinformationen der Anwendung anzuzeigen - `Kunden-ID` und `Kundengeheimnis`.
 
     ![create_application_filled_in](../../../images/de/wayfair_app_management/create_app_form.png)
 
