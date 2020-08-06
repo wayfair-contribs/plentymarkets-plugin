@@ -31,7 +31,7 @@
   "synced": "Synchronisiert",
   "error_sync": "Fehler beim synchronisieren, bitte versuchen sie es später erneut",
   "carrier_scac_mapping_title": "Versanddienstleister",
-  "carrier_title": "Wayfair Versanddienstleister code",
+  "carrier_title": "Code des Wayfair-Versanddienstleisters",
   "carrier_scac_mapping_menu": "Versandsbestätigung (ASN)",
   "order_marked_as_shipped_status": "Als versandt markieren wenn",
   "wayfair_shipping": "Wayfair Versand",
