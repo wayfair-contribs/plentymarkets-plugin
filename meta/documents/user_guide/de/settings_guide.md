@@ -177,5 +177,5 @@ Wayfair gibt Lieferanten Anweisungen zur Auswahl des richtigen Werts.
 ### Zuordnung von Plentymarkets-Speditionen zu Wayfair-Speditionen
 Wenn Sie die Option `Selbst Versende` auswählen, muss Wayfair die Versandinformationen von Plentymarkets in Daten übersetzen, die es versteht.
 1. Suchen Sie die von Wayfair bereitgestellten Spediteurinformationen. Wenden Sie sich bei Bedarf an [ERPSupport@wayfair.com](mailto:ERPSupport@wayfair.com).
-2. Geben Sie für jeden in der linken Spalte aufgeführten Plentymarkets `Shipping carrier` den von Wayfair bereitgestellten "SCAC Code" in die rechte Spalte `Wayfair carrier` ein.
+2. Geben Sie für jeden in der linken Spalte aufgeführten Plentymarkets `Versanddienstleister` den von Wayfair bereitgestellten "SCAC Code" in die rechte Spalte `Wayfair Versanddienstleister code` ein.
 3. Klicken Sie unten auf der Seite auf `Speichern` ![save button](../../../images/de/wayfair_settings/button_save.png)
