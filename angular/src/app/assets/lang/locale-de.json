@@ -22,7 +22,7 @@
   "buffer": "Puffer",
   "order_status_id": "Bestellstatus-ID",
   "shipping_provider_id": "Versandanbieter-ID",
-  "settings_default_item_mapping_method": "Item Mapping Method",
+  "settings_default_item_mapping_method": "Artikelzuweisungsmodus",
   "settings_is_all_items_active": "Vollständigen Bestand an Wayfair senden?",
   "item_mapping_variation_number": "Variationsnummer",
   "item_mapping_ean": "EAN",

@@ -75,8 +75,8 @@ Die Einstellung `Standard-Bestellstatus` bestimmt, in welchem ​​Status sich 
 Die Einstellung `Standardversandanbieter` ist eine Legacy-Einstellung, die das Verhalten des Plugins nicht mehr beeinflusst.
 **Wenn diese Einstellung in Ihrem System angezeigt wird, empfiehlt Wayfair dringend, dass Sie Ihr Plugin auf eine neuere Version aktualisieren.**
 
-### Item Mapping Method
-Die Einstellung `Item Mapping Method` bestimmt das Verhalten beim Abgleichen der Artikelvariationen von Plentymarkets mit den Wayfair-Produkten. Es wird verwendet, wenn die Bestandslisten an Wayfair gesendet werden und um die angeforderten Produkte in einer Wayfair-Bestellung auszuwählen. Der Benutzer von Plentymarkets sollte diese Einstellung so konfigurieren, dass sie der Art und Weise entspricht, in der die Elementvariationen ausgefüllt werden.
+### Artikelzuweisungsmodus
+Die Einstellung `Artikelzuweisungsmodus` bestimmt das Verhalten beim Abgleichen der Artikelvariationen von Plentymarkets mit den Wayfair-Produkten. Es wird verwendet, wenn die Bestandslisten an Wayfair gesendet werden und um die angeforderten Produkte in einer Wayfair-Bestellung auszuwählen. Der Benutzer von Plentymarkets sollte diese Einstellung so konfigurieren, dass sie der Art und Weise entspricht, in der die Elementvariationen ausgefüllt werden.
 
 ### Verwenden der Variationsnummer als Elementzuordnungsfeld
 Standardmäßig wird das Feld `Variationsnummer` für die Zuordnung der Artikel von Wayfair-Bestellungen zu Artikelvariationen von Plentymarkets verwendet.
@@ -86,7 +86,7 @@ Standardmäßig wird das Feld `Variationsnummer` für die Zuordnung der Artikel 
 Die anderen Optionen sind `EAN` (Barcode) und `SKU`.
 
 #### Verwenden von EAN (Barcode) als Elementzuordnungsmethode
-Wenn die `Item Mapping Method` auf `EAN` eingestellt ist, sollte jede Artikelvariation in Plentymarkets so eingerichtet werden, dass sie einen Barcode enthält, der die Wayfair-Lieferanten-Teilenummer widerspiegelt, die Wayfair in eingehenden Bestelldaten sendet:
+Wenn die `Artikelzuweisungsmodus` auf `EAN` eingestellt ist, sollte jede Artikelvariation in Plentymarkets so eingerichtet werden, dass sie einen Barcode enthält, der die Wayfair-Lieferanten-Teilenummer widerspiegelt, die Wayfair in eingehenden Bestelldaten sendet:
 
 ![barcode field](../../../images/de/variation_barcode_field.png)
 
