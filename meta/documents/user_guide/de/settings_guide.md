@@ -19,7 +19,7 @@ So suchen Sie die Einstellungen:
 
 4. Klicken Sie in der Liste der Märkte auf `Wayfair`. Es wird möglicherweise unten angezeigt, anstatt alphabetisch geordnet zu sein.
 
-5. Klicken Sie unter `Wayfair` auf `Home`
+5. Klicken Sie unter `Wayfair` auf `Startseite`
 
     ![home button](../../../images/de/wayfair_settings/menu_markets_wayfair_home.png)
 
@@ -29,7 +29,7 @@ So suchen Sie die Einstellungen:
 
 ## Die Home Seite
 
-Die Home Seite wird durch Klicken auf `Home` im Menü auf der linken Seite oder durch Klicken auf `Wayfair` in der Wayfair-Navigationsleiste aktiviert. Derzeit werden keine Informationen bereitgestellt.
+Die Home Seite wird durch Klicken auf `Startseite` im Menü auf der linken Seite oder durch Klicken auf `Wayfair` in der Wayfair-Navigationsleiste aktiviert. Derzeit werden keine Informationen bereitgestellt.
 
 ## Die Lager Seite
 
