@@ -366,7 +366,7 @@ class InventoryUpdateService
   {
     if (isset($filters) && isset($startOfWindow) && $startOfWindow > 0) {
       $filters['updatedBetween'] = [
-        $startOfWindow,
+        'timestampFrom' => $startOfWindow,
         'timestampTo' => time(),
       ];
     }
