@@ -19,7 +19,7 @@ So suchen Sie die Einstellungen:
 
 4. Klicken Sie in der Liste der Märkte auf `Wayfair`. Es wird möglicherweise unten angezeigt, anstatt alphabetisch geordnet zu sein.
 
-5. Klicken Sie unter `Wayfair` auf `Startseite`
+5. Klicken Sie unter `Wayfair` auf `Home`
 
     ![home button](../../../images/de/wayfair_settings/menu_markets_wayfair_home.png)
 
@@ -29,7 +29,7 @@ So suchen Sie die Einstellungen:
 
 ## Die Home Seite
 
-Die Home Seite wird durch Klicken auf `Startseite` im Menü auf der linken Seite oder durch Klicken auf `Wayfair` in der Wayfair-Navigationsleiste aktiviert. Derzeit werden keine Informationen bereitgestellt.
+Die Home Seite wird durch Klicken auf `Home` im Menü auf der linken Seite oder durch Klicken auf `Wayfair` in der Wayfair-Navigationsleiste aktiviert. Derzeit werden keine Informationen bereitgestellt.
 
 ## Die Lager Seite
 
@@ -75,8 +75,8 @@ Die Einstellung `Standard-Bestellstatus` bestimmt, in welchem ​​Status sich 
 Die Einstellung `Standardversandanbieter` ist eine Legacy-Einstellung, die das Verhalten des Plugins nicht mehr beeinflusst.
 **Wenn diese Einstellung in Ihrem System angezeigt wird, empfiehlt Wayfair dringend, dass Sie Ihr Plugin auf eine neuere Version aktualisieren.**
 
-### Methode zur Artikelzuweisung
-Die Einstellung `Methode zur Artikelzuweisung` bestimmt das Verhalten beim Abgleichen der Artikelvariationen von Plentymarkets mit den Wayfair-Produkten. Es wird verwendet, wenn die Bestandslisten an Wayfair gesendet werden und um die angeforderten Produkte in einer Wayfair-Bestellung auszuwählen. Der Benutzer von Plentymarkets sollte diese Einstellung so konfigurieren, dass sie der Art und Weise entspricht, in der die Elementvariationen ausgefüllt werden.
+### Item Mapping Method
+Die Einstellung `Item Mapping Method` bestimmt das Verhalten beim Abgleichen der Artikelvariationen von Plentymarkets mit den Wayfair-Produkten. Es wird verwendet, wenn die Bestandslisten an Wayfair gesendet werden und um die angeforderten Produkte in einer Wayfair-Bestellung auszuwählen. Der Benutzer von Plentymarkets sollte diese Einstellung so konfigurieren, dass sie der Art und Weise entspricht, in der die Elementvariationen ausgefüllt werden.
 
 ### Verwenden der Variationsnummer als Elementzuordnungsfeld
 Standardmäßig wird das Feld `Variationsnummer` für die Zuordnung der Artikel von Wayfair-Bestellungen zu Artikelvariationen von Plentymarkets verwendet.
@@ -86,7 +86,7 @@ Standardmäßig wird das Feld `Variationsnummer` für die Zuordnung der Artikel 
 Die anderen Optionen sind `EAN` (Barcode) und `SKU`.
 
 #### Verwenden von EAN (Barcode) als Elementzuordnungsmethode
-Wenn die `Methode zur Artikelzuweisung` auf `EAN` eingestellt ist, sollte jede Artikelvariation in Plentymarkets so eingerichtet werden, dass sie einen Barcode enthält, der die Wayfair-Lieferanten-Teilenummer widerspiegelt, die Wayfair in eingehenden Bestelldaten sendet:
+Wenn die `Item Mapping Method` auf `EAN` eingestellt ist, sollte jede Artikelvariation in Plentymarkets so eingerichtet werden, dass sie einen Barcode enthält, der die Wayfair-Lieferanten-Teilenummer widerspiegelt, die Wayfair in eingehenden Bestelldaten sendet:
 
 ![barcode field](../../../images/de/variation_barcode_field.png)
 
@@ -177,5 +177,5 @@ Wayfair gibt Lieferanten Anweisungen zur Auswahl des richtigen Werts.
 ### Zuordnung von Plentymarkets-Speditionen zu Wayfair-Speditionen
 Wenn Sie die Option `Selbst Versende` auswählen, muss Wayfair die Versandinformationen von Plentymarkets in Daten übersetzen, die es versteht.
 1. Suchen Sie die von Wayfair bereitgestellten Spediteurinformationen. Wenden Sie sich bei Bedarf an [ERPSupport@wayfair.com](mailto:ERPSupport@wayfair.com).
-2. Geben Sie für jeden in der linken Spalte aufgeführten Plentymarkets `Versanddienstleister` den von Wayfair bereitgestellten "SCAC Code" in die rechte Spalte `Wayfair-Kennziffer des Versanddienstleisters` ein.
+2. Geben Sie für jeden in der linken Spalte aufgeführten Plentymarkets `Shipping carrier` den von Wayfair bereitgestellten "SCAC Code" in die rechte Spalte `Wayfair carrier` ein.
 3. Klicken Sie unten auf der Seite auf `Speichern` ![save button](../../../images/de/wayfair_settings/button_save.png)
