@@ -6,7 +6,7 @@
 
 namespace Wayfair\Cron;
 
-class InventoryPartialCron extends InventoryCron
+class InventoryPartialCron extends AbstractInventoryCron
 {
 
   /**
