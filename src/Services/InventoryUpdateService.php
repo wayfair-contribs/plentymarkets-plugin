@@ -31,7 +31,8 @@ class InventoryUpdateService
   const LOG_KEY_SKIPPED_FULL = 'fullInventorySkipped';
   const LOG_KEY_LONG_RUN_FULL = `fullInventoryLongRunning`;
   const LOG_KEY_SKIPPED_PARTIAL = 'partialInventorySkipped';
-  const LOG_KEY_LONG_RUN_PARTIAL = `partialInventoryLongRunning`;
+  const LOG_KEY_LONG_RUN_PARTIAL = 'partialInventoryLongRunning';
+  const LOG_KEY_NO_SYNCS = 'noInventorySyncs';
 
   // TODO: make this user-configurable in a future update
   const MAX_INVENTORY_TIME_FULL = 7200;
@@ -121,41 +122,31 @@ class InventoryUpdateService
    */
   public function sync(bool $fullInventory, bool $manual = false): array
   {
-    /** @var InventoryService $inventoryService */
-    $inventoryService = pluginApp(InventoryService::class);
-    /** @var InventoryMapper $inventoryMapper */
-    $inventoryMapper = pluginApp(InventoryMapper::class);
     /** @var LoggerContract $loggerContract */
     $loggerContract = pluginApp(LoggerContract::class);
+
     /** @var ExternalLogs $externalLogs */
     $externalLogs = pluginApp(ExternalLogs::class);
-    /** @var VariationSearchRepositoryContract $variationSearchRepository */
-    $variationSearchRepository = pluginApp(VariationSearchRepositoryContract::class);
-    /** @var AbstractConfigHelper $configHelper */
-    $configHelper = pluginApp(AbstractConfigHelper::class);
-
-    // look up item mapping method at this level to ensure consistency and improve efficiency
-    $itemMappingMethod = $configHelper->getItemMappingMethod();
-
-    $loggerContract->debug(
-      TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_START),
-      [
-        'additionalInfo' => ['fullInventory' => (string) $fullInventory],
-        'method' => __METHOD__
-      ]
-    );
-
-    $page = 0;
-    $inventorySaveTotal = 0;
-    $inventorySaveSuccess = 0;
-    $inventorySaveFail = 0;
-    $saveInventoryDuration = 0;
-    $savedInventoryDuration = 0;
-    $amtOfDtosForPage = 0;
 
     try {
-
       $lastStartTime = $this->statusService->getLastAttemptTime($fullInventory);
+
+      if (!$fullInventory && (!isset($lastStartTime) || $lastStartTime <= 0)) {
+        $lastFull = $this->statusService->getLastAttemptTime(true);
+        if (!isset($lastFull) || $lastFull <= 0) {
+          $fullInventory = true;
+
+          $loggerContract->info(
+            TranslationHelper::getLoggerKey(self::LOG_KEY_NO_SYNCS),
+            [
+              'additionalInfo' => [],
+              'method' => __METHOD__
+            ]
+          );
+
+          $externalLogs->addInfoLog("Forcing a full inventory sync as there are no syncs on record");
+        }
+      }
 
       // potential race conditions - change service management strategy in a future update
       // (but this is better than letting the old UpdateFullInventoryStatusCron randomly change service states)
@@ -178,6 +169,15 @@ class InventoryUpdateService
         return $stateArray;
       }
 
+      /** @var InventoryService $inventoryService */
+      $inventoryService = pluginApp(InventoryService::class);
+      /** @var InventoryMapper $inventoryMapper */
+      $inventoryMapper = pluginApp(InventoryMapper::class);
+      /** @var VariationSearchRepositoryContract $variationSearchRepository */
+      $variationSearchRepository = pluginApp(VariationSearchRepositoryContract::class);
+      /** @var AbstractConfigHelper $configHelper */
+      $configHelper = pluginApp(AbstractConfigHelper::class);
+
       $fields = $this->getResultFields();
       /* Page size is tuned for a balance between memory usage (in plentymarkets) and number of transactions  */
       $fields['itemsPerPage'] = AbstractConfigHelper::INVENTORY_ITEMS_PER_PAGE;
@@ -186,14 +186,36 @@ class InventoryUpdateService
       if (!$fullInventory) {
         self::applyTimeFilter($lastStartTime, $filters);
       }
+
+      // look up item mapping method at this level to ensure consistency and improve efficiency
+      $itemMappingMethod = $configHelper->getItemMappingMethod();
+
+
       $variationSearchRepository->setFilters($filters);
 
       // stock buffer should be the same across all pages of inventory
       $stockBuffer = self::getNormalizedStockBuffer($configHelper, $loggerContract);
 
+
+      $loggerContract->debug(
+        TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_START),
+        [
+          'additionalInfo' => ['fullInventory' => (string) $fullInventory],
+          'method' => __METHOD__
+        ]
+      );
+
       $externalLogs->addInfoLog("Starting " . ($manual ? "Manual " : "Automatic ") . ($fullInventory ? "Full " : "Partial") . "inventory sync.");
 
       $this->statusService->markInventoryStarted(true, $manual);
+
+      $page = 0;
+      $inventorySaveTotal = 0;
+      $inventorySaveSuccess = 0;
+      $inventorySaveFail = 0;
+      $saveInventoryDuration = 0;
+      $savedInventoryDuration = 0;
+      $amtOfDtosForPage = 0;
 
       do {
 
@@ -270,12 +292,9 @@ class InventoryUpdateService
         $page++;
       } while (!$response->isLastPage());
 
-      if ($inventorySaveFail > 0)
-      {
+      if ($inventorySaveFail > 0) {
         $this->statusService->markInventoryFailed($fullInventory, $manual);
-      }
-      else
-      {
+      } else {
         $this->statusService->markInventoryComplete($fullInventory, $manual);
       }
 
