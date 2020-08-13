@@ -6,12 +6,12 @@
 
 namespace Wayfair\Cron;
 
-use Plenty\Modules\Cron\Contracts\CronHandler as Cron;
+use Plenty\Modules\Cron\Contracts\CronHandler;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Helpers\TranslationHelper;
-use Wayfair\Services\ScheduledInventorySyncService;
+use Wayfair\Services\InventoryUpdateService;
 
-abstract class InventoryCron extends Cron
+abstract class AbstractInventoryCron extends CronHandler
 {
   /** @var bool */
   private $full;
@@ -39,8 +39,8 @@ abstract class InventoryCron extends Cron
     $loggerContract = pluginApp(LoggerContract::class);
     $loggerContract->debug(TranslationHelper::getLoggerKey('cronStartedMessage'), ['method' => __METHOD__]);
     try {
-      /** @var ScheduledInventorySyncService */
-      $service = pluginApp(ScheduledInventorySyncService::class);
+      /** @var InventoryUpdateService */
+      $service = pluginApp(InventoryUpdateService::class);
       $service->sync($this->full);
     } finally {
       $loggerContract->debug(TranslationHelper::getLoggerKey('cronFinishedMessage'), ['method' => __METHOD__]);

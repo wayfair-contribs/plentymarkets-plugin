@@ -11,8 +11,6 @@ class InventoryPartialCron extends InventoryCron
 
   /**
    * InventoryPartialCron constructor.
-   *
-   * @param ScheduledInventorySyncService $service
    */
   public function __construct()
   {

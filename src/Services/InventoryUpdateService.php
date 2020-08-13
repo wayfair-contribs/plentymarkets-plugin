@@ -28,6 +28,14 @@ class InventoryUpdateService
   const LOG_KEY_INVENTORY_UPDATE_START = 'inventoryUpdateStart';
   const LOG_KEY_INVALID_INVENTORY_DTO = 'invalidInventoryDto';
   const LOG_KEY_INVALID_STOCK_BUFFER = 'invalidStockBufferValue';
+  const LOG_KEY_SKIPPED_FULL = 'fullInventorySkipped';
+  const LOG_KEY_LONG_RUN_FULL = `fullInventoryLongRunning`;
+  const LOG_KEY_SKIPPED_PARTIAL = 'partialInventorySkipped';
+  const LOG_KEY_LONG_RUN_PARTIAL = `partialInventoryLongRunning`;
+
+  // TODO: make this user-configurable in a future update
+  const MAX_INVENTORY_TIME_FULL = 7200;
+  const MAX_INVENTORY_TIME_PARTIAL = self::MAX_INVENTORY_TIME_FULL;
 
   const INVENTORY_SAVE_TOTAL = 'inventorySaveTotal';
   const INVENTORY_SAVE_SUCCESS = 'inventorySaveSuccess';
@@ -36,6 +44,14 @@ class InventoryUpdateService
   const SAVED_INVENTORY_DURATION = 'savedInventoryDuration';
   const PAGES = 'pages';
   const ERROR_MESSAGE = 'errorMessage';
+
+  /** @var InventoryStatusService */
+  private $statusService;
+
+  public function __construct(InventoryStatusService $statusService)
+  {
+    $this->statusService = $statusService;
+  }
 
   /**
    * Validate a request for inventory update
@@ -95,11 +111,14 @@ class InventoryUpdateService
   }
 
   /**
-   * @param bool $fullInventory
+   * Send inventory updates from Plentymarkets to Wayfair.
+   * The optional start parameter filters the update set down to items changed since the provided timestamp
+   *
+   * @param int $start optional unix start time for filtering changes to sync
    *
    * @return array
    */
-  public function sync(bool $fullInventory = false): array
+  public function sync(bool $fullInventory, bool $manual = false): array
   {
     /** @var InventoryService $inventoryService */
     $inventoryService = pluginApp(InventoryService::class);
@@ -125,21 +144,54 @@ class InventoryUpdateService
       ]
     );
 
+    $this->statusService->markInventoryStarted($fullInventory, $manual);
+
     $page = 0;
     $inventorySaveTotal = 0;
     $inventorySaveSuccess = 0;
     $inventorySaveFail = 0;
     $saveInventoryDuration = 0;
     $savedInventoryDuration = 0;
-
-    $errorMessage = null;
     $amtOfDtosForPage = 0;
 
     try {
+
+      $externalLogs->addInfoLog("Starting " . ($manual ? "Manual " : "Automatic ") . ($fullInventory ? "Full " : "Partial") . "inventory sync.");
+
+      $this->statusService->markInventoryStarted(true, $manual);
+
+      $lastStartTime = $this->statusService->getLastAttemptTime($fullInventory);
+
+      // potential race conditions - change service management strategy in a future update
+      // (but this is better than letting the old UpdateFullInventoryStatusCron randomly change service states)
+      if ($this->statusService->isInventoryRunning($fullInventory) && !$this->serviceHasBeenRunningTooLong($fullInventory)) {
+
+        $stateArray = $this->statusService->getServiceState($fullInventory);
+
+        $logKey = self::LOG_KEY_SKIPPED_PARTIAL;
+        if ($fullInventory) {
+          $logKey = self::LOG_KEY_SKIPPED_FULL;
+        }
+
+        $this->logger->info(TranslationHelper::getLoggerKey($logKey), [
+          'additionalInfo' => ['manual' => (string) $manual, 'startedAt' => $lastStartTime, 'state' => $stateArray],
+          'method' => __METHOD__
+        ]);
+        $externalLogs->addErrorLog(($manual ? "Manual " : "Automatic") . "Inventory sync BLOCKED - already running");
+
+        // early exit
+        return $stateArray;
+      }
+
       $fields = $this->getResultFields();
       /* Page size is tuned for a balance between memory usage (in plentymarkets) and number of transactions  */
       $fields['itemsPerPage'] = AbstractConfigHelper::INVENTORY_ITEMS_PER_PAGE;
-      $variationSearchRepository->setFilters($this->getFilters($fullInventory));
+
+      $filters = $this->getDefaultFilters();
+      if (!$fullInventory) {
+        self::applyTimeFilter($lastStartTime, $filters);
+      }
+      $variationSearchRepository->setFilters($filters);
 
       // stock buffer should be the same across all pages of inventory
       $stockBuffer = self::getNormalizedStockBuffer($configHelper, $loggerContract);
@@ -219,15 +271,17 @@ class InventoryUpdateService
         $page++;
       } while (!$response->isLastPage());
 
-      $loggerContract->debug(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_END),
-        [
-          'additionalInfo' => ['fullInventory' => (string) $fullInventory],
-          'method' => __METHOD__
-        ]
-      );
+      if ($inventorySaveFail > 0)
+      {
+        $this->statusService->markInventoryFailed($fullInventory, $manual);
+      }
+      else
+      {
+        $this->statusService->markInventoryComplete($fullInventory, $manual);
+      }
+
+      return $this->statusService->getServiceState($fullInventory);
     } catch (\Exception $e) {
-      // TODO: consider failing out of one item / one page instead of failing the whole sync
       $externalLogs->addInventoryLog('Inventory: ' . $e->getMessage(), 'inventoryFailed' . ($fullInventory ? 'Full' : ''), 1, 0, false);
 
       $loggerContract->error(
@@ -246,32 +300,29 @@ class InventoryUpdateService
       // (we want the failure amount to be more than zero in order for client to know this failed.)
       $inventorySaveFail += $amtOfDtosForPage;
 
-      $errorMessage = $e->getMessage();
-      if (!isset($errorMessage)) {
-        $errorMessage = (string) $e;
-      }
+      $this->statusService->markInventoryFailed(true, $manual, $e);
     } finally {
       // FIXME: the 'inventorySave' and 'inventorySaved' log types are too similar
-      // TODO: determine if changing the types will impact kibana / graphana / influxDB before changing
+      // TODO: determine if changing the types will impact kibana / grafana / influxDB before changing
       $externalLogs->addInventoryLog('Inventory save', 'inventorySave' . ($fullInventory ? 'Full' : ''), $inventorySaveTotal, $saveInventoryDuration);
       $externalLogs->addInventoryLog('Inventory save', 'inventorySaved' . ($fullInventory ? 'Full' : ''), $inventorySaveSuccess, $saveInventoryDuration);
       $externalLogs->addInventoryLog('Inventory save failed', 'inventorySaveFailed' . ($fullInventory ? 'Full' : ''), $inventorySaveFail, $savedInventoryDuration);
+
+      $externalLogs->addInfoLog("Finished " . ($manual ? "Manual " : "Automatic ") . ($fullInventory ? "Full " : "Partial") . "inventory sync.");
+
+      $loggerContract->debug(
+        TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_END),
+        [
+          'additionalInfo' => ['fullInventory' => (string) $fullInventory],
+          'method' => __METHOD__
+        ]
+      );
 
       /** @var LogSenderService $logSenderService */
       $logSenderService = pluginApp(LogSenderService::class);
 
       $logSenderService->execute($externalLogs->getLogs());
     }
-
-    return [
-      self::INVENTORY_SAVE_TOTAL => $inventorySaveTotal,
-      self::INVENTORY_SAVE_SUCCESS => $inventorySaveSuccess,
-      self::INVENTORY_SAVE_FAIL => $inventorySaveFail,
-      self::SAVE_INVENTORY_DURATION => $saveInventoryDuration,
-      self::SAVED_INVENTORY_DURATION => $savedInventoryDuration,
-      self::PAGES => $page,
-      self::ERROR_MESSAGE => $errorMessage
-    ];
   }
 
   /**
@@ -294,7 +345,7 @@ class InventoryUpdateService
    *
    * @return array
    */
-  public function getFilters(bool $fullInventory): array
+  private function getDefaultFilters(): array
   {
     /**
      * @var AbstractConfigHelper $configHelper
@@ -309,14 +360,17 @@ class InventoryUpdateService
       $filter['referrerId'] = [$configHelper->getOrderReferrerValue()];
     }
 
-    if (!$fullInventory) {
-      $filter['updatedBetween'] = [
-        'timestampFrom' => time() - AbstractConfigHelper::SECONDS_INTERVAL_FOR_INVENTORY,
+    return $filter;
+  }
+
+  private static function applyTimeFilter(int $startOfWindow, $filters)
+  {
+    if (isset($filters) && isset($startOfWindow) && $startOfWindow > 0) {
+      $filters['updatedBetween'] = [
+        $startOfWindow,
         'timestampTo' => time(),
       ];
     }
-
-    return $filter;
   }
 
   /**
@@ -351,5 +405,35 @@ class InventoryUpdateService
     }
 
     return 0;
+  }
+
+  /**
+   * Check if the state of the Inventory Service has been "running" for more than the maximum allotted time
+   * This functionality was extracted from the old UpdateFullInventoryStatusCron
+   *
+   * @return boolean
+   */
+  private function serviceHasBeenRunningTooLong(bool $full): bool
+  {
+    $maxTime = self::MAX_INVENTORY_TIME_PARTIAL;
+    $logKey = self::LOG_KEY_LONG_RUN_PARTIAL;
+    if ($full) {
+      $maxTime = self::MAX_INVENTORY_TIME_FULL;
+      $logKey = self::LOG_KEY_LONG_RUN_FULL;
+    }
+
+    if ($this->statusService->isInventoryRunning($full)) {
+      $lastStateChange = $this->statusService->getStateChangeTime(true);
+      if (!$lastStateChange || (\time() - \strtotime($lastStateChange)) > $maxTime) {
+
+        $this->logger->warning(TranslationHelper::getLoggerKey($logKey), [
+          'additionalInfo' => ['lastStateChange' => $lastStateChange, 'maximumTime' => $maxTime],
+          'method' => __METHOD__
+        ]);
+        return true;
+      }
+    }
+
+    return false;
   }
 }

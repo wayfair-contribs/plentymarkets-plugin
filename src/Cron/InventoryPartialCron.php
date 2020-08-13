@@ -6,13 +6,11 @@
 
 namespace Wayfair\Cron;
 
-class InventoryPartialCron extends InventoryCron
+class InventoryPartialCron extends AbstractInventoryCron
 {
 
   /**
    * InventoryPartialCron constructor.
-   *
-   * @param ScheduledInventorySyncService $service
    */
   public function __construct()
   {
