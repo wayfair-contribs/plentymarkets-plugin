@@ -5,7 +5,7 @@
 
 namespace Wayfair\Migrations;
 
-use Wayfair\Services\FullInventoryStatusService;
+use Wayfair\Services\InventoryStatusService;
 
 /**
  * Class ResetFullInventoryState
@@ -16,20 +16,20 @@ use Wayfair\Services\FullInventoryStatusService;
  */
 class ResetFullInventoryState {
   /**
-   * @var FullInventoryStatusService
+   * @var InventoryStatusService
    */
-  private $fullInventoryStatusService;
+  private $inventoryStatusService;
 
   /**
    * ResetFullInventoryState constructor.
    *
    * @param AddressService $addressService
    */
-  public function __construct(FullInventoryStatusService $fullInventoryStatusService) {
-    $this->fullInventoryStatusService = $fullInventoryStatusService;
+  public function __construct(InventoryStatusService $inventoryStatusService) {
+    $this->inventoryStatusService = $inventoryStatusService;
   }
 
   public function run() {
-    $this->fullInventoryStatusService->markFullInventoryIdle();
+    $this->inventoryStatusService->resetState(true);
   }
 }

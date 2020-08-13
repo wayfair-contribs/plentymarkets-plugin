@@ -16,6 +16,6 @@ class InventoryPartialCron extends InventoryCron
    */
   public function __construct()
   {
-    parent::__construct(true);
+    parent::__construct(false);
   }
 }
