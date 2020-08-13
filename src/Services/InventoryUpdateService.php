@@ -136,9 +136,6 @@ class InventoryUpdateService
     $amtOfDtosForPage = 0;
 
     try {
-
-
-
       $fields = $this->getResultFields();
       /* Page size is tuned for a balance between memory usage (in plentymarkets) and number of transactions  */
       $fields['itemsPerPage'] = AbstractConfigHelper::INVENTORY_ITEMS_PER_PAGE;
@@ -255,7 +252,7 @@ class InventoryUpdateService
       }
     } finally {
       // FIXME: the 'inventorySave' and 'inventorySaved' log types are too similar
-      // TODO: determine if changing the types will impact kibana / grafana / influxDB before changing
+      // TODO: determine if changing the types will impact kibana / graphana / influxDB before changing
       $externalLogs->addInventoryLog('Inventory save', 'inventorySave' . ($fullInventory ? 'Full' : ''), $inventorySaveTotal, $saveInventoryDuration);
       $externalLogs->addInventoryLog('Inventory save', 'inventorySaved' . ($fullInventory ? 'Full' : ''), $inventorySaveSuccess, $saveInventoryDuration);
       $externalLogs->addInventoryLog('Inventory save failed', 'inventorySaveFailed' . ($fullInventory ? 'Full' : ''), $inventorySaveFail, $savedInventoryDuration);
