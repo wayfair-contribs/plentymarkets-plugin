@@ -114,7 +114,8 @@ class InventoryUpdateService
    * Send inventory updates from Plentymarkets to Wayfair.
    * The optional start parameter filters the update set down to items changed since the provided timestamp
    *
-   * @param int $start optional unix start time for filtering changes to sync
+   * @param bool $fullInventory flag for syncing entire inventory versus partial inventory update
+   * @param bool $manual flag for logs which indicates that the sync was manually induced
    *
    * @return array
    */

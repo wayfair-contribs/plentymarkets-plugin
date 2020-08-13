@@ -21,7 +21,7 @@ class FullInventoryController extends Controller
   public function sync(InventoryUpdateService $inventoryUpdateService)
   {
     // set manual flag so that we know where sync request came from
-    return \json_encode($inventoryUpdateService->sync(true));
+    return \json_encode($inventoryUpdateService->sync(true, true));
   }
 
   /**
