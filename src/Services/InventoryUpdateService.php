@@ -145,8 +145,6 @@ class InventoryUpdateService
       ]
     );
 
-    $this->statusService->markInventoryStarted($fullInventory, $manual);
-
     $page = 0;
     $inventorySaveTotal = 0;
     $inventorySaveSuccess = 0;
@@ -156,10 +154,6 @@ class InventoryUpdateService
     $amtOfDtosForPage = 0;
 
     try {
-
-      $externalLogs->addInfoLog("Starting " . ($manual ? "Manual " : "Automatic ") . ($fullInventory ? "Full " : "Partial") . "inventory sync.");
-
-      $this->statusService->markInventoryStarted(true, $manual);
 
       $lastStartTime = $this->statusService->getLastAttemptTime($fullInventory);
 
@@ -196,6 +190,10 @@ class InventoryUpdateService
 
       // stock buffer should be the same across all pages of inventory
       $stockBuffer = self::getNormalizedStockBuffer($configHelper, $loggerContract);
+
+      $externalLogs->addInfoLog("Starting " . ($manual ? "Manual " : "Automatic ") . ($fullInventory ? "Full " : "Partial") . "inventory sync.");
+
+      $this->statusService->markInventoryStarted(true, $manual);
 
       do {
 
