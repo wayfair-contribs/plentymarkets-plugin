@@ -1,11 +1,14 @@
 # Wayfair Plugin: Troubleshooting
 
 ## Introduction
+
 This document is intended for users of the Wayfair plugin who are experiencing issues with it. If there is an issue in Plentymarkets which does not apply specifically to the Wayfair plugin, it should be reported to Plentymarkets.
 
 The known issues for current and past versions of the Wayfair plugin can be viewed on [the plugin's github page](https://github.com/wayfair-contribs/plentymarkets-plugin/issues).
 
+
 ## Plentymarkets logs
+
 The Wayfair plugin produces information in the Plentymarkets logs, which contains critical information for investigating and resolving issues.
 
 ### Viewing the logs
@@ -14,6 +17,7 @@ To view the Plentymarkets logs, from the main Plentymarkets page, go to `Data` >
 ![log menu entry](../../../images/en/troubleshooting/menu_data_log.png)
 
 ### Setting the log level for Wayfair
+
 The default settings for the logs do not show all messages from the Wayfair plugin. To get more details in the logs, change the level of logging for Wayfair to `Debug`:
 
 1. Open the Plentymarkets `Log` page if it is not already open.
@@ -41,7 +45,9 @@ The default settings for the logs do not show all messages from the Wayfair plug
 
     ![wayfair in filter](../../../images/en/troubleshooting/filter_logs_wayfair.png)
 
-3. Click on the magnifying glass button ![search button](../../../images/common/button_search.png).
+3. Click on the magnifying glass button ![search button](../../../images/common/button_search.png) to display only the Wayfair Plugin's log messages.
+
+4. Click on a row in the logs view in order to view more details for a message.
 
 
 ## Solving common issues
