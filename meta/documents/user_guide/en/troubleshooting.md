@@ -1,5 +1,10 @@
 # Wayfair Plugin: Troubleshooting
 
+## Introduction
+This document is intended for users of the Wayfair plugin who are experiencing issues with it. If there is an issue in Plentymarkets which does not apply specifically to the Wayfair plugin, it should be reported to Plentymarkets.
+
+The known issues for current and past versions of the Wayfair plugin can be viewed on [the plugin's github page](https://github.com/wayfair-contribs/plentymarkets-plugin/issues).
+
 ## Plentymarkets logs
 The Wayfair plugin produces information in the Plentymarkets logs, which contains critical information for investigating and resolving issues.
 
@@ -37,3 +42,17 @@ The default settings for the logs do not show all messages from the Wayfair plug
     ![wayfair in filter](../../../images/en/troubleshooting/filter_logs_wayfair.png)
 
 3. Click on the magnifying glass button ![search button](../../../images/common/button_search.png).
+
+
+## Solutions for common problems
+
+| Issue | Possible causes |
+| ----- | --------------- |
+| General lack of data coming from Wayfair or going to Wayfair | <ul><li>Missing or incorrect credentials for the Wayfair Plugin in the active Plugin Set</li><li>Internet connectivity issues</li><li>Temporary Wayfair downtime</ul> |
+| Items missing from inventory sent to Wayfair | <ul><li>The `Send all inventory items to Wayfair` setting is disabled and the Variation in Plentymarkets is not marked as available for the Wayfair marketplace.</li><li>The item is associated with a Plentymarkets Warehouse that is not mapped to a Wayfair Supplier ID on the `Warehouses` page of the Wayfair settings</li></ul>
+
+
+
+## Reporting issues to Wayfair
+
+If you are unable to resolve an issue with the Wayfair plugin, you may file a report on [the issues page for the plugin](https://github.com/wayfair-contribs/plentymarkets-plugin/issues) so that it may be evaluated by the Wayfair team.
