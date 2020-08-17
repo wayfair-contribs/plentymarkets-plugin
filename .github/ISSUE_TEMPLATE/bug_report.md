@@ -19,7 +19,7 @@ assignees: ''
 Steps to reproduce the behavior (if repeatable, please perform with the Wayfair logging in Plentymarkets set to the `Debug` level):
 1. [ie: Go to Warehouses settings page]
 2. [ie: Add new Warehouse mapping]
-3. [Ie: Click save]
+3. [ie: Click save]
 
 **Expected behavior:**
 [ie: New Warehouse mapping stays on page]
@@ -31,4 +31,4 @@ Steps to reproduce the behavior (if repeatable, please perform with the Wayfair 
 [If applicable, add screenshots to help explain your problem.]
 
 **Related logs:**
-[Please attach logs as files, and describe them here.]
+[Please attach logs (see `Log` entry in the `Data` menu in Plentymarkets) as files, and describe them here.]
