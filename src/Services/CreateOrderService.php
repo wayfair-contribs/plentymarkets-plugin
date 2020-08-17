@@ -6,7 +6,6 @@
 
 namespace Wayfair\Services;
 
-use Exception;
 use Plenty\Modules\Account\Address\Models\AddressRelationType;
 use Plenty\Modules\Account\Contact\Models\ContactType;
 use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
@@ -337,7 +336,7 @@ class CreateOrderService
       try {
         $this->savePackingSlipService->save($orderId, $poNumber);
       } catch (\Exception $exception) {
-        $externalLogs->addErrorLog("Unexpected " . get_class($exception) . " while working with packing slips: " . $exception->getMessage())
+        $externalLogs->addErrorLog("Unexpected " . get_class($exception) . " while working with packing slips: " . $exception->getMessage());
       }
 
       return $orderId;
