@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-**Date first encountered**:
+**Date(s) issue was encountered**:
 **Supplier's client ID (if known):**
 **Wayfair plugin Version (view in Plentymarkets Pluign Set)**
 **Plentymarkets Version / release channel:**
