@@ -6,6 +6,7 @@
 
 namespace Wayfair\Services;
 
+use Exception;
 use Plenty\Modules\Account\Address\Models\AddressRelationType;
 use Plenty\Modules\Account\Contact\Models\ContactType;
 use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
@@ -331,16 +332,12 @@ class CreateOrderService
         throw new \Exception("Unable to relate payment " . $paymentID . " with order " . $orderId);
       }
 
-      // TODO: look into moving packing slip fetching to be on-demand rather than doing it during order creation.
-      // The packing slip does not need to exist in plentymarkets until the user needs it.
-      // There have been occasional timeouts in packing slip service.
-
-      $packingSlipInfo = $this->savePackingSlipService->save($orderId, $poNumber);
-
-      // TODO: investigate structure of return value from savePackingSlipService, log the ID of the created item
-
-      if (!isset($packingSlipInfo) || empty($packingSlipInfo)) {
-        throw new \Exception("Unable to add packing slip to order " . $order . " PO: " . $poNumber);
+      // packing slips are an optional feature and may be phased out.
+      // do not fail the order for lack of packing slip.
+      try {
+        $this->savePackingSlipService->save($orderId, $poNumber);
+      } catch (\Exception $exception) {
+        $externalLogs->addErrorLog("Unexpected " . get_class($exception) . " while working with packing slips: " . $exception->getMessage())
       }
 
       return $orderId;

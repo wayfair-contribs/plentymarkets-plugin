@@ -203,6 +203,7 @@ class SavePackingSlipService
 
       $upload_result = $this->documentRepositoryContract->uploadOrderDocuments($orderId, Document::DELIVERY_NOTE, $documentData);
 
+      // TODO: log ID of uploaded document, if any
       $this->loggerContract->debug(
         TranslationHelper::getLoggerKey(self::LOG_KEY_FINISHED_UPLOADING_ORDER_DOCUMENTS),
         [
