@@ -61,7 +61,7 @@ Prior to contacting Wayfair, please use the table below to self-diagnose issues 
 | No orders coming from Wayfair | <ul><li>The Wayfair Supplier ID for the Wayfair Purchase Order is not mapped to a Plentymarkets Warehouse on the `Warehouses` page of the Wayfair settings.</li></ul> |
 | Orders coming from Wayfair are not properly getting associated with Items in Plentymarkets | <ul><li>The `Item Mapping Method` setting in Wayfair's settings is set to the incorrect value.</li><li>There is an empty or incorrect value in the field of the Plentymarkets Variation that is associated with the `Item Mapping Method` setting in Wayfair's settings.</li></ul> |
 | Warehouses missing or incorrect for Order coming from Wayfair | <ul><li>Warehouses are not assigned to Wayfair Supplier IDs on the `Warehouses` page of the Wayfair settings.</li><li>Multiple Warehouses associated with one Wayfair Supplier ID on the `Warehouses` page of the Wayfair settings.</li></ul> |
-
+| Shipping label download button does not appear in the "Overview" tab of an Order in the Plentymarkets Shipping centre | <ul><li>Order's shipment has not been registered.</li><li>Shipping Centre was not yet refreshed after shipment registration was performed.</li><li>Document downloading failed during the shipment registration process.</li></ul> |
 
 ## Reporting issues to Wayfair
 
