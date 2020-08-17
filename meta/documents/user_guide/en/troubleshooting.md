@@ -67,4 +67,4 @@ Prior to contacting Wayfair, please use the table below to self-diagnose issues 
 
 If you are unable to resolve an issue with the Wayfair plugin, you may file a report on [the issues page for the plugin](https://github.com/wayfair-contribs/plentymarkets-plugin/issues) so that it may be evaluated by the Wayfair team.
 
-**When contacting Wayfair, please include information on any settings that have recently been changed in Plentymarkets or in the Wayfair plugin's settings. In order to provide you with the best support, we may also need to ask you additional questions about your specific configuration.**
+**When contacting Wayfair, please include information on any settings that have recently been changed in Plentymarkets or in the Wayfair plugin's settings. In order to provide you with the best support Wayfair's representatives may also need to ask you additional questions about your specific configuration.**
