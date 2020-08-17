@@ -13,19 +13,19 @@ assignees: ''
 **Plentymarkets Version / release channel:**
 
 **Short description:**
-[ie: Cannot save Warehouse mapping]
+[ex: "Cannot save Warehouse mapping"]
 
 **To Reproduce**
 Steps to reproduce the behavior (if repeatable, please perform with the Wayfair logging in Plentymarkets set to the `Debug` level):
-1. [ie: Go to Warehouses settings page]
-2. [ie: Add new Warehouse mapping]
-3. [ie: Click save]
+1. [ex: "Go to Warehouses settings page"]
+2. [ex: "Add new Warehouse mapping"]
+3. [ex: "Click save"]
 
 **Expected behavior:**
-[ie: New Warehouse mapping stays on page]
+[What should be happening? ex: "New Warehouse mapping stays on page"]
 
 **Actual behavior:**
-[ie: New Warehouse mapping disappears after refreshing the page]
+[What is happening right now? ex: "New Warehouse mapping disappears after refreshing the page"]
 
 **Screenshots:**
 [If applicable, add screenshots to help explain your problem.]
