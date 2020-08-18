@@ -190,7 +190,7 @@ class SettingsController
       return null;
     }
 
-    if (!isset($inputStockBuffer) || !is_numeric($inputStockBuffer) || $inputStockBuffer < 0) {
+    if (!is_numeric($inputStockBuffer) || $inputStockBuffer < 0) {
       throw new ValidationException('When provided, Stock Buffer must be a non-negative number');
     }
 
