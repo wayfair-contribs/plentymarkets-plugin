@@ -258,7 +258,7 @@ class SettingsController
       throw new ValidationException('No Order Status found with ID: ' . $orderStatus);
     }
 
-    return $inputDefaultOrderStatus;
+    return $orderStatus;
   }
 
   /**
