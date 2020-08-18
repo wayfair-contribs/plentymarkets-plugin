@@ -250,8 +250,7 @@ class SettingsController
     try {
       $statusModel = $orderStatusRepository->get($orderStatus);
     } catch (\Exception $exception) {
-      // expected when there is no OrderStatus.
-      $statusModel = null;
+      // exception is expected when Plentymarkets can't find the row in the DB
     }
 
     if (!isset($statusModel)) {
