@@ -156,12 +156,14 @@ class SettingsController
 
       return $response->json($settingMappings);
     } catch (\Exception $e) {
+
       $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_SETTINGS), [
         'additionalInfo' => [
           'error' => $e->getMessage()
         ],
         'method'         => __METHOD__
       ]);
+
       return $response->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
   }

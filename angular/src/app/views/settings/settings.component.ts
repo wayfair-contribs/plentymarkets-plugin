@@ -69,7 +69,7 @@ export class SettingsComponent {
         this.showTranslatedInfo("saved");
       },
       (err) => {
-        this.showErrorVerbose(this.translation.translate("error_save") + ": " + err);
+        this.showTranslatedError("error_save");
       }
     );
   }
