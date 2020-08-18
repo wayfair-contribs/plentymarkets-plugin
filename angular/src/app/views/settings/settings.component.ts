@@ -156,7 +156,7 @@ export class SettingsComponent {
         this.translation.translate("order_status_id") +
         ": " +
         this.translation.translate(
-          SettingsComponent.TRANSLATION_KEY_NEGATIVE_NOT_ALLOWED
+          SettingsComponent.TRANSLATION_KEY_MUST_BE_POSITIVE
         ) +
         SettingsComponent.MESSAGE_DELIM;
     }
