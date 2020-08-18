@@ -60,7 +60,7 @@ class PurchaseOrderMapper {
     /** @var AbstractConfigHelper */
     $configHelper = pluginApp(AbstractConfigHelper::class);
     $itemMappingMethod = $configHelper->getItemMappingMethod();
-    
+
     $orderItems = [];
 
     foreach ($dto->getProducts() as $product) {
@@ -107,7 +107,7 @@ class PurchaseOrderMapper {
       'referrerId' => $referrerId,
       'plentyId' => $this->app->getPlentyId(),
       'orderItems' => $orderItems,
-      'statusId' => (int)$this->keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_ORDER_STATUS_KEY) ?? self::ORDER_STATUS_WAITING_FOR_ACTIVATION,
+      'statusId' => (float)$this->keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_ORDER_STATUS_KEY) ?? self::ORDER_STATUS_WAITING_FOR_ACTIVATION,
       'properties' => $properties,
       'addressRelations' => $addressRelations,
       'relations' => $relations

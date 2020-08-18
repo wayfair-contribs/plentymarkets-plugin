@@ -209,7 +209,7 @@ class SettingsController
    * Get the Default Order Status value from a payload
    *
    * @param mixed $inputData
-   * @return int|null
+   * @return float|null
    * @throws ValidationException
    */
   private static function getAndValidateDefaultOrderStatusFromInput($inputData)
@@ -226,7 +226,7 @@ class SettingsController
       throw new ValidationException('When set, Order Status ID must be a non-negative number');
     }
 
-    return (int) $inputDefaultOrderStatus;
+    return (float) $inputDefaultOrderStatus;
   }
 
   /**
