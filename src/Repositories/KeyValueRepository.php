@@ -28,10 +28,7 @@ class KeyValueRepository extends Repository
     if (!isset($key) || empty($key)) {
       throw new ValidationException("Key cannot be empty.");
     }
-    if (!isset($value)) {
-      // TODO: consider deleting in this case
-      throw new ValidationException("Value cannot be null.");
-    }
+
     /**
      * @var DataBase
      */
