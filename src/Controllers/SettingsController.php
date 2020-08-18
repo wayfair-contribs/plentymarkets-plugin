@@ -186,7 +186,7 @@ class SettingsController
     $inputStockBuffer = $inputData[AbstractConfigHelper::SETTINGS_STOCK_BUFFER_KEY];
 
     // this is nullable - see InventoryUpdateService
-    if (!isset($inputStockBuffer)) {
+    if (!isset($inputStockBuffer) || empty($inputStockBuffer)) {
       return null;
     }
 
@@ -232,7 +232,7 @@ class SettingsController
     $inputDefaultOrderStatus = $inputData[AbstractConfigHelper::SETTINGS_DEFAULT_ORDER_STATUS_KEY];
 
     // this is nullable - see PurchaseOrderMapper
-    if (!isset($inputDefaultOrderStatus)) {
+    if (!isset($inputDefaultOrderStatus) || empty($inputDefaultOrderStatus)) {
       return null;
     }
 
