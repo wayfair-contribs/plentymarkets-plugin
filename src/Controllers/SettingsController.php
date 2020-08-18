@@ -113,7 +113,7 @@ class SettingsController
       $defaultOrderStatusId = self::getAndValidateDefaultOrderStatusFromInput($dataIn);
       $defaultItemMappingMethod = $this->getAndValidateDefaultItemMappingMethodFromInput($dataIn);
       $importOrderSince = self::getAndValidateImportOrdersSinceFromInput($dataIn);
-      $isAllInventorySyncEnabled = self::getAndValidatAllInventorySyncFromInput($dataIn);
+      $isAllInventorySyncEnabled = self::getAndValidateAllInventorySyncFromInput($dataIn);
 
       $settingMappings = [
         AbstractConfigHelper::SETTINGS_STOCK_BUFFER_KEY => $stockBuffer,
@@ -162,15 +162,21 @@ class SettingsController
    * Get the Stock Buffer value from a payload
    *
    * @param mixed $inputData
-   * @return int
+   * @return int|null
    * @throws ValidationException
    */
   private static function getAndValidateStockBufferFromInput($inputData)
   {
     $inputStockBuffer = $inputData[AbstractConfigHelper::SETTINGS_STOCK_BUFFER_KEY];
 
+    // this is nullable - see InventoryUpdateService
+    if (!isset($inputStockBuffer))
+    {
+      return null;
+    }
+
     if (!isset($inputStockBuffer) || !is_numeric($inputStockBuffer) || $inputStockBuffer < 0) {
-      throw new ValidationException('Stock Buffer must be a non-negative number');
+      throw new ValidationException('When provided, Stock Buffer must be a non-negative number');
     }
 
     return (int) $inputStockBuffer;
@@ -203,15 +209,21 @@ class SettingsController
    * Get the Default Order Status value from a payload
    *
    * @param mixed $inputData
-   * @return int
+   * @return int|null
    * @throws ValidationException
    */
   private static function getAndValidateDefaultOrderStatusFromInput($inputData)
   {
     $inputDefaultOrderStatus = $inputData[AbstractConfigHelper::SETTINGS_DEFAULT_ORDER_STATUS_KEY];
 
-    if (!isset($inputDefaultOrderStatus) || !is_numeric($inputDefaultOrderStatus) || $inputDefaultOrderStatus < 0) {
-      throw new ValidationException('Order Status ID must be a non-negative number');
+    // this is nullable - see PurchaseOrderMapper
+    if (!isset($inputDefaultOrderStatus))
+    {
+      return null;
+    }
+
+    if (!is_numeric($inputDefaultOrderStatus) || $inputDefaultOrderStatus < 0) {
+      throw new ValidationException('When set, Order Status ID must be a non-negative number');
     }
 
     return (int) $inputDefaultOrderStatus;
@@ -272,7 +284,7 @@ class SettingsController
    * @return bool
    * @throws ValidationException
    */
-  private static function getAndValidatAllInventorySyncFromInput($inputData)
+  private static function getAndValidateAllInventorySyncFromInput($inputData)
   {
     $isAllInventorySyncEnabled = $inputData[AbstractConfigHelper::SETTINGS_SEND_ALL_ITEMS_KEY];
 

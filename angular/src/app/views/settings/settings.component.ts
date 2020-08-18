@@ -135,7 +135,7 @@ export class SettingsComponent {
   private validateSettings(): string {
     let issueStringBuffer = "";
 
-    if (this.stockBuffer < 0 || isNaN(this.stockBuffer)) {
+    if (this.stockBuffer && (this.stockBuffer < 0 || isNaN(this.stockBuffer))) {
       issueStringBuffer +=
         this.translation.translate("buffer") +
         ": " +
@@ -145,7 +145,7 @@ export class SettingsComponent {
         SettingsComponent.MESSAGE_DELIM;
     }
 
-    if (this.defaultOrderStatus < 0 || isNaN(this.defaultOrderStatus)) {
+    if (this.defaultOrderStatus && (this.defaultOrderStatus < 0 || isNaN(this.defaultOrderStatus))) {
       issueStringBuffer +=
         this.translation.translate("order_status_id") +
         ": " +
