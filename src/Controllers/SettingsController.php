@@ -24,6 +24,7 @@ class SettingsController
   const LOG_KEY_CONTROLLER_OUT = "controllerOutput";
   const LOG_KEY_SETTING_MAPPING_METHOD = "settingMappingMethod";
   const LOG_KEY_INVALID_SETTINGS = "invalidSettings";
+  const LOG_KEY_SAVE_FAILED= "couldNotSaveSettings";
 
   /**
    * @var KeyValueRepository
@@ -125,12 +126,17 @@ class SettingsController
         AbstractConfigHelper::IMPORT_ORDER_SINCE => $importOrderSince,
         AbstractConfigHelper::SETTINGS_SEND_ALL_ITEMS_KEY => $isAllInventorySyncEnabled,
       ];
-    } catch (\Exception $e) {
-      return $response->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
-    }
 
-    if (!isset($settingMappings) || empty($settingMappings)) {
-      return $response->json(['error' => 'unable to parse request'], Response::HTTP_BAD_REQUEST);
+    } catch (\Exception $e) {
+
+      $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_SETTINGS), [
+        'additionalInfo' => [
+          'error' => $e->getMessage()
+        ],
+        'method'         => __METHOD__
+      ]);
+
+      return $response->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
     }
 
     try {
@@ -157,7 +163,7 @@ class SettingsController
       return $response->json($settingMappings);
     } catch (\Exception $e) {
 
-      $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_SETTINGS), [
+      $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_SAVE_FAILED), [
         'additionalInfo' => [
           'error' => $e->getMessage()
         ],
