@@ -9,6 +9,8 @@ import { Language, TranslationService } from "angular-l10n";
 export class SettingsComponent {
   private static readonly TRANSLATION_KEY_NEGATIVE_NOT_ALLOWED =
     "negative_not_allowed";
+  private static readonly TRANSLATION_KEY_MUST_BE_POSITIVE =
+    "value_must_be_positive";
   private static readonly MESSAGE_DELIM = ", ";
 
   @Language()
@@ -135,7 +137,7 @@ export class SettingsComponent {
   private validateSettings(): string {
     let issueStringBuffer = "";
 
-    if (this.stockBuffer && (this.stockBuffer < 0 || isNaN(this.stockBuffer))) {
+    if (this.stockBuffer && (isNaN(this.stockBuffer) || this.stockBuffer < 0)) {
       issueStringBuffer +=
         this.translation.translate("buffer") +
         ": " +
@@ -145,7 +147,11 @@ export class SettingsComponent {
         SettingsComponent.MESSAGE_DELIM;
     }
 
-    if (this.defaultOrderStatus && (this.defaultOrderStatus < 0 || isNaN(this.defaultOrderStatus))) {
+    // minimum order status is 1
+    if (
+      this.defaultOrderStatus &&
+      (isNaN(this.defaultOrderStatus) || this.defaultOrderStatus < 1)
+    ) {
       issueStringBuffer +=
         this.translation.translate("order_status_id") +
         ": " +
@@ -157,7 +163,7 @@ export class SettingsComponent {
 
     if (
       this.defaultShippingProvider &&
-      (this.defaultShippingProvider < 0 || isNaN(this.defaultShippingProvider))
+      (isNaN(this.defaultShippingProvider) || this.defaultShippingProvider < 0)
     ) {
       issueStringBuffer +=
         this.translation.translate("shipping_provider_id") +
@@ -180,7 +186,11 @@ export class SettingsComponent {
    * @param type the style of the message
    * @param message the value of the message
    */
-  private showMessageVerbose(type, message, timestamp = new Date().toLocaleString()): void {
+  private showMessageVerbose(
+    type,
+    message,
+    timestamp = new Date().toLocaleString()
+  ): void {
     this.status.type = type;
     this.status.value = message;
     this.status.timestamp = timestamp;

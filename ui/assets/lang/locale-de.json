@@ -47,5 +47,6 @@
   "running": "im Gange",
   "complete": "Abgeschlossen",
   "full_inventory_disclaimer_label": "Verzichterklärung",
-  "full_inventory_disclaimer_text": "Alle Inventarsynchronisierungen werden den ganzen Tag über automatisch durchgeführt, ohne dass manueller Aufwand erforderlich ist.\nDie auf dieser Seite ausgeführten Aktionen gelten außerhalb der automatisch geplanten Synchronisierung und nur für die vollständige Inventarsynchronisierung"
+  "full_inventory_disclaimer_text": "Alle Inventarsynchronisierungen werden den ganzen Tag über automatisch durchgeführt, ohne dass manueller Aufwand erforderlich ist.\nDie auf dieser Seite ausgeführten Aktionen gelten außerhalb der automatisch geplanten Synchronisierung und nur für die vollständige Inventarsynchronisierung",
+  "value_must_be_positive": "Der Wert muss eine positive Zahl sein"
 }
