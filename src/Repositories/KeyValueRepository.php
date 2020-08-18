@@ -29,6 +29,10 @@ class KeyValueRepository extends Repository
       throw new ValidationException("Key cannot be empty.");
     }
 
+    if (!isset($value)) {
+      // cannot save null values - the underlying DB doesn't allow it
+      throw new ValidationException("Value cannot be null.");
+    }
     /**
      * @var DataBase
      */
@@ -55,6 +59,10 @@ class KeyValueRepository extends Repository
    */
   public function putOrReplace($key, $value)
   {
+    if (!isset($key) || empty($key)) {
+      throw new ValidationException("Key cannot be empty.");
+    }
+
     $firstModelForKey = null;
     try {
       /**
@@ -80,6 +88,14 @@ class KeyValueRepository extends Repository
             'method' => __METHOD__
           ]
         );
+    }
+
+    if (!isset($value)) {
+      // DB does not accept null values - remove the entry
+      if ($firstModelForKey) {
+        $database->delete($firstModelForKey);
+      }
+      return;
     }
 
     if ($firstModelForKey) {
