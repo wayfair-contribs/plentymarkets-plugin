@@ -7,6 +7,7 @@
 namespace Wayfair\Controllers;
 
 use Plenty\Exceptions\ValidationException;
+use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Wayfair\Core\Contracts\LoggerContract;
@@ -170,8 +171,7 @@ class SettingsController
     $inputStockBuffer = $inputData[AbstractConfigHelper::SETTINGS_STOCK_BUFFER_KEY];
 
     // this is nullable - see InventoryUpdateService
-    if (!isset($inputStockBuffer))
-    {
+    if (!isset($inputStockBuffer)) {
       return null;
     }
 
@@ -217,8 +217,7 @@ class SettingsController
     $inputDefaultOrderStatus = $inputData[AbstractConfigHelper::SETTINGS_DEFAULT_ORDER_STATUS_KEY];
 
     // this is nullable - see PurchaseOrderMapper
-    if (!isset($inputDefaultOrderStatus))
-    {
+    if (!isset($inputDefaultOrderStatus)) {
       return null;
     }
 
@@ -226,7 +225,18 @@ class SettingsController
       throw new ValidationException('When set, Order Status ID must be a non-negative number');
     }
 
-    return (float) $inputDefaultOrderStatus;
+    $orderStatus = (float) $inputDefaultOrderStatus;
+
+    /** @var OrderStatusRepositoryContract */
+    $orderStatusRepository = pluginApp(OrderStatusRepositoryContract::class);
+
+    $statusModel = $orderStatusRepository->get($orderStatus);
+
+    if (!isset($statusModel)) {
+      throw new ValidationException('No Order Status found with ID: ' . $orderStatus);
+    }
+
+    return $inputDefaultOrderStatus;
   }
 
   /**
