@@ -135,16 +135,16 @@ export class SettingsComponent {
    * @returns string
    */
   private validateSettings(): string {
-    let issueStringBuffer = "";
+    let issues = [];
 
     if (this.stockBuffer && (isNaN(this.stockBuffer) || this.stockBuffer < 0)) {
-      issueStringBuffer +=
+      issues.push(
         this.translation.translate("buffer") +
-        ": " +
-        this.translation.translate(
-          SettingsComponent.TRANSLATION_KEY_NEGATIVE_NOT_ALLOWED
-        ) +
-        SettingsComponent.MESSAGE_DELIM;
+          ": " +
+          this.translation.translate(
+            SettingsComponent.TRANSLATION_KEY_NEGATIVE_NOT_ALLOWED
+          )
+      );
     }
 
     // minimum order status is 1
@@ -152,33 +152,38 @@ export class SettingsComponent {
       this.defaultOrderStatus &&
       (isNaN(this.defaultOrderStatus) || this.defaultOrderStatus < 1)
     ) {
-      issueStringBuffer +=
-        this.translation.translate("order_status_id") +
-        ": " +
-        this.translation.translate(
-          SettingsComponent.TRANSLATION_KEY_MUST_BE_POSITIVE
-        ) +
-        SettingsComponent.MESSAGE_DELIM;
+      issues.push(
+          this.translation.translate("order_status_id") +
+          ": " +
+          this.translation.translate(
+            SettingsComponent.TRANSLATION_KEY_MUST_BE_POSITIVE
+          )
+      );
     }
 
     if (
       this.defaultShippingProvider &&
       (isNaN(this.defaultShippingProvider) || this.defaultShippingProvider < 0)
     ) {
-      issueStringBuffer +=
+      issues.push(
         this.translation.translate("shipping_provider_id") +
         ": " +
         this.translation.translate(
           SettingsComponent.TRANSLATION_KEY_NEGATIVE_NOT_ALLOWED
-        ) +
-        SettingsComponent.MESSAGE_DELIM;
+        )
+      );
     }
 
-    if (issueStringBuffer && issueStringBuffer.length < 1) {
+    if (issues.length < 1) {
       return null;
     }
 
-    return issueStringBuffer;
+    if (issues.length == 1)
+    {
+      return issues.pop();
+    }
+
+    return issues.toString();
   }
 
   /**
