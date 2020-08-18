@@ -8,7 +8,7 @@ namespace Wayfair\Controllers;
 
 use Plenty\Exceptions\ValidationException;
 use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
-use Plenty\Modules\Order\status\Models\OrderStatus;
+use Plenty\Modules\Order\Status\Models\OrderStatus;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Wayfair\Core\Contracts\LoggerContract;
