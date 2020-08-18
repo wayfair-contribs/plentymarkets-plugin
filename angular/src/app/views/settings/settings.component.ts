@@ -9,7 +9,9 @@ import { Language, TranslationService } from "angular-l10n";
 export class SettingsComponent {
   private static readonly TRANSLATION_KEY_NEGATIVE_NOT_ALLOWED =
     "negative_not_allowed";
-  private static readonly MESSAGE_DELIM = ", ";
+  private static readonly TRANSLATION_KEY_MUST_BE_POSITIVE =
+    "value_must_be_positive";
+  private static readonly MESSAGE_DELIM = " | ";
 
   @Language()
   public lang: string;
@@ -133,46 +135,60 @@ export class SettingsComponent {
    * @returns string
    */
   private validateSettings(): string {
-    let issueStringBuffer = "";
+    let issues = [];
 
-    if (this.stockBuffer && (this.stockBuffer < 0 || isNaN(this.stockBuffer))) {
-      issueStringBuffer +=
+    if (this.stockBuffer && (isNaN(this.stockBuffer) || this.stockBuffer < 0)) {
+      issues.push(
         this.translation.translate("buffer") +
-        ": " +
-        this.translation.translate(
-          SettingsComponent.TRANSLATION_KEY_NEGATIVE_NOT_ALLOWED
-        ) +
-        SettingsComponent.MESSAGE_DELIM;
+          ": " +
+          this.translation.translate(
+            SettingsComponent.TRANSLATION_KEY_NEGATIVE_NOT_ALLOWED
+          )
+      );
     }
 
-    if (this.defaultOrderStatus && (this.defaultOrderStatus < 0 || isNaN(this.defaultOrderStatus))) {
-      issueStringBuffer +=
-        this.translation.translate("order_status_id") +
-        ": " +
-        this.translation.translate(
-          SettingsComponent.TRANSLATION_KEY_NEGATIVE_NOT_ALLOWED
-        ) +
-        SettingsComponent.MESSAGE_DELIM;
+    // minimum order status is 1
+    if (
+      this.defaultOrderStatus &&
+      (isNaN(this.defaultOrderStatus) || this.defaultOrderStatus < 1)
+    ) {
+      issues.push(
+          this.translation.translate("order_status_id") +
+          ": " +
+          this.translation.translate(
+            SettingsComponent.TRANSLATION_KEY_MUST_BE_POSITIVE
+          )
+      );
     }
 
     if (
       this.defaultShippingProvider &&
-      (this.defaultShippingProvider < 0 || isNaN(this.defaultShippingProvider))
+      (isNaN(this.defaultShippingProvider) || this.defaultShippingProvider < 0)
     ) {
-      issueStringBuffer +=
+      issues.push(
         this.translation.translate("shipping_provider_id") +
         ": " +
         this.translation.translate(
           SettingsComponent.TRANSLATION_KEY_NEGATIVE_NOT_ALLOWED
-        ) +
-        SettingsComponent.MESSAGE_DELIM;
+        )
+      );
     }
 
-    if (issueStringBuffer && issueStringBuffer.length < 1) {
+    if (issues.length < 1) {
       return null;
     }
 
-    return issueStringBuffer;
+    if (issues.length == 1)
+    {
+      return issues.pop();
+    }
+
+    let buffer = "";
+    issues.forEach(message => buffer += message + SettingsComponent.MESSAGE_DELIM);
+    // remove trailing delim
+    buffer = buffer.slice(0, -1 * SettingsComponent.MESSAGE_DELIM.length);
+
+    return buffer;
   }
 
   /**
@@ -180,7 +196,11 @@ export class SettingsComponent {
    * @param type the style of the message
    * @param message the value of the message
    */
-  private showMessageVerbose(type, message, timestamp = new Date().toLocaleString()): void {
+  private showMessageVerbose(
+    type,
+    message,
+    timestamp = new Date().toLocaleString()
+  ): void {
     this.status.type = type;
     this.status.value = message;
     this.status.timestamp = timestamp;

@@ -8,6 +8,7 @@ namespace Wayfair\Controllers;
 
 use Plenty\Exceptions\ValidationException;
 use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
+use Plenty\Modules\Order\Status\Models\OrderStatus;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Wayfair\Core\Contracts\LoggerContract;
@@ -236,8 +237,8 @@ class SettingsController
       return null;
     }
 
-    if (!is_numeric($inputDefaultOrderStatus) || $inputDefaultOrderStatus < 0) {
-      throw new ValidationException('When set, Order Status ID must be a non-negative number');
+    if (!is_numeric($inputDefaultOrderStatus) || $inputDefaultOrderStatus < OrderStatus::ORDER_STATUS_MIN_VALUE || $inputDefaultOrderStatus > OrderStatus::ORDER_STATUS_MAX_VALUE) {
+      throw new ValidationException('When set, Order Status ID must be a number between ' . OrderStatus::ORDER_STATUS_MIN_VALUE . " and " . OrderStatus::ORDER_STATUS_MAX_VALUE);
     }
 
     $orderStatus = (float) $inputDefaultOrderStatus;
