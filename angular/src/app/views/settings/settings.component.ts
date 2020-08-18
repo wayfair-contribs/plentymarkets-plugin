@@ -69,13 +69,13 @@ export class SettingsComponent {
         this.showTranslatedInfo("saved");
       },
       (err) => {
-        this.showTranslatedError("error_save");
+        this.showErrorVerbose(this.translation.translate("error_save") + ": " + err);
       }
     );
   }
 
   /**
-   * Serliaze the current in-memory settings to an Object
+   * Serialize the current in-memory settings to an Object
    */
   private serializeSettings(): object {
     return {

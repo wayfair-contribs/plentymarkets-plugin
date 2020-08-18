@@ -23,6 +23,7 @@ class SettingsController
   const LOG_KEY_CONTROLLER_IN = "controllerInput";
   const LOG_KEY_CONTROLLER_OUT = "controllerOutput";
   const LOG_KEY_SETTING_MAPPING_METHOD = "settingMappingMethod";
+  const LOG_KEY_INVALID_SETTINGS = "invalidSettings";
 
   /**
    * @var KeyValueRepository
@@ -155,6 +156,12 @@ class SettingsController
 
       return $response->json($settingMappings);
     } catch (\Exception $e) {
+      $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_SETTINGS), [
+        'additionalInfo' => [
+          'error' => $e->getMessage()
+        ],
+        'method'         => __METHOD__
+      ]);
       return $response->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
   }
@@ -230,7 +237,14 @@ class SettingsController
     /** @var OrderStatusRepositoryContract */
     $orderStatusRepository = pluginApp(OrderStatusRepositoryContract::class);
 
-    $statusModel = $orderStatusRepository->get($orderStatus);
+    $statusModel = null;
+
+    try {
+      $statusModel = $orderStatusRepository->get($orderStatus);
+    } catch (\Exception $exception) {
+      // expected when there is no OrderStatus.
+      $statusModel = null;
+    }
 
     if (!isset($statusModel)) {
       throw new ValidationException('No Order Status found with ID: ' . $orderStatus);
