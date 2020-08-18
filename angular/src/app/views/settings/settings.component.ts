@@ -186,7 +186,7 @@ export class SettingsComponent {
     let buffer = "";
     issues.forEach(message => buffer += message + SettingsComponent.MESSAGE_DELIM);
 
-    return issues.toString();
+    return buffer;
   }
 
   /**
