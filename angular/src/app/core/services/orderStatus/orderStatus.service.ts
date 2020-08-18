@@ -9,7 +9,7 @@ import { OrderStatusInterface } from './data/orderStatus.interface';
 export class OrderStatusService extends TerraBaseService {
 
     constructor(loadingBarService:TerraLoadingSpinnerService, http: Http) {
-        super(loadingBarService, http, UrlHelper.getWayfairUrl(UrlHelper.URL_WAYFAIR_WAREHOUSES))
+        super(loadingBarService, http, UrlHelper.getWayfairUrl(UrlHelper.URL_WAYFAIR_ORDER_STATUSES))
     }
 
     fetch(): Observable<Array<OrderStatusInterface>>

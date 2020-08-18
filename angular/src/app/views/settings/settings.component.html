@@ -18,18 +18,17 @@
 
   <div class="form-row">
     <div class="form-group col-md-4 col-md-offset-2">
-      <label for="defaultOrderStatus" style="margin-top: 5px;">{{
+      <label for="selectedOrderStatus" style="margin-top: 5px;">{{
         "default_order_status" | translate: lang
       }}</label>
     </div>
     <div class="form-group col-md-4">
-      <input
-        class="form-control"
-        type="text"
-        name="defaultOrderStatus"
-        [(ngModel)]="defaultOrderStatus"
-        (input)="clearMessage()"
-      />
+      <select
+        name="selectedOrderStatus"
+        [(ngModel)]="selectedOrderStatus"
+        [(ngOptions)]="s.names for s in orderStatuses"
+      >
+      </select>
     </div>
   </div>
 

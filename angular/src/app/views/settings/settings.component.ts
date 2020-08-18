@@ -1,5 +1,6 @@
 import { Component } from "@angular/core";
 import { SettingsService } from "../../core/services/settings/settings.service";
+import { OrderStatusService } from "../../core/services/orderStatus/orderStatus.service"
 import { Language, TranslationService } from "angular-l10n";
 
 @Component({
@@ -25,13 +26,17 @@ export class SettingsComponent {
   public defaultItemMappingMethod = null;
   public importOrdersSince = null;
   public isAllInventorySyncEnabled = null;
+  public orderStatuses = [];
+  public selectedOrderStatus = null;
 
   public constructor(
     private settingsService: SettingsService,
+    private orderStatusService: OrderStatusService,
     private translation: TranslationService
   ) {}
 
   public ngOnInit(): void {
+    this.loadOrderStatusValues();
     this.loadSettingsFromStorage();
   }
 
@@ -101,6 +106,17 @@ export class SettingsComponent {
     );
   }
 
+  private loadOrderStatusValues(): void {
+    this.orderStatusService.fetch().subscribe(
+      (data) => {
+        this.orderStatuses = data;
+      },
+      (err) => {
+        this.showErrorVerbose(this.translation.translate("error_fetch"));
+      }
+    )
+  }
+
   /**
    * Load the settings in an Object into the in-memory settings
    * @param data the settings as an Object
@@ -112,6 +128,11 @@ export class SettingsComponent {
     this.defaultItemMappingMethod = data.defaultItemMappingMethod;
     this.importOrdersSince = data.importOrdersSince;
     this.isAllInventorySyncEnabled = data.isAllInventorySyncEnabled;
+
+    if (this.defaultOrderStatus)
+    {
+      // TODO: set selected status, based on value
+    }
   }
 
   /**

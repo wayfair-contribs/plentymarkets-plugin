@@ -11,7 +11,7 @@ use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Helpers\TranslationHelper;
 
 /**
- * Class WarehouseController
+ * Class OrderStatusController
  *
  * @package Wayfair\Controllers
  */
@@ -26,7 +26,7 @@ class OrderStatusController extends Controller {
   private $logger;
 
    /**
-   * WarehouseController constructor.
+   * OrderStatusController constructor.
    *
    * @param LoggerContract $logger
    */
@@ -55,7 +55,7 @@ class OrderStatusController extends Controller {
 
   /**
    * @param Twig                        $twig
-   * @param WarehouseRepositoryContract $warehouseRepositoryContract
+   * @param OrderStatusController $orderStatusRepositoryContract
    *
    * @return string
    */
@@ -73,7 +73,7 @@ class OrderStatusController extends Controller {
   }
 
   /**
-   * @param WarehouseRepositoryContract $warehouseRepositoryContract
+   * @param OrderStatusRepositoryContract $orderStatusRepositoryContract
    *
    * @return string
    */

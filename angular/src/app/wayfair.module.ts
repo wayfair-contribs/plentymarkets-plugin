@@ -37,6 +37,7 @@ import {CarrierScacMappingComponent} from "./views/carrierScacMapping/carrierSca
 import {CarrierService} from "./core/services/carrier/carrier.service";
 import {CarrierScacService} from "./core/services/carrierScac/carrierScac.service";
 import {ShippingMethodService} from "./core/services/shippingMethod/shippingMethod.service";
+import {OrderStatusService} from "./core/services/orderStatus/orderStatus.service"
 
 @NgModule({
     imports: [
@@ -74,7 +75,8 @@ import {ShippingMethodService} from "./core/services/shippingMethod/shippingMeth
         FullInventoryService,
         CarrierService,
         CarrierScacService,
-        ShippingMethodService
+        ShippingMethodService,
+        OrderStatusService
     ],
     bootstrap: [
         WayfairAppComponent
