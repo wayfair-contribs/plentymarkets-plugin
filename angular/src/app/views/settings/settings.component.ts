@@ -11,7 +11,7 @@ export class SettingsComponent {
     "negative_not_allowed";
   private static readonly TRANSLATION_KEY_MUST_BE_POSITIVE =
     "value_must_be_positive";
-  private static readonly MESSAGE_DELIM = " |";
+  private static readonly MESSAGE_DELIM = " | ";
 
   @Language()
   public lang: string;
