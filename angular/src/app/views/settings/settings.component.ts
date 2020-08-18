@@ -186,7 +186,7 @@ export class SettingsComponent {
     let buffer = "";
     issues.forEach(message => buffer += message + SettingsComponent.MESSAGE_DELIM);
     // remove trailing delim
-    buffer = buffer.slice(0, SettingsComponent.MESSAGE_DELIM.length);
+    buffer = buffer.slice(0, -1 * SettingsComponent.MESSAGE_DELIM.length);
 
     return buffer;
   }
