@@ -11,13 +11,16 @@ export class SettingsComponent {
     "negative_not_allowed";
   private static readonly MESSAGE_DELIM = ", ";
 
+  private static readonly DEFAULT_STOCK_BUFFER = 0;
+  private static readonly DEFAULT_ORDER_STATUS = 2;
+
   @Language()
   public lang: string;
 
   public status = { type: null, value: null, timestamp: null };
 
-  public stockBuffer = 0;
-  public defaultOrderStatus = null;
+  public stockBuffer = SettingsComponent.DEFAULT_STOCK_BUFFER;
+  public defaultOrderStatus = SettingsComponent.DEFAULT_ORDER_STATUS;
   // Default Shipping Provider is deprecated as of 1.1.2
   public defaultShippingProvider = null;
   public defaultItemMappingMethod = null;
@@ -104,8 +107,20 @@ export class SettingsComponent {
    * @param data the settings as an Object
    */
   private loadSettingsFromObject(data): void {
-    this.stockBuffer = data.stockBuffer;
-    this.defaultOrderStatus = data.defaultOrderStatus;
+    let sb = SettingsComponent.DEFAULT_STOCK_BUFFER;
+    if (data.stockBuffer)
+    {
+      sb = data.stockBuffer;
+    }
+    this.stockBuffer = sb;
+
+    let orderStatus = SettingsComponent.DEFAULT_ORDER_STATUS;
+    if (data.defaultOrderStatus)
+    {
+      orderStatus = data.defaultOrderStatus;
+    }
+
+    this.defaultOrderStatus = orderStatus;
     this.defaultShippingProvider = data.defaultShippingProvider;
     this.defaultItemMappingMethod = data.defaultItemMappingMethod;
     this.importOrdersSince = data.importOrdersSince;
