@@ -11,7 +11,7 @@ export class SettingsComponent {
     "negative_not_allowed";
   private static readonly TRANSLATION_KEY_MUST_BE_POSITIVE =
     "value_must_be_positive";
-  private static readonly MESSAGE_DELIM = "<br/>";
+  private static readonly MESSAGE_DELIM = " |";
 
   @Language()
   public lang: string;
@@ -185,6 +185,8 @@ export class SettingsComponent {
 
     let buffer = "";
     issues.forEach(message => buffer += message + SettingsComponent.MESSAGE_DELIM);
+    // remove trailing delim
+    buffer = buffer.slice(0, SettingsComponent.MESSAGE_DELIM.length);
 
     return buffer;
   }
