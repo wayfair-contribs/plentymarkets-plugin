@@ -12,7 +12,7 @@ export class SettingsComponent {
   private static readonly MESSAGE_DELIM = ", ";
 
   private static readonly DEFAULT_STOCK_BUFFER = 0;
-  private static readonly DEFAULT_ORDER_STATUS = 2;
+  private static readonly ORDER_STATUS_WAITING_FOR_ACTIVATION = 2;
 
   @Language()
   public lang: string;
@@ -20,7 +20,7 @@ export class SettingsComponent {
   public status = { type: null, value: null, timestamp: null };
 
   public stockBuffer = SettingsComponent.DEFAULT_STOCK_BUFFER;
-  public defaultOrderStatus = SettingsComponent.DEFAULT_ORDER_STATUS;
+  public defaultOrderStatus = SettingsComponent.ORDER_STATUS_WAITING_FOR_ACTIVATION;
   // Default Shipping Provider is deprecated as of 1.1.2
   public defaultShippingProvider = null;
   public defaultItemMappingMethod = null;
@@ -114,7 +114,7 @@ export class SettingsComponent {
     }
     this.stockBuffer = sb;
 
-    let orderStatus = SettingsComponent.DEFAULT_ORDER_STATUS;
+    let orderStatus = SettingsComponent.ORDER_STATUS_WAITING_FOR_ACTIVATION;
     if (data.defaultOrderStatus)
     {
       orderStatus = data.defaultOrderStatus;
