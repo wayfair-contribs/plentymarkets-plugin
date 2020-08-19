@@ -10,10 +10,6 @@ import { Language, TranslationService } from "angular-l10n";
   template: require("./settings.component.html"),
 })
 export class SettingsComponent {
-  private static readonly TRANSLATION_KEY_NEGATIVE_NOT_ALLOWED =
-    "negative_not_allowed";
-  private static readonly MESSAGE_DELIM = " | ";
-
   private static readonly DEFAULT_ORDER_STATUS_ID = 2;
 
   @Language()
@@ -23,8 +19,6 @@ export class SettingsComponent {
 
   public stockBuffer = null;
   public defaultOrderStatus: number = null;
-  // Default Shipping Provider is deprecated as of 1.1.2
-  public defaultShippingProvider = null;
   public defaultItemMappingMethod = null;
   public importOrdersSince = null;
   public isAllInventorySyncEnabled = null;
@@ -48,17 +42,7 @@ export class SettingsComponent {
     this.clearMessage();
     this.showTranslatedInfo("saving_status");
 
-    let error = this.normalizeSettings();
-    if (error && error.length > 0) {
-      this.showErrorVerbose(error);
-      return;
-    }
-
-    error = this.validateSettings();
-    if (error && error.length > 0) {
-      this.showErrorVerbose(error);
-      return;
-    }
+    this.normalizeSettings();
 
     this.saveSettingsToStorage();
   }
@@ -84,9 +68,9 @@ export class SettingsComponent {
    */
   private serializeSettings(): object {
     return {
-      stockBuffer: this.stockBuffer,
+      stockBuffer:
+        this.stockBuffer && this.stockBuffer > 0 ? this.stockBuffer : 0,
       defaultOrderStatus: this.defaultOrderStatus,
-      defaultShippingProvider: this.defaultShippingProvider,
       defaultItemMappingMethod: this.defaultItemMappingMethod,
       importOrdersSince: this.importOrdersSince,
       isAllInventorySyncEnabled: this.isAllInventorySyncEnabled,
@@ -114,8 +98,8 @@ export class SettingsComponent {
    * @param data the settings as an Object
    */
   private loadSettingsFromObject(data: SettingsInterface): void {
-    this.stockBuffer = data.stockBuffer;
-    this.defaultShippingProvider = data.defaultShippingProvider;
+    this.stockBuffer =
+      data.stockBuffer && data.stockBuffer > 0 ? data.stockBuffer : 0;
     this.defaultItemMappingMethod = data.defaultItemMappingMethod;
     this.importOrdersSince = data.importOrdersSince;
     this.isAllInventorySyncEnabled = data.isAllInventorySyncEnabled;
@@ -149,69 +133,32 @@ export class SettingsComponent {
   }
 
   /**
-   * normalize the settings in memory,
-   * returning any errors as string
-   * @returns string
+   * normalize the settings in memory so they're ready for the back-end
    */
-  private normalizeSettings(): string {
+  private normalizeSettings(): void {
     if (this.importOrdersSince) {
-      this.importOrdersSince = new Date(this.importOrdersSince)
-        .toISOString()
-        .slice(0, 10);
+      try {
+        this.importOrdersSince = new Date(this.importOrdersSince)
+          .toISOString()
+          .slice(0, 10);
+      } catch (err) {
+        this.importOrdersSince = null;
+      }
     }
 
-    return null;
-  }
-
-  /**
-   * validate the settings in memory,
-   * returning any errors as string
-   * @returns string
-   */
-  private validateSettings(): string {
-    let issues = [];
-
-    if (this.stockBuffer && (isNaN(this.stockBuffer) || this.stockBuffer < 0)) {
-      issues.push(
-        this.translation.translate("buffer") +
-          ": " +
-          this.translation.translate(
-            SettingsComponent.TRANSLATION_KEY_NEGATIVE_NOT_ALLOWED
-          )
-      );
+    // lowest allowed stock buffer is 0
+    if (!this.stockBuffer || isNaN(this.stockBuffer) || this.stockBuffer < 0) {
+      this.stockBuffer = 0;
     }
 
-    // defaultOrderStatus is being picked from list and no longer needs client-side validation.
-
+    // lowest allowed order status ID is 1
     if (
-      this.defaultShippingProvider &&
-      (isNaN(this.defaultShippingProvider) || this.defaultShippingProvider < 0)
+      !this.defaultOrderStatus ||
+      isNaN(this.defaultOrderStatus) ||
+      this.defaultOrderStatus < 1
     ) {
-      issues.push(
-        this.translation.translate("shipping_provider_id") +
-          ": " +
-          this.translation.translate(
-            SettingsComponent.TRANSLATION_KEY_NEGATIVE_NOT_ALLOWED
-          )
-      );
+      this.defaultOrderStatus = SettingsComponent.DEFAULT_ORDER_STATUS_ID;
     }
-
-    if (issues.length < 1) {
-      return null;
-    }
-
-    if (issues.length == 1) {
-      return issues.pop();
-    }
-
-    let buffer = "";
-    issues.forEach(
-      (message) => (buffer += message + SettingsComponent.MESSAGE_DELIM)
-    );
-    // remove trailing delim
-    buffer = buffer.slice(0, -1 * SettingsComponent.MESSAGE_DELIM.length);
-
-    return buffer;
   }
 
   /**
