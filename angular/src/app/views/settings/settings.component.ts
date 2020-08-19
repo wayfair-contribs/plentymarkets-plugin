@@ -4,7 +4,6 @@ import { OrderStatusService } from "../../core/services/orderStatus/orderStatus.
 import { SettingsInterface } from "../../core/services/settings/data/settings.interface";
 import { SettingsService } from "../../core/services/settings/settings.service";
 import { Language, TranslationService } from "angular-l10n";
-import { stat } from "fs";
 
 @Component({
   selector: "settings",
