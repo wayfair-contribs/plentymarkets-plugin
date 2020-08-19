@@ -34,7 +34,6 @@ export class SettingsComponent {
 
   private orderStatuses: OrderStatusInterface[] = [];
 
-
   public constructor(
     private settingsService: SettingsService,
     private orderStatusService: OrderStatusService,
@@ -101,9 +100,6 @@ export class SettingsComponent {
    * Load the settings in storage into the in-memory settings
    */
   private loadSettingsFromStorage(): void {
-
-    this.loadOrderStatusValues();
-
     this.settingsService.fetch().subscribe(
       (data) => {
         this.loadSettingsFromObject(data);
@@ -114,16 +110,7 @@ export class SettingsComponent {
     );
   }
 
-  private loadOrderStatusValues(): void {
-    this.orderStatusService.fetch().subscribe(
-      (data) => {
-        this.orderStatuses = data;
-      },
-      (err) => {
-        this.showErrorVerbose(this.translation.translate("error_fetch"));
-      }
-    );
-  }
+  private loadOrderStatusValues(): void {}
 
   /**
    * Load the settings in an Object into the in-memory settings
@@ -136,23 +123,32 @@ export class SettingsComponent {
     this.importOrdersSince = data.importOrdersSince;
     this.isAllInventorySyncEnabled = data.isAllInventorySyncEnabled;
 
-    this.chooseOrderStatus(data.defaultOrderStatus);
+    this.chooseOrderStatusAfterRefreshingList(data.defaultOrderStatus);
   }
 
-  private chooseOrderStatus(statusId): void {
-    if (statusId) {
-      if (this.orderStatuses && this.orderStatuses.length > 0) {
-        for (let option of this.orderStatuses) {
-          if (option.statusId == statusId) {
-            this.defaultOrderStatus = statusId;
-            return;
+  private chooseOrderStatusAfterRefreshingList(statusId): void {
+    this.orderStatusService.fetch().subscribe(
+      (data) => {
+        // store this so that the UI can show in drop-down
+        this.orderStatuses = data;
+        if (statusId) {
+          if (this.orderStatuses.length > 0) {
+            for (let option of this.orderStatuses) {
+              if (option.statusId == statusId) {
+                this.defaultOrderStatus = statusId;
+                return;
+              }
+            }
           }
         }
+        // status ID not set or not a valid option - use default
+        this.defaultOrderStatus = SettingsComponent.DEFAULT_ORDER_STATUS_ID;
+      },
+      (err) => {
+        this.showErrorVerbose(this.translation.translate("error_fetch"));
+        return;
       }
-    }
-
-    // could not find the status in the options, so revert to default
-    this.defaultOrderStatus = SettingsComponent.DEFAULT_ORDER_STATUS_ID;
+    );
   }
 
   /**
