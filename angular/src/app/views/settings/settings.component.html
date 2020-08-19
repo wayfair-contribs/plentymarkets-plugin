@@ -24,7 +24,7 @@
     </div>
     <div class="form-group col-md-4">
       <select class="form-control" name="defaultOrderStatus" [(ngModel)]="defaultOrderStatus">
-        <option *ngFor="let status of orderStatuses" [value]="status.statusId">{{status.statusId}}:{{status.names[orderStatusLanguageIndex]}</option>
+        <option *ngFor="let status of orderStatuses" [value]="status.statusId">{{status.statusId}}: {{status.names[lang]}</option>
       </select>
     </div>
   </div>

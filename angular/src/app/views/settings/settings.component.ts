@@ -32,9 +32,6 @@ export class SettingsComponent {
   public importOrdersSince = null;
   public isAllInventorySyncEnabled = null;
 
-  // no language is guaranteed to be populated on OrderStatus
-  public orderStatusLanguageIndex = 0;
-
   private orderStatuses: OrderStatusInterface[] = [];
 
 
