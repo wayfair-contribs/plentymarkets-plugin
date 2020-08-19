@@ -4,7 +4,7 @@
 
 Dieses Dokument richtet sich an Benutzer des Wayfair-Plugins, bei denen Probleme auftreten. Wenn es in Plentymarkets ein Problem gibt, das nicht speziell für das Wayfair-Plugin gilt, sollte es Plentymarkets gemeldet werden.
 
-Die bekannten Probleme für aktuelle und frühere Versionen des Wayfair-Plugins können auf [Die Issues Site auf Github](https://github.com/wayfair-contribs/plentymarkets-plugin/issues) eingesehen werden.
+Die bekannten Probleme für aktuelle und frühere Versionen des Wayfair-Plugins können auf [Die Issues Site auf GitHub](https://github.com/wayfair-contribs/plentymarkets-plugin/issues) eingesehen werden.
 
 
 ## Plentymarkets logs
@@ -67,6 +67,6 @@ Bevor Sie sich an Wayfair wenden, verwenden Sie bitte die folgende Tabelle, um P
 
 ## So melden Sie Probleme an Wayfair
 
-Wenn Sie ein Problem mit dem Wayfair-Plugin nicht beheben können, können Sie das Problem Wayfair auf [Die Issues Site für das Plugin auf Github](https://github.com/wayfair-contribs/plentymarkets-plugin/issues) melden.
+Wenn Sie ein Problem mit dem Wayfair-Plugin nicht beheben können, können Sie das Problem Wayfair auf [Die Issues Site für das Plugin auf GitHub](https://github.com/wayfair-contribs/plentymarkets-plugin/issues) melden.
 
 **Wenn Sie Wayfair kontaktieren, geben Sie bitte Informationen zu Einstellungen an, die kürzlich in Plentymarkets oder in des Wayfair-Plugins geändert wurden. Um Ihnen die bestmögliche Unterstützung zu bieten, müssen die Vertreter von Wayfair möglicherweise auch zusätzliche Fragen zu Ihrer spezifischen Konfiguration stellen.**

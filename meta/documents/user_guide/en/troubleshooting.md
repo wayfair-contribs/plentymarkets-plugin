@@ -4,7 +4,7 @@
 
 This document is intended for users of the Wayfair plugin who are experiencing issues with it. If there is an issue in Plentymarkets which does not apply specifically to the Wayfair plugin, it should be reported to Plentymarkets.
 
-The known issues for current and past versions of the Wayfair plugin can be viewed on [the plugin's github page](https://github.com/wayfair-contribs/plentymarkets-plugin/issues).
+The known issues for current and past versions of the Wayfair plugin can be viewed on [the plugin's GitHub page](https://github.com/wayfair-contribs/plentymarkets-plugin/issues).
 
 
 ## Plentymarkets logs
