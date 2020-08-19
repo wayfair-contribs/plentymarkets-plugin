@@ -1,9 +1,10 @@
 import { Component } from "@angular/core";
-import { OrderStatusInterface } from "../../core/services/orderStatus/data/orderStatus.interface"
-import { OrderStatusService } from "../../core/services/orderStatus/orderStatus.service"
-import { SettingsInterface } from "../../core/services/settings/data/settings.interface"
+import { OrderStatusInterface } from "../../core/services/orderStatus/data/orderStatus.interface";
+import { OrderStatusService } from "../../core/services/orderStatus/orderStatus.service";
+import { SettingsInterface } from "../../core/services/settings/data/settings.interface";
 import { SettingsService } from "../../core/services/settings/settings.service";
 import { Language, TranslationService } from "angular-l10n";
+import { stat } from "fs";
 
 @Component({
   selector: "settings",
@@ -16,19 +17,26 @@ export class SettingsComponent {
     "value_must_be_positive";
   private static readonly MESSAGE_DELIM = " | ";
 
+  private static readonly DEFAULT_ORDER_STATUS_ID = 2;
+
   @Language()
   public lang: string;
 
   public status = { type: null, value: null, timestamp: null };
 
   public stockBuffer = null;
+  public defaultOrderStatus: number = null;
   // Default Shipping Provider is deprecated as of 1.1.2
   public defaultShippingProvider = null;
   public defaultItemMappingMethod = null;
   public importOrdersSince = null;
   public isAllInventorySyncEnabled = null;
-  public orderStatuses:OrderStatusInterface[] = [];
-  public selectedOrderStatus: OrderStatusInterface = null;
+
+  // no language is guaranteed to be populated on OrderStatus
+  public orderStatusLanguageIndex = 0;
+
+  private orderStatuses: OrderStatusInterface[] = [];
+
 
   public constructor(
     private settingsService: SettingsService,
@@ -85,7 +93,7 @@ export class SettingsComponent {
   private serializeSettings(): object {
     return {
       stockBuffer: this.stockBuffer,
-      defaultOrderStatus: this.selectedOrderStatus.statusId,
+      defaultOrderStatus: this.defaultOrderStatus,
       defaultShippingProvider: this.defaultShippingProvider,
       defaultItemMappingMethod: this.defaultItemMappingMethod,
       importOrdersSince: this.importOrdersSince,
@@ -115,7 +123,7 @@ export class SettingsComponent {
       (err) => {
         this.showErrorVerbose(this.translation.translate("error_fetch"));
       }
-    )
+    );
   }
 
   /**
@@ -132,17 +140,21 @@ export class SettingsComponent {
     this.chooseOrderStatus(data.defaultOrderStatus);
   }
 
-  private chooseOrderStatus(statusId): void
-  {
-    if (statusId)
-    {
-      for (let option of this.orderStatuses) {
-        if (option.statusId == statusId)
-        this.selectedOrderStatus = option;
-        return;
+  private chooseOrderStatus(statusId): void {
+    if (statusId) {
+      this.loadOrderStatusValues();
+      if (this.orderStatuses && this.orderStatuses.length > 0) {
+        for (let option of this.orderStatuses) {
+          if (option.statusId == statusId) {
+            this.defaultOrderStatus = statusId;
+            return;
+          }
+        }
       }
     }
-    this.selectedOrderStatus = this.orderStatuses[0];
+
+    // could not find the status in the options, so revert to default
+    this.defaultOrderStatus = SettingsComponent.DEFAULT_ORDER_STATUS_ID;
   }
 
   /**
@@ -178,19 +190,7 @@ export class SettingsComponent {
       );
     }
 
-    // minimum order status is 1
-    if (
-      this.selectedOrderStatus &&
-      (isNaN(this.selectedOrderStatus.statusId) || this.selectedOrderStatus.statusId < 1)
-    ) {
-      issues.push(
-          this.translation.translate("order_status_id") +
-          ": " +
-          this.translation.translate(
-            SettingsComponent.TRANSLATION_KEY_MUST_BE_POSITIVE
-          )
-      );
-    }
+    // defaultOrderStatus is being picked from list and no longer needs client-side validation.
 
     if (
       this.defaultShippingProvider &&
@@ -198,10 +198,10 @@ export class SettingsComponent {
     ) {
       issues.push(
         this.translation.translate("shipping_provider_id") +
-        ": " +
-        this.translation.translate(
-          SettingsComponent.TRANSLATION_KEY_NEGATIVE_NOT_ALLOWED
-        )
+          ": " +
+          this.translation.translate(
+            SettingsComponent.TRANSLATION_KEY_NEGATIVE_NOT_ALLOWED
+          )
       );
     }
 
@@ -209,13 +209,14 @@ export class SettingsComponent {
       return null;
     }
 
-    if (issues.length == 1)
-    {
+    if (issues.length == 1) {
       return issues.pop();
     }
 
     let buffer = "";
-    issues.forEach(message => buffer += message + SettingsComponent.MESSAGE_DELIM);
+    issues.forEach(
+      (message) => (buffer += message + SettingsComponent.MESSAGE_DELIM)
+    );
     // remove trailing delim
     buffer = buffer.slice(0, -1 * SettingsComponent.MESSAGE_DELIM.length);
 

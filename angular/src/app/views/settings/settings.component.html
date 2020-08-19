@@ -18,15 +18,14 @@
 
   <div class="form-row">
     <div class="form-group col-md-4 col-md-offset-2">
-      <label for="selectedOrderStatus" style="margin-top: 5px;">{{
+      <label for="defaultOrderStatus" style="margin-top: 5px;">{{
         "default_order_status" | translate: lang
       }}</label>
     </div>
     <div class="form-group col-md-4">
-      <select class="form-control" name="selectedOrderStatus" [(ngModel)]="selectedOrderStatus">
-        <option *ngFor="let status of orderStatuses" [value]="status">{{status.statusId}}</option>
+      <select class="form-control" name="defaultOrderStatus" [(ngModel)]="defaultOrderStatus">
+        <option *ngFor="let status of orderStatuses" [value]="status.statusId">{{status.statusId}}:{{status.names[orderStatusLanguageIndex]}</option>
       </select>
-      <p *ngIf="selectedOrderStatus">{{selectedOrderStatus.names}}</p>
     </div>
   </div>
 
