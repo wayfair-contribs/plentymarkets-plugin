@@ -65,8 +65,8 @@ Bevor Sie sich an Wayfair wenden, verwenden Sie bitte die folgende Tabelle, um P
 | Lager zuordnungen fehlen oder sind für Bestellungen von Wayfair falsch | <ul><li>Probleme in Lager verbänden auf der [Lager Seite](settings_guide.md#die-lager-seite) der Wayfair Plugin Einstellungen.</li><li>Derzeit sind einer Wayfair Lieferanten ID mehrere Lager zugeordnet auf der [Lager Seite](settings_guide.md#die-lager-seite) der Wayfair Plugin Einstellungen.</li></ul> |
 | Die Schaltfläche zum Herunterladen von Versandetiketten wird nicht auf der Registerkarte `Übersicht` einer Bestellung im `Versand-Center` von Plentymarkets angezeigt | <ul><li>Der Versand der Bestellung wurde nicht registriert.</li><li>Die Seite des `Versand-Center` wurde noch nicht lade de neu, nachdem die Versandregistrierung durchgeführt wurde.</li><li>Das Herunterladen von Dokumenten ist während der Versand Registrierung fehlgeschlagen.</li></ul> |
 
-## Reporting issues to Wayfair
+## So melden Sie Probleme an Wayfair
 
-If you are unable to resolve an issue with the Wayfair plugin, you may file a report on [the issues page for the plugin](https://github.com/wayfair-contribs/plentymarkets-plugin/issues) so that it may be evaluated by the Wayfair team.
+Wenn Sie ein Problem mit dem Wayfair-Plugin nicht beheben können, können Sie das Problem Wayfair auf [Die Issues Site für das Plugin auf Github](https://github.com/wayfair-contribs/plentymarkets-plugin/issues) melden.
 
-**When contacting Wayfair, please include information on any settings that have recently been changed in Plentymarkets or in the Wayfair plugin's settings. In order to provide you with the best support, Wayfair's representatives may also need to ask you additional questions about your specific configuration.**
+**Wenn Sie Wayfair kontaktieren, geben Sie bitte Informationen zu Einstellungen an, die kürzlich in Plentymarkets oder in des Wayfair-Plugins geändert wurden. Um Ihnen die bestmögliche Unterstützung zu bieten, müssen die Vertreter von Wayfair möglicherweise auch zusätzliche Fragen zu Ihrer spezifischen Konfiguration stellen.**
