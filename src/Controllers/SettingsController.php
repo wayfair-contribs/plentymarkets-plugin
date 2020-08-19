@@ -71,12 +71,12 @@ class SettingsController
     $isAllInventorySyncEnabled = $this->keyValueRepository->get(AbstractConfigHelper::SETTINGS_SEND_ALL_ITEMS_KEY);
 
     $data = [
-      AbstractConfigHelper::SETTINGS_STOCK_BUFFER_KEY => (empty($stockBuffer) ? 0 : $stockBuffer),
-      AbstractConfigHelper::SETTINGS_DEFAULT_ORDER_STATUS_KEY => (empty($defaultOrderStatus) ? null : $defaultOrderStatus),
-      AbstractConfigHelper::SETTINGS_DEFAULT_SHIPPING_PROVIDER_KEY => (empty($defaultShippingProvider) ? null : $defaultShippingProvider),
-      AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD => (empty($defaultItemMappingMethod) ? AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER : $defaultItemMappingMethod),
-      AbstractConfigHelper::IMPORT_ORDER_SINCE => (empty($orderImportDate) ? '' : $orderImportDate),
-      AbstractConfigHelper::SETTINGS_SEND_ALL_ITEMS_KEY => (empty($isAllInventorySyncEnabled) ? false : $isAllInventorySyncEnabled),
+      AbstractConfigHelper::SETTINGS_STOCK_BUFFER_KEY => (!isset($stockBuffer) || empty($stockBuffer) ? 0 : $stockBuffer),
+      AbstractConfigHelper::SETTINGS_DEFAULT_ORDER_STATUS_KEY => (!isset($defaultOrderStatus) || empty($defaultOrderStatus) ? null : $defaultOrderStatus),
+      AbstractConfigHelper::SETTINGS_DEFAULT_SHIPPING_PROVIDER_KEY => (!isset($defaultShippingProvider) || empty($defaultShippingProvider) ? null : $defaultShippingProvider),
+      AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD => (!isset($defaultItemMappingMethod) || empty($defaultItemMappingMethod) ? AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER : $defaultItemMappingMethod),
+      AbstractConfigHelper::IMPORT_ORDER_SINCE => (!isset($orderImportDate) || empty($orderImportDate) ? '' : $orderImportDate),
+      AbstractConfigHelper::SETTINGS_SEND_ALL_ITEMS_KEY => (!isset($isAllInventorySyncEnabled) || empty($isAllInventorySyncEnabled) ? false : $isAllInventorySyncEnabled),
     ];
 
     $payload = json_encode($data);
@@ -179,16 +179,15 @@ class SettingsController
    * Get the Stock Buffer value from a payload
    *
    * @param mixed $inputData
-   * @return int|null
+   * @return int
    * @throws ValidationException
    */
   private static function getAndValidateStockBufferFromInput($inputData)
   {
     $inputStockBuffer = $inputData[AbstractConfigHelper::SETTINGS_STOCK_BUFFER_KEY];
 
-    // this is nullable - see InventoryUpdateService
     if (!isset($inputStockBuffer) || empty($inputStockBuffer)) {
-      return null;
+      return 0;
     }
 
     if (!is_numeric($inputStockBuffer) || $inputStockBuffer < 0) {
