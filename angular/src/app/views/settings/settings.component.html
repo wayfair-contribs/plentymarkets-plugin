@@ -26,7 +26,7 @@
       <select class="form-control" name="selectedOrderStatus" [(ngModel)]="selectedOrderStatus">
         <option *ngFor="let status of orderStatuses" [value]="status.statusId">{{status.statusId}}</option>
       </select>
-      <p *ngIf="selectedOrderStatus">{{selectedOrderStatus.names[0]}}</p>
+      <p *ngIf="selectedOrderStatus">{{selectedOrderStatus.names}}</p>
     </div>
   </div>
 
