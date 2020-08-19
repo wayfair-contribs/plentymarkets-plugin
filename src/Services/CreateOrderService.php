@@ -238,7 +238,7 @@ class CreateOrderService
           $billing = \json_decode($encodedBillingContactFromRepository, true);
         } catch (\Exception $e) {
           $externalLogs->addWarningLog("Could not decode billing information in KeyValueRepository - "
-            . get_class($e) . ": " . $e->getMessage());
+            . get_class($e) . ": " . $e->getMessage(), $e->getTraceAsString());
         }
       }
 
@@ -336,7 +336,7 @@ class CreateOrderService
       try {
         $this->savePackingSlipService->save($orderId, $poNumber);
       } catch (\Exception $exception) {
-        $externalLogs->addErrorLog("Unexpected " . get_class($exception) . " while working with packing slips: " . $exception->getMessage());
+        $externalLogs->addErrorLog("Unexpected " . get_class($exception) . " while working with packing slips: " . $exception->getMessage(), $exception->getTraceAsString());
       }
 
       return $orderId;
