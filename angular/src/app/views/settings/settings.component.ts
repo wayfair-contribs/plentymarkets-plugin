@@ -42,7 +42,6 @@ export class SettingsComponent {
   ) {}
 
   public ngOnInit(): void {
-    this.loadOrderStatusValues();
     this.loadSettingsFromStorage();
   }
 
@@ -102,6 +101,9 @@ export class SettingsComponent {
    * Load the settings in storage into the in-memory settings
    */
   private loadSettingsFromStorage(): void {
+
+    this.loadOrderStatusValues();
+
     this.settingsService.fetch().subscribe(
       (data) => {
         this.loadSettingsFromObject(data);
@@ -139,7 +141,6 @@ export class SettingsComponent {
 
   private chooseOrderStatus(statusId): void {
     if (statusId) {
-      this.loadOrderStatusValues();
       if (this.orderStatuses && this.orderStatuses.length > 0) {
         for (let option of this.orderStatuses) {
           if (option.statusId == statusId) {
