@@ -47,6 +47,5 @@
   "running": "In progress",
   "complete": "Complete",
   "full_inventory_disclaimer_label": "Disclaimer",
-  "full_inventory_disclaimer_text": "All inventory synchronizations are performed automatically throughout the day, with no manual effort required.\nActions performed on this page apply outside of auto-scheduled sync and apply only to Full Inventory Synchronization",
-  "value_must_be_positive": "The value must be positive"
+  "full_inventory_disclaimer_text": "All inventory synchronizations are performed automatically throughout the day, with no manual effort required.\nActions performed on this page apply outside of auto-scheduled sync and apply only to Full Inventory Synchronization"
 }

@@ -13,8 +13,6 @@ import { stat } from "fs";
 export class SettingsComponent {
   private static readonly TRANSLATION_KEY_NEGATIVE_NOT_ALLOWED =
     "negative_not_allowed";
-  private static readonly TRANSLATION_KEY_MUST_BE_POSITIVE =
-    "value_must_be_positive";
   private static readonly MESSAGE_DELIM = " | ";
 
   private static readonly DEFAULT_ORDER_STATUS_ID = 2;
