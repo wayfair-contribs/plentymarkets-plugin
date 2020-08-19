@@ -24,7 +24,7 @@
     </div>
     <div class="form-group col-md-4">
       <select class="form-control" name="selectedOrderStatus" [(ngModel)]="selectedOrderStatus">
-        <option *ngFor="let status of orderStatuses" [value]="status.statusId">{{status.statusId}}</option>
+        <option *ngFor="let status of orderStatuses" [value]="status">{{status.statusId}}</option>
       </select>
       <p *ngIf="selectedOrderStatus">{{selectedOrderStatus.names}}</p>
     </div>
