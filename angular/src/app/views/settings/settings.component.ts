@@ -1,6 +1,8 @@
 import { Component } from "@angular/core";
-import { SettingsService } from "../../core/services/settings/settings.service";
+import { OrderStatusInterface } from "../../core/services/orderStatus/data/orderStatus.interface"
 import { OrderStatusService } from "../../core/services/orderStatus/orderStatus.service"
+import { SettingsInterface } from "../../core/services/settings/data/settings.interface"
+import { SettingsService } from "../../core/services/settings/settings.service";
 import { Language, TranslationService } from "angular-l10n";
 
 @Component({
@@ -20,14 +22,13 @@ export class SettingsComponent {
   public status = { type: null, value: null, timestamp: null };
 
   public stockBuffer = null;
-  public defaultOrderStatus = null;
   // Default Shipping Provider is deprecated as of 1.1.2
   public defaultShippingProvider = null;
   public defaultItemMappingMethod = null;
   public importOrdersSince = null;
   public isAllInventorySyncEnabled = null;
-  public orderStatuses = [];
-  public selectedOrderStatus = null;
+  public orderStatuses:OrderStatusInterface[] = [];
+  public selectedOrderStatus: OrderStatusInterface = null;
 
   public constructor(
     private settingsService: SettingsService,
@@ -84,7 +85,7 @@ export class SettingsComponent {
   private serializeSettings(): object {
     return {
       stockBuffer: this.stockBuffer,
-      defaultOrderStatus: this.defaultOrderStatus,
+      defaultOrderStatus: this.selectedOrderStatus.statusId,
       defaultShippingProvider: this.defaultShippingProvider,
       defaultItemMappingMethod: this.defaultItemMappingMethod,
       importOrdersSince: this.importOrdersSince,
@@ -121,18 +122,27 @@ export class SettingsComponent {
    * Load the settings in an Object into the in-memory settings
    * @param data the settings as an Object
    */
-  private loadSettingsFromObject(data): void {
+  private loadSettingsFromObject(data: SettingsInterface): void {
     this.stockBuffer = data.stockBuffer;
-    this.defaultOrderStatus = data.defaultOrderStatus;
     this.defaultShippingProvider = data.defaultShippingProvider;
     this.defaultItemMappingMethod = data.defaultItemMappingMethod;
     this.importOrdersSince = data.importOrdersSince;
     this.isAllInventorySyncEnabled = data.isAllInventorySyncEnabled;
 
-    if (this.defaultOrderStatus)
+    this.chooseOrderStatus(data.defaultOrderStatus);
+  }
+
+  private chooseOrderStatus(statusId): void
+  {
+    if (statusId)
     {
-      // TODO: set selected status, based on value
+      for (let option of this.orderStatuses) {
+        if (option.statusId == statusId)
+        this.selectedOrderStatus = option;
+        return;
+      }
     }
+    this.selectedOrderStatus = this.orderStatuses[0];
   }
 
   /**
@@ -170,8 +180,8 @@ export class SettingsComponent {
 
     // minimum order status is 1
     if (
-      this.defaultOrderStatus &&
-      (isNaN(this.defaultOrderStatus) || this.defaultOrderStatus < 1)
+      this.selectedOrderStatus &&
+      (isNaN(this.selectedOrderStatus.statusId) || this.selectedOrderStatus.statusId < 1)
     ) {
       issues.push(
           this.translation.translate("order_status_id") +
