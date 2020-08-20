@@ -35,6 +35,9 @@ class AuthService implements AuthContract
   const CLIENT_SECRET = 'client_secret';
   const PRIVATE_INFO_KEYS = [self::CLIENT_ID, self::CLIENT_SECRET];
 
+  /** Accounts for the time it takes to download the token and save it (in seconds) */
+  const TOKEN_EXPIRY_CUSHION = 5;
+
   /**
    * @var StorageInterfaceContract
    */
@@ -148,12 +151,6 @@ class AuthService implements AuthContract
     return $this->client->call($method, $arguments);
   }
 
-  /**
-   * Refresh the Authorization Token, unconditionally
-   *
-   * @return void
-   * @throws \Exception
-   */
   public function refreshAuth()
   {
     $this->clearToken();
@@ -190,16 +187,16 @@ class AuthService implements AuthContract
     }
 
     $this->loggerContract
-    ->debug(
-      TranslationHelper::getLoggerKey(self::LOG_KEY_NEW_TOKEN),
-      [
-        'additionalInfo' =>
+      ->debug(
+        TranslationHelper::getLoggerKey(self::LOG_KEY_NEW_TOKEN),
         [
-          'maskedToken' => StringHelper::mask($tokenArray[self::ACCESS_TOKEN])
-        ],
-        'method' => __METHOD__
-      ]
-    );
+          'additionalInfo' =>
+          [
+            'maskedToken' => StringHelper::mask($tokenArray[self::ACCESS_TOKEN])
+          ],
+          'method' => __METHOD__
+        ]
+      );
   }
 
   /**
@@ -237,43 +234,37 @@ class AuthService implements AuthContract
   {
     $issues = [];
 
-    if (!isset($token) || ! is_array($token) || empty($token))
-    {
+    if (!isset($token) || !is_array($token) || empty($token)) {
       $issues[] = 'Token data is empty';
     }
 
 
-    if (!count($issues))
-    {
+    if (!count($issues)) {
       $required_elements = [self::ACCESS_TOKEN, self::STORE_TIME, self::EXPIRES_IN];
-      foreach($required_elements as $elem)
-      {
-        if (!isset($token[$elem]) || empty($token[$elem]))
-        {
+      foreach ($required_elements as $elem) {
+        if (!isset($token[$elem]) || empty($token[$elem])) {
           $issues[] = 'Token data is missing ' . $elem . 'element';
         }
       }
     }
 
-    // previous check proved that the two timestamps are set
-    if (!count($issues) && ($token[self::EXPIRES_IN] + $token[self::STORE_TIME]) <= time())
-    {
+    // previous check proved that the two timestamps are set.
+    if (!count($issues) && ($token[self::STORE_TIME] + $token[self::EXPIRES_IN] - self::TOKEN_EXPIRY_CUSHION) <= time()) {
       $issues[] = 'Token has expired';
     }
 
-    if (count($issues))
-    {
+    if (count($issues)) {
       $this->loggerContract
-      ->error(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_TOKEN),
-        [
-          'additionalInfo' =>
+        ->error(
+          TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_TOKEN),
           [
-            'issues' => $issues
-          ],
-          'method' => __METHOD__
-        ]
-      );
+            'additionalInfo' =>
+            [
+              'issues' => $issues
+            ],
+            'method' => __METHOD__
+          ]
+        );
       return false;
     }
 
@@ -289,11 +280,7 @@ class AuthService implements AuthContract
     return json_decode($this->store->get(self::STORAGE_KEY_TOKEN), true);
   }
 
-  /**
-   * Get an OAuth token for use with Wayfair APIs
-   *
-   * @return string|null
-   */
+
   public function getOAuthToken()
   {
     $credentialsChanged = $this->updateCredentials();
@@ -318,19 +305,13 @@ class AuthService implements AuthContract
     return null;
   }
 
-  /**
-   * Generate the value of an Auth header.
-   * The auth token may be refreshed in order to construct the header.
-   *
-   * @return string
-   * @throws TokenNotFoundException
-   */
+
   public function generateAuthHeader()
   {
     $tokenValue = $this->getOAuthToken();
 
     if (!isset($tokenValue) || empty($tokenValue)) {
-      throw new TokenNotFoundException("Could not get a valid OAUth token.");
+      throw new TokenNotFoundException("Could not get a valid OAuth token.");
     }
 
     return 'Bearer ' . $tokenValue;
