@@ -290,41 +290,44 @@ class AuthService implements AuthContract
   }
 
   /**
-   * Get an OAuthToken object for use with Wayfair APIs
+   * Get an OAuth token for use with Wayfair APIs
    *
-   * @return array|null
+   * @return string|null
    */
-  protected function getOAuthTokenData()
+  private function getOAuthToken()
   {
-    $tokenModel = null;
-
     $credentialsChanged = $this->updateCredentials();
     if (!$credentialsChanged) {
-      // can continue using current token if it didn't expire
-      $tokenModel = $this->getStoredTokenData();
+      // no change in credentials - stored token is okay if not expired
+      $oldTokenData = $this->getStoredTokenData();
 
-      if (isset($tokenModel) && $this->validateToken($tokenModel)) {
-        return $tokenModel;
+      if (isset($oldTokenData) && $this->validateToken($oldTokenData)) {
+        // token found, and it has not expired. use it.
+        return $oldTokenData[self::ACCESS_TOKEN];
       }
     }
 
     // abandon any stored token
     $this->refreshAuth();
-    return $this->getStoredTokenData();
+    $refreshedTokenData = $this->getStoredTokenData();
+    if (isset($refreshedTokenData) && $this->validateToken($refreshedTokenData)) {
+      return $refreshedTokenData[self::ACCESS_TOKEN];
+    }
+
+    // even after refreshing, we don't have a good token.
+    return null;
   }
 
   /**
+   * Generate the value of an Auth header.
+   * The auth token may be refreshed in order to construct the header.
+   *
    * @return string
    * @throws TokenNotFoundException
    */
   public function generateAuthHeader()
   {
-    $tokenValue = null;
-
-    $tokenModel = $this->getOAuthTokenData();
-    if (isset($tokenModel)) {
-      $tokenValue = $tokenModel['access_token'];
-    }
+    $tokenValue = $this->getOAuthToken();
 
     if (!isset($tokenValue) || empty($tokenValue)) {
       throw new TokenNotFoundException("Could not get a valid OAUth token.");
@@ -355,8 +358,14 @@ class AuthService implements AuthContract
     return false;
   }
 
+  /**
+   * Clear the auth token data in memory
+   *
+   * @return void
+   */
   private function clearToken(): void
   {
+    // storage contract has no remove
     $this->saveToken([]);
   }
 }
