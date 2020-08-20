@@ -144,6 +144,6 @@ class InventoryController {
      */
     $inventoryUpdateService = pluginApp(InventoryUpdateService::class);
 
-    return json_encode($inventoryUpdateService->sync());
+    return json_encode($inventoryUpdateService->sync(false, true));
   }
 }
