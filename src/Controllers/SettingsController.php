@@ -111,7 +111,7 @@ class SettingsController
         isset($externalLogs) && null !== $externalLogs->getLogs() &&
         count($externalLogs->getLogs())
       ) {
-        $this->logSenderService->execute($this->externalLogs->getLogs());
+        $this->logSenderService->execute($externalLogs->getLogs());
       }
     }
   }
