@@ -75,10 +75,10 @@ class SettingsController
    */
   public function get()
   {
-    try {
-      /** @var ExternalLogs */
-      $externalLogs = pluginApp(ExternalLogs::class);
+    /** @var ExternalLogs */
+    $externalLogs = pluginApp(ExternalLogs::class);
 
+    try {
       $stockBuffer = $this->keyValueRepository->get(AbstractConfigHelper::SETTINGS_STOCK_BUFFER_KEY);
       $defaultOrderStatus = $this->keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_ORDER_STATUS_KEY);
       $defaultShippingProvider = $this->keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_SHIPPING_PROVIDER_KEY);
@@ -219,7 +219,7 @@ class SettingsController
         null !== $externalLogs->getLogs() &&
         count($externalLogs->getLogs())
       ) {
-        $this->logSenderService->execute($this->externalLogs->getLogs());
+        $this->logSenderService->execute($externalLogs->getLogs());
       }
     }
   }
