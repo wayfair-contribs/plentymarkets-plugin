@@ -11,6 +11,7 @@ use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 use Plenty\Modules\Order\Status\Models\OrderStatus;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
+use Wayfair\Core\Api\Services\LogSenderService;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
@@ -26,7 +27,7 @@ class SettingsController
   const LOG_KEY_CONTROLLER_OUT = "controllerOutput";
   const LOG_KEY_SETTING_MAPPING_METHOD = "settingMappingMethod";
   const LOG_KEY_INVALID_SETTINGS = "invalidSettings";
-  const LOG_KEY_SAVE_FAILED= "couldNotSaveSettings";
+  const LOG_KEY_SAVE_FAILED = "couldNotSaveSettings";
 
   /**
    * @var KeyValueRepository
@@ -49,18 +50,29 @@ class SettingsController
   private $externalLogs;
 
   /**
+   * @var LogSenderService
+   */
+  private $logSenderService;
+
+  /**
    * SettingsController constructor.
    *
    * @param KeyValueRepository $keyValueRepository
    * @param AbstractConfigHelper $configHelper
    * @param LoggerContract $logger
    */
-  public function __construct(KeyValueRepository $keyValueRepository, AbstractConfigHelper $configHelper, LoggerContract $logger, ExternalLogs $externalLogs)
-  {
+  public function __construct(
+    KeyValueRepository $keyValueRepository,
+    AbstractConfigHelper $configHelper,
+    LoggerContract $logger,
+    ExternalLogs $externalLogs,
+    LogSenderService $logSenderService
+  ) {
     $this->keyValueRepository = $keyValueRepository;
     $this->logger = $logger;
     $this->configHelper = $configHelper;
     $this->externalLogs = $externalLogs;
+    $this->logSenderService = $logSenderService;
   }
 
   /**
@@ -105,84 +117,94 @@ class SettingsController
    */
   public function post(Request $request, Response $response)
   {
-    $settingMappings = null;
     try {
-      $dataIn = $request->input('data');
+      $settingMappings = null;
+      try {
+        $dataIn = $request->input('data');
 
-      $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_CONTROLLER_IN), [
-        'additionalInfo' => ['payloadIn' => json_encode($dataIn)],
-        'method'         => __METHOD__
-      ]);
+        $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_CONTROLLER_IN), [
+          'additionalInfo' => ['payloadIn' => json_encode($dataIn)],
+          'method'         => __METHOD__
+        ]);
 
-      if (!isset($dataIn) || empty($dataIn)) {
-        throw new \Exception('No settings data provided');
+        if (!isset($dataIn) || empty($dataIn)) {
+          throw new \Exception('No settings data provided');
+        }
+
+        // get and validate all user input
+        $stockBuffer = self::getAndValidateStockBufferFromInput($dataIn);
+        $defaultShippingProviderId = self::getAndValidateDefaultShippingProviderFromInput($dataIn);
+        $defaultOrderStatusId = self::getAndValidateDefaultOrderStatusFromInput($dataIn);
+        $defaultItemMappingMethod = $this->getAndValidateDefaultItemMappingMethodFromInput($dataIn);
+        $importOrderSince = self::getAndValidateImportOrdersSinceFromInput($dataIn);
+        $isAllInventorySyncEnabled = self::getAndValidateAllInventorySyncFromInput($dataIn);
+
+        $settingMappings = [
+          AbstractConfigHelper::SETTINGS_STOCK_BUFFER_KEY => $stockBuffer,
+          AbstractConfigHelper::SETTINGS_DEFAULT_SHIPPING_PROVIDER_KEY => $defaultShippingProviderId,
+          AbstractConfigHelper::SETTINGS_DEFAULT_ORDER_STATUS_KEY => $defaultOrderStatusId,
+          AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD => $defaultItemMappingMethod,
+          AbstractConfigHelper::IMPORT_ORDER_SINCE => $importOrderSince,
+          AbstractConfigHelper::SETTINGS_SEND_ALL_ITEMS_KEY => $isAllInventorySyncEnabled,
+        ];
+      } catch (\Exception $e) {
+
+        $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_SETTINGS), [
+          'additionalInfo' => [
+            'error' => $e->getMessage()
+          ],
+          'method'         => __METHOD__
+        ]);
+
+        $this->externalLogs->addErrorLog("Settings are invalid: " + $e->getMessage(), $e->getTraceAsString());
+
+        return $response->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
       }
 
-      // get and validate all user input
-      $stockBuffer = self::getAndValidateStockBufferFromInput($dataIn);
-      $defaultShippingProviderId = self::getAndValidateDefaultShippingProviderFromInput($dataIn);
-      $defaultOrderStatusId = self::getAndValidateDefaultOrderStatusFromInput($dataIn);
-      $defaultItemMappingMethod = $this->getAndValidateDefaultItemMappingMethodFromInput($dataIn);
-      $importOrderSince = self::getAndValidateImportOrdersSinceFromInput($dataIn);
-      $isAllInventorySyncEnabled = self::getAndValidateAllInventorySyncFromInput($dataIn);
+      try {
+        // store the mappings down into the plugin's data repository
 
-      $settingMappings = [
-        AbstractConfigHelper::SETTINGS_STOCK_BUFFER_KEY => $stockBuffer,
-        AbstractConfigHelper::SETTINGS_DEFAULT_SHIPPING_PROVIDER_KEY => $defaultShippingProviderId,
-        AbstractConfigHelper::SETTINGS_DEFAULT_ORDER_STATUS_KEY => $defaultOrderStatusId,
-        AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD => $defaultItemMappingMethod,
-        AbstractConfigHelper::IMPORT_ORDER_SINCE => $importOrderSince,
-        AbstractConfigHelper::SETTINGS_SEND_ALL_ITEMS_KEY => $isAllInventorySyncEnabled,
-      ];
+        $this->logger->debug(
+          TranslationHelper::getLoggerKey(self::LOG_KEY_SETTING_MAPPING_METHOD),
+          [
+            'additionalInfo' => ['mappingMethod' => $defaultItemMappingMethod],
+            'method' => __METHOD__
+          ]
+        );
 
-    } catch (\Exception $e) {
+        foreach ($settingMappings as $key => $value) {
+          $this->keyValueRepository->putOrReplace($key, $value);
+        }
 
-      $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_SETTINGS), [
-        'additionalInfo' => [
-          'error' => $e->getMessage()
-        ],
-        'method'         => __METHOD__
-      ]);
+        // send the validated, in-memory settings back out to the client
+        $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_CONTROLLER_OUT), [
+          'additionalInfo' => ['payloadOut' => $settingMappings],
+          'method'         => __METHOD__
+        ]);
 
-      $this->externalLogs->addErrorLog("Settings are invalid: " + $e->getMessage(), $e->getTraceAsString());
+        return $response->json($settingMappings);
+      } catch (\Exception $e) {
 
-      return $response->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
-    }
+        $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_SAVE_FAILED), [
+          'additionalInfo' => [
+            'error' => $e->getMessage()
+          ],
+          'method'         => __METHOD__
+        ]);
 
-    try {
-      // store the mappings down into the plugin's data repository
+        $this->externalLogs->addErrorLog("Unable to save settings: " + $e->getMessage(), $e->getTraceAsString());
 
-      $this->logger->debug(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_SETTING_MAPPING_METHOD),
-        [
-          'additionalInfo' => ['mappingMethod' => $defaultItemMappingMethod],
-          'method' => __METHOD__
-        ]
-      );
-
-      foreach ($settingMappings as $key => $value) {
-        $this->keyValueRepository->putOrReplace($key, $value);
+        return $response->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
       }
-
-      // send the validated, in-memory settings back out to the client
-      $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_CONTROLLER_OUT), [
-        'additionalInfo' => ['payloadOut' => $settingMappings],
-        'method'         => __METHOD__
-      ]);
-
-      return $response->json($settingMappings);
-    } catch (\Exception $e) {
-
-      $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_SAVE_FAILED), [
-        'additionalInfo' => [
-          'error' => $e->getMessage()
-        ],
-        'method'         => __METHOD__
-      ]);
-
-      $this->externalLogs->addErrorLog("Unable to save settings: " + $e->getMessage(), $e->getTraceAsString());
-
-      return $response->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+    } finally {
+      if (
+        isset($this->logSenderService) &&
+        isset($this->externalLogs) &&
+        isset($this->externalLogs->getLogs()) &&
+        count($this->externalLogs->getLogs())
+      ) {
+        $this->logSenderService->execute($this->externalLogs->getLogs());
+      }
     }
   }
 
