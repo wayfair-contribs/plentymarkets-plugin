@@ -294,7 +294,7 @@ class AuthService implements AuthContract
    *
    * @return string|null
    */
-  private function getOAuthToken()
+  public function getOAuthToken()
   {
     $credentialsChanged = $this->updateCredentials();
     if (!$credentialsChanged) {
