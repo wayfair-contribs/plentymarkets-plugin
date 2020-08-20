@@ -68,6 +68,7 @@ export class SettingsComponent {
    * Serialize the current in-memory settings to an Object
    */
   private serializeSettings(): object {
+
     return {
       stockBuffer:
         this.stockBuffer && this.stockBuffer > 0 ? this.stockBuffer : 0,
@@ -91,8 +92,6 @@ export class SettingsComponent {
       }
     );
   }
-
-  private loadOrderStatusValues(): void {}
 
   /**
    * Load the settings in an Object into the in-memory settings
@@ -134,17 +133,13 @@ export class SettingsComponent {
   }
 
   /**
-   * normalize the settings in memory so they're ready for the back-end
+   * normalize the settings in memory in case they're out of bounds
    */
   private normalizeSettings(): void {
     if (this.importOrdersSince) {
       try {
         let m = moment(this.importOrdersSince);
-        if (m.isValid())
-        {
-          this.importOrdersSince = moment(this.importOrdersSince).format("YYYY-MM-DD");
-        }
-        else
+        if (! m.isValid())
         {
           this.importOrdersSince = null;
         }

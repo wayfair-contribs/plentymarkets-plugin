@@ -78,14 +78,12 @@
       }}</label>
     </div>
     <div class="form-group col-md-4">
-      <terra-date-picker
+      <input type="date"
         [(ngModel)]="importOrdersSince"
         class="form-control"
-        inputDisplayDateFormat="yyyy-mm-dd"
         (input)="clearMessage()"
         (click)="clearMessage()"
       >
-      </terra-date-picker>
     </div>
   </div>
 
