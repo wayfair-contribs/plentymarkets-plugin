@@ -1,31 +1,34 @@
 import { Component } from "@angular/core";
+import { OrderStatusInterface } from "../../core/services/orderStatus/data/orderStatus.interface";
+import { OrderStatusService } from "../../core/services/orderStatus/orderStatus.service";
+import { SettingsInterface } from "../../core/services/settings/data/settings.interface";
 import { SettingsService } from "../../core/services/settings/settings.service";
 import { Language, TranslationService } from "angular-l10n";
+import * as moment from "moment";
 
 @Component({
   selector: "settings",
   template: require("./settings.component.html"),
 })
 export class SettingsComponent {
-  private static readonly TRANSLATION_KEY_NEGATIVE_NOT_ALLOWED =
-    "negative_not_allowed";
-  private static readonly MESSAGE_DELIM = ", ";
+  private static readonly DEFAULT_ORDER_STATUS_ID = 2;
 
   @Language()
   public lang: string;
 
   public status = { type: null, value: null, timestamp: null };
 
-  public stockBuffer = 0;
-  public defaultOrderStatus = null;
-  // Default Shipping Provider is deprecated as of 1.1.2
-  public defaultShippingProvider = null;
+  public stockBuffer = null;
+  public defaultOrderStatus: number = null;
   public defaultItemMappingMethod = null;
   public importOrdersSince = null;
   public isAllInventorySyncEnabled = null;
 
+  private orderStatuses: OrderStatusInterface[] = [];
+
   public constructor(
     private settingsService: SettingsService,
+    private orderStatusService: OrderStatusService,
     private translation: TranslationService
   ) {}
 
@@ -40,17 +43,7 @@ export class SettingsComponent {
     this.clearMessage();
     this.showTranslatedInfo("saving_status");
 
-    let error = this.normalizeSettings();
-    if (error && error.length > 0) {
-      this.showErrorVerbose(error);
-      return;
-    }
-
-    error = this.validateSettings();
-    if (error && error.length > 0) {
-      this.showErrorVerbose(error);
-      return;
-    }
+    this.normalizeSettings();
 
     this.saveSettingsToStorage();
   }
@@ -72,13 +65,14 @@ export class SettingsComponent {
   }
 
   /**
-   * Serliaze the current in-memory settings to an Object
+   * Serialize the current in-memory settings to an Object
    */
   private serializeSettings(): object {
+
     return {
-      stockBuffer: this.stockBuffer,
+      stockBuffer:
+        this.stockBuffer && this.stockBuffer > 0 ? this.stockBuffer : 0,
       defaultOrderStatus: this.defaultOrderStatus,
-      defaultShippingProvider: this.defaultShippingProvider,
       defaultItemMappingMethod: this.defaultItemMappingMethod,
       importOrdersSince: this.importOrdersSince,
       isAllInventorySyncEnabled: this.isAllInventorySyncEnabled,
@@ -103,76 +97,70 @@ export class SettingsComponent {
    * Load the settings in an Object into the in-memory settings
    * @param data the settings as an Object
    */
-  private loadSettingsFromObject(data): void {
-    this.stockBuffer = data.stockBuffer;
-    this.defaultOrderStatus = data.defaultOrderStatus;
-    this.defaultShippingProvider = data.defaultShippingProvider;
+  private loadSettingsFromObject(data: SettingsInterface): void {
+    this.stockBuffer =
+      data.stockBuffer && data.stockBuffer > 0 ? data.stockBuffer : 0;
     this.defaultItemMappingMethod = data.defaultItemMappingMethod;
     this.importOrdersSince = data.importOrdersSince;
     this.isAllInventorySyncEnabled = data.isAllInventorySyncEnabled;
+
+    this.chooseOrderStatusAfterRefreshingList(data.defaultOrderStatus);
+  }
+
+  private chooseOrderStatusAfterRefreshingList(statusId): void {
+    this.orderStatusService.fetch().subscribe(
+      (data) => {
+        // store this so that the UI can show in drop-down
+        this.orderStatuses = data;
+        if (statusId) {
+          if (this.orderStatuses.length > 0) {
+            for (let option of this.orderStatuses) {
+              if (option.statusId == statusId) {
+                this.defaultOrderStatus = statusId;
+                return;
+              }
+            }
+          }
+        }
+        // status ID not set or not a valid option - use default
+        this.defaultOrderStatus = SettingsComponent.DEFAULT_ORDER_STATUS_ID;
+      },
+      (err) => {
+        this.showErrorVerbose(this.translation.translate("error_fetch"));
+        return;
+      }
+    );
   }
 
   /**
-   * normalize the settings in memory,
-   * returning any errors as string
-   * @returns string
+   * normalize the settings in memory in case they're out of bounds
    */
-  private normalizeSettings(): string {
+  private normalizeSettings(): void {
     if (this.importOrdersSince) {
-      this.importOrdersSince = new Date(this.importOrdersSince)
-        .toISOString()
-        .slice(0, 10);
+      try {
+        let m = moment(this.importOrdersSince);
+        if (! m.isValid())
+        {
+          this.importOrdersSince = null;
+        }
+      } catch (err) {
+        this.importOrdersSince = null;
+      }
     }
 
-    return null;
-  }
-
-  /**
-   * validate the settings in memory,
-   * returning any errors as string
-   * @returns string
-   */
-  private validateSettings(): string {
-    let issueStringBuffer = "";
-
-    if (this.stockBuffer < 0 || isNaN(this.stockBuffer)) {
-      issueStringBuffer +=
-        this.translation.translate("buffer") +
-        ": " +
-        this.translation.translate(
-          SettingsComponent.TRANSLATION_KEY_NEGATIVE_NOT_ALLOWED
-        ) +
-        SettingsComponent.MESSAGE_DELIM;
+    // lowest allowed stock buffer is 0
+    if (!this.stockBuffer || isNaN(this.stockBuffer) || this.stockBuffer < 0) {
+      this.stockBuffer = 0;
     }
 
-    if (this.defaultOrderStatus < 0 || isNaN(this.defaultOrderStatus)) {
-      issueStringBuffer +=
-        this.translation.translate("order_status_id") +
-        ": " +
-        this.translation.translate(
-          SettingsComponent.TRANSLATION_KEY_NEGATIVE_NOT_ALLOWED
-        ) +
-        SettingsComponent.MESSAGE_DELIM;
-    }
-
+    // lowest allowed order status ID is 1
     if (
-      this.defaultShippingProvider &&
-      (this.defaultShippingProvider < 0 || isNaN(this.defaultShippingProvider))
+      !this.defaultOrderStatus ||
+      isNaN(this.defaultOrderStatus) ||
+      this.defaultOrderStatus < 1
     ) {
-      issueStringBuffer +=
-        this.translation.translate("shipping_provider_id") +
-        ": " +
-        this.translation.translate(
-          SettingsComponent.TRANSLATION_KEY_NEGATIVE_NOT_ALLOWED
-        ) +
-        SettingsComponent.MESSAGE_DELIM;
+      this.defaultOrderStatus = SettingsComponent.DEFAULT_ORDER_STATUS_ID;
     }
-
-    if (issueStringBuffer && issueStringBuffer.length < 1) {
-      return null;
-    }
-
-    return issueStringBuffer;
   }
 
   /**
@@ -180,7 +168,11 @@ export class SettingsComponent {
    * @param type the style of the message
    * @param message the value of the message
    */
-  private showMessageVerbose(type, message, timestamp = new Date().toLocaleString()): void {
+  private showMessageVerbose(
+    type,
+    message,
+    timestamp = new Date().toLocaleString()
+  ): void {
     this.status.type = type;
     this.status.value = message;
     this.status.timestamp = timestamp;

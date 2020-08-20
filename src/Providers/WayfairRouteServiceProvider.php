@@ -151,5 +151,11 @@ class WayfairRouteServiceProvider extends RouteServiceProvider {
             'middleware' => ['oauth.cookie']
         ]
     );
+    $router->get(
+        'wayfair/orderStatuses', [
+        'uses'       => 'Wayfair\Controllers\OrderStatusController@fetch',
+        'middleware' => ['oauth.cookie']
+        ]
+    );
   }
 }
