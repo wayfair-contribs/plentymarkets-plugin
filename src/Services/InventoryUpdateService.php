@@ -256,7 +256,7 @@ class InventoryUpdateService
             $rawInventoryRequestDTOs = $this->inventoryMapper->createInventoryDTOsFromVariation($variationWithStock, $itemMappingMethod, $stockBuffer);
             foreach ($rawInventoryRequestDTOs as $dto) {
               // validation method will output logs on failure
-              if ($this->validateInventoryRequestData($dto, $this->logger)) {
+              if ($this->validateInventoryRequestData($dto)) {
                 $validatedRequestDTOs[] = $dto;
               }
             }
@@ -365,7 +365,7 @@ class InventoryUpdateService
       }
     } finally {
       if (isset($this->logSenderService) && isset($externalLogs) && null !== $externalLogs->getLogs() && count($externalLogs->getLogs())) {
-        $this->logSenderService->execute($this->externalLogs->getLogs());
+        $this->logSenderService->execute($externalLogs->getLogs());
       }
     }
   }
