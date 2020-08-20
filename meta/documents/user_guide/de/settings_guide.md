@@ -23,7 +23,7 @@ So suchen Sie die Einstellungen:
 
     ![home button](../../../images/de/wayfair_settings/menu_markets_wayfair_home.png)
 
-6. Sie können jetzt die Wayfair-Navigationsleiste verwenden, um eine Einstellungsseite wie [`Lager`](#die-seite-lager) auszuwählen.
+6. Sie können jetzt die Wayfair-Navigationsleiste verwenden, um eine Einstellungsseite wie [`Lager`](#die-lager-seite) auszuwählen.
 
     ![wayfair nav bar](../../../images/de/wayfair_settings/wayfair_nav_bar.png)
 
@@ -130,10 +130,10 @@ Die optionale Einstellung `Aufträge importieren ab` bestimmt ein Datum, ab dem 
 
 ### Vollständigen Bestand an Wayfair senden?
 Die optionale Einstellung `Vollständigen Bestand an Wayfair senden?` legt fest, ob Plentymarkets-Artikelvariationen ausdrücklich als für den Verkauf auf Wayfair geeignet deklariert werden müssen oder nicht.
-Wenn `Vollständigen Bestand an Wayfair senden?` Deaktiviert ist, muss `Wayfair` in der Liste `Märkte` der Artikel enthalten sein, die auf Wayfair verkauft werden sollen, wie in diesem Beispiel dargestellt:
+Wenn `Vollständigen Bestand an Wayfair senden?` Deaktiviert ist, muss `Wayfair` in der Liste `Märkte` der Artikelvariationen enthalten sein, die auf Wayfair verkauft werden sollen, wie in diesem Beispiel dargestellt:
 ![Artikel mit Wayfair Market](../../../images/de/item_wayfair_market.png)
 
-Durch Aktivieren von `Vollständigen Bestand an Wayfair senden?` Kann Wayfair alle Artikel auflisten, von denen festgestellt wird, dass sie derzeit auf Lager sind, einschließlich der Artikel, für die "Wayfair" **nicht** in der "Märkte" -Liste enthalten ist.
+Durch Aktivieren von `Vollständigen Bestand an Wayfair senden?` Kann Wayfair alle Artikel auflisten, von denen festgestellt wird, dass sie derzeit auf Lager sind, einschließlich der Artikelvariationen, für die "Wayfair" **nicht** in der "Märkte" -Liste enthalten ist.
 
 
 ## Die Seite Voll Inventar
