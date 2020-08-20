@@ -14,6 +14,7 @@ use Plenty\Plugin\Http\Response;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
+use Wayfair\Models\ExternalLogs;
 use Wayfair\Repositories\KeyValueRepository;
 
 /**
@@ -43,17 +44,23 @@ class SettingsController
   private $logger;
 
   /**
+   * @var ExternalLogs
+   */
+  private $externalLogs;
+
+  /**
    * SettingsController constructor.
    *
    * @param KeyValueRepository $keyValueRepository
    * @param AbstractConfigHelper $configHelper
    * @param LoggerContract $logger
    */
-  public function __construct(KeyValueRepository $keyValueRepository, AbstractConfigHelper $configHelper, LoggerContract $logger)
+  public function __construct(KeyValueRepository $keyValueRepository, AbstractConfigHelper $configHelper, LoggerContract $logger, ExternalLogs $externalLogs)
   {
     $this->keyValueRepository = $keyValueRepository;
     $this->logger = $logger;
     $this->configHelper = $configHelper;
+    $this->externalLogs = $externalLogs;
   }
 
   /**
@@ -137,6 +144,8 @@ class SettingsController
         'method'         => __METHOD__
       ]);
 
+      $this->externalLogs->addErrorLog("Settings are invalid: " + $e->getMessage(), $e->getTraceAsString());
+
       return $response->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
     }
 
@@ -170,6 +179,8 @@ class SettingsController
         ],
         'method'         => __METHOD__
       ]);
+
+      $this->externalLogs->addErrorLog("Unable to save settings: " + $e->getMessage(), $e->getTraceAsString());
 
       return $response->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
     }

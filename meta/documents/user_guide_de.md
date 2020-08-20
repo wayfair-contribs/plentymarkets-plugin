@@ -47,3 +47,6 @@ Das Wayfair-Plugin bietet Plentymarkets-Benutzern die Möglichkeit, das Verhalte
 
 ## Tipps und Tricks
 Sowohl bei Plentymarkets als auch bei Wayfair ändern sich die Dinge ständig. [Klicken Sie hier, um Informationen zur effizienten und sicheren Verwendung des Wayfair-Plugins zu erhalten](https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide/de/tips_and_tricks.md).
+
+## Fehlerbehebung
+Funktioniert das Wayfair-Plugin nicht ordnungsgemäß? [Klicken Sie hier, um Informationen zum Lösen von Problemen zu erhalten](https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide/de/troubleshooting.md).
