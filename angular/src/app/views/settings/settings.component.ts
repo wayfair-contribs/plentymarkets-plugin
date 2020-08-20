@@ -4,6 +4,7 @@ import { OrderStatusService } from "../../core/services/orderStatus/orderStatus.
 import { SettingsInterface } from "../../core/services/settings/data/settings.interface";
 import { SettingsService } from "../../core/services/settings/settings.service";
 import { Language, TranslationService } from "angular-l10n";
+import * as moment from "moment";
 
 @Component({
   selector: "settings",
@@ -138,9 +139,15 @@ export class SettingsComponent {
   private normalizeSettings(): void {
     if (this.importOrdersSince) {
       try {
-        this.importOrdersSince = new Date(this.importOrdersSince)
-          .toISOString()
-          .slice(0, 10);
+        let m = moment(this.importOrdersSince);
+        if (m.isValid())
+        {
+          this.importOrdersSince = moment(this.importOrdersSince).format("YYYY-MM-DD");
+        }
+        else
+        {
+          this.importOrdersSince = null;
+        }
       } catch (err) {
         this.importOrdersSince = null;
       }
