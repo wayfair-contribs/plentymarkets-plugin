@@ -29,7 +29,7 @@ class InventoryUpdateService
   const LOG_KEY_INVALID_INVENTORY_DTO = 'invalidInventoryDto';
   const LOG_KEY_INVALID_STOCK_BUFFER = 'invalidStockBufferValue';
   const LOG_KEY_SKIPPED_FULL = 'fullInventorySkipped';
-  const LOG_KEY_LONG_RUN_FULL = `fullInventoryLongRunning`;
+  const LOG_KEY_LONG_RUN_FULL = 'fullInventoryLongRunning';
   const LOG_KEY_SKIPPED_PARTIAL = 'partialInventorySkipped';
   const LOG_KEY_LONG_RUN_PARTIAL = 'partialInventoryLongRunning';
   const LOG_KEY_NO_SYNCS = 'noInventorySyncs';
@@ -364,7 +364,7 @@ class InventoryUpdateService
         }
       }
     } finally {
-      if (isset($this->logSenderService) && isset($externalLogs) && isset($externalLogs->getLogs()) && count($externalLogs->getLogs())) {
+      if (isset($this->logSenderService) && isset($externalLogs) && null !== $externalLogs->getLogs() && count($externalLogs->getLogs())) {
         $this->logSenderService->execute($this->externalLogs->getLogs());
       }
     }
