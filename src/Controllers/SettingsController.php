@@ -45,11 +45,6 @@ class SettingsController
   private $logger;
 
   /**
-   * @var ExternalLogs
-   */
-  private $externalLogs;
-
-  /**
    * @var LogSenderService
    */
   private $logSenderService;
@@ -65,13 +60,11 @@ class SettingsController
     KeyValueRepository $keyValueRepository,
     AbstractConfigHelper $configHelper,
     LoggerContract $logger,
-    ExternalLogs $externalLogs,
     LogSenderService $logSenderService
   ) {
     $this->keyValueRepository = $keyValueRepository;
     $this->logger = $logger;
     $this->configHelper = $configHelper;
-    $this->externalLogs = $externalLogs;
     $this->logSenderService = $logSenderService;
   }
 
@@ -117,6 +110,9 @@ class SettingsController
    */
   public function post(Request $request, Response $response)
   {
+    /** @var ExternalLogs */
+    $externalLogs = pluginApp(ExternalLogs::class);
+
     try {
       $settingMappings = null;
       try {
@@ -156,7 +152,7 @@ class SettingsController
           'method'         => __METHOD__
         ]);
 
-        $this->externalLogs->addErrorLog("Settings are invalid: " + $e->getMessage(), $e->getTraceAsString());
+        $externalLogs->addErrorLog("Settings are invalid: " + $e->getMessage(), $e->getTraceAsString());
 
         return $response->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
       }
@@ -192,16 +188,16 @@ class SettingsController
           'method'         => __METHOD__
         ]);
 
-        $this->externalLogs->addErrorLog("Unable to save settings: " + $e->getMessage(), $e->getTraceAsString());
+        $externalLogs->addErrorLog("Unable to save settings: " + $e->getMessage(), $e->getTraceAsString());
 
         return $response->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
       }
     } finally {
       if (
         isset($this->logSenderService) &&
-        isset($this->externalLogs) &&
-        isset($this->externalLogs->getLogs()) &&
-        count($this->externalLogs->getLogs())
+        isset($externalLogs) &&
+        isset($externalLogs->getLogs()) &&
+        count($externalLogs->getLogs())
       ) {
         $this->logSenderService->execute($this->externalLogs->getLogs());
       }
