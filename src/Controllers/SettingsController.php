@@ -75,29 +75,46 @@ class SettingsController
    */
   public function get()
   {
-    $stockBuffer = $this->keyValueRepository->get(AbstractConfigHelper::SETTINGS_STOCK_BUFFER_KEY);
-    $defaultOrderStatus = $this->keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_ORDER_STATUS_KEY);
-    $defaultShippingProvider = $this->keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_SHIPPING_PROVIDER_KEY);
-    $defaultItemMappingMethod = $this->keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD);
-    $orderImportDate = $this->keyValueRepository->get(AbstractConfigHelper::IMPORT_ORDER_SINCE);
-    $isAllInventorySyncEnabled = $this->keyValueRepository->get(AbstractConfigHelper::SETTINGS_SEND_ALL_ITEMS_KEY);
+    try {
+      /** @var ExternalLogs */
+      $externalLogs = pluginApp(ExternalLogs::class);
 
-    $data = [
-      AbstractConfigHelper::SETTINGS_STOCK_BUFFER_KEY => (!isset($stockBuffer) || empty($stockBuffer) ? 0 : $stockBuffer),
-      AbstractConfigHelper::SETTINGS_DEFAULT_ORDER_STATUS_KEY => (!isset($defaultOrderStatus) || empty($defaultOrderStatus) ? null : $defaultOrderStatus),
-      AbstractConfigHelper::SETTINGS_DEFAULT_SHIPPING_PROVIDER_KEY => (!isset($defaultShippingProvider) || empty($defaultShippingProvider) ? null : $defaultShippingProvider),
-      AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD => (!isset($defaultItemMappingMethod) || empty($defaultItemMappingMethod) ? AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER : $defaultItemMappingMethod),
-      AbstractConfigHelper::IMPORT_ORDER_SINCE => (!isset($orderImportDate) || empty($orderImportDate) ? '' : $orderImportDate),
-      AbstractConfigHelper::SETTINGS_SEND_ALL_ITEMS_KEY => (!isset($isAllInventorySyncEnabled) || empty($isAllInventorySyncEnabled) ? false : $isAllInventorySyncEnabled),
-    ];
+      $stockBuffer = $this->keyValueRepository->get(AbstractConfigHelper::SETTINGS_STOCK_BUFFER_KEY);
+      $defaultOrderStatus = $this->keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_ORDER_STATUS_KEY);
+      $defaultShippingProvider = $this->keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_SHIPPING_PROVIDER_KEY);
+      $defaultItemMappingMethod = $this->keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD);
+      $orderImportDate = $this->keyValueRepository->get(AbstractConfigHelper::IMPORT_ORDER_SINCE);
+      $isAllInventorySyncEnabled = $this->keyValueRepository->get(AbstractConfigHelper::SETTINGS_SEND_ALL_ITEMS_KEY);
 
-    $payload = json_encode($data);
+      $data = [
+        AbstractConfigHelper::SETTINGS_STOCK_BUFFER_KEY => (!isset($stockBuffer) || empty($stockBuffer) ? 0 : $stockBuffer),
+        AbstractConfigHelper::SETTINGS_DEFAULT_ORDER_STATUS_KEY => (!isset($defaultOrderStatus) || empty($defaultOrderStatus) ? null : $defaultOrderStatus),
+        AbstractConfigHelper::SETTINGS_DEFAULT_SHIPPING_PROVIDER_KEY => (!isset($defaultShippingProvider) || empty($defaultShippingProvider) ? null : $defaultShippingProvider),
+        AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD => (!isset($defaultItemMappingMethod) || empty($defaultItemMappingMethod) ? AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER : $defaultItemMappingMethod),
+        AbstractConfigHelper::IMPORT_ORDER_SINCE => (!isset($orderImportDate) || empty($orderImportDate) ? '' : $orderImportDate),
+        AbstractConfigHelper::SETTINGS_SEND_ALL_ITEMS_KEY => (!isset($isAllInventorySyncEnabled) || empty($isAllInventorySyncEnabled) ? false : $isAllInventorySyncEnabled),
+      ];
 
-    $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_CONTROLLER_OUT), [
-      'additionalInfo' => ['payloadOut' => $payload],
-      'method'         => __METHOD__
-    ]);
-    return $payload;
+      $payload = json_encode($data);
+
+      $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_CONTROLLER_OUT), [
+        'additionalInfo' => ['payloadOut' => $payload],
+        'method'         => __METHOD__
+      ]);
+
+      $externalLogs->addInfoLog("Sending settings to client", $payload);
+
+      return $payload;
+    } finally {
+      if (
+        isset($this->logSenderService) &&
+        isset($externalLogs) &&
+        isset($externalLogs->getLogs()) &&
+        count($externalLogs->getLogs())
+      ) {
+        $this->logSenderService->execute($this->externalLogs->getLogs());
+      }
+    }
   }
 
   /**
@@ -117,6 +134,8 @@ class SettingsController
       $settingMappings = null;
       try {
         $dataIn = $request->input('data');
+
+        $externalLogs->addInfoLog("Settings update received from client", json_encode($dataIn));
 
         $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_CONTROLLER_IN), [
           'additionalInfo' => ['payloadIn' => json_encode($dataIn)],
@@ -177,6 +196,8 @@ class SettingsController
           'additionalInfo' => ['payloadOut' => $settingMappings],
           'method'         => __METHOD__
         ]);
+
+        $externalLogs->addInfoLog("Returning validated settings to client", json_encode($settingMappings));
 
         return $response->json($settingMappings);
       } catch (\Exception $e) {
