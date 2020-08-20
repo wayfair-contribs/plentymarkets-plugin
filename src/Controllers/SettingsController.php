@@ -108,8 +108,7 @@ class SettingsController
     } finally {
       if (
         isset($this->logSenderService) &&
-        isset($externalLogs) &&
-        isset($externalLogs->getLogs()) &&
+        isset($externalLogs) && null !== $externalLogs->getLogs() &&
         count($externalLogs->getLogs())
       ) {
         $this->logSenderService->execute($this->externalLogs->getLogs());
@@ -217,7 +216,7 @@ class SettingsController
       if (
         isset($this->logSenderService) &&
         isset($externalLogs) &&
-        isset($externalLogs->getLogs()) &&
+        null !== $externalLogs->getLogs() &&
         count($externalLogs->getLogs())
       ) {
         $this->logSenderService->execute($this->externalLogs->getLogs());
