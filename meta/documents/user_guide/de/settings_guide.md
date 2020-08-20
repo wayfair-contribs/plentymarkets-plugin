@@ -23,7 +23,7 @@ So suchen Sie die Einstellungen:
 
     ![home button](../../../images/de/wayfair_settings/menu_markets_wayfair_home.png)
 
-6. Sie können jetzt die Wayfair-Navigationsleiste verwenden, um eine Einstellungsseite wie [`Lager`](#die-seite-lager) auszuwählen.
+6. Sie können jetzt die Wayfair-Navigationsleiste verwenden, um eine Einstellungsseite wie [`Lager`](#die-lager-seite) auszuwählen.
 
     ![wayfair nav bar](../../../images/de/wayfair_settings/wayfair_nav_bar.png)
 
