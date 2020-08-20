@@ -6,7 +6,7 @@
 
 namespace Wayfair\Core\Contracts;
 
-use Wayfair\Core\Exceptions\TokenNotFoundException;
+use Wayfair\Core\Exceptions\AuthException;
 
 interface AuthContract
 {
@@ -15,7 +15,7 @@ interface AuthContract
    * The auth token may be refreshed in order to construct the header.
    *
    * @return string
-   * @throws TokenNotFoundException
+   * @throws AuthException
    */
   public function generateAuthHeader();
 
@@ -23,7 +23,7 @@ interface AuthContract
    * Refresh the Authorization Token, unconditionally
    *
    * @return void
-   * @throws \Exception
+   * @throws AuthException
    */
   public function refreshAuth();
 
@@ -31,6 +31,7 @@ interface AuthContract
    * Get an OAuth token for use with Wayfair APIs
    *
    * @return string|null
+   * @throws AuthException
    */
   public function getOAuthToken();
 }
