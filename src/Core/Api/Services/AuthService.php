@@ -297,7 +297,7 @@ class AuthService implements AuthContract
     // abandon any stored token
     $this->refreshAuth();
     $refreshedTokenData = $this->getStoredTokenData();
-    if (isset($refreshedTokenData) && $this->validateToken($refreshedTokenData)) {
+    if (isset($refreshedTokenData) && is_array($refreshedTokenData)) {
       return $refreshedTokenData[self::ACCESS_TOKEN];
     }
 
