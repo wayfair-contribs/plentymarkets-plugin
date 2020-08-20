@@ -322,7 +322,6 @@ class InventoryUpdateService
           $this->statusService->markInventoryComplete($fullInventory, $manual);
         }
 
-        return $this->statusService->getServiceState($fullInventory);
       } catch (\Exception $e) {
         $externalLogs->addInventoryLog('Inventory: ' . $e->getMessage(), 'inventoryFailed' . ($fullInventory ? 'Full' : ''), 1, 0, false);
 
@@ -363,6 +362,9 @@ class InventoryUpdateService
           $externalLogs->addInfoLog("Finished " . ($manual ? "Manual " : "Automatic ") . ($fullInventory ? "Full " : "Partial ") . "inventory sync.");
         }
       }
+
+      return $this->statusService->getServiceState($fullInventory);
+
     } finally {
       if (isset($this->logSenderService) && isset($externalLogs) && null !== $externalLogs->getLogs() && count($externalLogs->getLogs())) {
         $this->logSenderService->execute($externalLogs->getLogs());
