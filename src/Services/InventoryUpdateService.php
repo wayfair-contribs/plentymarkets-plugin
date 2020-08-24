@@ -335,7 +335,7 @@ class InventoryUpdateService
       $totalTimeSyncingAllPages = TimeHelper::getMilliseconds() - strtotime($timeStart);
 
       if ($totalDtosFailed > 0) {
-        $this->statusService->markInventoryFailed($fullInventory, $manual);
+        $this->statusService->markInventoryFailed($fullInventory);
 
         $logKeyFailed = self::LOG_KEY_FAILED_PARTIAL;
         if ($fullInventory) {
