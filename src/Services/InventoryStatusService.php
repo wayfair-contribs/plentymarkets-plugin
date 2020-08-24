@@ -236,7 +236,7 @@ class InventoryStatusService
    *
    * @return string
    */
-  function markInventoryStarted(bool $full, bool $manual = false)
+  function markInventoryStarted(bool $full)
   {
     $keyLastAttempt = self::INVENTORY_LAST_ATTEMPT_PARTIAL;
 
@@ -255,7 +255,7 @@ class InventoryStatusService
    * @param \Exception $exception
    * @return void
    */
-  function markInventoryFailed(bool $full, bool $manual = false, \Exception $exception = null)
+  function markInventoryFailed(bool $full)
   {
     $keySuccessFlag = self::INVENTORY_SUCCESS_PARTIAL;
     if ($full) {
@@ -273,7 +273,7 @@ class InventoryStatusService
    * @param bool $manual
    * @return void
    */
-  function markInventoryComplete(bool $full, bool $manual = false)
+  function markInventoryComplete(bool $full)
   {
     $keyCompletion = self::INVENTORY_LAST_COMPLETION_PARTIAL;
     $keySuccessFlag = self::INVENTORY_SUCCESS_PARTIAL;

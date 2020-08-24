@@ -239,7 +239,7 @@ class InventoryUpdateService
         'method' => __METHOD__
       ]);
 
-      $timeStart = $this->statusService->markInventoryStarted($fullInventory, $manual);
+      $timeStart = $this->statusService->markInventoryStarted($fullInventory);
       $externalLogs->addInfoLog("Starting " . ($manual ? "Manual " : "Automatic ") . ($fullInventory ? "Full " : "Partial ") . "inventory sync.");
 
 
@@ -343,18 +343,13 @@ class InventoryUpdateService
         }
 
         $info = ['manual' => (string) $manual];
-        if (isset($exception)) {
-          $info['exceptionType'] = get_class($exception);
-          $info['errorMessage'] = $exception->getMessage();
-          $info['stackTrace'] = $exception->getTraceAsString();
-        }
 
         $this->logger->error(TranslationHelper::getLoggerKey($logKeyFailed), [
           'additionalInfo' => $info,
           'method' => __METHOD__
         ]);
       } else {
-        $this->statusService->markInventoryComplete($fullInventory, $manual);
+        $this->statusService->markInventoryComplete($fullInventory);
       }
     } catch (InventorySyncBlockedException $e) {
       $stateArray = $this->statusService->getServiceState($fullInventory);
@@ -376,7 +371,7 @@ class InventoryUpdateService
         'method' => __METHOD__
       ]);
 
-      if (strcasecmp($this->statusService->getLastAttemptTime($fullInventory), $timeStart) == 0) {
+      if ($this->statusService->getLastAttemptTime($fullInventory) == $timeStart) {
         // this is the most recent sync of this flavor, and it is quitting early.
         // the inventory status service should see this flavor of sync as "idle" so that the next one can start.
         $this->statusService->resetState($fullInventory);
@@ -389,10 +384,23 @@ class InventoryUpdateService
       $totalDtosFailed += $amtOfDtosForPage;
 
       // statusService will log out to plentymarkets logs
-      $this->statusService->markInventoryFailed(true, $manual, $e);
+      $this->statusService->markInventoryFailed(true);
+
+      $logKeyFailed = self::LOG_KEY_FAILED_PARTIAL;
+      if ($fullInventory) {
+        $logKeyFailed = self::LOG_KEY_FAILED_FULL;
+      }
+
+      $info = ['manual' => (string) $manual];
+      $info['exceptionType'] = get_class($e);
+      $info['errorMessage'] = $e->getMessage();
+      $info['stackTrace'] = $e->getTraceAsString();
+
+      $this->logger->error(TranslationHelper::getLoggerKey($logKeyFailed), [
+        'additionalInfo' => $info,
+        'method' => __METHOD__
+      ]);
     } finally {
-
-
       $infoMap = [
         'manual' => (string) $manual,
         'dtosAttempted' => $totalDtosAttempted,
