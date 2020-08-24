@@ -35,6 +35,9 @@ class AuthService implements AuthContract
   const CLIENT_SECRET = 'client_secret';
   const PRIVATE_INFO_KEYS = [self::CLIENT_ID, self::CLIENT_SECRET];
 
+  /** Accounts for the time it takes to download the token and save it (in seconds) */
+  const TOKEN_EXPIRY_CUSHION = 5;
+
   /**
    * @var StorageInterfaceContract
    */
@@ -148,12 +151,6 @@ class AuthService implements AuthContract
     return $this->client->call($method, $arguments);
   }
 
-  /**
-   * Refresh the Authorization Token, unconditionally
-   *
-   * @return void
-   * @throws \Exception
-   */
   public function refreshAuth()
   {
     $this->clearToken();
@@ -174,47 +171,62 @@ class AuthService implements AuthContract
       throw new AuthException("Unable to authorize user: " . $responseArray['error']);
     }
 
-    $tokenArray = [];
+    // we should be adding the timestamp ASAP so that the time is accurate.
+    // steps such as validation may cause time skew.
+    $tokenArray = self::addTimestampToToken($responseArray);
+
+    if (!$this->validateToken($tokenArray)) {
+      throw new AuthException("Did not receive valid auth token data");
+    }
+
+    // save once it has a timestamp and it has been validated
     try {
       $tokenArray = $this->saveToken($responseArray);
     } catch (\Exception $e) {
       throw new AuthException("Unable to save Auth Token", 0, $e);
     }
 
-    if (!$this->validateToken($tokenArray)) {
-      throw new AuthException("Did not receive valid auth token data");
-    }
-
     $this->loggerContract
-    ->debug(
-      TranslationHelper::getLoggerKey(self::LOG_KEY_NEW_TOKEN),
-      [
-        'additionalInfo' =>
+      ->debug(
+        TranslationHelper::getLoggerKey(self::LOG_KEY_NEW_TOKEN),
         [
-          'maskedToken' => StringHelper::mask($tokenArray[self::ACCESS_TOKEN])
-        ],
-        'method' => __METHOD__
-      ]
-    );
+          'additionalInfo' =>
+          [
+            'maskedToken' => StringHelper::mask($tokenArray[self::ACCESS_TOKEN])
+          ],
+          'method' => __METHOD__
+        ]
+      );
   }
 
   /**
-   * Set the token's save time, save it, and return it.
-   * @param array $token
+   * Set the token's timestamp and return it
+   * @param array $tokenModel
    *
    * @return array
    */
-  private function saveToken($token)
+  private static function addTimestampToToken($tokenModel)
   {
-    $token[self::STORE_TIME] = time();
-    $this->store->set(self::STORAGE_KEY_TOKEN, json_encode($token));
+    $tokenModel[self::STORE_TIME] = time();
+    return $tokenModel;
+  }
 
-    return $token;
+  /**
+   * Save a token
+   * @param array $tokenModel
+   *
+   * @return void
+   */
+  private function saveToken($tokenModel)
+  {
+    $this->store->set(self::STORAGE_KEY_TOKEN, json_encode($tokenModel));
   }
 
   /**
    * Check if a token model is valid for use.
    * A token that passes validation has all required fields and has not yet expired.
+   *
+   * @param array $token
    *
    * @return boolean
    */
@@ -222,43 +234,37 @@ class AuthService implements AuthContract
   {
     $issues = [];
 
-    if (!isset($token) || empty($token))
-    {
+    if (!isset($token) || !is_array($token) || empty($token)) {
       $issues[] = 'Token data is empty';
     }
 
 
-    if (!count($issues))
-    {
+    if (!count($issues)) {
       $required_elements = [self::ACCESS_TOKEN, self::STORE_TIME, self::EXPIRES_IN];
-      foreach($required_elements as $elem)
-      {
-        if (!isset($token[$elem]) || empty($token[$elem]))
-        {
+      foreach ($required_elements as $elem) {
+        if (!isset($token[$elem]) || empty($token[$elem])) {
           $issues[] = 'Token data is missing ' . $elem . 'element';
         }
       }
     }
 
-    // previous check proved that the two timestamps are set
-    if (!count($issues) && ($token[self::EXPIRES_IN] + $token[self::STORE_TIME]) <= time())
-    {
+    // previous check proved that the two timestamps are set.
+    if (!count($issues) && ($token[self::STORE_TIME] + $token[self::EXPIRES_IN] - self::TOKEN_EXPIRY_CUSHION) <= time()) {
       $issues[] = 'Token has expired';
     }
 
-    if (count($issues))
-    {
+    if (count($issues)) {
       $this->loggerContract
-      ->error(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_TOKEN),
-        [
-          'additionalInfo' =>
+        ->error(
+          TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_TOKEN),
           [
-            'issues' => $issues
-          ],
-          'method' => __METHOD__
-        ]
-      );
+            'additionalInfo' =>
+            [
+              'issues' => $issues
+            ],
+            'method' => __METHOD__
+          ]
+        );
       return false;
     }
 
@@ -266,52 +272,46 @@ class AuthService implements AuthContract
   }
 
   /**
-   * @return mixed
+   * Load the stored token data
+   * @return array|null
    */
-  private function getStoredToken()
+  private function getStoredTokenData()
   {
     return json_decode($this->store->get(self::STORAGE_KEY_TOKEN), true);
   }
 
-  /**
-   * Get an OAuthToken object for use with Wayfair APIs
-   *
-   * @return string
-   */
+
   public function getOAuthToken()
   {
-    $token = null;
-
     $credentialsChanged = $this->updateCredentials();
     if (!$credentialsChanged) {
-      // can continue using current token if it didn't expire
-      $token = $this->getStoredToken();
+      // no change in credentials - stored token is okay if not expired
+      $oldTokenData = $this->getStoredTokenData();
 
-      if (isset($token) && $this->validateToken($token)) {
-        return $token;
+      if (isset($oldTokenData) && $this->validateToken($oldTokenData)) {
+        // token found, and it has not expired. use it.
+        return $oldTokenData[self::ACCESS_TOKEN];
       }
     }
 
     // abandon any stored token
     $this->refreshAuth();
-    return $this->getStoredToken();
-  }
-
-  /**
-   * @return string
-   * @throws TokenNotFoundException
-   */
-  public function generateAuthHeader()
-  {
-    $tokenValue = null;
-
-    $tokenModel = $this->getOAuthToken();
-    if (isset($tokenModel)) {
-      $tokenValue = $tokenModel['access_token'];
+    $refreshedTokenData = $this->getStoredTokenData();
+    if (isset($refreshedTokenData) && is_array($refreshedTokenData)) {
+      return $refreshedTokenData[self::ACCESS_TOKEN];
     }
 
+    // even after refreshing, we don't have a good token.
+    return null;
+  }
+
+
+  public function generateAuthHeader()
+  {
+    $tokenValue = $this->getOAuthToken();
+
     if (!isset($tokenValue) || empty($tokenValue)) {
-      throw new TokenNotFoundException("Could not get a valid OAUth token.");
+      throw new TokenNotFoundException("Could not get a valid OAuth token.");
     }
 
     return 'Bearer ' . $tokenValue;
@@ -339,8 +339,14 @@ class AuthService implements AuthContract
     return false;
   }
 
+  /**
+   * Clear the auth token data in memory
+   *
+   * @return void
+   */
   private function clearToken(): void
   {
+    // storage contract has no remove
     $this->saveToken([]);
   }
 }
