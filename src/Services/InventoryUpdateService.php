@@ -167,10 +167,7 @@ class InventoryUpdateService
     $totalTimeSpentGatheringData = 0;
     $totalTimeSpentSendingData = 0;
     $totalTimeSyncingAllPages = 0;
-
-    $variationIdsInDTOs = [];
-
-    // TODO: add more aggregate counters, etc.
+    $totalVariationIdsInDTOsForAllPages = 0;
 
     /** @var ExternalLogs */
     $externalLogs = pluginApp(ExternalLogs::class);
@@ -253,11 +250,13 @@ class InventoryUpdateService
 
         $unixTimeAtPageStart = TimeHelper::getMilliseconds();
 
-        /** @var RequestDTO[] $validatedRequestDTOs collection of DTOs to include in a bulk update*/
-        $validatedRequestDTOs = [];
+        /** @var RequestDTO[] collection of DTOs to include in a bulk update*/
+        $validatedRequestDTOsForPage = [];
         $searchParameters['page'] = (string) $page;
         $variationSearchRepository->setSearchParams($searchParameters);
         $response = $variationSearchRepository->search();
+
+        $validatedVariationIdsForPage = [];
 
         /** @var array $variationWithStock information about a single Variation, including stock for each Warehouse */
         foreach ($response->getResult() as $variationWithStock) {
@@ -265,19 +264,19 @@ class InventoryUpdateService
           /** @var RequestDTO[] non-normalized candidates for inclusion in bulk update */
           $rawInventoryRequestDTOsForVariation = $this->inventoryMapper->createInventoryDTOsFromVariation($variationWithStock, $itemMappingMethod, $stockBuffer);
           foreach ($rawInventoryRequestDTOsForVariation as $dto) {
+            $validatedDtosForVariation = [];
+
             // validation method will output logs on failure
             if ($this->validateInventoryRequestData($dto)) {
-              $validatedRequestDTOs[] = $dto;
-              $haveStockForVariation = true;
+              $validatedDtosForVariation[] = $dto;
             }
           }
 
-          if ($haveStockForVariation) {
-            $variationIdsInDTOs[] = $variationWithStock['id'];
+          if (count($validatedDtosForVariation)) {
+            $validatedRequestDTOsForPage = array_merge($validatedRequestDTOsForPage, $validatedDtosForVariation);
+            $validatedValidationIdsForPage[] = $variationWithStock['id'];
           }
         }
-
-        $amtOfDtosForPage = count($validatedRequestDTOs);
 
         if ($amtOfDtosForPage <= 0) {
           $this->logger
@@ -291,12 +290,21 @@ class InventoryUpdateService
 
           $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': No items to update for page ' . $page);
         } else {
+
+          $amtOfDtosForPage = count($validatedRequestDTOsForPage);
+          $amtOfVariationsForPage = count($validatedVariationIdsForPage);
+          $totalVariationIdsInDTOsForAllPages += $amtOfVariationsForPage;
+
           $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': ' . (string) $amtOfDtosForPage . ' updates to send for page ' . $page);
 
           $this->logger->debug(
             TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
             [
-              'additionalInfo' => ['info' => (string) $amtOfDtosForPage . ' updates to send', 'page' => $page],
+              'additionalInfo' => [
+                'page' => $page,
+                'amtOfDtosForPage' => $amtOfDtosForPage,
+                'amtOfVariationsForPage' => $amtOfVariationsForPage
+              ],
               'method' => __METHOD__
             ]
           );
@@ -306,7 +314,7 @@ class InventoryUpdateService
 
           $totalDtosAttempted +=  $amtOfDtosForPage;
 
-          $responseDto = $this->inventoryService->updateBulk($validatedRequestDTOs, $fullInventory);
+          $responseDto = $this->inventoryService->updateBulk($validatedRequestDTOsForPage, $fullInventory);
 
           $totalTimeSpentSendingData += TimeHelper::getMilliseconds() - $unixTimeBeforeSendingData;
 
@@ -407,7 +415,7 @@ class InventoryUpdateService
         'dtosSaved' => $totalDtosSaved,
         'dtosFailed' => $totalDtosFailed,
         'elapsedTime' => $totalTimeSyncingAllPages,
-        'variationsAttempted' => $variationIdsInDTOs
+        'variationsAttempted' => $totalVariationIdsInDTOsForAllPages
       ];
 
       $logKeyEnd = self::LOG_KEY_END_PARTIAL;
