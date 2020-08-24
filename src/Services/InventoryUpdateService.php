@@ -44,7 +44,7 @@ class InventoryUpdateService
 
   // TODO: make this user-configurable in a future update
   const MAX_INVENTORY_TIME_FULL = 7200;
-  const MAX_INVENTORY_TIME_PARTIAL = self::MAX_INVENTORY_TIME_FULL;
+  const MAX_INVENTORY_TIME_PARTIAL = 1800;
 
   const INVENTORY_SAVE_TOTAL = 'inventorySaveTotal';
   const INVENTORY_SAVE_SUCCESS = 'inventorySaveSuccess';
