@@ -26,7 +26,6 @@ abstract class AbstractConfigHelper {
   const SHIPPING_METHOD = 'shippingMethod';
   const PAYMENT_METHOD_INVOICE = 2;
   const WAYFAIR_INTEGRATION_HEADER = 'Wayfair-Integration-Agent';
-  const INVENTORY_ITEMS_PER_PAGE = 500;
   const INTEGRATION_AGENT_NAME = 'PlentyMarket';
 
   /**
@@ -64,7 +63,7 @@ abstract class AbstractConfigHelper {
   abstract public function getDryRun(): string;
 
   /**
-   * Returns the value of the user-configured "send all inventory items to Wayfair" settting
+   * Returns the value of the user-configured "send all inventory items to Wayfair" setting
    * @return bool
    */
   abstract public function isAllItemsActive(): bool;
