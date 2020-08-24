@@ -22,7 +22,6 @@ abstract class AbstractConfigHelper {
   const ITEM_MAPPING_EAN = 'barcode';
   const ITEM_MAPPING_VARIATION_NUMBER = 'numberExact';
   const ITEM_MAPPING_SKU = 'sku';
-  const SECONDS_INTERVAL_FOR_INVENTORY = 4800;
   const SHIPPING_METHOD = 'shippingMethod';
   const PAYMENT_METHOD_INVOICE = 2;
   const WAYFAIR_INTEGRATION_HEADER = 'Wayfair-Integration-Agent';

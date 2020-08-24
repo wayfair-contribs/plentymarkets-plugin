@@ -193,6 +193,7 @@ class InventoryUpdateService
       }
 
       $lastStartTime = $this->statusService->getLastAttemptTime($fullInventory);
+      $lastEndTime = $this->statusService->getLastCompletionTime($fullInventory);
 
       $fullSyncBlocked = $this->statusService->isInventoryRunning(true) && !$this->serviceHasBeenRunningTooLong(true);
       // don't run a partial sync while a full sync is running
@@ -206,7 +207,10 @@ class InventoryUpdateService
 
       $filters = $this->getDefaultFilters();
       if (!$fullInventory) {
-        self::applyTimeFilter($filters, $lastStartTime);
+
+        $startOfWindow = $this->getStartOfDeltaSyncWindow();
+
+        self::applyTimeFilter($filters, $startOfWindow);
       }
 
       // look up item mapping method at this level to ensure consistency and improve efficiency
@@ -483,7 +487,7 @@ class InventoryUpdateService
    * The time starts based on the argument,
    *
    * @param array $filters the filter array to add on to
-   * @param integer $startOfWindow when the time starts
+   * @param integer $startOfWindow unix time in seconds for when the time starts
    * @return void
    */
   private static function applyTimeFilter($filters, int $startOfWindow)
@@ -553,5 +557,30 @@ class InventoryUpdateService
     }
 
     return false;
+  }
+
+  /**
+   * Get the php timestamp (in seconds) for the start of a partial sync
+   *
+   * @return int
+   */
+  private function getStartOfDeltaSyncWindow(): int
+  {
+    $lastCompletion = $this->statusService->getLastCompletionTime(false);
+
+    if (isset($lastCompletion) && !empty($lastCompletion))
+    {
+      return strtotime($lastCompletion);
+    }
+
+    $lastCompletion = $this->statusService->getLastCompletionTime(true);
+
+    if (isset($lastCompletion) && !empty($lastCompletion))
+    {
+      return strtotime($lastCompletion);
+    }
+
+    //
+    return time() - 960;
   }
 }

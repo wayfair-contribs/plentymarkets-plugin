@@ -74,9 +74,9 @@ class InventoryStatusService
    * @param bool $full
    * @param string $state
    * @param string $timestamp
-   * @return string
+   * @return string|null
    */
-  private function setServiceState($full, $state, $timestamp = null): string
+  private function setServiceState($full, $state, $timestamp = null)
   {
     if (!isset($timestamp) || empty($timestamp)) {
       $timestamp = self::getCurrentTimestamp();
@@ -203,9 +203,9 @@ class InventoryStatusService
    *
    * @param bool $full
    *
-   * @return string
+   * @return string|null
    */
-  public function getLastAttemptTime(bool $full): string
+  public function getLastAttemptTime(bool $full)
   {
     $key = self::INVENTORY_LAST_ATTEMPT_PARTIAL;
     if ($full) {
@@ -236,7 +236,7 @@ class InventoryStatusService
    *
    * @return string
    */
-  function markInventoryStarted(bool $full)
+  function markInventoryStarted(bool $full): string
   {
     $keyLastAttempt = self::INVENTORY_LAST_ATTEMPT_PARTIAL;
 
