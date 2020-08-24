@@ -13,15 +13,17 @@ class FullInventoryController extends Controller
 {
 
   /**
-   * @param InventoryUpdateService $fullInventoryService
+   * @param InventoryUpdateService $inventoryUpdateService
+   * @param InventoryStatusService $inventoryStatusService
    *
    * @return string
    * @throws \Exception
    */
-  public function sync(InventoryUpdateService $inventoryUpdateService)
+  public function sync(InventoryUpdateService $inventoryUpdateService, InventoryStatusService $statusService)
   {
+    $inventoryUpdateService->sync(true, true);
     // set manual flag so that we know where sync request came from
-    return \json_encode($inventoryUpdateService->sync(true, true));
+    return $this->getState($statusService);
   }
 
   /**

@@ -344,7 +344,7 @@ class InventoryUpdateService
         $page++;
       } while (!$response->isLastPage());
 
-      $totalTimeSyncingAllPages = TimeHelper::getMilliseconds() - strtotime($timeStart);
+      $totalTimeSyncingAllPages = time() - strtotime($timeStart);
 
       if ($totalDtosFailed > 0) {
         $this->statusService->markInventoryFailed($fullInventory);
