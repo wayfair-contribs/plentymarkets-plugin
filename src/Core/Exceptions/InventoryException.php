@@ -6,6 +6,6 @@
 
 namespace Wayfair\Core\Exceptions;
 
-class InventorySyncInterruptedException extends InventoryException
+class InventoryException extends \Exception
 {
 }

@@ -11,6 +11,7 @@ use Wayfair\Core\Api\Services\InventoryService;
 use Wayfair\Core\Api\Services\LogSenderService;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\Inventory\RequestDTO;
+use Wayfair\Core\Exceptions\InventorySyncBlockedException;
 use Wayfair\Core\Exceptions\InventorySyncInterruptedException;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Core\Helpers\TimeHelper;
@@ -24,9 +25,6 @@ use Wayfair\Models\ExternalLogs;
 class InventoryUpdateService
 {
   const LOG_KEY_DEBUG = 'debugInventoryUpdate';
-  const LOG_KEY_INVENTORY_UPDATE_END = 'inventoryUpdateEnd';
-  const LOG_KEY_INVENTORY_UPDATE_ERROR = 'inventoryUpdateError';
-  const LOG_KEY_INVENTORY_UPDATE_START = 'inventoryUpdateStart';
   const LOG_KEY_INVALID_INVENTORY_DTO = 'invalidInventoryDto';
   const LOG_KEY_INVALID_STOCK_BUFFER = 'invalidStockBufferValue';
   const LOG_KEY_SKIPPED_FULL = 'fullInventorySkipped';
@@ -34,6 +32,12 @@ class InventoryUpdateService
   const LOG_KEY_SKIPPED_PARTIAL = 'partialInventorySkipped';
   const LOG_KEY_LONG_RUN_PARTIAL = 'partialInventoryLongRunning';
   const LOG_KEY_NO_SYNCS = 'noInventorySyncs';
+  const LOG_KEY_START_FULL = 'fullInventoryStart';
+  const LOG_KEY_END_FULL = 'fullInventoryEnd';
+  const LOG_KEY_FAILED_FULL = 'fullInventoryFailed';
+  const LOG_KEY_START_PARTIAL = 'partialInventoryStart';
+  const LOG_KEY_END_PARTIAL = 'partialInventoryEnd';
+  const LOG_KEY_FAILED_PARTIAL = 'partialInventoryFailed';
 
   // TODO: make this user-configurable in a future update
   const MAX_INVENTORY_TIME_FULL = 7200;
@@ -148,6 +152,8 @@ class InventoryUpdateService
    */
   public function sync(bool $fullInventory, bool $manual = false): array
   {
+    $lastStartTime = null;
+    $timeStart = null;
 
     $inventorySaveTotal = 0;
     $inventorySaveSuccess = 0;
@@ -189,21 +195,7 @@ class InventoryUpdateService
       // potential race conditions - change service management strategy in a future update
       // (but this is better than letting the old UpdateFullInventoryStatusCron randomly change service states)
       if ($currentSyncBlocked) {
-        $stateArray = $this->statusService->getServiceState($fullInventory);
-
-        $logKey = self::LOG_KEY_SKIPPED_PARTIAL;
-        if ($fullInventory) {
-          $logKey = self::LOG_KEY_SKIPPED_FULL;
-        }
-
-        $this->logger->info(TranslationHelper::getLoggerKey($logKey), [
-          'additionalInfo' => ['manual' => (string) $manual, 'startedAt' => $lastStartTime, 'state' => $stateArray],
-          'method' => __METHOD__
-        ]);
-        $externalLogs->addWarningLog(($manual ? "Manual " : "Automatic ") . ($fullInventory ? "Full " : "Partial ") . "Inventory sync BLOCKED - already running");
-
-        // early exit
-        return $stateArray;
+        throw new InventorySyncBlockedException();
       }
 
       $filters = $this->getDefaultFilters();
@@ -228,13 +220,15 @@ class InventoryUpdateService
       $page = 0;
       $amtOfDtosForPage = 0;
 
-      $this->logger->debug(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_START),
-        [
-          'additionalInfo' => ['fullInventory' => (string) $fullInventory],
-          'method' => __METHOD__
-        ]
-      );
+      $logKeyStart = self::LOG_KEY_START_PARTIAL;
+      if ($fullInventory) {
+        $logKeyStart = self::LOG_KEY_START_FULL;
+      }
+
+      $this->logger->info(TranslationHelper::getLoggerKey($logKeyStart), [
+        'additionalInfo' => ['manual' => (string) $manual],
+        'method' => __METHOD__
+      ]);
 
       $timeStart = $this->statusService->markInventoryStarted($fullInventory, $manual);
       $externalLogs->addInfoLog("Starting " . ($manual ? "Manual " : "Automatic ") . ($fullInventory ? "Full " : "Partial ") . "inventory sync.");
@@ -324,9 +318,41 @@ class InventoryUpdateService
 
         if ($inventorySaveFail > 0) {
           $this->statusService->markInventoryFailed($fullInventory, $manual);
+
+          $logKeyFailed = self::LOG_KEY_FAILED_PARTIAL;
+          if ($fullInventory) {
+            $logKeyFailed = self::LOG_KEY_FAILED_PARTIAL;
+          }
+
+          $info = ['manual' => (string) $manual];
+          if (isset($exception)) {
+            $info['exceptionType'] = get_class($exception);
+            $info['errorMessage'] = $exception->getMessage();
+            $info['stackTrace'] = $exception->getTraceAsString();
+          }
+
+          $this->logger->error(TranslationHelper::getLoggerKey($logKeyFailed), [
+            'additionalInfo' => $info,
+            'method' => __METHOD__
+          ]);
         } else {
           $this->statusService->markInventoryComplete($fullInventory, $manual);
         }
+      } catch (InventorySyncBlockedException $e)
+      {
+        $stateArray = $this->statusService->getServiceState($fullInventory);
+
+        $logKey = self::LOG_KEY_SKIPPED_PARTIAL;
+        if ($fullInventory) {
+          $logKey = self::LOG_KEY_SKIPPED_FULL;
+        }
+
+        $this->logger->info(TranslationHelper::getLoggerKey($logKey), [
+          'additionalInfo' => ['manual' => (string) $manual, 'otherSyncStartedAt' => $lastStartTime, 'state' => $stateArray],
+          'method' => __METHOD__
+        ]);
+        $externalLogs->addWarningLog(($manual ? "Manual " : "Automatic ") . ($fullInventory ? "Full " : "Partial ") . "Inventory sync BLOCKED - already running");
+        return $stateArray;
       } catch (InventorySyncInterruptedException $e)
       {
         $externalLogs->addInventoryLog('Inventory: ' . $e->getMessage(), 'inventoryInterrupted' . ($fullInventory ? 'Full' : ''), 1, 0, false);
@@ -343,13 +369,14 @@ class InventoryUpdateService
         $this->statusService->markInventoryFailed(true, $manual, $e);
       } finally {
 
-        $this->logger->debug(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_END),
-          [
-            'additionalInfo' => ['fullInventory' => (string) $fullInventory],
-            'method' => __METHOD__
-          ]
-        );
+        $logKeyEnd = self::LOG_KEY_END_PARTIAL;
+        if ($fullInventory) {
+          $logKeyEnd = self::LOG_KEY_END_FULL;
+        }
+
+        $this->logger->info(TranslationHelper::getLoggerKey($logKeyEnd), [
+          'manual' => (string) $manual, 'method' => __METHOD__
+        ]);
 
         if (isset($externalLogs)) {
           // FIXME: the 'inventorySave' and 'inventorySaved' log types are too similar

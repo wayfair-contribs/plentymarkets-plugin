@@ -16,18 +16,12 @@ use Wayfair\Repositories\KeyValueRepository;
 class InventoryStatusService
 {
   const LOG_KEY_STATE_CHECK_FULL = 'fullInventoryStateCheck';
-  const LOG_KEY_START_FULL = 'fullInventoryStart';
-  const LOG_KEY_END_FULL = 'fullInventoryEnd';
-  const LOG_KEY_FAILED_FULL = 'fullInventoryFailed';
-  const LOG_KEY_RESET_FULL = 'fullInventoryReset';
   const LOG_KEY_STATE_CHANGE_FULL = 'fullInventoryStateChange';
+  const LOG_KEY_RESET_FULL = 'fullInventoryReset';
 
   const LOG_KEY_STATE_CHECK_PARTIAL = 'partialInventoryStateCheck';
-  const LOG_KEY_START_PARTIAL = 'partialInventoryStart';
-  const LOG_KEY_END_PARTIAL = 'partialInventoryEnd';
-  const LOG_KEY_FAILED_PARTIAL = 'partialInventoryFailed';
-  const LOG_KEY_RESET_PARTIAL = 'partialInventoryReset';
   const LOG_KEY_STATE_CHANGE_PARTIAL = 'partialInventoryStateChange';
+  const LOG_KEY_RESET_PARTIAL = 'partialInventoryReset';
 
   const STATUS = 'status';
   const STATE_CHANGE_TIMESTAMP = 'stateChangeTimestamp';
@@ -244,18 +238,7 @@ class InventoryStatusService
    */
   function markInventoryStarted(bool $full, bool $manual = false)
   {
-    $logKeyStart = self::LOG_KEY_START_PARTIAL;
     $keyLastAttempt = self::INVENTORY_LAST_ATTEMPT_PARTIAL;
-
-    if ($full) {
-      $logKeyStart = self::LOG_KEY_START_FULL;
-      $keyLastAttempt = self::INVENTORY_LAST_ATTEMPT_FULL;
-    }
-
-    $this->logger->info(TranslationHelper::getLoggerKey($logKeyStart), [
-      'additionalInfo' => ['manual' => (string) $manual],
-      'method' => __METHOD__
-    ]);
 
     $ts = self::getCurrentTimestamp();
     $this->keyValueRepository->putOrReplace($keyLastAttempt, $ts);
@@ -275,23 +258,9 @@ class InventoryStatusService
   function markInventoryFailed(bool $full, bool $manual = false, \Exception $exception = null)
   {
     $keySuccessFlag = self::INVENTORY_SUCCESS_PARTIAL;
-    $logKeyFailed = self::LOG_KEY_FAILED_PARTIAL;
     if ($full) {
       $keySuccessFlag = self::INVENTORY_SUCCESS_PARTIAL;
-      $logKeyFailed = self::LOG_KEY_FAILED_PARTIAL;
     }
-
-    $info = ['manual' => (string) $manual];
-    if (isset($exception)) {
-      $info['exceptionType'] = get_class($exception);
-      $info['errorMessage'] = $exception->getMessage();
-      $info['stackTrace'] = $exception->getTraceAsString();
-    }
-
-    $this->logger->error(TranslationHelper::getLoggerKey($logKeyFailed), [
-      'additionalInfo' => $info,
-      'method' => __METHOD__
-    ]);
 
     $this->keyValueRepository->putOrReplace($keySuccessFlag, false);
     $this->setServiceState($full, self::STATE_IDLE);
@@ -306,18 +275,12 @@ class InventoryStatusService
    */
   function markInventoryComplete(bool $full, bool $manual = false)
   {
-    $logKeyEnd = self::LOG_KEY_END_PARTIAL;
     $keyCompletion = self::INVENTORY_LAST_COMPLETION_PARTIAL;
     $keySuccessFlag = self::INVENTORY_SUCCESS_PARTIAL;
     if ($full) {
-      $logKeyEnd = self::LOG_KEY_END_FULL;
       $keyCompletion = self::INVENTORY_LAST_COMPLETION_FULL;
       $keySuccessFlag = self::INVENTORY_SUCCESS_PARTIAL;
     }
-
-    $this->logger->info(TranslationHelper::getLoggerKey($logKeyEnd), [
-      'manual' => (string) $manual, 'method' => __METHOD__
-    ]);
 
     $ts = self::getCurrentTimestamp();
     $this->keyValueRepository->putOrReplace($keyCompletion, $ts);
