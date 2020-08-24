@@ -38,12 +38,19 @@ abstract class AbstractInventoryCron extends CronHandler
      */
     $loggerContract = pluginApp(LoggerContract::class);
     $loggerContract->debug(TranslationHelper::getLoggerKey('cronStartedMessage'), ['method' => __METHOD__]);
+    $syncResult = [];
     try {
       /** @var InventoryUpdateService */
       $service = pluginApp(InventoryUpdateService::class);
-      $service->sync($this->full);
+      $syncResult = $service->sync($this->full);
     } finally {
-      $loggerContract->debug(TranslationHelper::getLoggerKey('cronFinishedMessage'), ['method' => __METHOD__]);
+      $loggerContract->debug(TranslationHelper::getLoggerKey('cronFinishedMessage'), [
+        'additionalInfo' => [
+          'full' => $this->full,
+          'result' => $syncResult
+        ],
+        'method' => __METHOD__
+      ]);
     }
   }
 }
