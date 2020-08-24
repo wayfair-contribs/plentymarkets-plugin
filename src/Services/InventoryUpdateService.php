@@ -11,6 +11,7 @@ use Wayfair\Core\Api\Services\InventoryService;
 use Wayfair\Core\Api\Services\LogSenderService;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\Inventory\RequestDTO;
+use Wayfair\Core\Exceptions\InventorySyncInterruptedException;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Core\Helpers\TimeHelper;
 use Wayfair\Helpers\TranslationHelper;
@@ -159,12 +160,10 @@ class InventoryUpdateService
 
     try {
 
-      if (!$fullInventory)
-      {
+      if (!$fullInventory) {
         // if no full sync attempt is on record, we should do a full sync in place of a differential sync.
         $lastFullStartTime = $this->statusService->getLastAttemptTime(true);
-        if (!isset($lastFullStartTime) || $lastFullStartTime <= 0)
-        {
+        if (!isset($lastFullStartTime) || empty($lastFullStartTime)) {
 
           $this->logger->info(
             TranslationHelper::getLoggerKey(self::LOG_KEY_NO_SYNCS),
@@ -177,7 +176,7 @@ class InventoryUpdateService
           // NOTICE: due to recursion, this log will show up AFTER the logs for the Full Sync!
           $externalLogs->addInfoLog("Forced a full inventory sync as there are no syncs on record");
 
-         return $this->sync(true, $manual);
+          return $this->sync(true, $manual);
         }
       }
 
@@ -237,11 +236,18 @@ class InventoryUpdateService
         ]
       );
 
-      $this->statusService->markInventoryStarted($fullInventory, $manual);
+      $timeStart = $this->statusService->markInventoryStarted($fullInventory, $manual);
       $externalLogs->addInfoLog("Starting " . ($manual ? "Manual " : "Automatic ") . ($fullInventory ? "Full " : "Partial ") . "inventory sync.");
 
       try {
         do {
+
+          $mostRecentFullStart = $this->statusService->getLastAttemptTime($fullInventory);
+          if (strtotime($mostRecentFullStart) > $timeStart) {
+            throw new InventorySyncInterruptedException("Delta sync started at " . $timeStart .
+              " lost priority to full sync started at " . $mostRecentFullStart);
+          }
+
           $msAtPageStart = TimeHelper::getMilliseconds();
 
           /** @var RequestDTO[] $validatedRequestDTOs collection of DTOs to include in a bulk update*/
@@ -321,26 +327,19 @@ class InventoryUpdateService
         } else {
           $this->statusService->markInventoryComplete($fullInventory, $manual);
         }
-
+      } catch (InventorySyncInterruptedException $e)
+      {
+        $externalLogs->addInventoryLog('Inventory: ' . $e->getMessage(), 'inventoryInterrupted' . ($fullInventory ? 'Full' : ''), 1, 0, false);
+        // TODO: internal logs
+        // TODO: tell status service?
       } catch (\Exception $e) {
         $externalLogs->addInventoryLog('Inventory: ' . $e->getMessage(), 'inventoryFailed' . ($fullInventory ? 'Full' : ''), 1, 0, false);
-
-        $this->logger->error(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_ERROR),
-          [
-            'additionalInfo' => [
-              'exception' => $e,
-              'message' => $e->getMessage(),
-              'stackTrace' => $e->getTrace(),
-            ],
-            'method' => __METHOD__
-          ]
-        );
 
         // bulk update failed, so everything we were going to save should be considered failing.
         // (we want the failure amount to be more than zero in order for client to know this failed.)
         $inventorySaveFail += $amtOfDtosForPage;
 
+        // statusService will log out to plentymarkets logs
         $this->statusService->markInventoryFailed(true, $manual, $e);
       } finally {
 
@@ -364,7 +363,6 @@ class InventoryUpdateService
       }
 
       return $this->statusService->getServiceState($fullInventory);
-
     } finally {
       if (isset($this->logSenderService) && isset($externalLogs) && null !== $externalLogs->getLogs() && count($externalLogs->getLogs())) {
         $this->logSenderService->execute($externalLogs->getLogs());

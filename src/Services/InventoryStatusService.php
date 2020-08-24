@@ -234,12 +234,13 @@ class InventoryStatusService
   }
 
   /**
-   * Set the global timestamp for an attempt to sync to now, and update related fields
+   * Set the global timestamp for an attempt to sync,
+   * and return it.
    *
    * @param $full
    * @param $manual
    *
-   * @return void
+   * @return string
    */
   function markInventoryStarted(bool $full, bool $manual = false)
   {
@@ -260,6 +261,8 @@ class InventoryStatusService
     $this->keyValueRepository->putOrReplace($keyLastAttempt, $ts);
     // timestamp on state change should match last attempt
     $this->setServiceState($full, self::STATE_RUNNING, $ts);
+
+    return $ts;
   }
 
   /**
@@ -280,7 +283,9 @@ class InventoryStatusService
 
     $info = ['manual' => (string) $manual];
     if (isset($exception)) {
+      $info['exceptionType'] = get_class($exception);
       $info['errorMessage'] = $exception->getMessage();
+      $info['stackTrace'] = $exception->getTraceAsString();
     }
 
     $this->logger->error(TranslationHelper::getLoggerKey($logKeyFailed), [
