@@ -91,62 +91,6 @@ class InventoryUpdateService
   }
 
   /**
-   * Validate a request for inventory update
-   * @param RequestDTO $inventoryRequestDTO the DTO to validate
-   * @return bool
-   */
-  private function validateInventoryRequestData($inventoryRequestDTO): bool
-  {
-    if (!isset($inventoryRequestDTO)) {
-      return false;
-    }
-
-    $issues = [];
-
-    $supplierId = $inventoryRequestDTO->getSupplierId();
-
-    if (!isset($supplierId) || $supplierId <= 0) {
-      $issues[] = "Supplier ID is missing or invalid";
-    }
-
-    $partNum = $inventoryRequestDTO->getSupplierPartNumber();
-
-    if (!isset($partNum) || empty($partNum)) {
-      $issues[] = "Supplier Part number is missing";
-    }
-
-    $onHand = $inventoryRequestDTO->getQuantityOnHand();
-
-    if (isset($onHand)) {
-      if ($onHand  < -1) {
-        $issues[] = "Quantity on Hand is less than negative one";
-      }
-    } else {
-      $issues[] = "Quantity On Hand is missing";
-    }
-
-    if (!isset($issues) || empty($issues)) {
-      return true;
-    }
-
-    // TODO: replace issues with translated messages?
-    $this->logger
-      ->error(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_INVENTORY_DTO),
-        [
-          'additionalInfo' => [
-            'message' => 'inventory request data is invalid',
-            'issues' => json_encode($issues),
-            'data' => $inventoryRequestDTO->toArray(),
-          ],
-          'method' => __METHOD__
-        ]
-      );
-
-    return false;
-  }
-
-  /**
    * Send inventory updates from Plentymarkets to Wayfair.
    * The optional start parameter filters the update set down to items changed since the provided timestamp
    *
@@ -227,7 +171,7 @@ class InventoryUpdateService
 
       $searchParameters = $this->getDefaultSearchParameters();
 
-      $page = 0;
+      $pageNumber = 0;
       $amtOfDtosForPage = 0;
 
       $logKeyStart = self::LOG_KEY_START_PARTIAL;
@@ -243,7 +187,6 @@ class InventoryUpdateService
       $timeStart = $this->statusService->markInventoryStarted($fullInventory);
       $externalLogs->addInfoLog("Starting " . ($manual ? "Manual " : "Automatic ") . ($fullInventory ? "Full " : "Partial ") . "inventory sync.");
 
-
       do {
 
         $mostRecentFullStart = $this->statusService->getLastAttemptTime($fullInventory);
@@ -255,30 +198,22 @@ class InventoryUpdateService
         $unixTimeAtPageStart = TimeHelper::getMilliseconds();
 
         /** @var RequestDTO[] collection of DTOs to include in a bulk update*/
-        $validatedRequestDTOsForPage = [];
-        $searchParameters['page'] = (string) $page;
+        $requestDTOsForPage = [];
+        /** @var int[] collection of the IDs of Variations for which requestDTOs were created*/
+        $variationIdsForPage = [];
+        $searchParameters['page'] = (string) $pageNumber;
         $variationSearchRepository->setSearchParams($searchParameters);
-        $response = $variationSearchRepository->search();
-
-        $validatedVariationIdsForPage = [];
+        $variationSearchResponse = $variationSearchRepository->search();
 
         /** @var array $variationWithStock information about a single Variation, including stock for each Warehouse */
-        foreach ($response->getResult() as $variationWithStock) {
+        foreach ($variationSearchResponse->getResult() as $variationWithStock) {
           $haveStockForVariation = false;
-          /** @var RequestDTO[] non-normalized candidates for inclusion in bulk update */
-          $rawInventoryRequestDTOsForVariation = $this->inventoryMapper->createInventoryDTOsFromVariation($variationWithStock, $itemMappingMethod, $stockBuffer);
-          foreach ($rawInventoryRequestDTOsForVariation as $dto) {
-            $validatedDtosForVariation = [];
+          /** @var RequestDTO[] */
+          $requestDTOsForVariation = $this->inventoryMapper->createInventoryDTOsFromVariation($variationWithStock, $itemMappingMethod, $stockBuffer);
 
-            // validation method will output logs on failure
-            if ($this->validateInventoryRequestData($dto)) {
-              $validatedDtosForVariation[] = $dto;
-            }
-          }
-
-          if (count($validatedDtosForVariation)) {
-            $validatedRequestDTOsForPage = array_merge($validatedRequestDTOsForPage, $validatedDtosForVariation);
-            $validatedValidationIdsForPage[] = $variationWithStock['id'];
+          if (count($requestDTOsForVariation)) {
+            $requestDTOsForPage = array_merge($requestDTOsForPage, $requestDTOsForVariation);
+            $variationIdsForPage[] = $variationWithStock['id'];
           }
         }
 
@@ -287,25 +222,28 @@ class InventoryUpdateService
             ->debug(
               TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
               [
-                'additionalInfo' => ['info' => 'No items to update'],
+                'additionalInfo' => [
+                  'pageNum' => $pageNumber,
+                  'info' => 'No request DTOs to send'
+                ],
                 'method' => __METHOD__
               ]
             );
 
-          $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': No items to update for page ' . $page);
+          $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': No items to update for page ' . $pageNumber);
         } else {
 
-          $amtOfDtosForPage = count($validatedRequestDTOsForPage);
-          $amtOfVariationsForPage = count($validatedVariationIdsForPage);
+          $amtOfDtosForPage = count($requestDTOsForPage);
+          $amtOfVariationsForPage = count($variationIdsForPage);
           $totalVariationIdsInDTOsForAllPages += $amtOfVariationsForPage;
 
-          $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': ' . (string) $amtOfDtosForPage . ' updates to send for page ' . $page);
+          $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': ' . (string) $amtOfDtosForPage . ' updates to send for page ' . $pageNumber);
 
           $this->logger->debug(
             TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
             [
               'additionalInfo' => [
-                'page' => $page,
+                'page' => $pageNumber,
                 'amtOfDtosForPage' => $amtOfDtosForPage,
                 'amtOfVariationsForPage' => $amtOfVariationsForPage
               ],
@@ -318,7 +256,7 @@ class InventoryUpdateService
 
           $totalDtosAttempted +=  $amtOfDtosForPage;
 
-          $responseDto = $this->inventoryService->updateBulk($validatedRequestDTOsForPage, $fullInventory);
+          $responseDto = $this->inventoryService->updateBulk($requestDTOsForPage, $fullInventory);
 
           $totalTimeSpentSendingData += TimeHelper::getMilliseconds() - $unixTimeBeforeSendingData;
 
@@ -333,16 +271,16 @@ class InventoryUpdateService
           [
             'additionalInfo' => [
               'fullInventory' => (string) $fullInventory,
-              'page_num' => (string) $page,
+              'page_num' => (string) $pageNumber,
               'info' => 'page done',
-              'resultsForPage' => $dto
+              'resultsForPage' => $responseDto
             ],
             'method' => __METHOD__
           ]
         );
 
-        $page++;
-      } while (!$response->isLastPage());
+        $pageNumber++;
+      } while (isset($variationSearchResponse) && !$variationSearchResponse->isLastPage());
 
       $totalTimeSyncingAllPages = time() - strtotime($timeStart);
 
@@ -568,15 +506,13 @@ class InventoryUpdateService
   {
     $lastCompletion = $this->statusService->getLastCompletionTime(false);
 
-    if (isset($lastCompletion) && !empty($lastCompletion))
-    {
+    if (isset($lastCompletion) && !empty($lastCompletion)) {
       return strtotime($lastCompletion);
     }
 
     $lastCompletion = $this->statusService->getLastCompletionTime(true);
 
-    if (isset($lastCompletion) && !empty($lastCompletion))
-    {
+    if (isset($lastCompletion) && !empty($lastCompletion)) {
       return strtotime($lastCompletion);
     }
 

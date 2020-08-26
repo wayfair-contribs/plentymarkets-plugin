@@ -173,8 +173,8 @@ class InventoryMapper
       // Avl Immediately. ADJUSTED Net Stock (see Stock Buffer setting in Wayfair plugin).
       $onHand = self::getQuantityOnHand($stock, $loggerContract);
 
-      if (!isset($onHand)) {
-        // null value is NOT a valid input for quantity on hand - do NOT send to Wayfair.
+      if (!isset($onHand) || ($onHand < -1)) {
+        // inventory amounts less than -1 are not accepted - do NOT send to Wayfair.
         $loggerContract->warning(
           TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_INVENTORY_AMOUNT),
           [
