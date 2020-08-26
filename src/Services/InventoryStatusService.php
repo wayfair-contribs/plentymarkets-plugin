@@ -18,10 +18,12 @@ class InventoryStatusService
   const LOG_KEY_STATE_CHECK_FULL = 'fullInventoryStateCheck';
   const LOG_KEY_STATE_CHANGE_FULL = 'fullInventoryStateChange';
   const LOG_KEY_RESET_FULL = 'fullInventoryReset';
+  const LOG_KEY_CLEAR_FULL = 'fullInventoryClear';
 
   const LOG_KEY_STATE_CHECK_PARTIAL = 'partialInventoryStateCheck';
   const LOG_KEY_STATE_CHANGE_PARTIAL = 'partialInventoryStateChange';
   const LOG_KEY_RESET_PARTIAL = 'partialInventoryReset';
+  const LOG_KEY_CLEAR_PARTIAL = 'partialInventoryClear';
 
   const STATUS = 'status';
   const STATE_CHANGE_TIMESTAMP = 'stateChangeTimestamp';
@@ -37,12 +39,31 @@ class InventoryStatusService
   const INVENTORY_LAST_COMPLETION_FULL = "full_inventory_last_completion";
   const INVENTORY_LAST_ATTEMPT_FULL = "full_inventory_last_attempt";
   const INVENTORY_SUCCESS_FULL = "full_inventory_success";
+  const INVENTORY_LAST_SUCCESS_START_FULL = "full_inventory_last_success_start";
+
+  const KEYS_FOR_FULL = [
+    self::INVENTORY_CRON_STATUS_FULL,
+    self::INVENTORY_STATUS_UPDATED_AT_FULL,
+    self::INVENTORY_LAST_COMPLETION_FULL,
+    self::INVENTORY_SUCCESS_FULL,
+    self::INVENTORY_LAST_SUCCESS_START_FULL
+  ];
 
   const INVENTORY_CRON_STATUS_PARTIAL = 'partial_inventory_cron_status';
   const INVENTORY_STATUS_UPDATED_AT_PARTIAL = 'partial_inventory_status_updated_at';
   const INVENTORY_LAST_COMPLETION_PARTIAL = "partial_inventory_last_completion";
   const INVENTORY_LAST_ATTEMPT_PARTIAL = "partial_inventory_last_attempt";
   const INVENTORY_SUCCESS_PARTIAL = "partial_inventory_success";
+  const INVENTORY_LAST_SUCCESS_START_PARTIAL = "partial_inventory_last_success_start";
+
+  const KEYS_FOR_PARTIAL = [
+    self::INVENTORY_CRON_STATUS_PARTIAL,
+    self::INVENTORY_STATUS_UPDATED_AT_PARTIAL,
+    self::INVENTORY_LAST_COMPLETION_PARTIAL,
+    self::INVENTORY_LAST_ATTEMPT_PARTIAL,
+    self::INVENTORY_SUCCESS_PARTIAL,
+    self::INVENTORY_LAST_SUCCESS_START_PARTIAL
+  ];
 
   /**
    * @var KeyValueRepository
@@ -82,12 +103,8 @@ class InventoryStatusService
       $timestamp = self::getCurrentTimestamp();
     }
 
-    $statusKey = self::INVENTORY_CRON_STATUS_PARTIAL;
-    $logKeyStateChange = self::LOG_KEY_STATE_CHANGE_PARTIAL;
-    if ($full) {
-      $statusKey = self::INVENTORY_CRON_STATUS_PARTIAL;
-      $logKeyStateChange = self::LOG_KEY_STATE_CHANGE_FULL;
-    }
+    $statusKey = $full ? self::INVENTORY_CRON_STATUS_FULL : self::INVENTORY_CRON_STATUS_PARTIAL;
+    $logKeyStateChange = $full ? self::LOG_KEY_STATE_CHANGE_FULL : self::LOG_KEY_STATE_CHANGE_PARTIAL;
 
     $oldState = $this->keyValueRepository->get($statusKey);
 
@@ -136,12 +153,8 @@ class InventoryStatusService
    */
   private function getServiceStatusValue(bool $full): string
   {
-    $keyStatus = self::INVENTORY_CRON_STATUS_PARTIAL;
-    $logKeyStateCheck = self::LOG_KEY_STATE_CHANGE_PARTIAL;
-    if ($full) {
-      $keyStatus = self::INVENTORY_CRON_STATUS_FULL;
-      $logKeyStateCheck = self::LOG_KEY_STATE_CHANGE_FULL;
-    }
+    $keyStatus = $full ? self::INVENTORY_CRON_STATUS_FULL : self::INVENTORY_CRON_STATUS_PARTIAL;
+    $logKeyStateCheck = $full ? self::LOG_KEY_STATE_CHANGE_FULL : self::LOG_KEY_STATE_CHANGE_PARTIAL;
 
     $state = $this->keyValueRepository->get($keyStatus);
 
@@ -174,10 +187,8 @@ class InventoryStatusService
    */
   public function getStateChangeTime(bool $full): string
   {
-    $key = self::INVENTORY_STATUS_UPDATED_AT_PARTIAL;
-    if ($full) {
-      $key = self::INVENTORY_STATUS_UPDATED_AT_FULL;
-    }
+    $key = $full ? self::INVENTORY_STATUS_UPDATED_AT_FULL : self::INVENTORY_STATUS_UPDATED_AT_PARTIAL;
+
     return $this->keyValueRepository->get($key);
   }
 
@@ -190,16 +201,13 @@ class InventoryStatusService
    */
   public function getLastCompletionTime(bool $full): string
   {
-    $key = self::INVENTORY_LAST_COMPLETION_PARTIAL;
-    if ($full) {
-      $key = self::INVENTORY_LAST_COMPLETION_FULL;
-    }
+    $key = $full ? self::INVENTORY_LAST_COMPLETION_FULL : self::INVENTORY_LAST_COMPLETION_PARTIAL;
 
     return $this->keyValueRepository->get($key);
   }
 
   /**
-   * Get the timestamp for an attempt to sync
+   * Get the timestamp for any attempt to sync
    *
    * @param bool $full
    *
@@ -207,20 +215,14 @@ class InventoryStatusService
    */
   public function getLastAttemptTime(bool $full)
   {
-    $key = self::INVENTORY_LAST_ATTEMPT_PARTIAL;
-    if ($full) {
-      $key = self::INVENTORY_CRON_STATUS_FULL;
-    }
+    $key = $full ? self::INVENTORY_CRON_STATUS_FULL : self::INVENTORY_LAST_ATTEMPT_PARTIAL;
 
     return $this->keyValueRepository->get($key);
   }
 
   public function getLatestAttemptSuccess(bool $full): bool
   {
-    $key = self::INVENTORY_SUCCESS_PARTIAL;
-    if ($full) {
-      $key = self::INVENTORY_SUCCESS_FULL;
-    }
+    $key = $full ? self::INVENTORY_SUCCESS_FULL : self::INVENTORY_SUCCESS_PARTIAL;
 
     $flag = $this->keyValueRepository->get($key);
 
@@ -236,7 +238,7 @@ class InventoryStatusService
    *
    * @return string
    */
-  function markInventoryStarted(bool $full): string
+  public function markInventoryStarted(bool $full): string
   {
     $keyLastAttempt = self::INVENTORY_LAST_ATTEMPT_PARTIAL;
 
@@ -255,12 +257,9 @@ class InventoryStatusService
    * @param \Exception $exception
    * @return void
    */
-  function markInventoryFailed(bool $full)
+  public function markInventoryFailed(bool $full)
   {
-    $keySuccessFlag = self::INVENTORY_SUCCESS_PARTIAL;
-    if ($full) {
-      $keySuccessFlag = self::INVENTORY_SUCCESS_PARTIAL;
-    }
+    $keySuccessFlag = $full ? self::INVENTORY_SUCCESS_PARTIAL : self::INVENTORY_SUCCESS_PARTIAL;
 
     $this->keyValueRepository->putOrReplace($keySuccessFlag, false);
     $this->setServiceState($full, self::STATE_IDLE);
@@ -273,18 +272,16 @@ class InventoryStatusService
    * @param bool $manual
    * @return void
    */
-  function markInventoryComplete(bool $full)
+  public function markInventoryComplete(bool $full, string $startTime)
   {
-    $keyCompletion = self::INVENTORY_LAST_COMPLETION_PARTIAL;
-    $keySuccessFlag = self::INVENTORY_SUCCESS_PARTIAL;
-    if ($full) {
-      $keyCompletion = self::INVENTORY_LAST_COMPLETION_FULL;
-      $keySuccessFlag = self::INVENTORY_SUCCESS_PARTIAL;
-    }
+    $keyCompletion = $full ? self::INVENTORY_LAST_COMPLETION_FULL : self::INVENTORY_LAST_COMPLETION_PARTIAL;
+    $keySuccessFlag = $full ? self::INVENTORY_SUCCESS_FULL : self::INVENTORY_SUCCESS_PARTIAL;
+    $keyStartTime = $full ? self::INVENTORY_LAST_SUCCESS_START_FULL : self::INVENTORY_LAST_SUCCESS_START_PARTIAL;
 
     $ts = self::getCurrentTimestamp();
     $this->keyValueRepository->putOrReplace($keyCompletion, $ts);
     $this->keyValueRepository->putOrReplace($keySuccessFlag, true);
+    $this->keyValueRepository->putOrReplace($keyStartTime, $startTime);
     // timestamp on state change should match timestamp of last completion
     $this->setServiceState(self::STATE_IDLE, $ts);
   }
@@ -302,10 +299,7 @@ class InventoryStatusService
       $timestamp = self::getCurrentTimestamp();
     }
 
-    $key = self::INVENTORY_STATUS_UPDATED_AT_PARTIAL;
-    if ($full) {
-      $key = self::INVENTORY_STATUS_UPDATED_AT_FULL;
-    }
+    $key = $full ? self::INVENTORY_STATUS_UPDATED_AT_FULL : self::INVENTORY_STATUS_UPDATED_AT_PARTIAL;
 
     $this->keyValueRepository->putOrReplace($key, $timestamp);
 
@@ -329,12 +323,9 @@ class InventoryStatusService
    * @param $manual
    * @return void
    */
-  function resetState(bool $full, bool $manual = false)
+  public function resetState(bool $full, bool $manual = false)
   {
-    $logKey = self::LOG_KEY_RESET_PARTIAL;
-    if ($full) {
-      $logKey = self::LOG_KEY_RESET_FULL;
-    }
+    $logKey = $full ? self::LOG_KEY_RESET_FULL : self::LOG_KEY_RESET_PARTIAL;
 
     $this->logger->info(TranslationHelper::getLoggerKey($logKey), [
       'additionalInfo' => ['manual' => (string) $manual],
@@ -343,5 +334,43 @@ class InventoryStatusService
 
     // rewind timestamp to when we last tried to sync
     $this->setServiceState($full, self::STATE_IDLE, $this->getLastAttemptTime($full));
+  }
+
+  /**
+   * Clear all data for a type of sync
+   *
+   * @param boolean $full
+   * @param boolean $manual
+   * @return void
+   */
+  public function clearState(bool $full, bool $manual = false)
+  {
+    $keys = $full ? self::KEYS_FOR_FULL : self::KEYS_FOR_PARTIAL;
+
+    foreach ($keys as $key) {
+      // using 'putOrReplace' with null is a safe delete operation.
+      $this->keyValueRepository->putOrReplace($key, null);
+    }
+
+    $logKey = $full ? self::LOG_KEY_CLEAR_FULL : self::LOG_KEY_CLEAR_PARTIAL;
+
+    $this->logger->info(TranslationHelper::getLoggerKey($logKey), [
+      'additionalInfo' => ['manual' => (string) $manual],
+      'method' => __METHOD__
+    ]);
+  }
+
+  /**
+   * Get the timestamp for the time the last successful sync started
+   *
+   * @param bool $full
+   *
+   * @return string|null
+   */
+  public function getLastSuccessfulAttemptTime(bool $full)
+  {
+    $key = $full ? self::INVENTORY_LAST_SUCCESS_START_FULL : self::INVENTORY_LAST_SUCCESS_START_PARTIAL;
+
+    return $this->keyValueRepository->get($key);
   }
 }

@@ -101,7 +101,7 @@ class InventoryUpdateService
    */
   public function sync(bool $fullInventory, bool $manual = false): array
   {
-    $timeStart = null;
+    $startTimeStamp = null;
 
     $totalDtosAttempted = 0;
     $totalDtosSaved = 0;
@@ -120,10 +120,8 @@ class InventoryUpdateService
       }
 
       if (!$fullInventory) {
-        // if no full sync attempt is on record, we should do a full sync in place of a differential sync.
-        $mostRecentFullStart = $this->statusService->getLastAttemptTime(true);
-        if (!isset($mostRecentFullStart) || empty($mostRecentFullStart)) {
-
+        $lastGoodFullSyncStart = $this->statusService->getLastSuccessfulAttemptTime(true);
+        if (!isset($lastGoodFullSyncStart) || empty($lastGoodFullSyncStart)) {
           $this->logger->info(
             TranslationHelper::getLoggerKey(self::LOG_KEY_NO_SYNCS),
             [
@@ -133,18 +131,10 @@ class InventoryUpdateService
           );
 
           // NOTICE: due to recursion, this log will show up AFTER the logs for the Full Sync!
-          $externalLogs->addInfoLog("Forced a full inventory sync as there are no syncs on record");
+          $externalLogs->addInfoLog("Forced a full inventory sync as there are no successful full syncs on record");
 
           return $this->sync(true, $manual);
         }
-      }
-
-      $filters = $this->getDefaultFilters();
-      if (!$fullInventory) {
-
-        $startOfWindow = $this->getStartOfDeltaSyncWindow($externalLogs);
-
-        self::applyTimeFilter($filters, $startOfWindow);
       }
 
       // look up item mapping method at this level to ensure consistency and improve efficiency
@@ -153,8 +143,6 @@ class InventoryUpdateService
       // TODO: remove dependency on VariationSearchRepositoryContract by replacing with a Wayfair wrapper
       /** @var VariationSearchRepositoryContract */
       $variationSearchRepository = pluginApp(VariationSearchRepositoryContract::class);
-
-      $variationSearchRepository->setFilters($filters);
 
       // stock buffer should be the same across all pages of inventory
       $stockBuffer = $this->getNormalizedStockBuffer();
@@ -174,24 +162,36 @@ class InventoryUpdateService
         'method' => __METHOD__
       ]);
 
-      $timeStart = $this->statusService->markInventoryStarted($fullInventory);
+      $startTimeStamp = $this->statusService->markInventoryStarted($fullInventory);
       $externalLogs->addInfoLog("Starting " . ($manual ? "Manual " : "Automatic ") . ($fullInventory ? "Full " : "Partial ") . "inventory sync.");
+
+      $filters = $this->getDefaultFilters();
+      if (!$fullInventory) {
+
+        $startOfWindow = $this->getStartOfDeltaSyncWindow($externalLogs);
+        $endOfWindow = strtotime($startTimeStamp);
+
+        // look at inventory changes between last good sync and the declared sync start time.
+        // (the end of this window becomes the start of the next window)
+        self::applyTimeFilter($filters, $startOfWindow, $endOfWindow);
+      }
+
+      $variationSearchRepository->setFilters($filters);
 
       do {
         $mostRecentPartialStart = $this->statusService->getLastAttemptTime(false);
         $mostRecentFullStart = $this->statusService->getLastAttemptTime(true);
 
-        if (strtotime($mostRecentFullStart) > strtotime($timeStart)) {
+        if (strtotime($mostRecentFullStart) > strtotime($startTimeStamp)) {
           // a sync of all items is happening AFTER this one, so this sync is stale!
-          throw new InventorySyncInterruptedException("Inventory sync started at " . $timeStart .
+          throw new InventorySyncInterruptedException("Inventory sync started at " . $startTimeStamp .
             " lost priority to Full Inventory sync started at " . $mostRecentFullStart);
         }
 
-
-        if (!$fullInventory && strtotime($mostRecentPartialStart) > strtotime($timeStart)) {
+        if (!$fullInventory && strtotime($mostRecentPartialStart) > strtotime($startTimeStamp)) {
           // this is a partial inventory, but another partial inventory started after it.
           // this one should stop running.
-          throw new InventorySyncInterruptedException("Inventory sync started at " . $timeStart .
+          throw new InventorySyncInterruptedException("Inventory sync started at " . $startTimeStamp .
             " lost priority to Inventory sync started at " . $mostRecentPartialStart);
         }
 
@@ -282,7 +282,7 @@ class InventoryUpdateService
         $pageNumber++;
       } while (isset($variationSearchResponse) && !$variationSearchResponse->isLastPage());
 
-      $totalTimeSyncingAllPages = time() - strtotime($timeStart);
+      $totalTimeSyncingAllPages = time() - strtotime($startTimeStamp);
 
       if ($totalDtosFailed > 0) {
         $this->statusService->markInventoryFailed($fullInventory);
@@ -296,7 +296,7 @@ class InventoryUpdateService
           'method' => __METHOD__
         ]);
       } else {
-        $this->statusService->markInventoryComplete($fullInventory);
+        $this->statusService->markInventoryComplete($fullInventory, $startTimeStamp);
       }
     } catch (InventorySyncBlockedException $e) {
       $logKey = $fullInventory ? self::LOG_KEY_SKIPPED_FULL : self::LOG_KEY_SKIPPED_PARTIAL;
@@ -321,7 +321,7 @@ class InventoryUpdateService
         'method' => __METHOD__
       ]);
 
-      if ($this->statusService->getLastAttemptTime($fullInventory) == $timeStart) {
+      if ($this->statusService->getLastAttemptTime($fullInventory) == $startTimeStamp) {
         // this is the most recent sync of this flavor, and it is quitting early.
         // the inventory status service should see this flavor of sync as "idle" so that the next one can start.
         $this->statusService->resetState($fullInventory);
@@ -423,19 +423,19 @@ class InventoryUpdateService
   }
 
   /**
-   * Add a time-based filter to a VariationSearchRepository filter array
-   * The time starts based on the argument,
+   * Add a time-based filter to a VariationSearchRepository filter array,
+   * limiting the results to those that have changed in the given time window
    *
    * @param array $filters the filter array to add on to
    * @param integer $startOfWindow unix time in seconds for when the time starts
    * @return void
    */
-  private static function applyTimeFilter($filters, int $startOfWindow)
+  private static function applyTimeFilter($filters, int $startOfWindow, int $endOfWindow = time())
   {
     if (isset($filters) && isset($startOfWindow) && $startOfWindow > 0) {
       $filters['updatedBetween'] = [
         'timestampFrom' => $startOfWindow,
-        'timestampTo' => time(),
+        'timestampTo' => $endOfWindow,
       ];
     }
   }
@@ -502,31 +502,31 @@ class InventoryUpdateService
   }
 
   /**
-   * Get the php timestamp (in seconds) for the start of a partial sync
+   * Get the php time (in seconds) for the start of a partial sync
    *
    * @return int
    */
   private function getStartOfDeltaSyncWindow(ExternalLogs $externalLogs = null): int
   {
-    $lastCompletion = $this->statusService->getLastCompletionTime(false);
+    $lastWindowEnd = $this->statusService->getLastSuccessfulAttemptTime(false);
 
-    if (isset($lastCompletion) && !empty($lastCompletion)) {
-      return strtotime($lastCompletion);
+    if (isset($lastWindowEnd) && !empty($lastWindowEnd)) {
+      // new window should be directly after the previous window
+      return strtotime($lastWindowEnd);
     }
 
-    $lastCompletion = $this->statusService->getLastCompletionTime(true);
+    $lastGoodFullStart = $this->statusService->getLastSuccessfulAttemptTime(true);
 
-    if (isset($lastCompletion) && !empty($lastCompletion)) {
-      return strtotime($lastCompletion);
+    if (isset($lastGoodFullStart) && !empty($lastGoodFullStart)) {
+      // due to no window, fall back to syncing everything that changed since the last full sync
+      return strtotime($lastGoodFullStart);
     }
 
-    // no time data to work from.
-    // compensating code should have started a full sync before this calculation takes place!
-    // fall back to a window of 2 hours.
     if (isset($externalLogs)) {
-      $externalLogs->addWarningLog("Starting a partial inventory sync when no inventory syncs of any sort have been completed.");
+      $externalLogs->addErrorLog("Starting a partial inventory sync when no inventory syncs of any sort have been completed.");
     }
 
+    // in case we somehow got here, use an arbitrary window so that some data gets updated
     return time() - 7200;
   }
 
@@ -543,7 +543,13 @@ class InventoryUpdateService
       return true;
     }
 
-    // okay to start a Full sync, but don't run a partial sync on top of another partial sync.
-    return !$fullInventory && $this->statusService->isInventoryRunning(false) && !$this->serviceHasBeenRunningTooLong(false);
+    if ($fullInventory)
+    {
+      // no full inventory is running, so we can start a new one
+      return false;
+    }
+
+    // don't run a partial sync on top of another partial sync that is running with in the time limit.
+    return $this->statusService->isInventoryRunning($fullInventory) && !$this->serviceHasBeenRunningTooLong($fullInventory);
   }
 }
