@@ -226,6 +226,8 @@ class InventoryUpdateService
           }
         }
 
+        $amtOfDtosForPage = count($requestDTOsForPage);
+
         if ($amtOfDtosForPage <= 0) {
           $this->logger
             ->debug(
@@ -241,8 +243,6 @@ class InventoryUpdateService
 
           $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': No items to update for page ' . $pageNumber);
         } else {
-
-          $amtOfDtosForPage = count($requestDTOsForPage);
           $amtOfVariationsForPage = count($variationIdsForPage);
           $totalVariationIdsInDTOsForAllPages += $amtOfVariationsForPage;
 
