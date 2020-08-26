@@ -436,7 +436,8 @@ class InventoryUpdateService
    * limiting the results to those that have changed in the given time window
    *
    * @param array $filters the filter array to add on to
-   * @param integer $startOfWindow unix time in seconds for when the time starts
+   * @param integer $startOfWindow php time in seconds for earliest change time
+   * @param integer $endOfWindow (optional) php time in seconds for latest change time
    * @return void
    */
   private static function applyTimeFilter($filters, int $startOfWindow, int $endOfWindow = null)
