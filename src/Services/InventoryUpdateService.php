@@ -178,25 +178,22 @@ class InventoryUpdateService
       $externalLogs->addInfoLog("Starting " . ($manual ? "Manual " : "Automatic ") . ($fullInventory ? "Full " : "Partial ") . "inventory sync.");
 
       do {
+        $mostRecentPartialStart = $this->statusService->getLastAttemptTime(false);
+        $mostRecentFullStart = $this->statusService->getLastAttemptTime(true);
 
-        if ($this->statusService->isInventoryRunning(true)) {
-          $mostRecentPartialStart = $this->statusService->getLastAttemptTime(false);
-          $mostRecentFullStart = $this->statusService->getLastAttemptTime(true);
-
-          if (strtotime($mostRecentFullStart) > strtotime($timeStart)) {
-            // a sync of all items is happening AFTER this one, so this sync is stale!
-            throw new InventorySyncInterruptedException("Inventory sync started at " . $timeStart .
-              " lost priority to Full Inventory sync started at " . $mostRecentFullStart);
-          }
+        if (strtotime($mostRecentFullStart) > strtotime($timeStart)) {
+          // a sync of all items is happening AFTER this one, so this sync is stale!
+          throw new InventorySyncInterruptedException("Inventory sync started at " . $timeStart .
+            " lost priority to Full Inventory sync started at " . $mostRecentFullStart);
         }
 
-        if (!$fullInventory && $this->statusService->isInventoryRunning(false) && strtotime($mostRecentPartialStart) > strtotime($timeStart))
-          {
-            // this is a partial inventory, but another partial inventory started after it.
-            // this one should stop running.
-            throw new InventorySyncInterruptedException("Inventory sync started at " . $timeStart .
-              " lost priority to Inventory sync started at " . $mostRecentPartialStart);
-          }
+
+        if (!$fullInventory && strtotime($mostRecentPartialStart) > strtotime($timeStart)) {
+          // this is a partial inventory, but another partial inventory started after it.
+          // this one should stop running.
+          throw new InventorySyncInterruptedException("Inventory sync started at " . $timeStart .
+            " lost priority to Inventory sync started at " . $mostRecentPartialStart);
+        }
 
         $unixTimeAtPageStart = TimeHelper::getMilliseconds();
 
