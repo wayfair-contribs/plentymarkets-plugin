@@ -33,6 +33,7 @@ class FullInventoryController extends Controller
    */
   public function getState(InventoryStatusService $statusService)
   {
-    return \json_encode($statusService->getServiceState(true));
+    return json_encode($statusService->getServiceState(true));
   }
+
 }
