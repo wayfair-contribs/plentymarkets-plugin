@@ -101,8 +101,6 @@ class InventoryUpdateService
    */
   public function sync(bool $fullInventory, bool $manual = false): array
   {
-    $mostRecentFullStart = null;
-    $lastStartTime = null;
     $timeStart = null;
 
     $totalDtosAttempted = 0;
@@ -116,6 +114,19 @@ class InventoryUpdateService
     /** @var ExternalLogs */
     $externalLogs = pluginApp(ExternalLogs::class);
     try {
+
+      $lastStartTime = $this->statusService->getLastAttemptTime($fullInventory);
+
+      $fullSyncBlocked = $this->statusService->isInventoryRunning(true) && !$this->serviceHasBeenRunningTooLong(true);
+      // don't run a partial sync while a full sync is running
+      $currentSyncBlocked = $fullSyncBlocked || $this->statusService->isInventoryRunning($fullInventory) && !$this->serviceHasBeenRunningTooLong($fullInventory);
+
+      // potential race conditions - change service management strategy in a future update
+      // (but this is better than letting the old UpdateFullInventoryStatusCron randomly change service states)
+      if ($currentSyncBlocked) {
+        throw new InventorySyncBlockedException();
+      }
+
       if (!$fullInventory) {
         // if no full sync attempt is on record, we should do a full sync in place of a differential sync.
         $mostRecentFullStart = $this->statusService->getLastAttemptTime(true);
@@ -136,23 +147,10 @@ class InventoryUpdateService
         }
       }
 
-      $lastStartTime = $this->statusService->getLastAttemptTime($fullInventory);
-      $lastEndTime = $this->statusService->getLastCompletionTime($fullInventory);
-
-      $fullSyncBlocked = $this->statusService->isInventoryRunning(true) && !$this->serviceHasBeenRunningTooLong(true);
-      // don't run a partial sync while a full sync is running
-      $currentSyncBlocked = $fullSyncBlocked || $this->statusService->isInventoryRunning($fullInventory) && !$this->serviceHasBeenRunningTooLong($fullInventory);
-
-      // potential race conditions - change service management strategy in a future update
-      // (but this is better than letting the old UpdateFullInventoryStatusCron randomly change service states)
-      if ($currentSyncBlocked) {
-        throw new InventorySyncBlockedException();
-      }
-
       $filters = $this->getDefaultFilters();
       if (!$fullInventory) {
 
-        $startOfWindow = $this->getStartOfDeltaSyncWindow();
+        $startOfWindow = $this->getStartOfDeltaSyncWindow($externalLogs);
 
         self::applyTimeFilter($filters, $startOfWindow);
       }
@@ -302,12 +300,14 @@ class InventoryUpdateService
         $this->statusService->markInventoryComplete($fullInventory);
       }
     } catch (InventorySyncBlockedException $e) {
-      $stateArray = $this->statusService->getServiceState($fullInventory);
 
       $logKey = $fullInventory ? self::LOG_KEY_SKIPPED_FULL : self::LOG_KEY_SKIPPED_PARTIAL;
 
       $this->logger->info(TranslationHelper::getLoggerKey($logKey), [
-        'additionalInfo' => ['manual' => (string) $manual, 'otherSyncStartedAt' => $lastStartTime, 'state' => $stateArray],
+        'additionalInfo' => [
+          'manual' => (string) $manual,
+          'otherSyncStartedAt' => $lastStartTime,
+        ],
         'method' => __METHOD__
       ]);
       $externalLogs->addWarningLog(($manual ? "Manual " : "Automatic ") . ($fullInventory ? "Full " : "Partial ") . "Inventory sync BLOCKED - already running");
@@ -317,7 +317,10 @@ class InventoryUpdateService
       $logKey = $fullInventory ? self::LOG_KEY_INTERRUPTED_FULL : self::LOG_KEY_INTERRUPTED_PARTIAL;
 
       $this->logger->info(TranslationHelper::getLoggerKey($logKey), [
-        'additionalInfo' => ['manual' => (string) $manual, 'mostRecentFullStart' => $mostRecentFullStart],
+        'additionalInfo' => [
+          'manual' => (string) $manual,
+          'mostRecentFullStart' => $mostRecentFullStart
+        ],
         'method' => __METHOD__
       ]);
 
@@ -458,7 +461,9 @@ class InventoryUpdateService
       $this->logger->warning(
         TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_STOCK_BUFFER),
         [
-          'additionalInfo' => ['stockBuffer' => $stockBuffer],
+          'additionalInfo' => [
+            'stockBuffer' => json_encode($stockBuffer)
+          ],
           'method' => __METHOD__
         ]
       );
@@ -502,7 +507,7 @@ class InventoryUpdateService
    *
    * @return int
    */
-  private function getStartOfDeltaSyncWindow(): int
+  private function getStartOfDeltaSyncWindow(ExternalLogs $externalLogs = null): int
   {
     $lastCompletion = $this->statusService->getLastCompletionTime(false);
 
@@ -516,7 +521,13 @@ class InventoryUpdateService
       return strtotime($lastCompletion);
     }
 
-    //
-    return time() - 960;
+    // no time data to work from.
+    // compensating code should have started a full sync before this calculation takes place!
+    // fall back to a window of 2 hours.
+    if (isset($externalLogs)) {
+      $externalLogs->addWarningLog("Starting a partial inventory sync when no inventory syncs of any sort have been completed.");
+    }
+
+    return time() - 7200;
   }
 }
