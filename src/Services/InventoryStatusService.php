@@ -90,14 +90,14 @@ class InventoryStatusService
   }
 
   /**
-   * Set the global state of Full Inventory syncing,
+   * Set the global status of Full Inventory syncing,
    * returning the old state.
    * @param bool $full
-   * @param string $state
+   * @param string $status
    * @param string $timestamp
-   * @return string|null
+   * @return string
    */
-  private function setServiceState($full, $state, $timestamp = null)
+  private function setServiceStatusValue($full, $statusValue, $timestamp = null): string
   {
     if (!isset($timestamp) || empty($timestamp)) {
       $timestamp = self::getCurrentTimestamp();
@@ -106,23 +106,23 @@ class InventoryStatusService
     $statusKey = $full ? self::INVENTORY_CRON_STATUS_FULL : self::INVENTORY_CRON_STATUS_PARTIAL;
     $logKeyStateChange = $full ? self::LOG_KEY_STATE_CHANGE_FULL : self::LOG_KEY_STATE_CHANGE_PARTIAL;
 
-    $oldState = $this->keyValueRepository->get($statusKey);
+    $oldStatus = $this->getServiceStatusValue($full);
 
-    if ($oldState != $state) {
-      $this->keyValueRepository->putOrReplace($statusKey, $state);
+    if ($oldStatus != $statusValue) {
+      $this->keyValueRepository->putOrReplace($statusKey, $statusValue);
       // this replaces flaky code in KeyValueRepository that was attempting to do change tracking.
       $ts = $this->markStateChange($statusKey, $timestamp);
 
       $this->logger->debug(TranslationHelper::getLoggerKey($logKeyStateChange), [
         'additionalInfo' => [
-          'oldState' => $oldState,
-          'newState' => $state
+          'oldStatus' => $oldStatus,
+          'newStatus' => $statusValue
         ],
         'method' => __METHOD__
       ]);
     }
 
-    return $oldState;
+    return $oldStatus;
   }
 
   /**
@@ -158,6 +158,11 @@ class InventoryStatusService
 
     $state = $this->keyValueRepository->get($keyStatus);
 
+    if (!isset($state))
+    {
+      $state = self::STATE_IDLE;
+    }
+
     $this->logger->debug(TranslationHelper::getLoggerKey($logKeyStateCheck), [
       'additionalInfo' => ['state' => $state],
       'method' => __METHOD__
@@ -189,7 +194,14 @@ class InventoryStatusService
   {
     $key = $full ? self::INVENTORY_STATUS_UPDATED_AT_FULL : self::INVENTORY_STATUS_UPDATED_AT_PARTIAL;
 
-    return $this->keyValueRepository->get($key);
+    $ts = $this->keyValueRepository->get($key);
+
+    if (isset($ts))
+    {
+      return $ts;
+    }
+
+    return '';
   }
 
   /**
@@ -203,7 +215,14 @@ class InventoryStatusService
   {
     $key = $full ? self::INVENTORY_LAST_COMPLETION_FULL : self::INVENTORY_LAST_COMPLETION_PARTIAL;
 
-    return $this->keyValueRepository->get($key);
+    $ts = $this->keyValueRepository->get($key);
+
+    if (isset($ts))
+    {
+      return $ts;
+    }
+
+    return '';
   }
 
   /**
@@ -211,13 +230,20 @@ class InventoryStatusService
    *
    * @param bool $full
    *
-   * @return string|null
+   * @return string
    */
-  public function getLastAttemptTime(bool $full)
+  public function getLastAttemptTime(bool $full): string
   {
     $key = $full ? self::INVENTORY_CRON_STATUS_FULL : self::INVENTORY_LAST_ATTEMPT_PARTIAL;
 
-    return $this->keyValueRepository->get($key);
+    $ts = $this->keyValueRepository->get($key);
+
+    if (isset($ts))
+    {
+      return $ts;
+    }
+
+    return '';
   }
 
   public function getLatestAttemptSuccess(bool $full): bool
@@ -245,7 +271,7 @@ class InventoryStatusService
     $ts = self::getCurrentTimestamp();
     $this->keyValueRepository->putOrReplace($keyLastAttempt, $ts);
     // timestamp on state change should match last attempt
-    $this->setServiceState($full, self::STATE_RUNNING, $ts);
+    $this->setServiceStatusValue($full, self::STATE_RUNNING, $ts);
 
     return $ts;
   }
@@ -257,12 +283,12 @@ class InventoryStatusService
    * @param \Exception $exception
    * @return void
    */
-  public function markInventoryFailed(bool $full)
+  public function markInventoryFailed(bool $full): void
   {
     $keySuccessFlag = $full ? self::INVENTORY_SUCCESS_PARTIAL : self::INVENTORY_SUCCESS_PARTIAL;
 
     $this->keyValueRepository->putOrReplace($keySuccessFlag, false);
-    $this->setServiceState($full, self::STATE_IDLE);
+    $this->setServiceStatusValue($full, self::STATE_IDLE);
   }
 
   /**
@@ -272,7 +298,7 @@ class InventoryStatusService
    * @param bool $manual
    * @return void
    */
-  public function markInventoryComplete(bool $full, string $startTime)
+  public function markInventoryComplete(bool $full, string $startTime): void
   {
     $keyCompletion = $full ? self::INVENTORY_LAST_COMPLETION_FULL : self::INVENTORY_LAST_COMPLETION_PARTIAL;
     $keySuccessFlag = $full ? self::INVENTORY_SUCCESS_FULL : self::INVENTORY_SUCCESS_PARTIAL;
@@ -283,7 +309,7 @@ class InventoryStatusService
     $this->keyValueRepository->putOrReplace($keySuccessFlag, true);
     $this->keyValueRepository->putOrReplace($keyStartTime, $startTime);
     // timestamp on state change should match timestamp of last completion
-    $this->setServiceState(self::STATE_IDLE, $ts);
+    $this->setServiceStatusValue(self::STATE_IDLE, $ts);
   }
 
   /**
@@ -323,7 +349,7 @@ class InventoryStatusService
    * @param $manual
    * @return void
    */
-  public function resetState(bool $full, bool $manual = false)
+  public function resetState(bool $full, bool $manual = false): void
   {
     $logKey = $full ? self::LOG_KEY_RESET_FULL : self::LOG_KEY_RESET_PARTIAL;
 
@@ -333,7 +359,7 @@ class InventoryStatusService
     ]);
 
     // rewind timestamp to when we last tried to sync
-    $this->setServiceState($full, self::STATE_IDLE, $this->getLastAttemptTime($full));
+    $this->setServiceStatusValue($full, self::STATE_IDLE, $this->getLastAttemptTime($full));
   }
 
   /**
@@ -343,7 +369,7 @@ class InventoryStatusService
    * @param boolean $manual
    * @return void
    */
-  public function clearState(bool $full, bool $manual = false)
+  public function clearState(bool $full, bool $manual = false): void
   {
     $keys = $full ? self::KEYS_FOR_FULL : self::KEYS_FOR_PARTIAL;
 
@@ -365,12 +391,19 @@ class InventoryStatusService
    *
    * @param bool $full
    *
-   * @return string|null
+   * @return string
    */
-  public function getLastSuccessfulAttemptTime(bool $full)
+  public function getLastSuccessfulAttemptTime(bool $full): string
   {
     $key = $full ? self::INVENTORY_LAST_SUCCESS_START_FULL : self::INVENTORY_LAST_SUCCESS_START_PARTIAL;
 
-    return $this->keyValueRepository->get($key);
+    $ts = $this->keyValueRepository->get($key);
+
+    if (isset($ts))
+    {
+      return $ts;
+    }
+
+    return '';
   }
 }
