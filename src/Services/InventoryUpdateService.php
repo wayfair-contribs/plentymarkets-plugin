@@ -179,16 +179,25 @@ class InventoryUpdateService
       $variationSearchRepository->setFilters($filters);
 
       do {
-        $mostRecentPartialStart = $this->statusService->getLastAttemptTime(false);
+
         $mostRecentFullStart = $this->statusService->getLastAttemptTime(true);
 
-        if (strtotime($mostRecentFullStart) > strtotime($startTimeStamp)) {
+        if (
+          isset($mostRecentFullStart) && !empty($mostRecentFullStart)
+          && strtotime($mostRecentFullStart) > strtotime($startTimeStamp)
+        ) {
           // a sync of all items is happening AFTER this one, so this sync is stale!
           throw new InventorySyncInterruptedException("Inventory sync started at " . $startTimeStamp .
             " lost priority to Full Inventory sync started at " . $mostRecentFullStart);
         }
 
-        if (!$fullInventory && strtotime($mostRecentPartialStart) > strtotime($startTimeStamp)) {
+        $mostRecentPartialStart = $this->statusService->getLastAttemptTime(false);
+
+        if (
+          !$fullInventory
+          && isset($mostRecentPartialStart) && !empty($mostRecentPartialStart)
+          && strtotime($mostRecentPartialStart) > strtotime($startTimeStamp)
+        ) {
           // this is a partial inventory, but another partial inventory started after it.
           // this one should stop running.
           throw new InventorySyncInterruptedException("Inventory sync started at " . $startTimeStamp .
@@ -488,7 +497,7 @@ class InventoryUpdateService
 
     if ($this->statusService->isInventoryRunning($full)) {
       $lastStateChange = $this->statusService->getStateChangeTime(true);
-      if (!$lastStateChange || (\time() - \strtotime($lastStateChange)) > $maxTime) {
+      if (!isset($lastStateChange) || empty($lastStateChange) || (time() - strtotime($lastStateChange)) > $maxTime) {
 
         $this->logger->warning(TranslationHelper::getLoggerKey($logKey), [
           'additionalInfo' => ['lastStateChange' => $lastStateChange, 'maximumTime' => $maxTime],
@@ -543,8 +552,7 @@ class InventoryUpdateService
       return true;
     }
 
-    if ($fullInventory)
-    {
+    if ($fullInventory) {
       // no full inventory is running, so we can start a new one
       return false;
     }
