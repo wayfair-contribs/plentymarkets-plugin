@@ -234,7 +234,7 @@ class InventoryStatusService
    */
   public function getLastAttemptTime(bool $full): string
   {
-    $key = $full ? self::INVENTORY_CRON_STATUS_FULL : self::INVENTORY_LAST_ATTEMPT_PARTIAL;
+    $key = $full ? self::INVENTORY_LAST_ATTEMPT_FULL : self::INVENTORY_LAST_ATTEMPT_PARTIAL;
 
     $ts = $this->keyValueRepository->get($key);
 
