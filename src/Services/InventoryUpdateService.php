@@ -116,7 +116,7 @@ class InventoryUpdateService
     try {
 
       if ($this->syncIsBlocked($fullInventory)) {
-        throw new InventorySyncBlockedException();
+        throw new InventorySyncBlockedException("Another inventory sync is in progress, preventing this one from starting");
       }
 
       if (!$fullInventory) {
@@ -180,13 +180,23 @@ class InventoryUpdateService
       do {
 
         if ($this->statusService->isInventoryRunning(true)) {
+          $mostRecentPartialStart = $this->statusService->getLastAttemptTime(false);
           $mostRecentFullStart = $this->statusService->getLastAttemptTime(true);
+
           if (strtotime($mostRecentFullStart) > strtotime($timeStart)) {
             // a sync of all items is happening AFTER this one, so this sync is stale!
             throw new InventorySyncInterruptedException("Inventory sync started at " . $timeStart .
               " lost priority to Full Inventory sync started at " . $mostRecentFullStart);
           }
         }
+
+        if (!$fullInventory && $this->statusService->isInventoryRunning(false) && strtotime($mostRecentPartialStart) > strtotime($timeStart))
+          {
+            // this is a partial inventory, but another partial inventory started after it.
+            // this one should stop running.
+            throw new InventorySyncInterruptedException("Inventory sync started at " . $timeStart .
+              " lost priority to Inventory sync started at " . $mostRecentPartialStart);
+          }
 
         $unixTimeAtPageStart = TimeHelper::getMilliseconds();
 
@@ -292,27 +302,24 @@ class InventoryUpdateService
         $this->statusService->markInventoryComplete($fullInventory);
       }
     } catch (InventorySyncBlockedException $e) {
-
-      $lastStartTime = $this->statusService->getLastAttemptTime($fullInventory);
       $logKey = $fullInventory ? self::LOG_KEY_SKIPPED_FULL : self::LOG_KEY_SKIPPED_PARTIAL;
 
       $this->logger->info(TranslationHelper::getLoggerKey($logKey), [
         'additionalInfo' => [
           'manual' => (string) $manual,
-          'otherSyncStartedAt' => $lastStartTime,
         ],
         'method' => __METHOD__
       ]);
-      $externalLogs->addWarningLog(($manual ? "Manual " : "Automatic ") . ($fullInventory ? "Full " : "Partial ") . "Inventory sync BLOCKED - already running");
+
+      $externalLogs->addInventoryLog('Inventory blocked: ' . $e->getMessage(), 'inventoryBlocked' . ($fullInventory ? 'Full' : ''), 1, 0, false, $e->getTraceAsString());
     } catch (InventorySyncInterruptedException $e) {
-      $externalLogs->addInventoryLog('Inventory: ' . $e->getMessage(), 'inventoryInterrupted' . ($fullInventory ? 'Full' : ''), 1, 0, false);
 
       $logKey = $fullInventory ? self::LOG_KEY_INTERRUPTED_FULL : self::LOG_KEY_INTERRUPTED_PARTIAL;
 
       $this->logger->info(TranslationHelper::getLoggerKey($logKey), [
         'additionalInfo' => [
           'manual' => (string) $manual,
-          'mostRecentFullStart' => $mostRecentFullStart
+          'message' => $e->getMessage()
         ],
         'method' => __METHOD__
       ]);
@@ -322,8 +329,10 @@ class InventoryUpdateService
         // the inventory status service should see this flavor of sync as "idle" so that the next one can start.
         $this->statusService->resetState($fullInventory);
       }
+
+      $externalLogs->addInventoryLog('Inventory interrupted: ' . $e->getMessage(), 'inventoryInterrupted' . ($fullInventory ? 'Full' : ''), 1, 0, false, $e->getTraceAsString());
     } catch (\Exception $e) {
-      $externalLogs->addInventoryLog('Inventory: ' . $e->getMessage(), 'inventoryFailed' . ($fullInventory ? 'Full' : ''), 1, 0, false);
+      $externalLogs->addInventoryLog('Inventory exception: ' . $e->getMessage(), 'inventoryFailed' . ($fullInventory ? 'Full' : ''), 1, 0, false);
 
       // bulk update failed, so everything we were going to save should be considered failing.
       // (we want the failure amount to be more than zero in order for client to know this failed.)

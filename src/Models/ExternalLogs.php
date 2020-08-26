@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright 2020 Wayfair LLC - All rights reserved
  */
@@ -7,7 +8,8 @@ namespace Wayfair\Models;
 
 use Wayfair\Core\Helpers\TimeHelper;
 
-class ExternalLogs {
+class ExternalLogs
+{
 
   /**
    * @var array
@@ -17,14 +19,16 @@ class ExternalLogs {
   /**
    * @return array
    */
-  public function getLogs(): array {
+  public function getLogs(): array
+  {
     return $this->logs;
   }
 
   /**
    * @return void
    */
-  public function clearLogs() {
+  public function clearLogs()
+  {
     $this->logs = [];
   }
 
@@ -33,7 +37,8 @@ class ExternalLogs {
    *
    * @return void
    */
-  public function addLog(array $log) {
+  public function addLog(array $log)
+  {
     $this->logs[] = $log;
   }
 
@@ -43,7 +48,8 @@ class ExternalLogs {
    *
    * @return void
    */
-  public function addErrorLog(string $message, string $details = null) {
+  public function addErrorLog(string $message, string $details = null)
+  {
     $this->addCustomLog('ERROR', $message, $details);
   }
 
@@ -53,7 +59,8 @@ class ExternalLogs {
    *
    * @return void
    */
-  public function addWarningLog(string $message, string $details = null) {
+  public function addWarningLog(string $message, string $details = null)
+  {
     $this->addCustomLog('WARNING', $message, $details);
   }
 
@@ -63,7 +70,8 @@ class ExternalLogs {
    *
    * @return void
    */
-  public function addInfoLog(string $message, string $details = null) {
+  public function addInfoLog(string $message, string $details = null)
+  {
     $this->addCustomLog('INFO', $message, $details);
   }
 
@@ -73,7 +81,8 @@ class ExternalLogs {
    *
    * @return void
    */
-  public function addDebugLog(string $message, string $details = null) {
+  public function addDebugLog(string $message, string $details = null)
+  {
     $this->addCustomLog('DEBUG', $message, $details);
   }
 
@@ -86,8 +95,9 @@ class ExternalLogs {
    *
    * @return void
    */
-  public function addPurchaseOrderLog(string $message, string $type, int $cnt, float $duration, bool $applyDuration = true) {
-    $this->addLogWithMetrics('PURCHASE_ORDER', $message, $type, $cnt, $duration, $applyDuration);
+  public function addPurchaseOrderLog(string $message, string $type, int $cnt, float $duration, bool $applyDuration = true, $details = null)
+  {
+    $this->addLogWithMetrics('PURCHASE_ORDER', $message, $type, $cnt, $duration, $applyDuration, $details);
   }
 
   /**
@@ -99,8 +109,9 @@ class ExternalLogs {
    *
    * @return void
    */
-  public function addInventoryLog(string $message, string $type, int $cnt, float $duration, bool $applyDuration = true) {
-    $this->addLogWithMetrics('INVENTORY', $message, $type, $cnt, $duration, $applyDuration);
+  public function addInventoryLog(string $message, string $type, int $cnt, float $duration, bool $applyDuration = true, $details = null)
+  {
+    $this->addLogWithMetrics('INVENTORY', $message, $type, $cnt, $duration, $applyDuration, $details);
   }
 
   /**
@@ -112,8 +123,9 @@ class ExternalLogs {
    *
    * @return void
    */
-  public function addShippingLabelLog(string $message, string $type, int $cnt, float $duration, bool $applyDuration = true) {
-    $this->addLogWithMetrics('SHIPPING_LABEL', $message, $type, $cnt, $duration, $applyDuration);
+  public function addShippingLabelLog(string $message, string $type, int $cnt, float $duration, bool $applyDuration = true, $details = null)
+  {
+    $this->addLogWithMetrics('SHIPPING_LABEL', $message, $type, $cnt, $duration, $applyDuration, $details);
   }
 
   /**
@@ -125,8 +137,9 @@ class ExternalLogs {
    *
    * @return void
    */
-  public function addASNLog(string $message, string $type, int $cnt, float $duration, bool $applyDuration = true) {
-    $this->addLogWithMetrics('ASN', $message, $type, $cnt, $duration, $applyDuration);
+  public function addASNLog(string $message, string $type, int $cnt, float $duration, bool $applyDuration = true, $details = null)
+  {
+    $this->addLogWithMetrics('ASN', $message, $type, $cnt, $duration, $applyDuration, $details);
   }
 
   /**
@@ -139,7 +152,8 @@ class ExternalLogs {
    *
    * @return void
    */
-  private function addLogWithMetrics(string $logType, string $message, string $type, int $cnt, float $duration, bool $applyDuration) {
+  private function addLogWithMetrics(string $logType, string $message, string $type, int $cnt, float $duration, bool $applyDuration, $details = null)
+  {
     $metrics = [
       'type' => $type,
       'value' => $cnt,
@@ -158,13 +172,18 @@ class ExternalLogs {
         $metrics
       ]
     ];
+
+    if (isset($details)) {
+      $log['details'] = $details;
+    }
   }
 
   /**
    * @param string $level
    * @param string $message
    */
-  private function addCustomLog(string $level, string $message, $details = null) {
+  private function addCustomLog(string $level, string $message, $details = null)
+  {
     $log = [
       'message' => $message,
       'level' => $level,
@@ -172,8 +191,7 @@ class ExternalLogs {
       'time_stamp' => TimeHelper::getMilliseconds()
     ];
 
-    if (isset($details))
-    {
+    if (isset($details)) {
       $log['details'] = $details;
     }
 
