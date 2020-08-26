@@ -42,9 +42,9 @@ class InventoryUpdateService
   const LOG_KEY_SKIPPED_FULL = 'fullInventorySkipped';
   const LOG_KEY_SKIPPED_PARTIAL = 'partialInventorySkipped';
 
-  // TODO: make this user-configurable in a future update
-  const MAX_INVENTORY_TIME_FULL = 7200;
-  const MAX_INVENTORY_TIME_PARTIAL = 1800;
+  // TODO: make these user-configurable in a future update
+  const MAX_INVENTORY_TIME_FULL = 14400;
+  const MAX_INVENTORY_TIME_PARTIAL = 3600;
 
   const INVENTORY_SAVE_TOTAL = 'inventorySaveTotal';
   const INVENTORY_SAVE_SUCCESS = 'inventorySaveSuccess';
@@ -189,7 +189,7 @@ class InventoryUpdateService
 
       do {
 
-        $mostRecentFullStart = $this->statusService->getLastAttemptTime($fullInventory);
+        $mostRecentFullStart = $this->statusService->getLastAttemptTime(true);
         if (strtotime($mostRecentFullStart) > strtotime($timeStart)) {
           throw new InventorySyncInterruptedException("Inventory sync started at " . $timeStart .
             " lost priority to Full Inventory sync started at " . $mostRecentFullStart);
