@@ -285,7 +285,7 @@ class InventoryStatusService
    */
   public function markInventoryFailed(bool $full): void
   {
-    $keySuccessFlag = $full ? self::INVENTORY_SUCCESS_PARTIAL : self::INVENTORY_SUCCESS_PARTIAL;
+    $keySuccessFlag = $full ? self::INVENTORY_SUCCESS_FULL : self::INVENTORY_SUCCESS_PARTIAL;
 
     $this->keyValueRepository->putOrReplace($keySuccessFlag, false);
     $this->setServiceStatusValue($full, self::STATE_IDLE);
