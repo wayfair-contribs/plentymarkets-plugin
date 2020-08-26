@@ -439,8 +439,13 @@ class InventoryUpdateService
    * @param integer $startOfWindow unix time in seconds for when the time starts
    * @return void
    */
-  private static function applyTimeFilter($filters, int $startOfWindow, int $endOfWindow = time())
+  private static function applyTimeFilter($filters, int $startOfWindow, int $endOfWindow = null)
   {
+    if (!isset($endOfWindow))
+    {
+      $endOfWindow = time();
+    }
+
     if (isset($filters) && isset($startOfWindow) && $startOfWindow > 0) {
       $filters['updatedBetween'] = [
         'timestampFrom' => $startOfWindow,
