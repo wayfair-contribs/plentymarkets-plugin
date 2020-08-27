@@ -93,7 +93,7 @@ class InventoryStatusService
    * Set the global status of Full Inventory syncing,
    * returning the old state.
    * @param bool $full
-   * @param string $status
+   * @param string $statusValue
    * @param string $timestamp
    * @return string
    */
@@ -279,8 +279,6 @@ class InventoryStatusService
   /**
    * Set the global timestamp for a successful sync to now, and update related fields
    * @param bool $full
-   * @param bool $manual
-   * @param \Exception $exception
    * @return void
    */
   public function markInventoryFailed(bool $full): void
@@ -295,7 +293,7 @@ class InventoryStatusService
    * Set the global Timestamp for a successful sync to now, and update related fields
    *
    * @param bool $full
-   * @param bool $manual
+   * @param string $startTime
    * @return void
    */
   public function markInventoryComplete(bool $full, string $startTime): void

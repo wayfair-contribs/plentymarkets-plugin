@@ -488,7 +488,7 @@ class InventoryUpdateService
   /**
    * Check if the state of the Inventory Service has been "running" for more than the maximum allotted time
    * This functionality was extracted from the old UpdateFullInventoryStatusCron
-   * @param boolean $full check full inventory service instead of partial
+   * @param bool $full check full inventory service instead of partial
    * @return bool
    */
   private function serviceHasBeenRunningTooLong(bool $full): bool
