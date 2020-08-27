@@ -108,7 +108,6 @@ class InventoryUpdateService
     $totalDtosFailed = 0;
     $totalTimeSpentGatheringData = 0;
     $totalTimeSpentSendingData = 0;
-    $totalTimeSyncingAllPages = 0;
     $totalVariationIdsInDTOsForAllPages = 0;
 
     /** @var ExternalLogs */
@@ -291,8 +290,6 @@ class InventoryUpdateService
         $pageNumber++;
       } while (isset($variationSearchResponse) && !$variationSearchResponse->isLastPage());
 
-      $totalTimeSyncingAllPages = time() - strtotime($startTimeStamp);
-
       if ($totalDtosFailed > 0) {
         $this->statusService->markInventoryFailed($fullInventory);
 
@@ -362,12 +359,15 @@ class InventoryUpdateService
         'method' => __METHOD__
       ]);
     } finally {
+
+      $elapsedTime = time() - strtotime($startTimeStamp);
+
       $infoMap = [
         'manual' => (string) $manual,
         'dtosAttempted' => $totalDtosAttempted,
         'dtosSaved' => $totalDtosSaved,
         'dtosFailed' => $totalDtosFailed,
-        'elapsedTime' => $totalTimeSyncingAllPages,
+        'elapsedTime' => $elapsedTime,
         'variationsAttempted' => $totalVariationIdsInDTOsForAllPages
       ];
 
