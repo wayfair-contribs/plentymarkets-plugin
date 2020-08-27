@@ -6,14 +6,14 @@
 
 namespace Wayfair\Cron;
 
-class InventoryFullCron extends AbstractInventoryCron
+class InventoryPartialCron extends AbstractInventoryCron
 {
 
   /**
-   * InventoryFullCron constructor.
+   * InventoryPartialCron constructor.
    */
   public function __construct()
   {
-    parent::__construct(true);
+    parent::__construct(false);
   }
 }

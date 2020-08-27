@@ -6,26 +6,34 @@
 namespace Wayfair\Controllers;
 
 use Plenty\Plugin\Controller;
-use Wayfair\Services\FullInventoryService;
-use Wayfair\Services\FullInventoryStatusService;
+use Wayfair\Services\InventoryUpdateService;
+use Wayfair\Services\InventoryStatusService;
 
 class FullInventoryController extends Controller
 {
 
   /**
-   * @param FullInventoryService $fullInventoryService
+   * @param InventoryUpdateService $inventoryUpdateService
+   * @param InventoryStatusService $inventoryStatusService
    *
    * @return string
    * @throws \Exception
    */
-  public function sync(FullInventoryService $fullInventoryService)
+  public function sync(InventoryUpdateService $inventoryUpdateService, InventoryStatusService $statusService)
   {
+    $inventoryUpdateService->sync(true, true);
     // set manual flag so that we know where sync request came from
-    return \json_encode($fullInventoryService->sync(true));
+    return $this->getState($statusService);
   }
 
-  public function getState(FullInventoryStatusService $statusService)
+  /**
+   * @param InventoryStatusService $statusService
+   *
+   * @return string
+   */
+  public function getState(InventoryStatusService $statusService)
   {
-    return \json_encode($statusService->getServiceState());
+    return json_encode($statusService->getServiceState(true));
   }
+
 }
