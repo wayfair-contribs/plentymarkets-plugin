@@ -266,7 +266,7 @@ class InventoryStatusService
    */
   public function markInventoryStarted(bool $full): string
   {
-    $keyLastAttempt = self::INVENTORY_LAST_ATTEMPT_PARTIAL;
+    $keyLastAttempt = $full ? self::INVENTORY_LAST_ATTEMPT_FULL : self::INVENTORY_LAST_ATTEMPT_PARTIAL;
 
     $ts = self::getCurrentTimestamp();
     $this->keyValueRepository->putOrReplace($keyLastAttempt, $ts);

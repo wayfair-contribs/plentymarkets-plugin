@@ -491,21 +491,17 @@ class InventoryUpdateService
    * @param bool $full check full inventory service instead of partial
    * @return bool
    */
-  private function serviceHasBeenRunningTooLong(bool $full): bool
+  private function serviceIsRunningAndForTooLong(bool $full): bool
   {
-    $maxTime = self::MAX_INVENTORY_TIME_PARTIAL;
-    $logKey = self::LOG_KEY_LONG_RUN_PARTIAL;
-    if ($full) {
-      $maxTime = self::MAX_INVENTORY_TIME_FULL;
-      $logKey = self::LOG_KEY_LONG_RUN_FULL;
-    }
+    $maxTime = $full ? self:: MAX_INVENTORY_TIME_FULL : self::MAX_INVENTORY_TIME_PARTIAL;
+    $logKey = $full ? self::LOG_KEY_LONG_RUN_FULL : self::LOG_KEY_LONG_RUN_PARTIAL;
 
     if ($this->statusService->isInventoryRunning($full)) {
-      $lastStateChange = $this->statusService->getStateChangeTime(true);
-      if (!isset($lastStateChange) || empty($lastStateChange) || (time() - strtotime($lastStateChange)) > $maxTime) {
+      $lastStart = $this->statusService->getLastAttemptTime($full);
+      if (isset($lastStart) && !empty($lastStart) && (time() - strtotime($lastStart)) > $maxTime) {
 
         $this->logger->warning(TranslationHelper::getLoggerKey($logKey), [
-          'additionalInfo' => ['lastStateChange' => $lastStateChange, 'maximumTime' => $maxTime],
+          'additionalInfo' => ['otherServiceStartTime' => $lastStart, 'maximumTime' => $maxTime],
           'method' => __METHOD__
         ]);
         return true;
@@ -517,6 +513,8 @@ class InventoryUpdateService
 
   /**
    * Get the php time (in seconds) for the start of a partial sync
+   *
+   * @param ExternalLogs $externalLogs
    *
    * @return int
    */
@@ -560,7 +558,7 @@ class InventoryUpdateService
    */
   private function syncIsBlocked(bool $fullInventory): bool
   {
-    if ($this->statusService->isInventoryRunning(true) && !$this->serviceHasBeenRunningTooLong(true)) {
+    if ($this->serviceIsRunningAndForTooLong($fullInventory)) {
       // full sync is running within normal time limit - don't start anything new while it's running
       return true;
     }
