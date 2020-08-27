@@ -154,7 +154,7 @@ class InventoryStatusService
   private function getServiceStatusValue(bool $full): string
   {
     $keyStatus = $full ? self::INVENTORY_CRON_STATUS_FULL : self::INVENTORY_CRON_STATUS_PARTIAL;
-    $logKeyStateCheck = $full ? self::LOG_KEY_STATE_CHANGE_FULL : self::LOG_KEY_STATE_CHANGE_PARTIAL;
+    $logKeyStateCheck = $full ? self::LOG_KEY_STATE_CHECK_FULL : self::LOG_KEY_STATE_CHECK_PARTIAL;
 
     $state = $this->keyValueRepository->get($keyStatus);
 
