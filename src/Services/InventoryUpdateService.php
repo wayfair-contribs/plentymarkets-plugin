@@ -442,8 +442,7 @@ class InventoryUpdateService
    */
   private static function applyTimeFilter($filters, int $startOfWindow, int $endOfWindow = null)
   {
-    if (!isset($endOfWindow))
-    {
+    if (!isset($endOfWindow)) {
       $endOfWindow = time();
     }
 
@@ -523,18 +522,26 @@ class InventoryUpdateService
    */
   private function getStartOfDeltaSyncWindow(ExternalLogs $externalLogs = null): int
   {
+    $windowStart = 0;
+
     $lastWindowEnd = $this->statusService->getLastSuccessfulAttemptTime(false);
+    $lastGoodFullStart = $this->statusService->getLastSuccessfulAttemptTime(true);
 
     if (isset($lastWindowEnd) && !empty($lastWindowEnd)) {
       // new window should be directly after the previous window
-      return strtotime($lastWindowEnd);
+      $windowStart = strtotime($lastWindowEnd);
     }
 
-    $lastGoodFullStart = $this->statusService->getLastSuccessfulAttemptTime(true);
-
     if (isset($lastGoodFullStart) && !empty($lastGoodFullStart)) {
-      // due to no window, fall back to syncing everything that changed since the last full sync
-      return strtotime($lastGoodFullStart);
+      $numericTimeForFullSync = strtotime($lastGoodFullStart);
+      if ($windowStart > 0 && $numericTimeForFullSync < $windowStart) {
+        // full sync happened more recently than partial sync - use that time.
+        $windowStart = $numericTimeForFullSync;
+      }
+    }
+
+    if ($windowStart > 0) {
+      return $windowStart;
     }
 
     if (isset($externalLogs)) {
