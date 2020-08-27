@@ -511,7 +511,6 @@ class InventoryUpdateService
       return true;
     }
 
-
     return false;
   }
 
