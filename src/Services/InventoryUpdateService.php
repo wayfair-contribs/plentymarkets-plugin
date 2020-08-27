@@ -270,7 +270,7 @@ class InventoryUpdateService
           $totalTimeSpentSendingData += TimeHelper::getMilliseconds() - $unixTimeBeforeSendingData;
 
           $amtErrors = count($responseDto->getErrors());
-          // TODO: verify that there can only be one
+          // TODO: verify that there is a 1:1 relationship between errors and DTOs
           $totalDtosSaved += $amtOfDtosForPage - $amtErrors;
           $totalDtosFailed += $amtErrors;
         }
