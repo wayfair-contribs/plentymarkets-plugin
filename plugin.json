@@ -34,7 +34,6 @@
             "\\Wayfair\\Migrations\\ReUpdateWFAddress",
             "\\Wayfair\\Migrations\\CreateOrderImportDate",
             "\\Wayfair\\Migrations\\CreatePendingLogsTable",
-            "\\Wayfair\\Migrations\\UpdatePendingLogsTable",
-            "\\Wayfair\\Migrations\\ClearInventoryState"
+            "\\Wayfair\\Migrations\\UpdatePendingLogsTable"
       ]
 }
