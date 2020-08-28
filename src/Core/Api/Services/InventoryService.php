@@ -10,8 +10,6 @@ use Wayfair\Core\Api\APIService;
 use Wayfair\Core\Dto\Inventory\ResponseDTO;
 use Wayfair\Core\Exceptions\GraphQLQueryException;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
-use Wayfair\Helpers\TranslationHelper;
-use Wayfair\Http\WayfairResponse;
 use Wayfair\Models\ExternalLogs;
 
 /**
