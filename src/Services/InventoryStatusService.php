@@ -90,7 +90,8 @@ class InventoryStatusService
   }
 
   /**
-   * Set the global status of Full Inventory syncing,
+   * Set the global status for full or partial inventory syncing,
+
    * returning the old state.
    * @param bool $full
    * @param string $statusValue
