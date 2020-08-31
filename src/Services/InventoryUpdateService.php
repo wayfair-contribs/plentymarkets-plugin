@@ -436,19 +436,19 @@ class InventoryUpdateService
    *
    * @param array $filters the filter array to add on to
    * @param integer $startOfWindow php time in seconds for earliest change time
-   * @param integer $syncStartAsPhpTime (optional) php time in seconds for latest change time
+   * @param integer $endOfWindow (optional) php time in seconds for latest change time
    * @return void
    */
-  private static function applyTimeFilter($filters, int $startOfWindow, int $syncStartAsPhpTime = null)
+  private static function applyTimeFilter($filters, int $startOfWindow, int $endOfWindow = null)
   {
-    if (!isset($syncStartAsPhpTime)) {
-      $syncStartAsPhpTime = time();
+    if (!isset($endOfWindow)) {
+      $endOfWindow = time();
     }
 
     if (isset($filters) && isset($startOfWindow) && $startOfWindow > 0) {
       $filters['updatedBetween'] = [
         'timestampFrom' => $startOfWindow,
-        'timestampTo' => $syncStartAsPhpTime,
+        'timestampTo' => $endOfWindow,
       ];
     }
   }
