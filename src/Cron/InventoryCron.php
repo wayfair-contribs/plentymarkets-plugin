@@ -11,8 +11,15 @@ use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Services\InventoryUpdateService;
 
-abstract class AbstractInventoryCron extends CronHandler
+abstract class InventoryCron extends CronHandler
 {
+
+  /** @var InventoryUpdateService */
+  private $inventoryUpdateService;
+
+  /** @var  */
+  private $loggerContract;
+
   /** @var bool */
   private $full;
 
@@ -21,8 +28,13 @@ abstract class AbstractInventoryCron extends CronHandler
    *
    * @param bool $full
    */
-  public function __construct(bool $full)
-  {
+  public function __construct(
+    InventoryUpdateservice $inventoryUpdateService,
+    LoggerContract $loggerContract,
+    bool $full = false
+  ) {
+    $this->inventoryUpdateService = $inventoryUpdateService;
+    $this->loggerContract = $loggerContract;
     $this->full = $full;
   }
 
@@ -36,13 +48,10 @@ abstract class AbstractInventoryCron extends CronHandler
     /**
      * @var LoggerContract $loggerContract
      */
-    $loggerContract = pluginApp(LoggerContract::class);
-    $loggerContract->debug(TranslationHelper::getLoggerKey('cronStartedMessage'), ['method' => __METHOD__]);
+    $this->loggerContract->debug(TranslationHelper::getLoggerKey('cronStartedMessage'), ['method' => __METHOD__]);
     $syncResult = [];
     try {
-      /** @var InventoryUpdateService */
-      $service = pluginApp(InventoryUpdateService::class);
-      $syncResult = $service->sync($this->full);
+      $syncResult = $this->inventoryUpdateService->sync($this->full);
     } finally {
       $loggerContract->debug(TranslationHelper::getLoggerKey('cronFinishedMessage'), [
         'additionalInfo' => [

@@ -23,8 +23,8 @@ use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Contracts\RegisterPurchaseOrderContract;
 use Wayfair\Core\Contracts\StorageInterfaceContract;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
-use Wayfair\Cron\InventoryFullCron;
-use Wayfair\Cron\InventoryPartialCron;
+use Wayfair\Cron\FullInventoryCron;
+use Wayfair\Cron\InventoryCron;
 use Wayfair\Cron\OrderAcceptCron;
 use Wayfair\Helpers\ConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
@@ -78,8 +78,8 @@ class WayfairServiceProvider extends ServiceProvider
     // register crons
     $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, OrderImportCron::class);
     $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, OrderAcceptCron::class);
-    $cronContainer->add(CronContainer::DAILY, InventoryFullCron::class);
-    $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, InventoryPartialCron::class);
+    $cronContainer->add(CronContainer::DAILY, FullInventoryCron::class);
+    $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, InventoryCron::class);
 
     $shippingControllers = [
       'Wayfair\\Controllers\\ShippingController@registerShipments',
