@@ -342,7 +342,7 @@ class InventoryUpdateService
       $totalDtosFailed += $amtOfDtosForPage;
 
       // statusService will log out to plentymarkets logs
-      $this->statusService->markInventoryFailed(true);
+      $this->statusService->markInventoryFailed($fullInventory);
 
       $logKeyFailed = self::LOG_KEY_FAILED_PARTIAL;
       if ($fullInventory) {
