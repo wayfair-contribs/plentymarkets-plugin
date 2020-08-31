@@ -525,12 +525,12 @@ class InventoryUpdateService
   {
     $windowStart = 0;
 
-    $lastWindowEnd = $this->statusService->getLastSuccessfulAttemptTime(false);
+    $lastGoodPartialStart = $this->statusService->getLastSuccessfulAttemptTime(false);
     $lastGoodFullStart = $this->statusService->getLastSuccessfulAttemptTime(true);
 
-    if (isset($lastWindowEnd) && !empty($lastWindowEnd)) {
+    if (isset($lastGoodPartialStart) && !empty($lastGoodPartialStart)) {
       // new window should be directly after the previous window
-      $windowStart = strtotime($lastWindowEnd);
+      $windowStart = strtotime($lastGoodPartialStart);
     }
 
     if (isset($lastGoodFullStart) && !empty($lastGoodFullStart)) {
