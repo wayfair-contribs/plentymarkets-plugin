@@ -92,7 +92,6 @@ class InventoryUpdateService
 
   /**
    * Send inventory updates from Plentymarkets to Wayfair.
-   * The optional start parameter filters the update set down to items changed since the provided timestamp
    *
    * @param bool $fullInventory flag for syncing entire inventory versus partial inventory update
    * @param bool $manual flag used during logging which indicates that the sync was manually induced
@@ -168,11 +167,11 @@ class InventoryUpdateService
       if (!$fullInventory) {
 
         $startOfWindow = $this->getStartOfDeltaSyncWindow($externalLogs);
-        $endOfWindow = strtotime($startTimeStamp);
+        $syncStartAsPhpTime = strtotime($startTimeStamp);
 
         // look at inventory changes between last good sync and the declared sync start time.
         // (the end of this window becomes the start of the next window)
-        self::applyTimeFilter($filters, $startOfWindow, $endOfWindow);
+        self::applyTimeFilter($filters, $startOfWindow, $syncStartAsPhpTime);
       }
 
       $variationSearchRepository->setFilters($filters);
@@ -437,19 +436,19 @@ class InventoryUpdateService
    *
    * @param array $filters the filter array to add on to
    * @param integer $startOfWindow php time in seconds for earliest change time
-   * @param integer $endOfWindow (optional) php time in seconds for latest change time
+   * @param integer $syncStartAsPhpTime (optional) php time in seconds for latest change time
    * @return void
    */
-  private static function applyTimeFilter($filters, int $startOfWindow, int $endOfWindow = null)
+  private static function applyTimeFilter($filters, int $startOfWindow, int $syncStartAsPhpTime = null)
   {
-    if (!isset($endOfWindow)) {
-      $endOfWindow = time();
+    if (!isset($syncStartAsPhpTime)) {
+      $syncStartAsPhpTime = time();
     }
 
     if (isset($filters) && isset($startOfWindow) && $startOfWindow > 0) {
       $filters['updatedBetween'] = [
         'timestampFrom' => $startOfWindow,
-        'timestampTo' => $endOfWindow,
+        'timestampTo' => $syncStartAsPhpTime,
       ];
     }
   }
