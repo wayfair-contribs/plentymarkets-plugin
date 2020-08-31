@@ -55,7 +55,10 @@ class InventoryController extends Controller
   public function sync()
   {
     $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_CONTROLLER_IN), [
-      'additionalInfo' => ['payloadIn' => ''],
+      'additionalInfo' => [
+        'full' => $this->full,
+        'payloadIn' => ''
+      ],
       'method'         => __METHOD__
     ]);
 
@@ -72,15 +75,37 @@ class InventoryController extends Controller
     $dataOut = json_encode($this->inventoryStatusService->getServiceState($this->full));
 
     $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_CONTROLLER_OUT), [
-      'additionalInfo' => ['payloadOut' => $dataOut],
+      'additionalInfo' => [
+        'full' => $this->full,
+        'payloadOut' => $dataOut
+      ],
       'method'         => __METHOD__
     ]);
 
     return $dataOut;
   }
 
+  /**
+   * @return void
+   */
   public function clearState()
   {
+    $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_CONTROLLER_IN), [
+      'additionalInfo' => [
+        'full' => $this->full,
+        'payloadIn' => ''
+      ],
+      'method'         => __METHOD__
+    ]);
+
     $this->inventoryStatusService->clearState($this->full, true);
+
+    $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_CONTROLLER_OUT), [
+      'additionalInfo' => [
+        'full' => $this->full,
+        'payloadOut' => ''
+      ],
+      'method'         => __METHOD__
+    ]);
   }
 }

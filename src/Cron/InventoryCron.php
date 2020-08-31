@@ -48,7 +48,12 @@ abstract class InventoryCron extends CronHandler
     /**
      * @var LoggerContract $loggerContract
      */
-    $this->loggerContract->debug(TranslationHelper::getLoggerKey('cronStartedMessage'), ['method' => __METHOD__]);
+    $this->loggerContract->debug(TranslationHelper::getLoggerKey('cronStartedMessage'), [
+      'additionalInfo' => [
+        'full' => $this->full,
+      ],
+      'method' => __METHOD__
+    ]);
     $syncResult = [];
     try {
       $syncResult = $this->inventoryUpdateService->sync($this->full);
