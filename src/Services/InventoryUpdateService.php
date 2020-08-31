@@ -147,7 +147,8 @@ class InventoryUpdateService
 
       $searchParameters = $this->getDefaultSearchParameters();
 
-      $pageNumber = 0;
+      // The Plentymarkets team instructed to start on page 1, not page 0.
+      $pageNumber = 1;
       $amtOfDtosForPage = 0;
 
       $logKeyStart = self::LOG_KEY_START_PARTIAL;
@@ -534,7 +535,7 @@ class InventoryUpdateService
 
     if (isset($lastGoodFullStart) && !empty($lastGoodFullStart)) {
       $numericTimeForFullSync = strtotime($lastGoodFullStart);
-      if ($windowStart > 0 && $numericTimeForFullSync < $windowStart) {
+      if ($windowStart > 0 && $numericTimeForFullSync > $windowStart) {
         // full sync happened more recently than partial sync - use that time.
         $windowStart = $numericTimeForFullSync;
       }
