@@ -335,7 +335,7 @@ class InventoryUpdateService
 
       $externalLogs->addInventoryLog('Inventory interrupted: ' . $e->getMessage(), 'inventoryInterrupted' . ($fullInventory ? 'Full' : ''), 1, 0, false, $e->getTraceAsString());
     } catch (\Exception $e) {
-      $externalLogs->addInventoryLog('Inventory exception: ' . $e->getMessage(), 'inventoryFailed' . ($fullInventory ? 'Full' : ''), 1, 0, false);
+      $externalLogs->addInventoryLog('Inventory exception: ' . $e->getMessage(), 'inventoryFailed' . ($fullInventory ? 'Full' : ''), 1, 0, false, $e->getTraceAsString());
 
       // bulk update failed, so everything we were going to save should be considered failing.
       // (we want the failure amount to be more than zero in order for client to know this failed.)
