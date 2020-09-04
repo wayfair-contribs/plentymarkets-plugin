@@ -17,17 +17,19 @@ export class InventoryComponent {
   private static readonly TRANSLATION_KEY_WAITING_FOR_NEXT_SYNC =
     "inventory_waiting_for_next_sync";
   private static readonly TRANSLATION_KEY_IN_PROGRESS = "in_progress";
+  private static readonly TRANSLATION_KEY_SYNC_HAS_ISSUES = "sync_has_issues";
 
   private static readonly STATE_IDLE = "idle";
 
   private static readonly TEXT_CLASS_WARNING = "warning";
   private static readonly TEXT_CLASS_DANGER = "danger";
   private static readonly TEXT_CLASS_INFO = "info";
+  private static readonly TEXT_CLASS_PRIMARY = "primary";
 
   /**
    * The interval on which the UI will automatically refresh
    */
-  private static readonly REFRESH_INTERVAL = 300000;
+  private static readonly REFRESH_INTERVAL = 60000;
 
   @Language()
   public lang: string;
@@ -113,12 +115,23 @@ export class InventoryComponent {
   }
 
   private updateDisplayedState() {
-    this.displayedState.style = InventoryComponent.TEXT_CLASS_INFO;
+    this.displayedState.style = InventoryComponent.TEXT_CLASS_PRIMARY;
 
     if (this.statusObject.status == InventoryComponent.STATE_IDLE) {
-      if (this.noSyncsAttempted()) {
-        this.displayedState.value =
-        this.translation.translate(InventoryComponent.TRANSLATION_KEY_WAITING_FOR_FIRST_SYNC);
+      if (this.syncIssuesHappened()) {
+        this.displayedState.value = this.displayedState.value = this.translation.translate(
+          InventoryComponent.TRANSLATION_KEY_SYNC_HAS_ISSUES
+        );
+
+        this.displayedState.style = InventoryComponent.TEXT_CLASS_DANGER;
+
+        return;
+      }
+
+      if (!this.syncsAttempted()) {
+        this.displayedState.value = this.translation.translate(
+          InventoryComponent.TRANSLATION_KEY_WAITING_FOR_FIRST_SYNC
+        );
 
         this.displayedState.style = InventoryComponent.TEXT_CLASS_WARNING;
         return;
@@ -164,40 +177,58 @@ export class InventoryComponent {
   }
 
   public shouldDisplayRunning(kind: string): boolean {
-    return this.displayedState && this.displayedState.value == kind;
+    return this.statusObject && this.statusObject.status == kind;
   }
 
   public shouldDisplayCheckmark(kind: string): boolean {
-    return (
-      this.statusObject &&
-      this.statusObject.status != kind &&
-      !this.displayedState.value.startsWith("error") &&
-      !this.statusObject.details[kind].needsAttention
+    return !(
+      this.shouldDisplayClock ||
+      this.shouldDisplayRunning ||
+      this.shouldDisplayErrorIcon
     );
   }
 
   public shouldDisplayErrorIcon(kind: string): boolean {
     return (
-      !this.displayedState ||
-      null == this.displayedState.value ||
-      this.displayedState.value.length == 0 ||
-      !(this.shouldDisplayCheckmark(kind) || this.shouldDisplayRunning(kind))
+      this.statusObject.details[kind].needsAttention ||
+      this.displayedState.value.startsWith("error")
     );
   }
 
-  public noSyncsAttempted(): boolean {
+  public shouldDisplayClock(kind: string): boolean {
+    return this.statusObject && !this.statusObject.details[kind].attemptedStart;
+  }
+
+  public syncsAttempted(): boolean {
     if (!this.statusObject || !this.statusObject.details) {
       return false;
     }
 
-    let detailBodies: InventoryStatusDetailsBodyInterface[] = [
-      this.statusObject.details.full,
-      this.statusObject.details.partial,
-    ];
-    return (
-      detailBodies.findIndex(
-        (d) => d && d.attemptedStart && d.attemptedStart.length > 0
-      ) < 0
-    );
+    for (const key in this.statusObject.details) {
+      if (
+        this.statusObject.details[key] &&
+        this.statusObject.details[key].attemptedStart &&
+        this.statusObject.details[key].attemptedStart.length > 0
+      )
+        return true;
+    }
+
+    return false;
+  }
+
+  public syncIssuesHappened(): boolean {
+    if (!this.statusObject || !this.statusObject.details) {
+      return false;
+    }
+
+    for (const key in this.statusObject.details) {
+      if (
+        this.statusObject.details[key] &&
+        this.statusObject.details[key].needsAttention
+      )
+        return true;
+    }
+
+    return false;
   }
 }

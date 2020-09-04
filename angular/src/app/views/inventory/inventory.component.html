@@ -10,10 +10,10 @@
     </p>
   </div>
 
+  <div class="form-group-row text-center">
+    <p></p>>
+   </div>
   <div *ngIf="statusObject" name="resultTable">
-    <div class="form-group-row text-center">
-      <h3>{{ "inventory_status_details_heading" | translate: lang }}</h3>
-    </div>
     <div
       class="form-group row"
       *ngFor="let key of objectKeysWrapper(statusObject.details)"
@@ -28,20 +28,19 @@
       <div class="col-md-2 text-center" name="statusIcons">
         <span *ngIf="shouldDisplayLoading()" name="syncLoading">
           <svg
-            width="2em"
-            height="2em"
+            width="1em"
+            height="1em"
             viewBox="0 0 16 16"
-            class="bi bi-search"
+            class="bi bi-arrow-repeat"
             fill="currentColor"
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              fill-rule="evenodd"
-              d="M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z"
+              d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"
             />
             <path
               fill-rule="evenodd"
-              d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"
+              d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"
             />
           </svg>
         </span>
@@ -75,6 +74,21 @@
             ></path>
           </svg>
         </span>
+        <span *ngIf="shouldDisplayClock(key)" name="syncSuccess">
+          <svg
+            width="2em"
+            height="2em"
+            viewBox="0 0 16 16"
+            class="bi bi-clock-fill"
+            fill="currentColor"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"
+            />
+          </svg>
+        </span>
         <span *ngIf="shouldDisplayCheckmark(key)" name="syncSuccess">
           <svg
             width="2em"
@@ -93,41 +107,54 @@
       </div>
 
       <div class="col-md-3" name="statusValue">
-        <span
-          *ngIf="!statusObject.details[key].completedStart"
-          name="noSyncs"
-          >{{ "no_syncs_completed" | translate: lang }}</span
-        >
-        <span
-          *ngIf="
-            statusObject.details[key].completedStart &&
-            statusObject.details[key].completedAmount == 0
-          "
-          name="syncNotRequired"
-          >{{ "inventory_sync_not_required" | translate: lang }} &nbsp;
-          {{ statusObject.details[key].completedStart }}</span
-        >
-        <span
-          *ngIf="
-            statusObject.details[key].completedStart &&
-            statusObject.details[key].completedAmount > 0
-          "
-          name="syncHappened"
-          >{{ "synced" | translate: lang }} &nbsp;
-          {{ statusObject.details[key].completedAmount }} &nbsp;
-          {{ "products" | translate: lang }} &nbsp;
-        </span>
-        <span *ngIf="statusObject.details[key].completedStart" name="syncTime">
-          &nbsp; {{ "at" | translate: lang }} &nbsp;
-          {{ statusObject.details[key].completedStart }}
-        </span>
+        <div *ngIf="!statusObject.details[key].attemptedStart">
+          <span name="noSyncsAttempted" class="text-warning">{{
+            "no_syncs_attempted" | translate: lang
+          }}</span>
+        </div>
+        <div *ngIf="statusObject.details[key].attemptedStart">
+          <span
+            *ngIf="
+              statusObject.details[key].attemptedStart &&
+              !statusObject.details[key].completedStart
+            "
+            name="noGoodSyncs"
+            class="text-danger"
+            >{{ "no_syncs_completed" | translate: lang }}</span
+          >
+          <span
+            *ngIf="
+              statusObject.details[key].completedStart &&
+              statusObject.details[key].completedAmount == 0
+            "
+            name="syncNotRequired"
+            class="text-primary"
+            >{{ "inventory_sync_not_required" | translate: lang }} &nbsp;
+            {{ statusObject.details[key].completedStart }}</span
+          >
+          <span
+            *ngIf="
+              statusObject.details[key].completedStart &&
+              statusObject.details[key].completedAmount > 0
+            "
+            name="syncHappened"
+            class="text-"
+            >{{ "last_sync" | translate: lang }} {{ "at" | translate: lang }}
+            {{ statusObject.details[key].completedStart }}
+            {{ "with" | translate: lang }}
+            {{ statusObject.details[key].completedAmount }}
+            {{ "products" | translate: lang }} &nbsp;
+          </span>
+        </div>
       </div>
     </div>
     <div class="form-group-row text-center" name="fetchTime">
-      <p>({{ "time_of_download" | translate: lang }}: {{ fetchTime }})</p>
+      <p class="text-info">
+        ({{ "page_refreshed" | translate: lang }}: {{ fetchTime }})
+      </p>
     </div>
   </div>
-  <div class="form-group row text-center mt-2" name="buttonContainer">
+  <div class="form-group row text-center mt-2" name="buttonContainer" hidden>
     <button
       class="btn btn-primary"
       id="refreshState"

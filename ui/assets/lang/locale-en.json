@@ -49,6 +49,10 @@
   "service_status": "Service status",
   "inventory_waiting_for_first_sync": "Waiting for the Wayfair Plugin to initialize",
   "in_progress": "in progress",
-  "time_of_download": "Time of download",
-  "inventory_waiting_for_next_sync": "Ready for the next scheduled sync"
+  "page_refreshed": "Page refreshed",
+  "inventory_waiting_for_next_sync": "Ready for the next scheduled sync",
+  "at": "at",
+  "last_sync": "Last sync happened",
+  "no_syncs_attempted": "Synchronization is scheduled",
+  "sync_has_issues": "The Wayfair Plugin is having trouble syncing the inventory. Please view the logs, then contact Wayfair for further assistance."
 }
