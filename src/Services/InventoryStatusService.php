@@ -38,7 +38,6 @@ class InventoryStatusService
 
   const DB_KEY_INVENTORY_DATA_VERSION = 'inventory_data_version';
 
-  const DB_KEY_INVENTORY_START_TIME = 'inventory_start_time';
   const DB_KEY_INVENTORY_STATUS = 'inventory_status';
 
   const DB_KEY_INVENTORY_LAST_COMPLETION_END_FULL = "full_inventory_last_completion_end";
@@ -53,7 +52,6 @@ class InventoryStatusService
 
   const DB_KEYS = [
     self::DB_KEY_INVENTORY_DATA_VERSION,
-    self::DB_KEY_INVENTORY_START_TIME,
     self::DB_KEY_INVENTORY_STATUS,
     self::DB_KEY_INVENTORY_LAST_COMPLETION_END_FULL,
     self::DB_KEY_INVENTORY_LAST_ATTEMPT_FULL,
@@ -253,7 +251,6 @@ class InventoryStatusService
 
     $statusValue = $full ? self::FULL : self::PARTIAL;
     $this->setServiceStatusValue($statusValue);
-    $this->keyValueRepository->putOrReplace(self::DB_KEY_INVENTORY_START_TIME, $ts);
 
     $keyForLastAttempt = $full ? self::DB_KEY_INVENTORY_LAST_ATTEMPT_FULL : self::DB_KEY_INVENTORY_LAST_ATTEMPT_PARTIAL;
     $this->keyValueRepository->putOrReplace($keyForLastAttempt, $ts);
@@ -266,15 +263,8 @@ class InventoryStatusService
    * @param bool $full
    * @return void
    */
-  public function markInventoryFailed(bool $full, string $startTime): void
+  public function markInventoryFailed(): void
   {
-    $storedStartTime = $this->getStartOfCurrentSync();
-
-    if ($startTime !== $storedStartTime) {
-      // avoid changing the state, because this is a stale service instance that completed
-      return;
-    }
-
     $this->setServiceStatusValue(self::STATE_IDLE);
   }
 
@@ -287,12 +277,6 @@ class InventoryStatusService
    */
   public function markInventoryComplete(bool $full, string $startTime, int $amount): void
   {
-    $storedStartTime = $this->getStartOfCurrentSync();
-
-    if ($startTime !== $storedStartTime) {
-      // avoid changing the state, because this is a stale service instance that completed
-      return;
-    }
 
     $keyCompletionStart = $full ? self::DB_KEY_INVENTORY_LAST_COMPLETION_START_FULL : self::DB_KEY_INVENTORY_LAST_COMPLETION_START_PARTIAL;
     $keyCompletionEnd = $full ? self::DB_KEY_INVENTORY_LAST_COMPLETION_END_FULL : self::DB_KEY_INVENTORY_LAST_COMPLETION_END_PARTIAL;
@@ -334,20 +318,6 @@ class InventoryStatusService
       'additionalInfo' => ['manual' => (string) $manual],
       'method' => __METHOD__
     ]);
-  }
-
-  /**
-   * Get the timestamp of the sync that was started most recently
-   *
-   * @return string
-   */
-  public function getStartOfCurrentSync(): string
-  {
-    if (!$this->isInventoryRunning()) {
-      return '';
-    }
-
-    return $this->keyValueRepository->get(self::DB_KEY_INVENTORY_START_TIME);
   }
 
   /**

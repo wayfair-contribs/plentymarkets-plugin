@@ -247,7 +247,7 @@ class InventoryUpdateService
       } while (isset($variationSearchResponse) && !$variationSearchResponse->isLastPage());
 
       if ($totalDtosFailed > 0) {
-        $this->statusService->markInventoryFailed($fullInventory, $startTimeStamp);
+        $this->statusService->markInventoryFailed();
 
         $info = ['full' => (string) $fullInventory, 'manual' => (string) $manual];
 
@@ -282,6 +282,8 @@ class InventoryUpdateService
       ]);
 
       $externalLogs->addInventoryLog('Inventory interrupted: ' . $e->getMessage(), 'inventoryInterrupted' . ($fullInventory ? 'Full' : ''), 1, 0, false, $e->getTraceAsString());
+
+      // don't update the inventory status - it will conflict with the run that interrupted this one.
     } catch (\Exception $e) {
       $externalLogs->addInventoryLog('Inventory exception: ' . $e->getMessage(), 'inventoryFailed' . ($fullInventory ? 'Full' : ''), 1, 0, false, $e->getTraceAsString());
 
@@ -290,7 +292,7 @@ class InventoryUpdateService
       $totalDtosFailed += $amtOfDtosForPage;
 
       // statusService will log out to plentymarkets logs
-      $this->statusService->markInventoryFailed($fullInventory, $startTimeStamp);
+      $this->statusService->markInventoryFailed();
 
       $info = [
         'full' => (string) $fullInventory,
