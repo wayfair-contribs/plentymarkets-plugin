@@ -102,12 +102,8 @@ class InventoryStatusService
    * @param string $timestamp
    * @return string
    */
-  private function setServiceStatusValue($statusValue, $timestamp = null): string
+  private function setServiceStatusValue($statusValue): string
   {
-    if (!isset($timestamp) || empty($timestamp)) {
-      $timestamp = self::getCurrentTimestamp();
-    }
-
     $oldStatus = $this->getServiceStatusValue();
 
     if ($oldStatus != $statusValue) {
@@ -256,7 +252,7 @@ class InventoryStatusService
     $ts = self::getCurrentTimestamp();
 
     $statusValue = $full ? self::FULL : self::PARTIAL;
-    $this->setServiceStatusValue($statusValue, $ts);
+    $this->setServiceStatusValue($statusValue);
     $this->keyValueRepository->putOrReplace(self::DB_KEY_INVENTORY_START_TIME, $ts);
 
     $keyForLastAttempt = $full ? self::DB_KEY_INVENTORY_LAST_ATTEMPT_FULL : self::DB_KEY_INVENTORY_LAST_ATTEMPT_PARTIAL;
@@ -272,7 +268,8 @@ class InventoryStatusService
    */
   public function markInventoryFailed(bool $full, string $startTime): void
   {
-    $storedStartTime = $this->getCurrentTimestamp();
+    $storedStartTime = $this->getStartOfCurrentSync();
+
     if ($startTime !== $storedStartTime) {
       // avoid changing the state, because this is a stale service instance that completed
       return;
@@ -290,7 +287,8 @@ class InventoryStatusService
    */
   public function markInventoryComplete(bool $full, string $startTime, int $amount): void
   {
-    $storedStartTime = $this->getCurrentTimestamp();
+    $storedStartTime = $this->getStartOfCurrentSync();
+
     if ($startTime !== $storedStartTime) {
       // avoid changing the state, because this is a stale service instance that completed
       return;
@@ -305,7 +303,7 @@ class InventoryStatusService
     $this->keyValueRepository->putOrReplace($keyCompletionStart, $startTime);
     $this->keyValueRepository->putOrReplace($keyCompletionAmount, $amount);
     // timestamp on state change should match timestamp of last completion
-    $this->setServiceStatusValue(self::STATE_IDLE, $ts);
+    $this->setServiceStatusValue(self::STATE_IDLE);
   }
 
   /**
