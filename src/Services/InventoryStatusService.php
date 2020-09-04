@@ -321,6 +321,41 @@ class InventoryStatusService
   }
 
   /**
+   * Get the timestamp of the sync that was started most recently
+   *
+   * @return string
+   */
+  public function getStartOfMostRecentAttempt(): string
+  {
+    $mostRecentPartial = $this->keyValueRepository->get(self::DB_KEY_INVENTORY_LAST_ATTEMPT_PARTIAL);
+    $mostRecentFull = $this->keyValueRepository->get(self::DB_KEY_INVENTORY_LAST_ATTEMPT_FULL);
+
+    if (!isset($mostRecentPartial) || empty($mostRecentPartial))
+    {
+      return $mostRecentFull;
+    }
+
+    if (!isset($mostRecentFull) || empty($mostRecentFull))
+    {
+      return $mostRecentPartial;
+    }
+
+    $numericPartial = strtotime($mostRecentPartial);
+    if ($numericPartial <= 0)
+    {
+      return $mostRecentFull;
+    }
+
+    $numericFull = strtotime($mostRecentFull);
+    if ($numericFull <= $numericPartial)
+    {
+      return $mostRecentPartial;
+    }
+
+    return $mostRecentFull;
+  }
+
+  /**
    * Get the amount of products that were synced during the last successful sync
    *
    * @param boolean $full full inventory?

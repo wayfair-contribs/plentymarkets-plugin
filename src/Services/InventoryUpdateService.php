@@ -150,7 +150,7 @@ class InventoryUpdateService
       $variationSearchRepository->setFilters($filters);
 
       do {
-        $startTimeInDatabase = $this->statusService->getStartOfCurrentSync();
+        $startTimeInDatabase = $this->statusService->getStartOfMostRecentAttempt();
 
         if (isset($startTimeInDatabase) && !empty($startTimeInDatabase) && strtotime($startTimeInDatabase) > strtotime($startTimeStamp)) {
           throw new InventorySyncInterruptedException("Inventory sync started at " . $startTimeStamp .
@@ -440,7 +440,7 @@ class InventoryUpdateService
       return false;
     }
 
-    $currentSessionStartedAt = $this->statusService->getStartOfCurrentSync();
+    $currentSessionStartedAt = $this->statusService->getStartOfMostRecentAttempt();
     if (isset($currentSessionStartedAt) && !empty($currentSessionStartedAt) && (time() - strtotime($currentSessionStartedAt)) > self::MAX_INVENTORY_TIME) {
 
       $this->logger->warning(TranslationHelper::getLoggerKey(self::LOG_KEY_LONG_RUN), [
