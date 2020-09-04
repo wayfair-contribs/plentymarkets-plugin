@@ -42,7 +42,7 @@
   "refresh": "Refresh",
   "inventory_status_heading": "Inventory Status",
   "inventory_status_details_heading": "Inventory Details",
-  "inventory_status_label_full": "Daily sync of all products",
+  "inventory_status_label_full": "daily sync of all products",
   "inventory_status_label_partial": "Periodic sync of inventory changes",
   "no_syncs_completed": "No successful syncs yet",
   "inventory_sync_not_required": "Inventory sync not required",

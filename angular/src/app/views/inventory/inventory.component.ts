@@ -26,6 +26,9 @@ export class InventoryComponent {
   private static readonly TEXT_CLASS_INFO = "info";
   private static readonly TEXT_CLASS_PRIMARY = "primary";
 
+  private static readonly ICON_SIZE_HUGE = "8em";
+  private static readonly ICON_SIZE_NORMAL = "2em";
+
   /**
    * The interval on which the UI will automatically refresh
    */
@@ -169,39 +172,56 @@ export class InventoryComponent {
     this.updateFetchTime();
   }
 
-  public shouldDisplayLoading(): boolean {
+  public loadingIconEnabled(): boolean {
     return (
       this.displayedState &&
       this.displayedState.value == InventoryComponent.TRANSLATION_KEY_LOADING
     );
   }
 
-  public shouldDisplayRunning(kind: string): boolean {
-    return this.statusObject && this.statusObject.status == kind;
+  public runningIconEnabled(kind?: string): boolean {
+    if (!this.statusObject) {
+      return false;
+    }
+    if (!kind || kind.length == 0) {
+      return this.statusObject.status != InventoryComponent.STATE_IDLE;
+    }
+
+    return this.statusObject.status == kind;
   }
 
-  public shouldDisplayCheckmark(kind: string): boolean {
+  public successIconEnabled(kind?: string): boolean {
     return !(
-      this.shouldDisplayClock ||
-      this.shouldDisplayRunning ||
-      this.shouldDisplayErrorIcon
+      this.clockIconEnabled(kind) ||
+      this.runningIconEnabled(kind) ||
+      this.errorIconEnabled(kind)
     );
   }
 
-  public shouldDisplayErrorIcon(kind: string): boolean {
+  public errorIconEnabled(kind?: string): boolean {
     return (
-      this.statusObject.details[kind].needsAttention ||
-      this.displayedState.value.startsWith("error")
+      (kind && this.syncIssuesHappened(kind)) ||
+      (!kind &&
+        (this.displayedState.value.startsWith("error") ||
+          this.syncIssuesHappened()))
     );
   }
 
-  public shouldDisplayClock(kind: string): boolean {
-    return this.statusObject && !this.statusObject.details[kind].attemptedStart;
+  public clockIconEnabled(kind?: string): boolean {
+    return !this.syncsAttempted(kind);
   }
 
-  public syncsAttempted(): boolean {
+  public syncsAttempted(kind?: string): boolean {
     if (!this.statusObject || !this.statusObject.details) {
       return false;
+    }
+
+    if (kind) {
+      return (
+        this.statusObject.details[kind] &&
+        this.statusObject.details[kind].attemptedStart &&
+        this.statusObject.details[kind].attemptedStart.length > 0
+      );
     }
 
     for (const key in this.statusObject.details) {
@@ -216,9 +236,13 @@ export class InventoryComponent {
     return false;
   }
 
-  public syncIssuesHappened(): boolean {
+  public syncIssuesHappened(kind?: string): boolean {
     if (!this.statusObject || !this.statusObject.details) {
       return false;
+    }
+
+    if (kind) {
+      return this.statusObject[kind] && this.statusObject[kind].needsAttention;
     }
 
     for (const key in this.statusObject.details) {
