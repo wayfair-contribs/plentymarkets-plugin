@@ -1,0 +1,140 @@
+<div class="center-block">
+  <div class="form-group-row text-center">
+    <h3>{{ "inventory_status_heading" | translate: lang }}</h3>
+    <p
+      name="displayedState"
+      class="{{ 'text-' + displayedState.style }}"
+      style="font-weight: bold"
+    >
+      {{ displayedState.value }}
+    </p>
+  </div>
+
+  <div *ngIf="statusObject" name="resultTable">
+    <div class="form-group-row text-center">
+      <h3>{{ "inventory_status_details_heading" | translate: lang }}</h3>
+    </div>
+    <div
+      class="form-group row"
+      *ngFor="let key of objectKeysWrapper(statusObject.details)"
+    >
+      <div
+        class="col-md-5 text-right"
+        style="font-weight: bold"
+        name="inventoryStatusLabel"
+      >
+        {{ "inventory_status_label_" + key | translate: lang }}:
+      </div>
+      <div class="col-md-2 text-center" name="statusIcons">
+        <span *ngIf="shouldDisplayLoading()" name="syncLoading">
+          <svg
+            width="2em"
+            height="2em"
+            viewBox="0 0 16 16"
+            class="bi bi-search"
+            fill="currentColor"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z"
+            />
+            <path
+              fill-rule="evenodd"
+              d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"
+            />
+          </svg>
+        </span>
+        <span *ngIf="shouldDisplayRunning(key)" name="syncRunning">
+          <svg
+            width="2em"
+            height="2em"
+            viewBox="0 0 16 16"
+            class="bi bi-cloud-upload-fill"
+            fill="currentColor"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M8 0a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 4.095 0 5.555 0 7.318 0 9.366 1.708 11 3.781 11H7.5V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11h4.188C14.502 11 16 9.57 16 7.773c0-1.636-1.242-2.969-2.834-3.194C12.923 1.999 10.69 0 8 0zm-.5 14.5V11h1v3.5a.5.5 0 0 1-1 0z"
+            />
+          </svg>
+        </span>
+        <span *ngIf="shouldDisplayErrorIcon(key)" name="syncAlert">
+          <svg
+            width="2em"
+            height="2em"
+            viewBox="0 0 16 16"
+            class="bi bi-exclamation-triangle-fill"
+            fill="currentColor"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 5zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"
+            ></path>
+          </svg>
+        </span>
+        <span *ngIf="shouldDisplayCheckmark(key)" name="syncSuccess">
+          <svg
+            width="2em"
+            height="2em"
+            viewBox="0 0 16 16"
+            class="bi bi-cloud-check-fill"
+            fill="currentColor"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M8 2a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 6.095 0 7.555 0 9.318 0 11.366 1.708 13 3.781 13h8.906C14.502 13 16 11.57 16 9.773c0-1.636-1.242-2.969-2.834-3.194C12.923 3.999 10.69 2 8 2zm2.354 4.854a.5.5 0 0 0-.708-.708L7 8.793 5.854 7.646a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0l3-3z"
+            />
+          </svg>
+        </span>
+      </div>
+
+      <div class="col-md-3" name="statusValue">
+        <span
+          *ngIf="!statusObject.details[key].completedStart"
+          name="noSyncs"
+          >{{ "no_syncs_completed" | translate: lang }}</span
+        >
+        <span
+          *ngIf="
+            statusObject.details[key].completedStart &&
+            statusObject.details[key].completedAmount == 0
+          "
+          name="syncNotRequired"
+          >{{ "inventory_sync_not_required" | translate: lang }} &nbsp;
+          {{ statusObject.details[key].completedStart }}</span
+        >
+        <span
+          *ngIf="
+            statusObject.details[key].completedStart &&
+            statusObject.details[key].completedAmount > 0
+          "
+          name="syncHappened"
+          >{{ "synced" | translate: lang }} &nbsp;
+          {{ statusObject.details[key].completedAmount }} &nbsp;
+          {{ "products" | translate: lang }} &nbsp;
+        </span>
+        <span *ngIf="statusObject.details[key].completedStart" name="syncTime">
+          &nbsp; {{ "at" | translate: lang }} &nbsp;
+          {{ statusObject.details[key].completedStart }}
+        </span>
+      </div>
+    </div>
+    <div class="form-group-row text-center" name="fetchTime">
+      <p>({{ "time_of_download" | translate: lang }}: {{ fetchTime }})</p>
+    </div>
+  </div>
+  <div class="form-group row text-center mt-2" name="buttonContainer">
+    <button
+      class="btn btn-primary"
+      id="refreshState"
+      (click)="refreshState()"
+      [disabled]="stateOfRefreshButton.disabled"
+    >
+      {{ stateOfRefreshButton.text | translate: lang }}
+    </button>
+  </div>
+</div>

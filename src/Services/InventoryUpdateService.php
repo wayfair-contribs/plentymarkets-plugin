@@ -11,6 +11,8 @@ use Wayfair\Core\Api\Services\InventoryService;
 use Wayfair\Core\Api\Services\LogSenderService;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\Inventory\RequestDTO;
+use Wayfair\Core\Exceptions\InventorySyncBlockedException;
+use Wayfair\Core\Exceptions\InventorySyncInterruptedException;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Core\Helpers\TimeHelper;
 use Wayfair\Helpers\TranslationHelper;
@@ -23,11 +25,18 @@ use Wayfair\Models\ExternalLogs;
 class InventoryUpdateService
 {
   const LOG_KEY_DEBUG = 'debugInventoryUpdate';
-  const LOG_KEY_INVENTORY_UPDATE_END = 'inventoryUpdateEnd';
-  const LOG_KEY_INVENTORY_UPDATE_ERROR = 'inventoryUpdateError';
-  const LOG_KEY_INVENTORY_UPDATE_START = 'inventoryUpdateStart';
   const LOG_KEY_INVALID_INVENTORY_DTO = 'invalidInventoryDto';
   const LOG_KEY_INVALID_STOCK_BUFFER = 'invalidStockBufferValue';
+  const LOG_KEY_NO_SYNCS = 'noInventorySyncs';
+  const LOG_KEY_LONG_RUN = 'inventoryLongRunning';
+  const LOG_KEY_INTERRUPTED = 'inventoryInterrupted';
+  const LOG_KEY_START = 'inventoryStart';
+  const LOG_KEY_END = 'inventoryEnd';
+  const LOG_KEY_FAILED = 'inventoryFailed';
+  const LOG_KEY_BLOCKED = 'inventoryBlocked';
+
+  // TODO: make these user-configurable in a future update
+  const MAX_INVENTORY_TIME = 14400;
 
   const INVENTORY_SAVE_TOTAL = 'inventorySaveTotal';
   const INVENTORY_SAVE_SUCCESS = 'inventorySaveSuccess';
@@ -37,247 +46,302 @@ class InventoryUpdateService
   const PAGES = 'pages';
   const ERROR_MESSAGE = 'errorMessage';
 
-  /**
-   * Validate a request for inventory update
-   * @param RequestDTO $inventoryRequestDTO
-   * @param LoggerContract $loggerContract
-   * @return bool
-   */
-  private function validateInventoryRequestData($inventoryRequestDTO, $loggerContract): bool
-  {
-    if (!isset($inventoryRequestDTO)) {
-      return false;
-    }
+  const VARIATIONS_PER_PAGE = 200;
 
-    $issues = [];
+  /** @var InventoryStatusService */
+  private $statusService;
 
-    $supplierId = $inventoryRequestDTO->getSupplierId();
+  /** @var InventoryService */
+  private $inventoryService;
 
-    if (!isset($supplierId) || $supplierId <= 0) {
-      $issues[] = "Supplier ID is missing or invalid";
-    }
+  /** @var InventoryMapper */
+  private $inventoryMapper;
 
-    $partNum = $inventoryRequestDTO->getSupplierPartNumber();
+  /** @var LoggerContract */
+  private $logger;
 
-    if (!isset($partNum) || empty($partNum)) {
-      $issues[] = "Supplier Part number is missing";
-    }
+  /** @var AbstractConfigHelper */
+  private $configHelper;
 
-    $onHand = $inventoryRequestDTO->getQuantityOnHand();
+  /** @var LogSenderService */
+  private $logSenderService;
 
-    if (isset($onHand)) {
-      if ($onHand  < -1) {
-        $issues[] = "Quantity on Hand is less than negative one";
-      }
-    } else {
-      $issues[] = "Quantity On Hand is missing";
-    }
-
-    if (!isset($issues) || empty($issues)) {
-      return true;
-    }
-
-    // TODO: replace issues with translated messages?
-    $loggerContract
-      ->error(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_INVENTORY_DTO),
-        [
-          'additionalInfo' => [
-            'message' => 'inventory request data is invalid',
-            'issues' => json_encode($issues),
-            'data' => $inventoryRequestDTO->toArray(),
-          ],
-          'method' => __METHOD__
-        ]
-      );
-
-    return false;
+  public function __construct(
+    InventoryService $inventoryService,
+    InventoryMapper $inventoryMapper,
+    InventoryStatusService $statusService,
+    AbstractConfigHelper $configHelper,
+    LoggerContract $logger,
+    LogSenderService $logSenderService
+  ) {
+    $this->inventoryService = $inventoryService;
+    $this->inventoryMapper = $inventoryMapper;
+    $this->statusService = $statusService;
+    $this->configHelper = $configHelper;
+    $this->logger = $logger;
+    $this->logSenderService = $logSenderService;
   }
 
   /**
-   * @param bool $fullInventory
+   * Send inventory updates from Plentymarkets to Wayfair.
+   *
+   * @param bool $fullInventory flag for syncing entire inventory versus partial inventory update
+   * @param bool $manual flag used during logging which indicates that the sync was manually induced
    *
    * @return array
    */
-  public function sync(bool $fullInventory = false): array
+  public function sync(bool $fullInventory, bool $manual = false): array
   {
-    /** @var InventoryService $inventoryService */
-    $inventoryService = pluginApp(InventoryService::class);
-    /** @var InventoryMapper $inventoryMapper */
-    $inventoryMapper = pluginApp(InventoryMapper::class);
-    /** @var LoggerContract $loggerContract */
-    $loggerContract = pluginApp(LoggerContract::class);
-    /** @var ExternalLogs $externalLogs */
+    $startTimeStamp = null;
+
+    $totalDtosAttempted = 0;
+    $totalDtosSaved = 0;
+    $totalDtosFailed = 0;
+    $totalTimeSpentGatheringData = 0;
+    $totalTimeSpentSendingData = 0;
+    $totalVariationIdsInDTOsForAllPages = 0;
+
+    /** @var ExternalLogs */
     $externalLogs = pluginApp(ExternalLogs::class);
-    /** @var VariationSearchRepositoryContract $variationSearchRepository */
-    $variationSearchRepository = pluginApp(VariationSearchRepositoryContract::class);
-    /** @var AbstractConfigHelper $configHelper */
-    $configHelper = pluginApp(AbstractConfigHelper::class);
-
-    // look up item mapping method at this level to ensure consistency and improve efficiency
-    $itemMappingMethod = $configHelper->getItemMappingMethod();
-
-    $loggerContract->debug(
-      TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_START),
-      [
-        'additionalInfo' => ['fullInventory' => (string) $fullInventory],
-        'method' => __METHOD__
-      ]
-    );
-
-    $page = 0;
-    $inventorySaveTotal = 0;
-    $inventorySaveSuccess = 0;
-    $inventorySaveFail = 0;
-    $saveInventoryDuration = 0;
-    $savedInventoryDuration = 0;
-
-    $errorMessage = null;
-    $amtOfDtosForPage = 0;
-
     try {
-      $fields = $this->getResultFields();
-      /* Page size is tuned for a balance between memory usage (in plentymarkets) and number of transactions  */
-      $fields['itemsPerPage'] = AbstractConfigHelper::INVENTORY_ITEMS_PER_PAGE;
-      $variationSearchRepository->setFilters($this->getFilters($fullInventory));
+
+      if ($this->syncIsBlocked()) {
+        throw new InventorySyncBlockedException("Another inventory sync is in progress, preventing this one from starting");
+      }
+
+      // look up item mapping method at this level to ensure consistency and improve efficiency
+      $itemMappingMethod = $this->configHelper->getItemMappingMethod();
+
+      // TODO: remove dependency on VariationSearchRepositoryContract by replacing with a Wayfair wrapper
+      /** @var VariationSearchRepositoryContract */
+      $variationSearchRepository = pluginApp(VariationSearchRepositoryContract::class);
 
       // stock buffer should be the same across all pages of inventory
-      $stockBuffer = self::getNormalizedStockBuffer($configHelper, $loggerContract);
+      $stockBuffer = $this->getNormalizedStockBuffer();
+
+      $searchParameters = $this->getDefaultSearchParameters();
+
+      // The Plentymarkets team instructed to start on page 1, not page 0.
+      $pageNumber = 1;
+      $amtOfDtosForPage = 0;
+
+      $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_START), [
+        'additionalInfo' => [
+          'full' => (string) $fullInventory,
+          'manual' => (string) $manual
+        ],
+        'method' => __METHOD__
+      ]);
+
+      $startTimeStamp = $this->statusService->markInventoryStarted($fullInventory);
+      $externalLogs->addInfoLog("Starting " . ($manual ? "Manual " : "Automatic ") . ($fullInventory ? "Full " : "Partial ") . "inventory sync.");
+
+      $filters = $this->getDefaultFilters();
+      if (!$fullInventory) {
+
+        $startOfWindowAsPhpTime = $this->getStartOfDeltaSyncWindow($externalLogs);
+        $syncStartAsPhpTime = strtotime($startTimeStamp);
+
+        // look at inventory changes between last good sync and the declared sync start time.
+        // (the end of this window becomes the start of the next window)
+        self::applyTimeFilter($filters, $startOfWindowAsPhpTime, $syncStartAsPhpTime);
+      }
+
+      $variationSearchRepository->setFilters($filters);
 
       do {
+        $startTimeInDatabase = $this->statusService->getStartOfCurrentSync();
 
-        $msAtPageStart = TimeHelper::getMilliseconds();
+        if (isset($startTimeInDatabase) && !empty($startTimeInDatabase) && strtotime($startTimeInDatabase) > strtotime($startTimeStamp)) {
+          throw new InventorySyncInterruptedException("Inventory sync started at " . $startTimeStamp .
+            " is quitting due to staleness. A new inventory sync started at " . $startTimeInDatabase);
+        }
 
-        /** @var RequestDTO[] $validatedRequestDTOs collection of DTOs to include in a bulk update*/
-        $validatedRequestDTOs = [];
-        $fields['page'] = (string) $page;
-        $variationSearchRepository->setSearchParams($fields);
-        $response = $variationSearchRepository->search();
+        $unixTimeAtPageStart = TimeHelper::getMilliseconds();
+
+        /** @var RequestDTO[] collection of DTOs to include in a bulk update*/
+        $requestDTOsForPage = [];
+        /** @var int[] collection of the IDs of Variations for which requestDTOs were created*/
+        $variationIdsForPage = [];
+        $searchParameters['page'] = (string) $pageNumber;
+        $variationSearchRepository->setSearchParams($searchParameters);
+        $variationSearchResponse = $variationSearchRepository->search();
 
         /** @var array $variationWithStock information about a single Variation, including stock for each Warehouse */
-        foreach ($response->getResult() as $variationWithStock) {
-          /** @var RequestDTO[] $rawInventoryRequestDTOs non-normalized candidates for inclusion in bulk update */
-          $rawInventoryRequestDTOs = $inventoryMapper->createInventoryDTOsFromVariation($variationWithStock, $itemMappingMethod, $stockBuffer);
-          foreach ($rawInventoryRequestDTOs as $dto) {
-            // validation method will output logs on failure
-            if ($this->validateInventoryRequestData($dto, $loggerContract)) {
-              $validatedRequestDTOs[] = $dto;
-            }
+        foreach ($variationSearchResponse->getResult() as $variationWithStock) {
+          $haveStockForVariation = false;
+          /** @var RequestDTO[] */
+          $requestDTOsForVariation = $this->inventoryMapper->createInventoryDTOsFromVariation($variationWithStock, $itemMappingMethod, $stockBuffer);
+
+          if (count($requestDTOsForVariation)) {
+            $requestDTOsForPage = array_merge($requestDTOsForPage, $requestDTOsForVariation);
+            $variationIdsForPage[] = $variationWithStock['id'];
           }
         }
 
-        $amtOfDtosForPage = count($validatedRequestDTOs);
+        $amtOfDtosForPage = count($requestDTOsForPage);
 
         if ($amtOfDtosForPage <= 0) {
-          $loggerContract
+          $this->logger
             ->debug(
               TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
               [
-                'additionalInfo' => ['info' => 'No items to update'],
+                'additionalInfo' => [
+                  'full' => (string) $fullInventory,
+                  'pageNum' => $pageNumber,
+                  'info' => 'No request DTOs to send'
+                ],
                 'method' => __METHOD__
               ]
             );
 
-          $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': No items to update');
+          $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': No items to update for page ' . $pageNumber);
         } else {
-          $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': ' . (string) $amtOfDtosForPage . ' updates to send');
+          $amtOfVariationsForPage = count($variationIdsForPage);
+          $totalVariationIdsInDTOsForAllPages += $amtOfVariationsForPage;
 
-          $loggerContract->debug(
+          $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': ' . (string) $amtOfDtosForPage . ' updates to send for page ' . $pageNumber);
+
+          $this->logger->debug(
             TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
             [
-              'additionalInfo' => ['info' => (string) $amtOfDtosForPage . ' updates to send'],
+              'additionalInfo' => [
+                'full' => (string) $fullInventory,
+                'page' => $pageNumber,
+                'amtOfDtosForPage' => $amtOfDtosForPage,
+                'amtOfVariationsForPage' => $amtOfVariationsForPage
+              ],
               'method' => __METHOD__
             ]
           );
 
-          $saveInventoryDuration += TimeHelper::getMilliseconds() - $msAtPageStart;
-          $msBeforeUpdate = TimeHelper::getMilliseconds();
+          $totalTimeSpentGatheringData += TimeHelper::getMilliseconds() - $unixTimeAtPageStart;
+          $unixTimeBeforeSendingData = TimeHelper::getMilliseconds();
 
-          $inventorySaveTotal +=  $amtOfDtosForPage;
+          $totalDtosAttempted +=  $amtOfDtosForPage;
 
-          $dto = $inventoryService->updateBulk($validatedRequestDTOs, $fullInventory);
+          $responseDto = $this->inventoryService->updateBulk($requestDTOsForPage, $fullInventory);
 
-          $savedInventoryDuration += TimeHelper::getMilliseconds() - $msBeforeUpdate;
+          $totalTimeSpentSendingData += TimeHelper::getMilliseconds() - $unixTimeBeforeSendingData;
 
-          $inventorySaveSuccess += count($validatedRequestDTOs) - count($dto->getErrors());
-          $inventorySaveFail += count($dto->getErrors());
+          $amtErrors = count($responseDto->getErrors());
+          // TODO: verify that there is a 1:1 relationship between errors and DTOs
+          $totalDtosSaved += $amtOfDtosForPage - $amtErrors;
+          $totalDtosFailed += $amtErrors;
         }
 
-        $loggerContract->debug(
+        $this->logger->debug(
           TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
           [
             'additionalInfo' => [
               'fullInventory' => (string) $fullInventory,
-              'page_num' => (string) $page,
+              'page_num' => (string) $pageNumber,
               'info' => 'page done',
-              'resultsForPage' => $dto
+              'resultsForPage' => $responseDto
             ],
             'method' => __METHOD__
           ]
         );
 
-        $page++;
-      } while (!$response->isLastPage());
+        $pageNumber++;
+      } while (isset($variationSearchResponse) && !$variationSearchResponse->isLastPage());
 
-      $loggerContract->debug(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_END),
-        [
-          'additionalInfo' => ['fullInventory' => (string) $fullInventory],
+      if ($totalDtosFailed > 0) {
+        $this->statusService->markInventoryFailed($fullInventory, $startTimeStamp);
+
+        $info = ['full' => (string) $fullInventory, 'manual' => (string) $manual];
+
+        $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_FAILED), [
+          'additionalInfo' => $info,
           'method' => __METHOD__
-        ]
-      );
+        ]);
+      } else {
+        $this->statusService->markInventoryComplete($fullInventory, $startTimeStamp, $totalDtosSaved);
+      }
+    } catch (InventorySyncBlockedException $e) {
+
+      $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_BLOCKED), [
+        'additionalInfo' => [
+          'full' => (string) $fullInventory,
+          'manual' => (string) $manual,
+          'message' => $e->getMessage()
+        ],
+        'method' => __METHOD__
+      ]);
+
+      $externalLogs->addInventoryLog('Inventory blocked: ' . $e->getMessage(), 'inventoryBlocked' . ($fullInventory ? 'Full' : ''), 1, 0, false, $e->getTraceAsString());
+    } catch (InventorySyncInterruptedException $e) {
+
+      $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_INTERRUPTED), [
+        'additionalInfo' => [
+          'full' => (string) $fullInventory,
+          'manual' => (string) $manual,
+          'message' => $e->getMessage()
+        ],
+        'method' => __METHOD__
+      ]);
+
+      $externalLogs->addInventoryLog('Inventory interrupted: ' . $e->getMessage(), 'inventoryInterrupted' . ($fullInventory ? 'Full' : ''), 1, 0, false, $e->getTraceAsString());
     } catch (\Exception $e) {
-      // TODO: consider failing out of one item / one page instead of failing the whole sync
-      $externalLogs->addInventoryLog('Inventory: ' . $e->getMessage(), 'inventoryFailed' . ($fullInventory ? 'Full' : ''), 1, 0, false);
-
-      $loggerContract->error(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_UPDATE_ERROR),
-        [
-          'additionalInfo' => [
-            'exception' => $e,
-            'message' => $e->getMessage(),
-            'stackTrace' => $e->getTrace(),
-          ],
-          'method' => __METHOD__
-        ]
-      );
+      $externalLogs->addInventoryLog('Inventory exception: ' . $e->getMessage(), 'inventoryFailed' . ($fullInventory ? 'Full' : ''), 1, 0, false, $e->getTraceAsString());
 
       // bulk update failed, so everything we were going to save should be considered failing.
       // (we want the failure amount to be more than zero in order for client to know this failed.)
-      $inventorySaveFail += $amtOfDtosForPage;
+      $totalDtosFailed += $amtOfDtosForPage;
 
-      $errorMessage = $e->getMessage();
-      if (!isset($errorMessage)) {
-        $errorMessage = (string) $e;
-      }
+      // statusService will log out to plentymarkets logs
+      $this->statusService->markInventoryFailed($fullInventory, $startTimeStamp);
+
+      $info = [
+        'full' => (string) $fullInventory,
+        'manual' => (string) $manual,
+        'exceptionType' => get_class($e),
+        'errorMessage' => $e->getMessage(),
+        'stackTrace' => $e->getTraceAsString()
+      ];
+
+      $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_FAILED), [
+        'additionalInfo' => $info,
+        'method' => __METHOD__
+      ]);
     } finally {
-      // FIXME: the 'inventorySave' and 'inventorySaved' log types are too similar
-      // TODO: determine if changing the types will impact kibana / graphana / influxDB before changing
-      $externalLogs->addInventoryLog('Inventory save', 'inventorySave' . ($fullInventory ? 'Full' : ''), $inventorySaveTotal, $saveInventoryDuration);
-      $externalLogs->addInventoryLog('Inventory save', 'inventorySaved' . ($fullInventory ? 'Full' : ''), $inventorySaveSuccess, $saveInventoryDuration);
-      $externalLogs->addInventoryLog('Inventory save failed', 'inventorySaveFailed' . ($fullInventory ? 'Full' : ''), $inventorySaveFail, $savedInventoryDuration);
 
-      /** @var LogSenderService $logSenderService */
-      $logSenderService = pluginApp(LogSenderService::class);
+      $elapsedTime = time() - strtotime($startTimeStamp);
 
-      $logSenderService->execute($externalLogs->getLogs());
+      $infoMap = [
+        'full' => (string) $fullInventory,
+        'manual' => (string) $manual,
+        'dtosAttempted' => $totalDtosAttempted,
+        'dtosSaved' => $totalDtosSaved,
+        'dtosFailed' => $totalDtosFailed,
+        'elapsedTime' => $elapsedTime,
+        'variationsAttempted' => $totalVariationIdsInDTOsForAllPages
+      ];
+
+      $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_END), [
+        'additionalInfo' => $infoMap,
+        'method' => __METHOD__
+      ]);
+
+      if (isset($externalLogs) && isset($this->logSenderService)) {
+        $externalLogs->addInventoryLog('Inventory syncs attempted', 'totalDtosAttempted' . ($fullInventory ? 'Full' : ''), $totalDtosAttempted, $totalTimeSpentGatheringData);
+        $externalLogs->addInventoryLog('Inventory syncs completed', 'totalDtosSaved' . ($fullInventory ? 'Full' : ''), $totalDtosSaved, $totalTimeSpentSendingData);
+        $externalLogs->addInventoryLog('Inventory syncs failed', 'totalDtosFailed' . ($fullInventory ? 'Full' : ''), $totalDtosFailed, $totalTimeSpentSendingData);
+
+        $externalLogs->addInfoLog("Finished " . ($manual ? "Manual " : "Automatic ") . ($fullInventory ? "Full " : "Partial ") . "inventory sync.");
+
+        $this->logSenderService->execute($externalLogs->getLogs());
+      }
     }
 
-    return [
-      self::INVENTORY_SAVE_TOTAL => $inventorySaveTotal,
-      self::INVENTORY_SAVE_SUCCESS => $inventorySaveSuccess,
-      self::INVENTORY_SAVE_FAIL => $inventorySaveFail,
-      self::SAVE_INVENTORY_DURATION => $saveInventoryDuration,
-      self::SAVED_INVENTORY_DURATION => $savedInventoryDuration,
-      self::PAGES => $page,
-      self::ERROR_MESSAGE => $errorMessage
-    ];
+    return $infoMap;
   }
 
   /**
+   * Get the default search parameters for VariationSearchRepository
    * @return array
    */
-  public function getResultFields()
+  public function getDefaultSearchParameters()
   {
     return [
       'with' => [
@@ -285,53 +349,63 @@ class InventoryUpdateService
         'variationSkus' => true,
         'variationBarcodes' => true,
         'variationMarkets' => true
-      ]
+      ],
+
+      'itemsPerPage' => self::VARIATIONS_PER_PAGE
     ];
   }
 
   /**
-   * @param bool $fullInventory
-   *
+   * Get the base VariationSearchRepository filters based on the supplier config
    * @return array
    */
-  public function getFilters(bool $fullInventory): array
+  private function getDefaultFilters(): array
   {
-    /**
-     * @var AbstractConfigHelper $configHelper
-     */
-    $configHelper = pluginApp(AbstractConfigHelper::class);
 
     $filter = [
       'isActive' => true
     ];
 
-    if (!$configHelper->isAllItemsActive()) {
-      $filter['referrerId'] = [$configHelper->getOrderReferrerValue()];
-    }
-
-    if (!$fullInventory) {
-      $filter['updatedBetween'] = [
-        'timestampFrom' => time() - AbstractConfigHelper::SECONDS_INTERVAL_FOR_INVENTORY,
-        'timestampTo' => time(),
-      ];
+    if (!$this->configHelper->isAllItemsActive()) {
+      $filter['referrerId'] = [$this->configHelper->getOrderReferrerValue()];
     }
 
     return $filter;
   }
 
   /**
+   * Add a time-based filter to a VariationSearchRepository filter array,
+   * limiting the results to those that have changed in the given time window
+   *
+   * @param array $filters the filter array to add on to
+   * @param integer $startOfWindow php time in seconds for earliest change time
+   * @param integer $endOfWindow (optional) php time in seconds for latest change time
+   * @return void
+   */
+  private static function applyTimeFilter($filters, int $startOfWindow, int $endOfWindow = null)
+  {
+    if (!isset($endOfWindow)) {
+      $endOfWindow = time();
+    }
+
+    if (isset($filters) && isset($startOfWindow) && $startOfWindow > 0) {
+      $filters['updatedBetween'] = [
+        'timestampFrom' => $startOfWindow,
+        'timestampTo' => $endOfWindow,
+      ];
+    }
+  }
+
+  /**
    * Get the stock buffer value, normalized to 0
    *
-   * @param AbstractConfigHelper $configHelper
-   * @param LoggerContract $loggerContract
    * @return int
    */
-  private static function getNormalizedStockBuffer($configHelper, $loggerContract = null)
+  private function getNormalizedStockBuffer()
   {
     $stockBuffer = null;
-    if (isset($configHelper)) {
-      $stockBuffer = $configHelper->getStockBufferValue();
-    }
+    $stockBuffer = $this->configHelper->getStockBufferValue();
+
 
     if (isset($stockBuffer)) {
       if ($stockBuffer >= 0) {
@@ -339,17 +413,95 @@ class InventoryUpdateService
       }
 
       // invalid value for buffer
-      if (isset($loggerContract)) {
-        $loggerContract->warning(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_STOCK_BUFFER),
-          [
-            'additionalInfo' => ['stockBuffer' => $stockBuffer],
-            'method' => __METHOD__
-          ]
-        );
-      }
+      $this->logger->warning(
+        TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_STOCK_BUFFER),
+        [
+          'additionalInfo' => [
+            'stockBuffer' => json_encode($stockBuffer)
+          ],
+          'method' => __METHOD__
+        ]
+      );
     }
 
     return 0;
+  }
+
+  /**
+   * Check if the state of the Inventory Service has been "running" for more than the maximum allotted time
+   * This functionality was extracted from the old UpdateFullInventoryStatusCron
+   * @return bool
+   */
+  private function serviceHasBeenRunningTooLong(): bool
+  {
+    if (!$this->statusService->isInventoryRunning()) {
+      return false;
+    }
+
+    $currentSessionStartedAt = $this->statusService->getStartOfCurrentSync();
+    if (isset($currentSessionStartedAt) && !empty($currentSessionStartedAt) && (time() - strtotime($currentSessionStartedAt)) > self::MAX_INVENTORY_TIME) {
+
+      $this->logger->warning(TranslationHelper::getLoggerKey(self::LOG_KEY_LONG_RUN), [
+        'additionalInfo' => [
+
+          'syncStartedAt' => $currentSessionStartedAt,
+          'maximumTime' => self::MAX_INVENTORY_TIME
+        ],
+        'method' => __METHOD__
+      ]);
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Get the php time (in seconds) for the start of a partial sync
+   *
+   * @param ExternalLogs $externalLogs
+   *
+   * @return int
+   */
+  private function getStartOfDeltaSyncWindow(ExternalLogs $externalLogs = null): int
+  {
+    $windowStart = 0;
+
+    $lastGoodPartialStart = $this->statusService->getLastCompletionStart(false);
+    $lastGoodFullStart = $this->statusService->getLastCompletionStart(true);
+
+    if (isset($lastGoodPartialStart) && !empty($lastGoodPartialStart)) {
+      // new window should be directly after the previous window
+      $windowStart = strtotime($lastGoodPartialStart);
+    }
+
+    if (isset($lastGoodFullStart) && !empty($lastGoodFullStart)) {
+      $numericTimeForFullSync = strtotime($lastGoodFullStart);
+      if ($windowStart > 0 && $numericTimeForFullSync > $windowStart) {
+        // full sync happened more recently than partial sync - use that time.
+        $windowStart = $numericTimeForFullSync;
+      }
+    }
+
+    if ($windowStart > 0) {
+      return $windowStart;
+    }
+
+    if (isset($externalLogs)) {
+      $externalLogs->addErrorLog("Starting a partial inventory sync when no inventory syncs of any sort have been completed.");
+    }
+
+    // in case we somehow got here, use an arbitrary window so that some data gets updated
+    return time() - 7200;
+  }
+
+  /**
+   * Check if we can start a new sync or not.
+   * Returns true if no sync is running or the running sync has timed out
+   *
+   * @return boolean
+   */
+  private function syncIsBlocked(): bool
+  {
+    return $this->statusService->isInventoryRunning() && !$this->serviceHasBeenRunningTooLong();
   }
 }
