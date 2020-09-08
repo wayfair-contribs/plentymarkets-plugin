@@ -330,25 +330,21 @@ class InventoryStatusService
     $mostRecentPartial = $this->keyValueRepository->get(self::DB_KEY_INVENTORY_LAST_ATTEMPT_PARTIAL);
     $mostRecentFull = $this->keyValueRepository->get(self::DB_KEY_INVENTORY_LAST_ATTEMPT_FULL);
 
-    if (!isset($mostRecentPartial) || empty($mostRecentPartial))
-    {
+    if (!isset($mostRecentPartial) || empty($mostRecentPartial)) {
       return $mostRecentFull;
     }
 
-    if (!isset($mostRecentFull) || empty($mostRecentFull))
-    {
+    if (!isset($mostRecentFull) || empty($mostRecentFull)) {
       return $mostRecentPartial;
     }
 
     $numericPartial = strtotime($mostRecentPartial);
-    if ($numericPartial <= 0)
-    {
+    if ($numericPartial <= 0) {
       return $mostRecentFull;
     }
 
     $numericFull = strtotime($mostRecentFull);
-    if ($numericFull <= $numericPartial)
-    {
+    if ($numericFull <= $numericPartial) {
       return $mostRecentPartial;
     }
 
@@ -402,11 +398,25 @@ class InventoryStatusService
    */
   public function needsAttention(bool $full): bool
   {
-    $maxDiff = $full ? self::OVERDUE_TIME_FULL : self::OVERDUE_TIME_PARTIAL;
+    if ($full && $this->getCompleteSyncSize($full) < 1) {
+      return true;
+    }
 
-    $diff = $this->timeSinceLastGoodSyncStart($full);
+    $timeSinceLastGoodFullStart = $this->timeSinceLastGoodSyncStart(true);
+    if ($full) {
+      return $timeSinceLastGoodFullStart < 0 || $timeSinceLastGoodFullStart > self::OVERDUE_TIME_FULL;
+    }
 
-    return $diff < 0 || $diff > $maxDiff;
+    // checking status of partial sync
+    if ($timeSinceLastGoodFullStart < 0)
+    {
+      // we don't worry about partial sync until the full sync is successful.
+      return false;
+    }
+
+    $timeSinceLastGoodPartialStart = $this->timeSinceLastGoodSyncStart(false);
+
+    return $timeSinceLastGoodPartialStart < 0 || $timeSinceLastGoodPartialStart > self::OVERDUE_TIME_PARTIAL;
   }
 
   /**

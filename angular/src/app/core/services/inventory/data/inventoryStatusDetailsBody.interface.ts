@@ -4,5 +4,5 @@ export interface InventoryStatusDetailsBodyInterface
     completedEnd?:string
     completedAmount?:number
     attemptedStart?:string
-    needsAttention:boolean
+    needsAttention?: boolean
 }

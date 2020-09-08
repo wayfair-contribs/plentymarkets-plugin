@@ -12,22 +12,29 @@ export class InventoryComponent {
   private static readonly TRANSLATION_KEY_REFRESH = "refresh";
   private static readonly TRANSLATION_KEY_LOADING = "loading";
   private static readonly TRANSLATION_KEY_ERROR_FETCH = "error_fetch";
-  private static readonly TRANSLATION_KEY_WAITING_FOR_FIRST_SYNC =
-    "inventory_waiting_for_first_sync";
-  private static readonly TRANSLATION_KEY_WAITING_FOR_NEXT_SYNC =
-    "inventory_waiting_for_next_sync";
-  private static readonly TRANSLATION_KEY_IN_PROGRESS = "in_progress";
-  private static readonly TRANSLATION_KEY_SYNC_HAS_ISSUES = "sync_has_issues";
+  private static readonly TRANSLATION_KEY_NO_ISSUES = "inventory_no_issues";
+  private static readonly TRANSLATION_KEY_SYNC_HAS_ISSUES =
+    "inventory_has_issues";
+  private static readonly TRANSLATION_KEY_NO_SYNCS =
+    "inventory_no_syncs_attempted";
+  private static readonly TRANSLATION_KEY_AT = "at";
+  private static readonly TRANSLATION_KEY_COMPLETED_WITH = "completed_with";
+  private static readonly TRANSLATION_KEY_PRODUCTS = "products";
+  private static readonly TRANSLATION_KEY_SKIPPED = "inventory_skipped";
+  private static readonly TRANSLATION_KEY_HAS_NEVER_SUCCEEDED =
+    "has_never_succeeded";
+  private static readonly TRANSLATION_KEY_HAS_NEVER_BEEN_ATTEMPTED =
+    "has_never_been_attempted";
 
   private static readonly STATE_IDLE = "idle";
 
-  private static readonly TEXT_CLASS_WARNING = "warning";
-  private static readonly TEXT_CLASS_DANGER = "danger";
-  private static readonly TEXT_CLASS_INFO = "info";
-  private static readonly TEXT_CLASS_PRIMARY = "primary";
+  private static readonly TEXT_CLASS_WARNING = "text-warning";
+  private static readonly TEXT_CLASS_DANGER = "text-danger";
+  private static readonly TEXT_CLASS_INFO = "text-info";
+  private static readonly TEXT_CLASS_SUCCESS = "text-success";
 
-  private static readonly ICON_SIZE_HUGE = "8em";
-  private static readonly ICON_SIZE_NORMAL = "2em";
+  private static readonly ICON_SIZE_MAIN= "8vw";
+  private static readonly ICON_SIZE_TABLE = "2vw";
 
   /**
    * The interval on which the UI will automatically refresh
@@ -39,13 +46,7 @@ export class InventoryComponent {
 
   objectKeysWrapper = Object.keys;
 
-  public statusObject: InventoryStatusInterface = {
-    status: InventoryComponent.TRANSLATION_KEY_LOADING,
-    details: {
-      full: { needsAttention: false },
-      partial: { needsAttention: false },
-    },
-  };
+  public statusObject: InventoryStatusInterface;
 
   public displayedState = {
     value: InventoryComponent.TRANSLATION_KEY_LOADING,
@@ -118,43 +119,32 @@ export class InventoryComponent {
   }
 
   private updateDisplayedState() {
-    this.displayedState.style = InventoryComponent.TEXT_CLASS_PRIMARY;
-
-    if (this.statusObject.status == InventoryComponent.STATE_IDLE) {
-      if (this.syncIssuesHappened()) {
-        this.displayedState.value = this.displayedState.value = this.translation.translate(
-          InventoryComponent.TRANSLATION_KEY_SYNC_HAS_ISSUES
-        );
-
-        this.displayedState.style = InventoryComponent.TEXT_CLASS_DANGER;
-
-        return;
-      }
-
-      if (!this.syncsAttempted()) {
-        this.displayedState.value = this.translation.translate(
-          InventoryComponent.TRANSLATION_KEY_WAITING_FOR_FIRST_SYNC
-        );
-
-        this.displayedState.style = InventoryComponent.TEXT_CLASS_WARNING;
-        return;
-      }
-
-      this.displayedState.value = this.translation.translate(
-        InventoryComponent.TRANSLATION_KEY_WAITING_FOR_NEXT_SYNC
+    if (this.needsAttention()) {
+      this.displayedState.value = this.displayedState.value = this.translation.translate(
+        InventoryComponent.TRANSLATION_KEY_SYNC_HAS_ISSUES
       );
+
+      this.displayedState.style = InventoryComponent.TEXT_CLASS_DANGER;
 
       return;
     }
 
-    this.displayedState.value =
-      this.translation.translate(
-        "inventory_status_label_" + this.statusObject.status
-      ) +
-      " " +
-      this.translation.translate(
-        InventoryComponent.TRANSLATION_KEY_IN_PROGRESS
+    if (!this.syncsAttempted()) {
+      this.displayedState.value = this.translation.translate(
+        InventoryComponent.TRANSLATION_KEY_NO_SYNCS
       );
+
+      this.displayedState.style = InventoryComponent.TEXT_CLASS_WARNING;
+      return;
+    }
+
+    this.displayedState.value = this.translation.translate(
+      InventoryComponent.TRANSLATION_KEY_NO_ISSUES
+    );
+
+    this.displayedState.style = InventoryComponent.TEXT_CLASS_SUCCESS;
+
+    return;
   }
 
   private showLoading() {
@@ -180,35 +170,22 @@ export class InventoryComponent {
   }
 
   public runningIconEnabled(kind?: string): boolean {
-    if (!this.statusObject) {
-      return false;
-    }
-    if (!kind || kind.length == 0) {
-      return this.statusObject.status != InventoryComponent.STATE_IDLE;
-    }
-
-    return this.statusObject.status == kind;
+    return (
+      this.statusObject &&
+      this.statusObject.status.length > 0 &&
+      this.statusObject.status != InventoryComponent.STATE_IDLE &&
+      (!kind || this.statusObject.status == kind)
+    );
   }
 
   public successIconEnabled(kind?: string): boolean {
-    return !(
-      this.clockIconEnabled(kind) ||
-      this.runningIconEnabled(kind) ||
-      this.errorIconEnabled(kind)
-    );
+    return !(this.runningIconEnabled(kind) || this.errorIconEnabled(kind));
   }
 
   public errorIconEnabled(kind?: string): boolean {
     return (
-      (kind && this.syncIssuesHappened(kind)) ||
-      (!kind &&
-        (this.displayedState.value.startsWith("error") ||
-          this.syncIssuesHappened()))
+      this.displayedState.value.startsWith("error") || this.needsAttention(kind)
     );
-  }
-
-  public clockIconEnabled(kind?: string): boolean {
-    return !this.syncsAttempted(kind);
   }
 
   public syncsAttempted(kind?: string): boolean {
@@ -236,9 +213,90 @@ export class InventoryComponent {
     return false;
   }
 
-  public syncIssuesHappened(kind?: string): boolean {
+  public getTextClass(kind?: string): string {
+    if (!kind) {
+      return this.displayedState.style;
+    }
+
+    if (this.needsAttention(kind)) {
+      return InventoryComponent.TEXT_CLASS_DANGER;
+    }
+
+    if (!this.syncsAttempted(kind)) {
+      return InventoryComponent.TEXT_CLASS_WARNING;
+    }
+
+    return InventoryComponent.TEXT_CLASS_SUCCESS;
+  }
+
+  public getStatusText(kind?: string): string {
+    if (kind) {
+      let buffer = this.translation.translate("inventory_status_label_" + kind);
+
+      if (this.statusObject.details[kind]) {
+        if (this.statusObject[kind].completedStart) {
+          buffer +=
+            " " +
+            this.translation.translate(InventoryComponent.TRANSLATION_KEY_AT) +
+            " " +
+            this.statusObject[kind].completedStart;
+
+          let amt = this.statusObject[kind].completedAmount;
+
+          if (amt && amt > 0) {
+            return (
+              buffer +
+              " " +
+              this.translation.translate(
+                InventoryComponent.TRANSLATION_KEY_COMPLETED_WITH
+              ) +
+              " " +
+              amt +
+              " " +
+              this.translation.translate(
+                InventoryComponent.TRANSLATION_KEY_PRODUCTS
+              )
+            );
+          }
+
+          return (
+            buffer +
+            " " +
+            this.translation.translate(
+              InventoryComponent.TRANSLATION_KEY_SKIPPED
+            )
+          );
+        }
+
+        if (!this.syncsAttempted(kind)) {
+          return (
+            buffer +
+            " " +
+            this.translation.translate(
+              InventoryComponent.TRANSLATION_KEY_HAS_NEVER_BEEN_ATTEMPTED
+            )
+          );
+        }
+
+        return (
+          buffer +
+          " " +
+          this.translation.translate(
+            InventoryComponent.TRANSLATION_KEY_HAS_NEVER_SUCCEEDED
+          )
+        );
+      }
+      // unexpected state - requested details for a row that doesn't exist
+      return "";
+    }
+
+    return this.displayedState.value;
+  }
+
+  public needsAttention(kind?: string): boolean {
     if (!this.statusObject || !this.statusObject.details) {
-      return false;
+      // lack of data is a problem
+      return true;
     }
 
     if (kind) {
@@ -254,5 +312,15 @@ export class InventoryComponent {
     }
 
     return false;
+  }
+
+  public getIconSize(inTable?: boolean): string
+  {
+    if (inTable)
+    {
+      return InventoryComponent.ICON_SIZE_TABLE;
+    }
+
+    return InventoryComponent.ICON_SIZE_MAIN;
   }
 }
