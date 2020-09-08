@@ -1,6 +1,5 @@
 import { Component } from "@angular/core";
 import { InventoryStatusInterface } from "../../core/services/inventory/data/inventoryStatus.interface";
-import { InventoryStatusDetailsBodyInterface } from "../../core/services/inventory/data/inventoryStatusDetailsBody.interface";
 import { InventoryService } from "../../core/services/inventory/inventory.service";
 import { Language, TranslationService } from "angular-l10n";
 
@@ -93,17 +92,6 @@ export class InventoryComponent {
     this.fetchTime = new Date().toLocaleString();
   }
 
-  private updateRefreshButton(): void {
-    if (
-      this.displayedState.value === InventoryComponent.TRANSLATION_KEY_LOADING
-    ) {
-      this.stateOfRefreshButton.disabled = true;
-      return;
-    }
-    this.stateOfRefreshButton.text = InventoryComponent.TRANSLATION_KEY_REFRESH;
-    this.stateOfRefreshButton.disabled = false;
-  }
-
   /**
    * Update the UI to match back-end data provided in the argument
    * @param data FullInventoryInterface
@@ -114,13 +102,11 @@ export class InventoryComponent {
     this.updateFetchTime();
 
     this.updateDisplayedState();
-
-    this.updateRefreshButton();
   }
 
   private updateDisplayedState() {
     if (this.needsAttention()) {
-      this.displayedState.value = this.displayedState.value = this.translation.translate(
+      this.displayedState.value  = this.translation.translate(
         InventoryComponent.TRANSLATION_KEY_SYNC_HAS_ISSUES
       );
 
@@ -150,15 +136,11 @@ export class InventoryComponent {
   private showLoading() {
     this.displayedState.value = InventoryComponent.TRANSLATION_KEY_LOADING;
     this.displayedState.style = InventoryComponent.TEXT_CLASS_INFO;
-
-    this.updateRefreshButton();
   }
 
   private showError() {
     this.displayedState.value = InventoryComponent.TRANSLATION_KEY_ERROR_FETCH;
     this.displayedState.style = InventoryComponent.TEXT_CLASS_DANGER;
-
-    this.updateRefreshButton();
     this.updateFetchTime();
   }
 
@@ -234,14 +216,14 @@ export class InventoryComponent {
       let buffer = this.translation.translate("inventory_status_label_" + kind);
 
       if (this.statusObject.details[kind]) {
-        if (this.statusObject[kind].completedStart) {
+        if (this.statusObject.details[kind].completedStart) {
           buffer +=
             " " +
             this.translation.translate(InventoryComponent.TRANSLATION_KEY_AT) +
             " " +
-            this.statusObject[kind].completedStart;
+            this.statusObject.details[kind].completedStart;
 
-          let amt = this.statusObject[kind].completedAmount;
+          let amt = this.statusObject.details[kind].completedAmount;
 
           if (amt && amt > 0) {
             return (
@@ -300,7 +282,7 @@ export class InventoryComponent {
     }
 
     if (kind) {
-      return this.statusObject[kind] && this.statusObject[kind].needsAttention;
+      return this.statusObject.details[kind] && this.statusObject.details[kind].needsAttention;
     }
 
     for (const key in this.statusObject.details) {
