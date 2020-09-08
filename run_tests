@@ -47,10 +47,11 @@ USAGE: run_tests COMMAND [FILES]
 
 COMMANDS
 
-  all        Runs all tools
-  sniff      Runs CodeSniffer on code
-  analyze    Runs PHPStan on code
-  test       Runs PHPUnit
+  all           Runs all tools
+  sniff         Runs CodeSniffer on code
+  analyze       Runs PHPStan on code
+  test          Runs PHPUnit
+  testCoverage  Runs PHPUnit with coverage
 
   sniff-fix  Automatically fix codesniffer errors
 EOF
@@ -82,7 +83,19 @@ run_phpunit() {
   fi
 
   print_header "RUNNING PHPUnit"
-  $(get_script_dir)/vendor/bin/phpunit --bootstrap $(get_script_dir)/vendor/autoload.php ${files} --coverage-clover=test_results/unit_test_coverage.xml --log-junit=test_results/unit_tests.xml --whitelist ${files}
+  $(get_script_dir)/vendor/bin/phpunit --bootstrap $(get_script_dir)/vendor/autoload.php ${files}
+}
+
+run_coverage() {
+  if [[ $# -ge 1 ]]
+  then
+      files="$@"
+  else
+      files="tests"
+  fi
+
+  print_header "RUNNING PHPUnit with coverage"
+  $(get_script_dir)/vendor/bin/phpunit --bootstrap $(get_script_dir)/vendor/autoload.php ${files} --coverage-clover=test_results/unit_test_coverage.xml --log-junit=test_results/unit_tests.xml --whitelist src
 }
 
 run_phpstan() {
@@ -175,7 +188,7 @@ run_autofixsniff() {
 run_all() {
   run_codesniffer "$@"
   run_phpstan "$@"
-  run_phpunit "$@"
+  run_coverage "$@"
 }
 
 parse_command() {
@@ -195,6 +208,7 @@ parse_command() {
     sniff-fix)         shift; run_autofixsniff "$@"; return ;;
     analyze)           shift; run_phpstan "$@"; return ;;
     test)              shift; run_phpunit "$@"; return ;;
+    testCoverage)      shift; run_coverage "$@"; return ;;
     all)               shift; run_all "$@"; return;;
 
     # Default
