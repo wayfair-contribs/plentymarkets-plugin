@@ -1,83 +1,103 @@
 <div class="center-block">
-  <div class="form-group-row text-center" name="globalStatusIcon">
-    <span *ngIf="loadingIconEnabled()" name="globalLoading">
+  <div
+    class="form-group-row text-center {{ 'text-' + displayedState.style }}"
+    name="globalStatusIcon"
+  >
+    <div *ngIf="!statusObject" name="iconNoObject">
       <svg
         width="{{ ICON_SIZE_HUGE }}"
         height="{{ ICON_SIZE_HUGE }}"
         viewBox="0 0 16 16"
-        class="bi bi-arrow-repeat"
-        fill="currentColor"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"
-        />
-        <path
-          fill-rule="evenodd"
-          d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"
-        />
-      </svg>
-    </span>
-    <span *ngIf="runningIconEnabled()" name="globalRunning">
-      <svg
-        width="{{ ICON_SIZE_HUGE }}"
-        height="{{ ICON_SIZE_HUGE }}"
-        viewBox="0 0 16 16"
-        class="bi bi-cloud-upload-fill"
+        class="bi bi-question-diamond-fill"
         fill="currentColor"
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
           fill-rule="evenodd"
-          d="M8 0a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 4.095 0 5.555 0 7.318 0 9.366 1.708 11 3.781 11H7.5V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11h4.188C14.502 11 16 9.57 16 7.773c0-1.636-1.242-2.969-2.834-3.194C12.923 1.999 10.69 0 8 0zm-.5 14.5V11h1v3.5a.5.5 0 0 1-1 0z"
+          d="M9.05.435c-.58-.58-1.52-.58-2.1 0L.436 6.95c-.58.58-.58 1.519 0 2.098l6.516 6.516c.58.58 1.519.58 2.098 0l6.516-6.516c.58-.58.58-1.519 0-2.098L9.05.435zM5.495 6.033a.237.237 0 0 1-.24-.247C5.35 4.091 6.737 3.5 8.005 3.5c1.396 0 2.672.73 2.672 2.24 0 1.08-.635 1.594-1.244 2.057-.737.559-1.01.768-1.01 1.486v.105a.25.25 0 0 1-.25.25h-.81a.25.25 0 0 1-.25-.246l-.004-.217c-.038-.927.495-1.498 1.168-1.987.59-.444.965-.736.965-1.371 0-.825-.628-1.168-1.314-1.168-.803 0-1.253.478-1.342 1.134-.018.137-.128.25-.266.25h-.825zm2.325 6.443c-.584 0-1.009-.394-1.009-.927 0-.552.425-.94 1.01-.94.609 0 1.028.388 1.028.94 0 .533-.42.927-1.029.927z"
         />
       </svg>
-    </span>
-    <span *ngIf="errorIconEnabled()" name="globalError">
-      <svg
-        width="{{ ICON_SIZE_HUGE }}"
-        height="{{ ICON_SIZE_HUGE }}"
-        viewBox="0 0 16 16"
-        class="bi bi-exclamation-triangle-fill"
-        fill="currentColor"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          fill-rule="evenodd"
-          d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 5zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"
-        ></path>
-      </svg>
-    </span>
-    <span *ngIf="successIconEnabled()" name="globalSuccess">
-      <svg
-        width="{{ ICON_SIZE_HUGE }}"
-        height="{{ ICON_SIZE_HUGE }}"
-        viewBox="0 0 16 16"
-        class="bi bi-cloud-check-fill"
-        fill="currentColor"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          fill-rule="evenodd"
-          d="M8 2a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 6.095 0 7.555 0 9.318 0 11.366 1.708 13 3.781 13h8.906C14.502 13 16 11.57 16 9.773c0-1.636-1.242-2.969-2.834-3.194C12.923 3.999 10.69 2 8 2zm2.354 4.854a.5.5 0 0 0-.708-.708L7 8.793 5.854 7.646a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0l3-3z"
-        />
-      </svg>
-    </span>
-    <span *ngIf="clockIconEnabled()" name="globalWaiting">
-      <svg
-        width="{{ ICON_SIZE_HUGE }}"
-        height="{{ ICON_SIZE_HUGE }}"
-        viewBox="0 0 16 16"
-        class="bi bi-clock-fill"
-        fill="currentColor"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          fill-rule="evenodd"
-          d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"
-        />
-      </svg>
-    </span>
+    </div>
+    <div *ngIf="statusObject" name="iconHaveObject">
+      <span *ngIf="loadingIconEnabled()" name="globalLoading">
+        <svg
+          width="{{ ICON_SIZE_HUGE }}"
+          height="{{ ICON_SIZE_HUGE }}"
+          viewBox="0 0 16 16"
+          class="bi bi-arrow-repeat"
+          fill="currentColor"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"
+          />
+          <path
+            fill-rule="evenodd"
+            d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"
+          />
+        </svg>
+      </span>
+      <span *ngIf="runningIconEnabled()" name="globalRunning">
+        <svg
+          width="{{ ICON_SIZE_HUGE }}"
+          height="{{ ICON_SIZE_HUGE }}"
+          viewBox="0 0 16 16"
+          class="bi bi-cloud-upload-fill"
+          fill="currentColor"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M8 0a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 4.095 0 5.555 0 7.318 0 9.366 1.708 11 3.781 11H7.5V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11h4.188C14.502 11 16 9.57 16 7.773c0-1.636-1.242-2.969-2.834-3.194C12.923 1.999 10.69 0 8 0zm-.5 14.5V11h1v3.5a.5.5 0 0 1-1 0z"
+          />
+        </svg>
+      </span>
+      <span *ngIf="errorIconEnabled()" name="globalError">
+        <svg
+          width="{{ ICON_SIZE_HUGE }}"
+          height="{{ ICON_SIZE_HUGE }}"
+          viewBox="0 0 16 16"
+          class="bi bi-cloud-slash-fill"
+          fill="currentColor"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M3.112 5.112a3.125 3.125 0 0 0-.17.613C1.266 6.095 0 7.555 0 9.318 0 11.366 1.708 13 3.781 13H11L3.112 5.112zm11.372 7.372L4.937 2.937A5.512 5.512 0 0 1 8 2c2.69 0 4.923 2 5.166 4.579C14.758 6.804 16 8.137 16 9.773a3.2 3.2 0 0 1-1.516 2.711zm-.838 1.87l-12-12 .708-.708 12 12-.707.707z"
+          />
+        </svg>
+      </span>
+      <span *ngIf="successIconEnabled()" name="globalSuccess">
+        <svg
+          width="{{ ICON_SIZE_HUGE }}"
+          height="{{ ICON_SIZE_HUGE }}"
+          viewBox="0 0 16 16"
+          class="bi bi-cloud-check-fill"
+          fill="currentColor"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M8 2a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 6.095 0 7.555 0 9.318 0 11.366 1.708 13 3.781 13h8.906C14.502 13 16 11.57 16 9.773c0-1.636-1.242-2.969-2.834-3.194C12.923 3.999 10.69 2 8 2zm2.354 4.854a.5.5 0 0 0-.708-.708L7 8.793 5.854 7.646a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0l3-3z"
+          />
+        </svg>
+      </span>
+      <span *ngIf="clockIconEnabled()" name="globalWaiting">
+        <svg
+          width="{{ ICON_SIZE_HUGE }}"
+          height="{{ ICON_SIZE_HUGE }}"
+          viewBox="0 0 16 16"
+          class="bi bi-clock-fill"
+          fill="currentColor"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"
+          />
+        </svg>
+      </span>
+    </div>
   </div>
   <div class="form-group-row text-center" name="globalStatusText">
     <p
@@ -161,7 +181,7 @@
         </span>
       </div>
       <div class="col-md-3" name="statusValue">
-        {{'inventory_status_label_' + key | translate: lang}}:
+        {{ "inventory_status_label_" + key | translate: lang }}:
         <div *ngIf="!syncsAttempted(key)">
           <span name="noSyncsAttempted" class="text-warning">{{
             "no_syncs_attempted" | translate: lang
