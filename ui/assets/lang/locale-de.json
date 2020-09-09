@@ -50,5 +50,6 @@
   "inventory_skipped": "wurde übersprungen, da kein Inventar (Änderungen) für die Synchronisierung vorhanden war",
   "has_never_succeeded": "war nie erfolgreich",
   "has_never_been_attempted": "ist für die nahe Zukunft geplant",
-  "inventory_synchronization_label": "Synchronisierung des Inventars mit Wayfair"
+  "inventory_synchronization_label": "Synchronisierung des Inventars mit Wayfair",
+  "is_currently_running": "wird derzeit ausgeführt"
 }

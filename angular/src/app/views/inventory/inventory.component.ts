@@ -24,6 +24,8 @@ export class InventoryComponent {
     "has_never_been_attempted";
   private static readonly TRANSLATION_KEY_INV_SYNC_LABEL =
     "inventory_synchronization_label";
+  private static readonly TRANSLATION_KEY_IS_CURRENTLY_RUNNING =
+    "is_currently_running";
 
   private static readonly STATE_IDLE = "idle";
 
@@ -175,7 +177,8 @@ export class InventoryComponent {
 
   public errorIconEnabled(kind?: string): boolean {
     return (
-      (!kind && this.displayedState.value.startsWith("error")) || (!this.scheduledIconEnabled(kind) && this.needsAttention(kind))
+      (!kind && this.displayedState.value.startsWith("error")) ||
+      (!this.scheduledIconEnabled(kind) && this.needsAttention(kind))
     );
   }
 
@@ -227,6 +230,16 @@ export class InventoryComponent {
   public getStatusText(kind?: string): string {
     if (kind) {
       let buffer = this.translation.translate("inventory_status_label_" + kind);
+
+      if (kind && this.statusObject.status == kind) {
+        buffer +=
+          " " +
+          this.translation.translate(
+            InventoryComponent.TRANSLATION_KEY_IS_CURRENTLY_RUNNING
+          ) +
+          ". " +
+          this.translation.translate("inventory_status_label_" + kind);
+      }
 
       if (this.statusObject.details[kind]) {
         if (this.statusObject.details[kind].completedStart) {
