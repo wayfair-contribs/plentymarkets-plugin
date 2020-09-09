@@ -263,7 +263,8 @@ export class InventoryComponent {
               " " +
               this.translation.translate(
                 InventoryComponent.TRANSLATION_KEY_PRODUCTS
-              )
+              ) +
+              "."
             );
           }
 
@@ -272,7 +273,8 @@ export class InventoryComponent {
             " " +
             this.translation.translate(
               InventoryComponent.TRANSLATION_KEY_SKIPPED
-            )
+            ) +
+            "."
           );
         }
 
@@ -282,7 +284,8 @@ export class InventoryComponent {
             " " +
             this.translation.translate(
               InventoryComponent.TRANSLATION_KEY_HAS_NEVER_BEEN_ATTEMPTED
-            )
+            ) +
+            "."
           );
         }
 
@@ -291,7 +294,8 @@ export class InventoryComponent {
           " " +
           this.translation.translate(
             InventoryComponent.TRANSLATION_KEY_HAS_NEVER_SUCCEEDED
-          )
+          ) +
+          "."
         );
       }
       // unexpected state - requested details for a row that doesn't exist
