@@ -57,8 +57,10 @@ class InventoryStatusService
     self::DB_KEY_INVENTORY_LAST_ATTEMPT_FULL,
     self::DB_KEY_INVENTORY_LAST_COMPLETION_START_FULL,
     self::DB_KEY_INVENTORY_LAST_COMPLETION_END_PARTIAL,
+    self::DB_KEY_INVENTORY_LAST_COMPLETION_AMOUNT_FULL,
     self::DB_KEY_INVENTORY_LAST_ATTEMPT_PARTIAL,
-    self::DB_KEY_INVENTORY_LAST_COMPLETION_START_PARTIAL
+    self::DB_KEY_INVENTORY_LAST_COMPLETION_START_PARTIAL,
+    self::DB_KEY_INVENTORY_LAST_COMPLETION_AMOUNT_PARTIAL
   ];
   /**
    * @var KeyValueRepository
@@ -407,10 +409,10 @@ class InventoryStatusService
       return $timeSinceLastGoodFullStart < 0 || $timeSinceLastGoodFullStart > self::OVERDUE_TIME_FULL;
     }
 
-    // checking status of partial sync
-    if ($timeSinceLastGoodFullStart < 0)
+    if ($timeSinceLastGoodFullStart < self::OVERDUE_TIME_PARTIAL)
     {
-      // we don't worry about partial sync until the full sync is successful.
+      // partial sync doesn't need to happen if a full sync did not happen yet,
+      // or if a full sync happened recently.
       return false;
     }
 

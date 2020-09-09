@@ -167,6 +167,20 @@ class InventoryUpdateService
         $variationIdsForPage = [];
         $searchParameters['page'] = (string) $pageNumber;
         $variationSearchRepository->setSearchParams($searchParameters);
+        $this->logger
+          ->debug(
+            TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
+            [
+              'additionalInfo' => [
+                'full' => (string) $fullInventory,
+                'pageNum' => $pageNumber,
+                'info' => 'Searching Variation repo',
+                'filters' => $variationSearchRepository->getFilters(),
+                'conditions' => $variationSearchRepository->getConditions()
+              ],
+              'method' => __METHOD__
+            ]
+          );
         $variationSearchResponse = $variationSearchRepository->search();
 
         /** @var array $variationWithStock information about a single Variation, including stock for each Warehouse */
