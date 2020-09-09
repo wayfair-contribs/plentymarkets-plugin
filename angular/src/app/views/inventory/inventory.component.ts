@@ -108,16 +108,6 @@ export class InventoryComponent {
   }
 
   private updateDisplayedState() {
-    if (this.needsAttention()) {
-      this.displayedState.value = this.translation.translate(
-        InventoryComponent.TRANSLATION_KEY_SYNC_HAS_ISSUES
-      );
-
-      this.displayedState.style = InventoryComponent.TEXT_CLASS_DANGER;
-
-      return;
-    }
-
     if (!this.syncsAttempted()) {
       this.displayedState.value =
         this.translation.translate(
@@ -129,6 +119,16 @@ export class InventoryComponent {
         );
 
       this.displayedState.style = InventoryComponent.TEXT_CLASS_WARNING;
+      return;
+    }
+
+    if (this.needsAttention()) {
+      this.displayedState.value = this.translation.translate(
+        InventoryComponent.TRANSLATION_KEY_SYNC_HAS_ISSUES
+      );
+
+      this.displayedState.style = InventoryComponent.TEXT_CLASS_DANGER;
+
       return;
     }
 
@@ -184,6 +184,10 @@ export class InventoryComponent {
   }
 
   public scheduledIconEnabled(kind?: string): boolean {
+    if (!kind) {
+      return !this.syncsAttempted();
+    }
+
     return !this.syncsAttempted(kind) && !this.runningIconEnabled(kind);
   }
 
@@ -217,12 +221,12 @@ export class InventoryComponent {
       return this.displayedState.style;
     }
 
-    if (this.needsAttention(kind)) {
-      return InventoryComponent.TEXT_CLASS_DANGER;
-    }
-
     if (!this.syncsAttempted(kind)) {
       return InventoryComponent.TEXT_CLASS_WARNING;
+    }
+
+    if (this.needsAttention(kind)) {
+      return InventoryComponent.TEXT_CLASS_DANGER;
     }
 
     return InventoryComponent.TEXT_CLASS_SUCCESS;
@@ -248,7 +252,9 @@ export class InventoryComponent {
             " " +
             this.translation.translate(InventoryComponent.TRANSLATION_KEY_AT) +
             " " +
-            moment(new Date(this.statusObject.details[kind].completedStart)).toLocaleString();
+            moment(
+              new Date(this.statusObject.details[kind].completedStart)
+            ).toLocaleString();
 
           let amt = this.statusObject.details[kind].completedAmount;
 
