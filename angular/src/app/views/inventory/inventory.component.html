@@ -1,5 +1,5 @@
 <div class="center-block">
-  <div class="{{ getTextClass() }}" name="globalStatus">
+  <div class="{{ getTextClass() }} text-center" name="globalStatus">
     <div class="form-group-row text-center" name="globalStatusIcon">
       <span *ngIf="loadingIconEnabled()" name="globalIconLoading">
         <svg
@@ -192,7 +192,7 @@
     </div>
   </div>
   <div class="form-group-row" name="fetchTime">
-    <p class="text-info">
+    <p class="text-info text-center">
       {{ "page_loaded" | translate: lang }} {{ "at" | translate: lang }}
       {{ fetchTime }}
     </p>
