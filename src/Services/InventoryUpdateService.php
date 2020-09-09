@@ -6,6 +6,7 @@
 
 namespace Wayfair\Services;
 
+use InvalidArgumentException;
 use Plenty\Modules\Item\Variation\Contracts\VariationSearchRepositoryContract;
 use Wayfair\Core\Api\Services\InventoryService;
 use Wayfair\Core\Api\Services\LogSenderService;
@@ -144,7 +145,8 @@ class InventoryUpdateService
 
         // look at inventory changes between last good sync and the declared sync start time.
         // (the end of this window becomes the start of the next window)
-        self::applyTimeFilter($filters, $startOfWindowAsPhpTime, $syncStartAsPhpTime);
+        // NOTICE: multi-dimensional array gets passed by value - need to capture return value
+        $filters = self::applyTimeFilter($filters, $startOfWindowAsPhpTime, $syncStartAsPhpTime);
       }
 
       $variationSearchRepository->setFilters($filters);
@@ -377,17 +379,37 @@ class InventoryUpdateService
 
   /**
    * Add a time-based filter to a VariationSearchRepository filter array,
-   * limiting the results to those that have changed in the given time window
+   * limiting the results to those that have changed in the given time window,
+   * and return the updated array
    *
    * @param array $filters the filter array to add on to
    * @param integer $startOfWindow php time in seconds for earliest change time
    * @param integer $endOfWindow (optional) php time in seconds for latest change time
-   * @return void
+   * @return array
    */
-  private static function applyTimeFilter($filters, int $startOfWindow, int $endOfWindow = null)
+  static function applyTimeFilter(array $filters, int $startOfWindow, int $endOfWindow = null): array
   {
-    if (!isset($endOfWindow)) {
+    if (!isset($filters)) {
+      return [];
+    }
+
+    if (!isset($startOfWindow) || $startOfWindow <= 0) {
+      throw new InvalidArgumentException("Window Start must be greater than zero");
+    }
+
+    if (isset($endOfWindow)) {
+      if ($startOfWindow >= $endOfWindow) {
+        throw new InvalidArgumentException("Window Start must be earlier than Window End");
+      }
+
+      if ($endOfWindow <= 0) {
+        throw new InvalidArgumentException("Window End must be greater than zero");
+      }
+    } else {
       $endOfWindow = time();
+      if ($startOfWindow >= $endOfWindow) {
+        throw new InvalidArgumentException("Window Start must be earlier than the current time");
+      }
     }
 
     if (isset($filters) && isset($startOfWindow) && $startOfWindow > 0) {
@@ -396,6 +418,8 @@ class InventoryUpdateService
         'timestampTo' => $endOfWindow,
       ];
     }
+
+    return $filters;
   }
 
   /**
