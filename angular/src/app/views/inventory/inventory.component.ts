@@ -2,6 +2,7 @@ import { Component } from "@angular/core";
 import { InventoryStatusInterface } from "../../core/services/inventory/data/inventoryStatus.interface";
 import { InventoryService } from "../../core/services/inventory/inventory.service";
 import { Language, TranslationService } from "angular-l10n";
+import * as moment from "moment";
 
 @Component({
   selector: "inventory",
@@ -91,7 +92,7 @@ export class InventoryComponent {
   }
 
   private updateFetchTime(): void {
-    this.fetchTime = new Date().toLocaleString();
+    this.fetchTime = moment().toLocaleString();
   }
 
   /**
@@ -247,7 +248,7 @@ export class InventoryComponent {
             " " +
             this.translation.translate(InventoryComponent.TRANSLATION_KEY_AT) +
             " " +
-            this.statusObject.details[kind].completedStart;
+            moment(new Date(this.statusObject.details[kind].completedStart)).toLocaleString;
 
           let amt = this.statusObject.details[kind].completedAmount;
 
