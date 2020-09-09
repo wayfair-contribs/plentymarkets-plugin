@@ -181,10 +181,12 @@ class AuthService implements AuthContract
 
     // save once it has a timestamp and it has been validated
     try {
-      $tokenArray = $this->saveToken($responseArray);
+      $this->saveToken($responseArray);
     } catch (\Exception $e) {
       throw new AuthException("Unable to save Auth Token", 0, $e);
     }
+
+    $token = $tokenArray[self::ACCESS_TOKEN];
 
     $this->loggerContract
       ->debug(
@@ -192,7 +194,7 @@ class AuthService implements AuthContract
         [
           'additionalInfo' =>
           [
-            'maskedToken' => StringHelper::mask($tokenArray[self::ACCESS_TOKEN])
+            'maskedToken' => isset($token) ? StringHelper::mask($tokenArray[self::ACCESS_TOKEN]) : ''
           ],
           'method' => __METHOD__
         ]
