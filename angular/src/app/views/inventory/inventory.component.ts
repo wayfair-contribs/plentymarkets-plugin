@@ -14,8 +14,6 @@ export class InventoryComponent {
   private static readonly TRANSLATION_KEY_NO_ISSUES = "inventory_no_issues";
   private static readonly TRANSLATION_KEY_SYNC_HAS_ISSUES =
     "inventory_has_issues";
-  private static readonly TRANSLATION_KEY_NO_SYNCS =
-    "inventory_no_syncs_attempted";
   private static readonly TRANSLATION_KEY_AT = "at";
   private static readonly TRANSLATION_KEY_COMPLETED_WITH = "completed_with";
   private static readonly TRANSLATION_KEY_PRODUCTS = "products";
@@ -24,6 +22,8 @@ export class InventoryComponent {
     "has_never_succeeded";
   private static readonly TRANSLATION_KEY_HAS_NEVER_BEEN_ATTEMPTED =
     "has_never_been_attempted";
+  private static readonly TRANSLATION_KEY_INV_SYNC_LABEL =
+    "inventory_synchronization_label";
 
   private static readonly STATE_IDLE = "idle";
 
@@ -32,7 +32,7 @@ export class InventoryComponent {
   private static readonly TEXT_CLASS_INFO = "text-info";
   private static readonly TEXT_CLASS_SUCCESS = "text-success";
 
-  private static readonly ICON_SIZE_MAIN= "8vw";
+  private static readonly ICON_SIZE_MAIN = "8vw";
   private static readonly ICON_SIZE_TABLE = "2vw";
 
   /**
@@ -106,7 +106,7 @@ export class InventoryComponent {
 
   private updateDisplayedState() {
     if (this.needsAttention()) {
-      this.displayedState.value  = this.translation.translate(
+      this.displayedState.value = this.translation.translate(
         InventoryComponent.TRANSLATION_KEY_SYNC_HAS_ISSUES
       );
 
@@ -116,9 +116,14 @@ export class InventoryComponent {
     }
 
     if (!this.syncsAttempted()) {
-      this.displayedState.value = this.translation.translate(
-        InventoryComponent.TRANSLATION_KEY_NO_SYNCS
-      );
+      this.displayedState.value =
+        this.translation.translate(
+          InventoryComponent.TRANSLATION_KEY_INV_SYNC_LABEL
+        ) +
+        " " +
+        this.translation.translate(
+          InventoryComponent.TRANSLATION_KEY_HAS_NEVER_BEEN_ATTEMPTED
+        );
 
       this.displayedState.style = InventoryComponent.TEXT_CLASS_WARNING;
       return;
@@ -161,13 +166,21 @@ export class InventoryComponent {
   }
 
   public successIconEnabled(kind?: string): boolean {
-    return !(this.runningIconEnabled(kind) || this.errorIconEnabled(kind));
+    return !(
+      this.runningIconEnabled(kind) ||
+      this.errorIconEnabled(kind) ||
+      this.scheduledIconEnabled(kind)
+    );
   }
 
   public errorIconEnabled(kind?: string): boolean {
     return (
-      this.displayedState.value.startsWith("error") || this.needsAttention(kind)
+      (!kind && this.displayedState.value.startsWith("error")) || (!this.scheduledIconEnabled(kind) && this.needsAttention(kind))
     );
+  }
+
+  public scheduledIconEnabled(kind?: string): boolean {
+    return !this.syncsAttempted(kind) && !this.runningIconEnabled(kind);
   }
 
   public syncsAttempted(kind?: string): boolean {
@@ -282,7 +295,10 @@ export class InventoryComponent {
     }
 
     if (kind) {
-      return this.statusObject.details[kind] && this.statusObject.details[kind].needsAttention;
+      return (
+        this.statusObject.details[kind] &&
+        this.statusObject.details[kind].needsAttention
+      );
     }
 
     for (const key in this.statusObject.details) {
@@ -296,10 +312,8 @@ export class InventoryComponent {
     return false;
   }
 
-  public getIconSize(inTable?: boolean): string
-  {
-    if (inTable)
-    {
+  public getIconSize(inTable?: boolean): string {
+    if (inTable) {
       return InventoryComponent.ICON_SIZE_TABLE;
     }
 
