@@ -248,7 +248,7 @@ export class InventoryComponent {
             " " +
             this.translation.translate(InventoryComponent.TRANSLATION_KEY_AT) +
             " " +
-            moment(new Date(this.statusObject.details[kind].completedStart)).toLocaleString;
+            moment(new Date(this.statusObject.details[kind].completedStart)).toLocaleString();
 
           let amt = this.statusObject.details[kind].completedAmount;
 
