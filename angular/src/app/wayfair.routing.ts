@@ -7,7 +7,7 @@ import { HomeComponent } from './views/home/home.component';
 import { RouterViewComponent } from './views/router/router-view.component';
 import { WarehouseSupplierComponent } from './views/warehouseSupplier/warehouseSupplier.component';
 import { SettingsComponent } from './views/settings/settings.component';
-import { FullInventoryComponent } from './views/fullInventory/fullInventory.component';
+import { InventoryComponent } from './views/inventory/inventory.component';
 import {CarrierScacMappingComponent} from "./views/carrierScacMapping/carrierScacMapping.component";
 
 const appRoutes: Routes = [
@@ -50,10 +50,10 @@ const appRoutes: Routes = [
                 }
             },
             {
-                path: 'fullInventory',
-                component: FullInventoryComponent,
+                path: 'inventory',
+                component: InventoryComponent,
                 data: {
-                    label: 'Full Inventory'
+                    label: 'Inventory'
                 }
             },
             {

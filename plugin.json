@@ -6,7 +6,7 @@
       "email": "ERPSupport@wayfair.com",
       "authorIcon": "icon_author_xs.png",
       "type": "shipping",
-      "version": "1.1.4-alpha",
+      "version": "1.1.4-alpha.9",
       "pluginIcon": "icon_plugin_md.png",
       "categories": ["3521"],
       "price": 0.00,
@@ -34,7 +34,6 @@
             "\\Wayfair\\Migrations\\ReUpdateWFAddress",
             "\\Wayfair\\Migrations\\CreateOrderImportDate",
             "\\Wayfair\\Migrations\\CreatePendingLogsTable",
-            "\\Wayfair\\Migrations\\UpdatePendingLogsTable",
-            "\\Wayfair\\Migrations\\ResetFullInventoryState"
+            "\\Wayfair\\Migrations\\UpdatePendingLogsTable"
       ]
 }

@@ -6,6 +6,7 @@
 
 namespace Wayfair\Mappers;
 
+use Plenty\Modules\StockManagement\Stock\Contracts\StockRepositoryContract;
 use Plenty\Modules\Item\VariationStock\Contracts\VariationStockRepositoryContract;
 use Plenty\Modules\Item\VariationStock\Models\VariationStock;
 use Wayfair\Core\Contracts\LoggerContract;
@@ -24,8 +25,25 @@ class InventoryMapper
   const LOG_KEY_INVALID_INVENTORY_AMOUNT = 'invalidInventoryAmount';
   const LOG_KEY_NORMALIZING_INVENTORY = 'normalizingInventoryAmount';
 
-  const VARIATION_BARCODES = 'variationBarcodes';
-  const VARIATION_SKUS = 'variationSkus';
+  const VARIATION_COL_ID = 'id';
+  const VARIATION_COL_NUMBER = 'number';
+  const VARIATION_COL_BARCODES = 'variationBarcodes';
+  const VARIATION_COL_SKUS = 'variationSkus';
+
+  const STOCK_COL_STOCK_NET = 'stockNet';
+  const STOCK_COL_VARIATION_ID = 'variationId';
+  const STOCK_COL_WAREHOUSE_ID = 'warehouseId';
+  const STOCK_COL_RESERVED_STOCK = 'reservedStock';
+
+  const STOCK_FILTER_UPDATED_AT_FROM = 'updatedAtFrom';
+  const STOCK_FILTER_UPDATED_AT_TO = 'updatedAtTo';
+
+  const ALL_STOCK_COLS = [
+    self::STOCK_COL_WAREHOUSE_ID,
+    self::STOCK_COL_VARIATION_ID,
+    self::STOCK_COL_STOCK_NET,
+    self::STOCK_COL_RESERVED_STOCK
+  ];
 
   /**
    * @param $mainVariationId
@@ -50,27 +68,23 @@ class InventoryMapper
   }
 
   /**
-   * Determine the "Quantity On Hand" to report to Wayfair,
-   * based on a VariationStock
-   * @param VariationStock $variationStock
+   * Determine the "Quantity On Hand" to report to Wayfair
+   * @param int $netStock
+   * @param int $variationId
    * @param LoggerContract $loggerContract
    *
    * @return int|mixed
    */
-  static function getQuantityOnHand($variationStock, $loggerContract = null)
+  static function normalizeQuantityOnHand($netStock, $variationId, $loggerContract = null)
   {
-    if (!isset($variationStock) || !isset($variationStock->netStock)) {
+    if (!isset($netStock)) {
       // API did not return a net stock
       // not a valid input for Wayfair, should get filtered out later.
       return null;
     }
 
-    $netStock = $variationStock->netStock;
-
     if ($netStock <= -1) {
       if (isset($loggerContract)) {
-
-        $variationId = $variationStock->variationId;
 
         $loggerContract->info(
           TranslationHelper::getLoggerKey(self::LOG_KEY_NORMALIZING_INVENTORY),
@@ -93,14 +107,18 @@ class InventoryMapper
 
   /**
    * Create Inventory DTOs for one variation.
-   * Returns a DTO for each supplier ID that has stock information for the variation.
+   * Returns a DTO for each supplier ID that has stock information for the variation,
+   * fitting in the constraints of the arguments
+   *
    * @param array $variationData
    * @param string $itemMappingMethod
    * @param int $stockBuffer
+   * @param string $w3cStart
+   * @param string $w3CEnd
    *
    * @return RequestDTO[]
    */
-  public function createInventoryDTOsFromVariation($variationData, $itemMappingMethod, $stockBuffer)
+  public function createInventoryDTOsFromVariation($variationData, $itemMappingMethod, $stockBuffer, $w3cStart = null, $w3CEnd = null)
   {
     /** @var LoggerContract $loggerContract */
     $loggerContract = pluginApp(LoggerContract::class);
@@ -108,8 +126,8 @@ class InventoryMapper
     /** @var array<string,RequestDTO> $requestDtosBySuID */
     $requestDtosBySuID = [];
 
-    $mainVariationId = $variationData['id'];
-    $variationNumber = $variationData['number'];
+    $mainVariationId = $variationData[self::VARIATION_COL_ID];
+    $variationNumber = $variationData[self::VARIATION_COL_NUMBER];
 
     $supplierPartNumber = $this->getSupplierPartNumberFromVariation($variationData, $itemMappingMethod, $loggerContract);
 
@@ -133,97 +151,120 @@ class InventoryMapper
 
     $nextAvailableDate = $this->getAvailableDate($mainVariationId); // Pending. Need Item
 
-    // the 'stock' element is not declared for the Variation type,
-    // so type hints for "variationData" need to stay as "array"
-    $stockList = $variationData['stock'];
-    /** @var VariationStock $stock */
-    foreach ($stockList as $stock) {
-      $warehouseId = $stock['warehouseId'];
-      if (!isset($warehouseId)) {
-        // we don't know the warehouse, so we can't figure out the supplier ID.
-        // Not an error, but unexpected.
-        $loggerContract->info(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_STOCK_MISSING_WAREHOUSE),
-          [
-            'additionalInfo' => [
-              'variationID' => $mainVariationId,
-              'variationNumber' => $variationNumber
-            ],
-            'method' => __METHOD__
-          ]
-        );
-        continue;
+    $filters = [self::STOCK_COL_VARIATION_ID => $mainVariationId];
+    if (isset($w3cStart) && !empty($w3cStart)) {
+      // FIXME: these conversions should happen before calling into here
+      $filters[self::STOCK_FILTER_UPDATED_AT_FROM] = $w3cStart;
+
+      if (isset($w3CEnd) && !empty($w3CEnd)) {
+        $filters[self::STOCK_FILTER_UPDATED_AT_TO] = $w3CEnd;
       }
-
-      // this is a 'mixed' value - might be null.
-      $supplierId = $this->getSupplierIDForWarehouseID($warehouseId);
-
-      if (!isset($supplierId) || $supplierId === 0 || $supplierId === '0') {
-        // no supplier assigned to this warehouse - NOT an error - we should NOT sync it
-        $loggerContract->debug(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_NO_SUPPLIER_ID_ASSIGNED_TO_WAREHOUSE),
-          [
-            'additionalInfo' => ['warehouseID' => $warehouseId, 'variationID' => $mainVariationId,],
-            'method' => __METHOD__
-          ]
-        );
-        continue;
-      }
-
-      // Avl Immediately. ADJUSTED Net Stock (see Stock Buffer setting in Wayfair plugin).
-      $onHand = self::getQuantityOnHand($stock, $loggerContract);
-
-      if (!isset($onHand)) {
-        // null value is NOT a valid input for quantity on hand - do NOT send to Wayfair.
-        $loggerContract->warning(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_INVENTORY_AMOUNT),
-          [
-            'additionalInfo' => [
-              'variationID' => $mainVariationId,
-              'variationNumber' => $variationNumber,
-              'warehouseId' => $warehouseId,
-              'amount' => json_encode($onHand)
-            ],
-            'method' => __METHOD__
-          ]
-        );
-        continue;
-      }
-
-      // Already Ordered items.
-      $onOrder = $stock->reservedStock;
-
-      // key for a potential preexisting DTO that we need to merge with
-      $dtoKey = $supplierId . '_' . $supplierPartNumber;
-
-      /** @var RequestDTO $existingDTO */
-      $existingDTO = $requestDtosBySuID[$dtoKey];
-
-      if (isset($existingDTO) && !empty($existingDTO)) {
-        /* merge with previous values for this suID.
-         * stock values should be summed.
-         * Variation-level data (nextAvailableDate) does not vary.
-        */
-
-        // all null $onHand values are thrown out before this calculation happens.
-        $onHand = self::mergeInventoryQuantities($onHand, $existingDTO->getQuantityOnHand());
-
-        // quantityOnOrder IS nullable.
-        $onOrder = self::mergeInventoryQuantities($onOrder, $existingDTO->getQuantityOnOrder());
-      }
-
-      $dtoData = [
-        'supplierId' => $supplierId,
-        'supplierPartNumber' => $supplierPartNumber,
-        'quantityOnHand' => $onHand,
-        'quantityOnOrder' => $onOrder,
-        'itemNextAvailabilityDate' => $nextAvailableDate,
-        'productNameAndOptions' => $variationData['name']
-      ];
-
-      // replaces any existing DTO with a "merge" for this suID
-      $requestDtosBySuID[$dtoKey] = RequestDTO::createFromArray($dtoData);
     }
+
+    /**
+     * @var StockRepositoryContract
+     */
+    $stockRepository = pluginApp(StockRepositoryContract::class);
+    $stockRepository->setFilters($filters);
+
+    $pageNumber = 1;
+    do {
+      $stockSearchResponsePage = $stockRepository->listStock(InventoryMapper::ALL_STOCK_COLS, $pageNumber, 50);
+
+      foreach ($stockSearchResponsePage->getResult() as $stock) {
+        $warehouseId = $stock[InventoryMapper::STOCK_COL_WAREHOUSE_ID];
+
+        if (!isset($warehouseId)) {
+          // we don't know the warehouse, so we can't figure out the supplier ID.
+          // Not an error, but unexpected.
+          $loggerContract->info(
+            TranslationHelper::getLoggerKey(self::LOG_KEY_STOCK_MISSING_WAREHOUSE),
+            [
+              'additionalInfo' => [
+                'variationID' => $mainVariationId,
+                'variationNumber' => $variationNumber
+              ],
+              'method' => __METHOD__
+            ]
+          );
+          continue;
+        }
+
+        // TODO: cache results of this lookup?
+        $supplierId = $this->getSupplierIDForWarehouseID($warehouseId);
+
+        if (!isset($supplierId) || $supplierId === 0 || $supplierId === '0') {
+          // no supplier assigned to this warehouse - NOT an error - we should NOT sync it
+          $loggerContract->debug(
+            TranslationHelper::getLoggerKey(self::LOG_KEY_NO_SUPPLIER_ID_ASSIGNED_TO_WAREHOUSE),
+            [
+              'additionalInfo' => [
+                'warehouseID' => $warehouseId,
+                'variationID' => $mainVariationId
+              ],
+              'method' => __METHOD__
+            ]
+          );
+          continue;
+        }
+
+        // Avl Immediately. ADJUSTED Net Stock (see Stock Buffer setting in Wayfair plugin).
+        $onHand = self::normalizeQuantityOnHand($stock[InventoryMapper::STOCK_COL_STOCK_NET], $loggerContract);
+
+        if (!isset($onHand) || ($onHand < -1)) {
+          // inventory amounts less than -1 are not accepted - do NOT send to Wayfair.
+          $loggerContract->warning(
+            TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_INVENTORY_AMOUNT),
+            [
+              'additionalInfo' => [
+                'variationID' => $mainVariationId,
+                'variationNumber' => $variationNumber,
+                'warehouseId' => $warehouseId,
+                'amount' => json_encode($onHand)
+              ],
+              'method' => __METHOD__
+            ]
+          );
+          continue;
+        }
+
+        // Already Ordered items.
+        $onOrder = $stock[self::STOCK_COL_RESERVED_STOCK];
+
+        // key for a potential preexisting DTO that we need to merge with
+        $dtoKey = $supplierId . '_' . $supplierPartNumber;
+
+        /** @var RequestDTO $existingDTO */
+        $existingDTO = $requestDtosBySuID[$dtoKey];
+
+        if (isset($existingDTO) && !empty($existingDTO)) {
+          /*
+            *merge with previous values for this suID:
+              * stock values should be summed.
+              * Variation-level data (nextAvailableDate) does not vary.
+          */
+
+          // all null $onHand values are thrown out before this calculation happens.
+          $onHand = self::mergeInventoryQuantities($onHand, $existingDTO->getQuantityOnHand());
+
+          // quantityOnOrder IS nullable.
+          $onOrder = self::mergeInventoryQuantities($onOrder, $existingDTO->getQuantityOnOrder());
+        }
+
+        $dtoData = [
+          'supplierId' => $supplierId,
+          'supplierPartNumber' => $supplierPartNumber,
+          'quantityOnHand' => $onHand,
+          'quantityOnOrder' => $onOrder,
+          'itemNextAvailabilityDate' => $nextAvailableDate,
+          'productNameAndOptions' => $variationData['name']
+        ];
+
+        // replaces any existing DTO with a "merge" for this suID
+        $requestDtosBySuID[$dtoKey] = RequestDTO::createFromArray($dtoData);
+      } // end of loop over stock items on page
+      $pageNumber++;
+    } while (!$stockSearchResponsePage->isLastPage());
 
     // all stock amounts are now visited
     $inventoryDTOs = array_values($requestDtosBySuID);
@@ -306,20 +347,21 @@ class InventoryMapper
 
     $supplierPartNumber = null;
 
-    $mainVariationId = $variationData['id'];
-    $variationNumber = $variationData['number'];
+    $variationNumber = $variationData[self::VARIATION_COL_NUMBER];
 
     $supplierPartNumber = null;
 
     switch ($itemMappingMethod) {
       case AbstractConfigHelper::ITEM_MAPPING_SKU:
-        if (array_key_exists(self::VARIATION_SKUS, $variationData) && !empty($variationData[self::VARIATION_SKUS])) {
-          $supplierPartNumber = $variationData[self::VARIATION_SKUS][0]['sku'];
+        if (array_key_exists(self::VARIATION_COL_SKUS, $variationData) && !empty($variationData[self::VARIATION_COL_SKUS])) {
+          // FIXME: should not blindly use the first SKU - only should use the one assigned to Wayfair!
+          $supplierPartNumber = $variationData[self::VARIATION_COL_SKUS][0]['sku'];
         }
         break;
       case AbstractConfigHelper::ITEM_MAPPING_EAN:
-        if (array_key_exists(self::VARIATION_BARCODES, $variationData) && !empty($variationData[self::VARIATION_BARCODES])) {
-          $supplierPartNumber = $variationData[self::VARIATION_BARCODES][0]['code'];
+        if (array_key_exists(self::VARIATION_COL_BARCODES, $variationData) && !empty($variationData[self::VARIATION_COL_BARCODES])) {
+          // TODO: find a way to avoid blindly using first barcode.
+          $supplierPartNumber = $variationData[self::VARIATION_COL_BARCODES][0]['code'];
         }
         break;
       case AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER:

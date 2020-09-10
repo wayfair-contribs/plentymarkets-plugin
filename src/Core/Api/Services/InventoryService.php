@@ -10,8 +10,6 @@ use Wayfair\Core\Api\APIService;
 use Wayfair\Core\Dto\Inventory\ResponseDTO;
 use Wayfair\Core\Exceptions\GraphQLQueryException;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
-use Wayfair\Helpers\TranslationHelper;
-use Wayfair\Http\WayfairResponse;
 use Wayfair\Models\ExternalLogs;
 
 /**
@@ -23,61 +21,6 @@ class InventoryService extends APIService
 {
   const LOG_KEY_INVENTORY_QUERY_ERROR = 'inventoryQueryError';
   const LOG_KEY_INVENTORY_QUERY_DEBUG = 'debugInventoryQuery';
-
-  /**
-   *
-   * @return WayfairResponse
-   */
-  public function fetch()
-  {
-    $query = 'query inventory {'
-      . 'inventory(limit: 2)'
-      . '{'
-      . 'supplierPartNumber,  quantityOnHand,  quantityBackordered,  quantityOnOrder,  discontinued,  itemNextAvailabilityDate'
-      . '}'
-      . '}';
-    try {
-
-      $response = $this->query($query);
-
-      if (!isset($response) or empty($response)) {
-        throw new GraphQLQueryException("Did not get query response");
-      }
-
-      $this->loggerContract->debug(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_QUERY_DEBUG),
-        [
-          'additionalInfo' => [
-            'query' => $query,
-            'response' => $response
-          ],
-          'method' => __METHOD__
-        ]
-      );
-
-      if ($response->hasErrors()) {
-        $error = $response->getError();
-        throw new \Exception("Response from inventory query has errors:" . \json_encode($error));
-      }
-
-      return $response;
-    } catch (\Exception $e) {
-
-      $this->loggerContract->error(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_QUERY_ERROR),
-        [
-          'additionalInfo' => [
-            'exception' => $e,
-            'message' => $e->getMessage(),
-            'stackTrace' => $e->getTrace(),
-          ],
-          'method' => __METHOD__
-        ]
-      );
-
-      return null;
-    }
-  }
 
   /**
    * @param array $listOfRequestDTOs
