@@ -257,7 +257,7 @@ class AuthService implements AuthContract
 
     if (count($issues)) {
       $this->loggerContract
-        ->error(
+        ->debug(
           TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_TOKEN),
           [
             'additionalInfo' =>
