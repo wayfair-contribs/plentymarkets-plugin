@@ -390,51 +390,6 @@ class InventoryUpdateService
   }
 
   /**
-   * Add a time-based filter to a VariationSearchRepository filter array,
-   * limiting the results to those that have changed in the given time window,
-   * and return the updated array
-   *
-   * @param array $filters the filter array to add on to
-   * @param integer $startOfWindow php time in seconds for earliest change time
-   * @param integer $endOfWindow (optional) php time in seconds for latest change time
-   * @return array
-   */
-  static function applyTimeFilter(array $filters, int $startOfWindow, int $endOfWindow = null): array
-  {
-    if (!isset($filters)) {
-      return [];
-    }
-
-    if (!isset($startOfWindow) || $startOfWindow <= 0) {
-      throw new InvalidArgumentException("Window Start must be greater than zero");
-    }
-
-    if (isset($endOfWindow)) {
-      if ($startOfWindow >= $endOfWindow) {
-        throw new InvalidArgumentException("Window Start must be earlier than Window End");
-      }
-
-      if ($endOfWindow <= 0) {
-        throw new InvalidArgumentException("Window End must be greater than zero");
-      }
-    } else {
-      $endOfWindow = time();
-      if ($startOfWindow >= $endOfWindow) {
-        throw new InvalidArgumentException("Window Start must be earlier than the current time");
-      }
-    }
-
-    if (isset($filters) && isset($startOfWindow) && $startOfWindow > 0) {
-      $filters['updatedBetween'] = [
-        'timestampFrom' => $startOfWindow,
-        'timestampTo' => $endOfWindow,
-      ];
-    }
-
-    return $filters;
-  }
-
-  /**
    * Get the stock buffer value, normalized to 0
    *
    * @return int
