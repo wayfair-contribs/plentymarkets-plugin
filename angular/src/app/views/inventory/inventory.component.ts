@@ -246,6 +246,7 @@ export class InventoryComponent {
     );
     this.mainState.style = DisplayedState.TEXT_CLASS_DANGER;
     this.mainState.icon = InventoryComponent.ICON_ERROR;
+    this.table = null;
     this.updateFetchTime();
   }
 

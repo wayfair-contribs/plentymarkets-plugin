@@ -1,6 +1,6 @@
 <div class="center-block">
   <div class="{{ mainState.style }} text-center" name="mainStateData">
-    <div class="form-group-row text-center" name="mainStateIcon">
+    <div class="form-group-row" name="mainStateIcon">
       <svg
         width="6vw"
         height="6vw"
@@ -17,14 +17,16 @@
       </svg>
     </div>
     <div class="form-group-row" name="mainStateMessage">
-      <p style="font-size: 2vw">{{ mainState.message }}</p>
+      <p style="font-size: 2vw; white-space: pre-wrap">
+        {{ mainState.message }}
+      </p>
     </div>
   </div>
 
   <div *ngIf="table" name="resultTable">
     <div class="form-group row" *ngFor="let row of table">
       <div class="{{ row.style }}" name="rowData">
-        <div class="col-md-1 col-md-offset-1" name="rowIcon">
+        <div class="col-md-1 col-md-offset-2" name="rowIcon">
           <svg
             width="2vw"
             height="2vw"
@@ -40,7 +42,7 @@
             ></path>
           </svg>
         </div>
-        <div class="col-md-10" name="rowStatus">
+        <div class="col-md-8" name="rowStatus">
           <p>
             {{ row.message }}
           </p>

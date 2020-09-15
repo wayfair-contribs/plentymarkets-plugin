@@ -1,5 +1,5 @@
 {
-  "plugin_version": "Wayfair plugin v1.1.4-alpha.12",
+  "plugin_version": "Wayfair plugin v1.1.4-alpha.13",
   "copyright_footer": "© Copyright 2020 Wayfair LLC - Alle Rechte vorbehalten",
   "welcomeMessage": "Willkommen bei Wayfair",
   "warehouse_menu": "Lager",
@@ -41,7 +41,7 @@
   "inventory_status_label_partial": "Die inkrementelle Aktualisierung von Inventar Änderungen",
   "page_loaded": "Seite aktualisiert",
   "at": "um",
-  "inventory_has_issues": "Das Wayfair-Plugin hat Probleme beim Synchronisieren des Inventars. Bitte sehen Sie sich die Protokolle an und wenden Sie sich an Wayfair, um weitere Unterstützung zu erhalten",
+  "inventory_has_issues": "Das Wayfair-Plugin hat Probleme beim Synchronisieren des Inventars.\nBitte sehen Sie sich die Protokolle an und wenden Sie sich an Wayfair, um weitere Unterstützung zu erhalten",
   "inventory_no_issues": "Das Inventar ist ordnungsgemäß mit Wayfair synchronisiert",
   "inventory_sync_skipped": "wurde übersprungen, da keine Informationen an Wayfair gesendet werden konnten",
   "completed_with": "abgeschlossen mit",
