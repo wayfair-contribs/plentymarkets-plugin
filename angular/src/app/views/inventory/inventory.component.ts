@@ -310,8 +310,7 @@ export class InventoryComponent {
           let amt = this.statusObject.details[key].completedAmount;
 
           if (amt && amt > 0) {
-            return (
-              nextRow.message +
+            nextRow.message +=
               " " +
               this.translation.translate(
                 InventoryComponent.TRANSLATION_KEY_COMPLETED_WITH
@@ -321,8 +320,7 @@ export class InventoryComponent {
               " " +
               this.translation.translate(
                 InventoryComponent.TRANSLATION_KEY_PRODUCTS
-              )
-            );
+              );
           } else {
             nextRow.message +=
               " " +
