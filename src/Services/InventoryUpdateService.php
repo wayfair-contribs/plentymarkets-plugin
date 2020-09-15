@@ -185,7 +185,7 @@ class InventoryUpdateService
         $variationSearchResponse = $variationSearchRepository->search();
 
         $searchResults = $variationSearchResponse->getResult();
-        if ($pageNumber == 1 && !isset($searchResults) || isEmpty($searchResults)) {
+        if ($pageNumber == 1 && !isset($searchResults) || empty($searchResults)) {
           throw new WayfairVariationsMissingException("No Variations are currently linked to Wayfair");
         }
 
