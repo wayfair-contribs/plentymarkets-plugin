@@ -275,7 +275,7 @@ class InventoryUpdateService
           'additionalInfo' => $info,
           'method' => __METHOD__
         ]);
-      } elseif ($totalDtosFailed >= 0) {
+      } elseif ($totalDtosFailed > 0) {
         $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_FAILED), [
           'additionalInfo' => $info,
           'method' => __METHOD__
