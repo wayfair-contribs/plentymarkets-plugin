@@ -324,14 +324,14 @@ export class InventoryComponent {
               )
             );
           } else {
-            nextRow.message +
+            nextRow.message +=
               " " +
               this.translation.translate(
                 InventoryComponent.TRANSLATION_KEY_SKIPPED
               );
           }
         } else {
-          nextRow.message +
+          nextRow.message +=
             " " +
             this.translation.translate(
               InventoryComponent.TRANSLATION_KEY_HAS_NEVER_SUCCEEDED
