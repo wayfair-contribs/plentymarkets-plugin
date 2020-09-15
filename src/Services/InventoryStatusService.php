@@ -135,7 +135,7 @@ class InventoryStatusService
       self::RESPONSE_KEY_STATUS => $this->getServiceStatusValue()
     ];
 
-    $detailsLoopInput = [self::PARTIAL => false, self::FULL => true];
+    $detailsLoopInput = [self::FULL => true, self::PARTIAL => false];
     foreach ($detailsLoopInput as $key => $value) {
       $stateArray[self::RESPONSE_KEY_DETAILS][$key][self::RESPONSE_DETAILS_KEY_LAST_COMPLETION_START] = $this->getLastCompletionStart($value);
       $stateArray[self::RESPONSE_KEY_DETAILS][$key][self::RESPONSE_DETAILS_KEY_LAST_COMPLETION_END] = $this->getLastCompletionEnd($value);
