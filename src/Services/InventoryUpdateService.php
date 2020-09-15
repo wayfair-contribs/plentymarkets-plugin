@@ -275,15 +275,14 @@ class InventoryUpdateService
           'additionalInfo' => $info,
           'method' => __METHOD__
         ]);
-      } elseif ($totalDtosFailed == 0) {
+      } elseif ($totalDtosFailed >= 0) {
+        $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_FAILED), [
+          'additionalInfo' => $info,
+          'method' => __METHOD__
+        ]);
+      } else {
         $this->statusService->markInventoryComplete($fullInventory, $startTimeStamp, $totalDtosSaved);
-        return;
       }
-
-      $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_FAILED), [
-        'additionalInfo' => $info,
-        'method' => __METHOD__
-      ]);
     } catch (InventorySyncBlockedException $e) {
 
       $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_BLOCKED), [
