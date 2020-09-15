@@ -30,7 +30,7 @@ class InventoryStatusService
   const RESPONSE_DETAILS_KEY_LAST_COMPLETION_END = 'completedEnd';
   const RESPONSE_DETAILS_COMPLETED_AMOUNT = 'completedAmount';
   const RESPONSE_DETAILS_KEY_LAST_ATTEMPT_TIMESTAMP = 'attemptedStart';
-  const RESPONSE_DETAILS_KEY_NEEDS_ATTENTION = 'needsAttention';
+  const RESPONSE_DETAILS_KEY_OVERDUE = 'overdue';
 
   const STATE_IDLE = 'idle';
   const FULL = 'full';
@@ -141,7 +141,7 @@ class InventoryStatusService
       $stateArray[self::RESPONSE_KEY_DETAILS][$key][self::RESPONSE_DETAILS_KEY_LAST_COMPLETION_END] = $this->getLastCompletionEnd($value);
       $stateArray[self::RESPONSE_KEY_DETAILS][$key][self::RESPONSE_DETAILS_COMPLETED_AMOUNT] = $this->getCompleteSyncSize($value);
       $stateArray[self::RESPONSE_KEY_DETAILS][$key][self::RESPONSE_DETAILS_KEY_LAST_ATTEMPT_TIMESTAMP] = $this->getLastAttemptStart($value);
-      $stateArray[self::RESPONSE_KEY_DETAILS][$key][self::RESPONSE_DETAILS_KEY_NEEDS_ATTENTION] = $this->needsAttention($value);
+      $stateArray[self::RESPONSE_KEY_DETAILS][$key][self::RESPONSE_DETAILS_KEY_OVERDUE] = $this->isOverdue($value);
     }
 
     $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_STATE_CHECK), [
@@ -261,11 +261,11 @@ class InventoryStatusService
   }
 
   /**
-   * Set the global timestamp for a successful sync to now, and update related fields
+   * Set the status back to idle state
    * @param bool $full
    * @return void
    */
-  public function markInventoryFailed(): void
+  public function markInventoryIdle(): void
   {
     $this->setServiceStatusValue(self::STATE_IDLE);
   }
@@ -398,12 +398,8 @@ class InventoryStatusService
    * @param boolean $full full inventory?
    * @return boolean
    */
-  public function needsAttention(bool $full): bool
+  public function isOverdue(bool $full): bool
   {
-    if ($full && $this->getCompleteSyncSize($full) < 1) {
-      return true;
-    }
-
     $timeSinceLastGoodFullStart = $this->timeSinceLastGoodSyncStart(true);
     if ($full) {
       return $timeSinceLastGoodFullStart < 0 || $timeSinceLastGoodFullStart > self::OVERDUE_TIME_FULL;

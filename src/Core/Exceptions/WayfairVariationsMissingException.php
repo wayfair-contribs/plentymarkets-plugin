@@ -6,6 +6,6 @@
 
 namespace Wayfair\Core\Exceptions;
 
-abstract class InventoryException extends \Exception
+class WayfairVariationsMissingException extends InventoryException
 {
 }

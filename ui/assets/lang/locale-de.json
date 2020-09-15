@@ -1,5 +1,5 @@
 {
-  "plugin_version": "Wayfair plugin v1.1.4-alpha.9",
+  "plugin_version": "Wayfair plugin v1.1.4-alpha.10",
   "copyright_footer": "© Copyright 2020 Wayfair LLC - Alle Rechte vorbehalten",
   "welcomeMessage": "Willkommen bei Wayfair",
   "warehouse_menu": "Lager",
@@ -37,19 +37,20 @@
   "import_orders_since": "Aufträge importieren ab",
   "must_have_at_least_one_scac": "Selbst Versende erfordert mindenstens ein Eintrag für die Trägertabelle",
   "loading": "lade Daten",
-  "inventory_status_label_full": "Tägliche Synchronisierung aller Produkte",
-  "inventory_status_label_partial": "Periodische Synchronisierung von Inventaränderungen",
+  "inventory_status_label_full": "Der Erfassung aller Produkte",
+  "inventory_status_label_partial": "Die inkrementelle Aktualisierung von Inventar Änderungen",
   "page_loaded": "Seite aktualisiert",
   "at": "um",
   "inventory_has_issues": "Das Wayfair-Plugin hat Probleme beim Synchronisieren des Inventars. Bitte sehen Sie sich die Protokolle an und wenden Sie sich an Wayfair, um weitere Unterstützung zu erhalten",
   "inventory_no_issues": "Das Inventar ist ordnungsgemäß mit Wayfair synchronisiert",
   "inventory_sync_skipped": "wurde übersprungen, da keine Informationen an Wayfair gesendet werden konnten",
-  "inventory_is_waiting_for_plugin_to_init": "wartet auf die Initialisierung des Wayfair Plugins",
   "completed_with": "abgeschlossen mit",
   "products": "Artikel",
-  "inventory_skipped": "wurde übersprungen, da kein Inventar (Änderungen) für die Synchronisierung vorhanden war",
+  "inventory_skipped": "wurde übersprungen, da kein Inventar Änderungen für die Synchronisierung vorhanden war",
   "has_never_succeeded": "war nie erfolgreich",
   "has_never_been_attempted": "ist für die nahe Zukunft geplant",
   "inventory_synchronization_label": "Synchronisierung des Inventars mit Wayfair",
-  "is_currently_running": "wird derzeit ausgeführt"
+  "is_currently_running": "wird derzeit ausgeführt",
+  "is_overdue": "ist überfällig",
+  "and": "und"
 }

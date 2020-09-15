@@ -7,7 +7,6 @@
 namespace Wayfair\Services;
 
 use DateTime;
-use InvalidArgumentException;
 use Plenty\Modules\Item\Variation\Contracts\VariationSearchRepositoryContract;
 use Wayfair\Core\Api\Services\InventoryService;
 use Wayfair\Core\Api\Services\LogSenderService;
@@ -15,6 +14,7 @@ use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\Inventory\RequestDTO;
 use Wayfair\Core\Exceptions\InventorySyncBlockedException;
 use Wayfair\Core\Exceptions\InventorySyncInterruptedException;
+use Wayfair\Core\Exceptions\WayfairVariationsMissingException;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Core\Helpers\TimeHelper;
 use Wayfair\Helpers\TranslationHelper;
@@ -36,6 +36,8 @@ class InventoryUpdateService
   const LOG_KEY_END = 'inventoryEnd';
   const LOG_KEY_FAILED = 'inventoryFailed';
   const LOG_KEY_BLOCKED = 'inventoryBlocked';
+  const LOG_KEY_NO_VARIATIONS = 'inventoryNoVariations';
+  const LOG_KEY_NO_STOCKS = 'inventoryNoStocks';
 
   // TODO: make these user-configurable in a future update
   const MAX_INVENTORY_TIME = 14400;
@@ -182,15 +184,20 @@ class InventoryUpdateService
           );
         $variationSearchResponse = $variationSearchRepository->search();
 
-        /** @var array $variationWithStock information about a single Variation, including stock for each Warehouse */
-        foreach ($variationSearchResponse->getResult() as $variationWithStock) {
+        $searchResults = $variationSearchResponse->getResult();
+        if ($pageNumber == 1 && !isset($searchResults) || isEmpty($searchResults)) {
+          throw new WayfairVariationsMissingException("No Variations are currently linked to Wayfair");
+        }
+
+        /** @var array $variationData information about a single Variation */
+        foreach ($searchResults as $variationData) {
           $haveStockForVariation = false;
           /** @var RequestDTO[] */
-          $requestDTOsForVariation = $this->inventoryMapper->createInventoryDTOsFromVariation($variationWithStock, $itemMappingMethod, $stockBuffer, $windowStart, $windowEnd);
+          $requestDTOsForVariation = $this->inventoryMapper->createInventoryDTOsFromVariation($variationData, $itemMappingMethod, $stockBuffer, $windowStart, $windowEnd);
 
           if (count($requestDTOsForVariation)) {
             $requestDTOsForPage = array_merge($requestDTOsForPage, $requestDTOsForVariation);
-            $variationIdsForPage[] = $variationWithStock['id'];
+            $variationIdsForPage[] = $variationData['id'];
           }
         }
 
@@ -261,18 +268,22 @@ class InventoryUpdateService
         $pageNumber++;
       } while (isset($variationSearchResponse) && !$variationSearchResponse->isLastPage());
 
-      if ($totalDtosFailed > 0) {
-        $this->statusService->markInventoryFailed();
+      $info = ['full' => (string) $fullInventory, 'manual' => (string) $manual];
 
-        $info = ['full' => (string) $fullInventory, 'manual' => (string) $manual];
-
-        $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_FAILED), [
+      if ($fullInventory && $totalDtosAttempted < 1) {
+        $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_NO_STOCKS), [
           'additionalInfo' => $info,
           'method' => __METHOD__
         ]);
-      } else {
+      } elseif ($totalDtosFailed == 0) {
         $this->statusService->markInventoryComplete($fullInventory, $startTimeStamp, $totalDtosSaved);
+        return;
       }
+
+      $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_FAILED), [
+        'additionalInfo' => $info,
+        'method' => __METHOD__
+      ]);
     } catch (InventorySyncBlockedException $e) {
 
       $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_BLOCKED), [
@@ -299,15 +310,24 @@ class InventoryUpdateService
       $externalLogs->addInventoryLog('Inventory interrupted: ' . $e->getMessage(), 'inventoryInterrupted' . ($fullInventory ? 'Full' : ''), 1, 0, false, $e->getTraceAsString());
 
       // don't update the inventory status - it will conflict with the run that interrupted this one.
+    } catch (WayfairVariationsMissingException $e) {
+
+      $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_NO_VARIATIONS), [
+        'additionalInfo' => [
+          'full' => (string) $fullInventory,
+          'manual' => (string) $manual,
+          'message' => $e->getMessage()
+        ],
+        'method' => __METHOD__
+      ]);
+
+      $externalLogs->addInventoryLog('Inventory : ' . $e->getMessage(), 'inventoryNoVariations' . ($fullInventory ? 'Full' : ''), 1, 0, false, $e->getTraceAsString());
     } catch (\Exception $e) {
       $externalLogs->addInventoryLog('Inventory exception: ' . $e->getMessage(), 'inventoryFailed' . ($fullInventory ? 'Full' : ''), 1, 0, false, $e->getTraceAsString());
 
       // bulk update failed, so everything we were going to save should be considered failing.
       // (we want the failure amount to be more than zero in order for client to know this failed.)
       $totalDtosFailed += $amtOfDtosForPage;
-
-      // statusService will log out to plentymarkets logs
-      $this->statusService->markInventoryFailed();
 
       $info = [
         'full' => (string) $fullInventory,
@@ -322,6 +342,7 @@ class InventoryUpdateService
         'method' => __METHOD__
       ]);
     } finally {
+      $this->statusService->markInventoryIdle();
 
       $elapsedTime = time() - strtotime($startTimeStamp);
 
