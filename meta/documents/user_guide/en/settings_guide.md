@@ -84,7 +84,6 @@ When a new item is created or imported, a main variation that cannot be deleted 
 ### Item Mapping Method
 The `Item Mapping Method` setting determines the behavior for matching the Plentymarkets Item Variations to the Wayfair Products. It is used when the inventory listings are sent to Wayfair, and also to select the requested products in a Wayfair Purchase Order. The Plentymarkets user should configure this setting to match the way their Item Variations are populated.
 
-
 ### Using Variation Number as the Item Mapping Field
 By default, the `Variation Number` field is used for mapping Wayfair Orders' items to Plentymarkets Item Variations:
 

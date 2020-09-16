@@ -90,8 +90,8 @@ Wenn ein neues Artikel erstellt oder importiert wird, wird automatisch eine Haup
 
 ![add item variation](../../../images/de/add_item_variation.png)
 
-### Item Mapping Method
-Die Einstellung `Item Mapping Method` bestimmt das Verhalten beim Abgleichen der Artikelvariationen von Plentymarkets mit den Wayfair-Produkten. Es wird verwendet, wenn die Bestandslisten an Wayfair gesendet werden und um die angeforderten Produkte in einer Wayfair-Bestellung auszuwählen. Der Benutzer von Plentymarkets sollte diese Einstellung so konfigurieren, dass sie der Art und Weise entspricht, in der die Elementvariationen ausgefüllt werden.
+### Artikel Zuordnungsmethode
+Die Einstellung `Artikel Zuordnungsmethode` bestimmt das Verhalten beim Abgleichen der Artikelvariationen von Plentymarkets mit den Wayfair-Produkten. Es wird verwendet, wenn die Bestandslisten an Wayfair gesendet werden und um die angeforderten Produkte in einer Wayfair-Bestellung auszuwählen. Der Benutzer von Plentymarkets sollte diese Einstellung so konfigurieren, dass sie der Art und Weise entspricht, in der die Elementvariationen ausgefüllt werden.
 
 ### Verwenden der Variationsnummer als Elementzuordnungsfeld
 Standardmäßig wird das Feld `Variationsnummer` für die Zuordnung der Artikel von Wayfair-Bestellungen zu Artikelvariationen von Plentymarkets verwendet.
