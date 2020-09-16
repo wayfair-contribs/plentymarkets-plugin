@@ -71,9 +71,24 @@ Die Einstellung `Standard-Bestellstatus` bestimmt, in welchem ​​Status sich 
 
 **Hinweis:** Die Auftragserstellung gilt nicht als Änderung des Auftragsstatus. Wenn Sie den Standardbestellstatus auf einen höheren als die Statuswerte für konfigurierten Plentymarkets-Ereignisse setzen, können einige Ereignisse fehlschlagen.
 
+
 ### Standardversandanbieter **(nicht genutzt)**
 Die Einstellung `Standardversandanbieter` ist eine Legacy-Einstellung, die das Verhalten des Plugins nicht mehr beeinflusst.
 **Wenn diese Einstellung in Ihrem System angezeigt wird, empfiehlt Wayfair dringend, dass Sie Ihr Plugin auf eine neuere Version aktualisieren.**
+
+### Artikelvarianten
+Wenn ein neues Artikel erstellt oder importiert wird, wird automatisch eine Hauptvariante generiert, die nicht gelöscht werden kann. Die Registerkarte "Varianten" wird nur zum Erstellen zusätzlicher Varianten für Artikel verwendet (in PlentyMarkets als untergeordnete Varianten bezeichnet). Diese untergeordneten Variationen erben automatisch die Eigenschaften / Merkmale der Hauptvariante, sofern die Vererbungsoption nicht deaktiviert ist. Die geerbten Merkmale für untergeordnete Varianten können bearbeitet werden, indem Sie die Registerkarte untergeordnete Varianten öffnen und die beabsichtigte Variantenseigenschaft bearbeiten.<br/>
+**Hinweis:** Untergeordnete Varianten sind erforderlich, wenn mehrere Versionen des Artikels vorhanden sind.<br/>
+**Beispiel:**<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **Artikel/Hauptvariante:** Couch<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **Untergeordnete Varianten:** Schwarze Couch oder weiße Couch.<br/>
+
+#### Hinzufügen von Artikelvariationen
+1. Gehen Sie auf der Hauptseite von Plentymarkets zu `Artikel` >>` Artikel bearbeiten`
+2. Wählen Sie die Registerkarte `Variationen`
+3. Klicken Sie auf die Schaltfläche `+ Neu`
+
+![add item variation](../../../images/de/add_item_variation.png)
 
 ### Item Mapping Method
 Die Einstellung `Item Mapping Method` bestimmt das Verhalten beim Abgleichen der Artikelvariationen von Plentymarkets mit den Wayfair-Produkten. Es wird verwendet, wenn die Bestandslisten an Wayfair gesendet werden und um die angeforderten Produkte in einer Wayfair-Bestellung auszuwählen. Der Benutzer von Plentymarkets sollte diese Einstellung so konfigurieren, dass sie der Art und Weise entspricht, in der die Elementvariationen ausgefüllt werden.

@@ -67,8 +67,23 @@ The `Default Order Status` setting determines which state a new Plentymarkets Or
 The `Default Shipping Provider` setting is a legacy setting that no longer impacts the behavior of the plugin.
 **If this setting appears in your system, Wayfair strongly recommends that you upgrade your plugin to a newer version.**
 
+### Item Variation
+When a new item is created or imported, a main variation that cannot be deleted is generated automatically. The variation tab is only used to create additional variation for items (known as child variation  in PlentyMarkets). These child variations will automatically inherit the properties/characteristics  from the main variation unless the inheritance option is deactivated. The inherited characteristics for children variation can be edited, by opening the child variation tab and editing the intended variation property.<br/>
+**Note:** Child variation are needed if multiple versions of the item exists.<br/>
+**Example:** <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **item/main variation:** Couch<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **child variation:** Black Couch or White Couch.
+
+#### Adding Item Variations
+1. From the main Plentymarkets page, go to `Item` >> `Edit Item`
+2. Select the `Variations` tab
+3. Click the `+ New` button
+
+![add item variation](../../../images/en/add_item_variation.png)
+
 ### Item Mapping Method
 The `Item Mapping Method` setting determines the behavior for matching the Plentymarkets Item Variations to the Wayfair Products. It is used when the inventory listings are sent to Wayfair, and also to select the requested products in a Wayfair Purchase Order. The Plentymarkets user should configure this setting to match the way their Item Variations are populated.
+
 
 ### Using Variation Number as the Item Mapping Field
 By default, the `Variation Number` field is used for mapping Wayfair Orders' items to Plentymarkets Item Variations:
@@ -124,10 +139,10 @@ The optional `Import orders since` setting determines a date on which new Wayfai
 
 ### Send all inventory items to Wayfair?
 The optional `Send all inventory items to Wayfair?` setting determines if Plentymarkets Item Variations must be explicitly declared as eligible for sale on Wayfair or not.
-When `Send all inventory items to Wayfair?` is disabled, selling an Item on Wayfair requires having "Wayfair" present in the `Markets` list of the `Availability` tab of each  Variation to be sold on Wayfair, as seen in this example:
+When `Send all inventory items to Wayfair?` is disabled, selling an Item on Wayfair requires having "Wayfair" present in the `Markets` list of the `Availability` tab of an Item, as seen in this example:
 ![item with Wayfair Market](../../../images/en/item_wayfair_market.png)
 
-Enabling `Send all inventory items to Wayfair?` will allow Wayfair to list any item that is determined to be currently in stock, including those Item Variations for which "Wayfair" is **not** present in the `Markets` list.
+Enabling `Send all inventory items to Wayfair?` will allow Wayfair to list any item that is determined to be currently in stock, including those Items for which "Wayfair" is **not** present in the `Markets` list.
 
 
 ## Full Inventory page
