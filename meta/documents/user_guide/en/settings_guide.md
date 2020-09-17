@@ -137,11 +137,12 @@ It is used for checking the status of syncing the Plentymarkets inventory with W
 The page's data refreshes on a regular basis, as denoted by the timestamp toward the bottom.
 
 ### Main synchronization status
+
 The top of the `Inventory` page always displays an icon and message to describe the overall health of the inventory synchronization process.
 
 * A calendar icon ![calendar](../../../images/common/icon_calendar.png) will appear if the Wayfair plugin has yet to attempt inventory synchronizations.
 
-    * This happens after the plugin is installed.
+    * This happens right after the plugin is installed.
     * This may happen if the plugin was recently upgraded.
     * The page will change within 15-30 minutes, as the synchronization system initializes.
 
