@@ -182,7 +182,7 @@ If Wayfair's shipping services are to be used, the Wayfair plugin's ASN settings
 16. Click the `Save` button ![save button](../../../images/common/button_save.png).
 
 ## 8. First inventory synchronization
-Once everything has been set up, the it is time for the Wayfair plugin to start listing items for sale on Wayfair.
+Once everything has been set up, then it is time for the Wayfair plugin to start listing items for sale on Wayfair.
 
 ### Version 1.1.4 and later
 
