@@ -25,14 +25,14 @@ import {HomeComponent} from './views/home/home.component';
 import {RouterViewComponent} from './views/router/router-view.component';
 import {WarehouseSupplierComponent} from './views/warehouseSupplier/warehouseSupplier.component';
 import {SettingsComponent} from './views/settings/settings.component';
-import {FullInventoryComponent} from './views/fullInventory/fullInventory.component';
+import {InventoryComponent} from './views/inventory/inventory.component';
 import {TerraNodeTreeConfig} from '@plentymarkets/terra-components';
 
 // Services
 import {WarehouseSupplierService} from './core/services/warehouseSupplier/warehouseSupplier.service';
 import {WarehouseService} from './core/services/warehouse/warehouse.service';
 import {SettingsService} from './core/services/settings/settings.service';
-import {FullInventoryService} from './core/services/fullInventory/fullInventory.service';
+import {InventoryService} from './core/services/inventory/inventory.service';
 import {CarrierScacMappingComponent} from "./views/carrierScacMapping/carrierScacMapping.component";
 import {CarrierService} from "./core/services/carrier/carrier.service";
 import {CarrierScacService} from "./core/services/carrierScac/carrierScac.service";
@@ -57,7 +57,7 @@ import {OrderStatusService} from "./core/services/orderStatus/orderStatus.servic
         MenuComponent,
         WarehouseSupplierComponent,
         SettingsComponent,
-        FullInventoryComponent,
+        InventoryComponent,
         CarrierScacMappingComponent
     ],
     providers: [
@@ -72,7 +72,7 @@ import {OrderStatusService} from "./core/services/orderStatus/orderStatus.servic
         WarehouseSupplierService,
         WarehouseService,
         SettingsService,
-        FullInventoryService,
+        InventoryService,
         CarrierService,
         CarrierScacService,
         ShippingMethodService,
