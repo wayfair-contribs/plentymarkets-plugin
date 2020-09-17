@@ -109,8 +109,26 @@ class InventoryUpdateService
     $externalLogs = pluginApp(ExternalLogs::class);
     try {
 
-      if ($this->syncIsBlocked()) {
-        throw new InventorySyncBlockedException("Another inventory sync is in progress, preventing this one from starting");
+      if ($this->statusService->isInventoryRunning()) {
+
+        $currentSessionStartedAt = $this->statusService->getStartOfMostRecentAttempt();
+
+        if (isset($currentSessionStartedAt) && time() - strtotime($currentSessionStartedAt) < self::MAX_INVENTORY_TIME) {
+          // other inventory sync is running within allowed time limits
+          throw new InventorySyncBlockedException("Another inventory sync is in progress, preventing this one from starting");
+        }
+
+        // other inventory sync is stale or stalled, so a new one should start.
+        $this->logger->warning(TranslationHelper::getLoggerKey(self::LOG_KEY_LONG_RUN), [
+          'additionalInfo' => [
+
+            'syncStartedAt' => $currentSessionStartedAt,
+            'maximumTime' => self::MAX_INVENTORY_TIME
+          ],
+          'method' => __METHOD__
+        ]);
+
+        $externalLogs->addErrorLog('Inventory ' . ($fullInventory ? 'Full' : '') . ' overriding a currently running inventory sync process that started at ' . $currentSessionStartedAt);
       }
 
       // look up item mapping method at this level to ensure consistency and improve efficiency
@@ -248,8 +266,7 @@ class InventoryUpdateService
           $amtErrors = 0;
           $errors = $responseDto->getErrors();
 
-          if (isset($errors) && !empty($errors))
-          {
+          if (isset($errors) && !empty($errors)) {
             $amtErrors = count($errors);
 
             $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_ERRORS), [
@@ -260,7 +277,7 @@ class InventoryUpdateService
               'method' => __METHOD__
             ]);
 
-            $externalLogs->addErrorLog('Inventory ' . ($fullInventory ? 'Full' : '') . ' errors from page ' . $pageNumber . ': ' . json_encode($errors));
+            $externalLogs->addErrorLog('Inventory ' . ($fullInventory ? 'Full' : '') . ' errors found for page ' . $pageNumber, json_encode($errors));
           }
 
           // TODO: verify that there is a 1:1 relationship between errors and DTOs
@@ -452,34 +469,6 @@ class InventoryUpdateService
   }
 
   /**
-   * Check if the state of the Inventory Service has been "running" for more than the maximum allotted time
-   * This functionality was extracted from the old UpdateFullInventoryStatusCron
-   * @return bool
-   */
-  private function serviceHasBeenRunningTooLong(): bool
-  {
-    if (!$this->statusService->isInventoryRunning()) {
-      return false;
-    }
-
-    $currentSessionStartedAt = $this->statusService->getStartOfMostRecentAttempt();
-    if (isset($currentSessionStartedAt) && !empty($currentSessionStartedAt) && (time() - strtotime($currentSessionStartedAt)) > self::MAX_INVENTORY_TIME) {
-
-      $this->logger->warning(TranslationHelper::getLoggerKey(self::LOG_KEY_LONG_RUN), [
-        'additionalInfo' => [
-
-          'syncStartedAt' => $currentSessionStartedAt,
-          'maximumTime' => self::MAX_INVENTORY_TIME
-        ],
-        'method' => __METHOD__
-      ]);
-      return true;
-    }
-
-    return false;
-  }
-
-  /**
    * Get the W3C-formatted time for the start of a partial sync
    *
    * @param ExternalLogs $externalLogs
@@ -519,16 +508,5 @@ class InventoryUpdateService
     // date_create does NOT accept epoch time as an integer.
     // cannot use 'new' operator in Plenty.
     return date_create("@$windowStart")->format(DateTime::W3C);
-  }
-
-  /**
-   * Check if we can start a new sync or not.
-   * Returns true if no sync is running or the running sync has timed out
-   *
-   * @return boolean
-   */
-  private function syncIsBlocked(): bool
-  {
-    return $this->statusService->isInventoryRunning() && !$this->serviceHasBeenRunningTooLong();
   }
 }
