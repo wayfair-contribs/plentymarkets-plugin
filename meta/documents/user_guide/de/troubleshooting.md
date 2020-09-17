@@ -7,9 +7,9 @@ Dieses Dokument richtet sich an Benutzer des Wayfair-Plugins, bei denen Probleme
 Die bekannten Probleme für aktuelle und frühere Versionen des Wayfair-Plugins können auf [Die Issues Site auf GitHub](https://github.com/wayfair-contribs/plentymarkets-plugin/issues) eingesehen werden.
 
 
-## Plentymarkets logs
+## Plentymarkets Logs
 
-The Wayfair plugin produces information in the Plentymarkets logs, which contains critical information for investigating and resolving issues.
+Das Wayfair Plugin erstellt Informationen in den Plentymarkets Logs, die wichtige Informationen zur Untersuchung und Lösung von Problemen enthalten.
 
 ### Anzeigen der Logs
 Um die Plentymarkets-Protokolle anzeigen, Gehen Sie von der Hauptseite von Plentymarkets aus zu `Daten` >> `Log`.
