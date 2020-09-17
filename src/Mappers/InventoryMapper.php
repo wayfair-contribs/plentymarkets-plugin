@@ -8,7 +8,6 @@ namespace Wayfair\Mappers;
 
 use Plenty\Modules\StockManagement\Stock\Contracts\StockRepositoryContract;
 use Plenty\Modules\Item\VariationStock\Contracts\VariationStockRepositoryContract;
-use Plenty\Modules\Item\VariationStock\Models\VariationStock;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\Inventory\RequestDTO;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
@@ -110,15 +109,15 @@ class InventoryMapper
    * Returns a DTO for each supplier ID that has stock information for the variation,
    * fitting in the constraints of the arguments
    *
-   * @param array $variationData
-   * @param string $itemMappingMethod
-   * @param int $stockBuffer
-   * @param string $w3cStart
-   * @param string $w3CEnd
+   * @param array $variationData the Variation data from the Variation Repository
+   * @param string $itemMappingMethod the item mapping method setting
+   * @param int $stockBuffer (optional) amount of stock (per product) to withold from Wayfair
+   * @param string $timeWindowStartW3c (optional) start of time-based filter in W3C format
+   * @param string $timeWindowEndW3c (optional) end of time-based filter in W3C format
    *
    * @return RequestDTO[]
    */
-  public function createInventoryDTOsFromVariation($variationData, $itemMappingMethod, $stockBuffer, $w3cStart = null, $w3CEnd = null)
+  public function createInventoryDTOsFromVariation($variationData, $itemMappingMethod, $stockBuffer, $timeWindowStartW3c = null, $timeWindowEndW3c = null)
   {
     /** @var LoggerContract $loggerContract */
     $loggerContract = pluginApp(LoggerContract::class);
@@ -152,12 +151,12 @@ class InventoryMapper
     $nextAvailableDate = $this->getAvailableDate($mainVariationId); // Pending. Need Item
 
     $filters = [self::STOCK_COL_VARIATION_ID => $mainVariationId];
-    if (isset($w3cStart) && !empty($w3cStart)) {
+    if (isset($timeWindowStartW3c) && !empty($timeWindowStartW3c)) {
       // FIXME: these conversions should happen before calling into here
-      $filters[self::STOCK_FILTER_UPDATED_AT_FROM] = $w3cStart;
+      $filters[self::STOCK_FILTER_UPDATED_AT_FROM] = $timeWindowStartW3c;
 
-      if (isset($w3CEnd) && !empty($w3CEnd)) {
-        $filters[self::STOCK_FILTER_UPDATED_AT_TO] = $w3CEnd;
+      if (isset($timeWindowEndW3c) && !empty($timeWindowEndW3c)) {
+        $filters[self::STOCK_FILTER_UPDATED_AT_TO] = $timeWindowEndW3c;
       }
     }
 

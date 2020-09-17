@@ -38,6 +38,7 @@ class InventoryUpdateService
   const LOG_KEY_BLOCKED = 'inventoryBlocked';
   const LOG_KEY_NO_VARIATIONS = 'inventoryNoVariations';
   const LOG_KEY_NO_STOCKS = 'inventoryNoStocks';
+  const LOG_KEY_INVENTORY_ERRORS = 'inventoryErrors';
 
   // TODO: make these user-configurable in a future update
   const MAX_INVENTORY_TIME = 14400;
@@ -90,11 +91,10 @@ class InventoryUpdateService
    * Send inventory updates from Plentymarkets to Wayfair.
    *
    * @param bool $fullInventory flag for syncing entire inventory versus partial inventory update
-   * @param bool $manual flag used during logging which indicates that the sync was manually induced
    *
    * @return array
    */
-  public function sync(bool $fullInventory, bool $manual = false): array
+  public function sync(bool $fullInventory): array
   {
     $startTimeStamp = null;
 
@@ -131,14 +131,13 @@ class InventoryUpdateService
 
       $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_START), [
         'additionalInfo' => [
-          'full' => (string) $fullInventory,
-          'manual' => (string) $manual
+          'full' => (string) $fullInventory
         ],
         'method' => __METHOD__
       ]);
 
       $startTimeStamp = $this->statusService->markInventoryStarted($fullInventory);
-      $externalLogs->addInfoLog("Starting " . ($manual ? "Manual " : "Automatic ") . ($fullInventory ? "Full " : "Partial ") . "inventory sync.");
+      $externalLogs->addInfoLog("Starting " . ($fullInventory ? "Full " : "Partial ") . "inventory sync.");
 
       $variationSearchRepository->setFilters($this->getDefaultFilters());
 
@@ -246,7 +245,24 @@ class InventoryUpdateService
 
           $totalTimeSpentSendingData += TimeHelper::getMilliseconds() - $unixTimeBeforeSendingData;
 
-          $amtErrors = count($responseDto->getErrors());
+          $amtErrors = 0;
+          $errors = $responseDto->getErrors();
+
+          if (isset($errors) && !empty($errors))
+          {
+            $amtErrors = count($errors);
+
+            $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_ERRORS), [
+              'additionalInfo' => [
+                'full' => (string) $fullInventory,
+                'errors' => json_encode($errors)
+              ],
+              'method' => __METHOD__
+            ]);
+
+            $externalLogs->addErrorLog('Inventory ' . ($fullInventory ? 'Full' : '') . ' errors from page ' . $pageNumber . ': ' . json_encode($errors));
+          }
+
           // TODO: verify that there is a 1:1 relationship between errors and DTOs
           $totalDtosSaved += $amtOfDtosForPage - $amtErrors;
           $totalDtosFailed += $amtErrors;
@@ -268,7 +284,7 @@ class InventoryUpdateService
         $pageNumber++;
       } while (isset($variationSearchResponse) && !$variationSearchResponse->isLastPage());
 
-      $info = ['full' => (string) $fullInventory, 'manual' => (string) $manual];
+      $info = ['full' => (string) $fullInventory];
 
       if ($fullInventory && $totalDtosAttempted < 1) {
         $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_NO_STOCKS), [
@@ -288,7 +304,6 @@ class InventoryUpdateService
       $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_BLOCKED), [
         'additionalInfo' => [
           'full' => (string) $fullInventory,
-          'manual' => (string) $manual,
           'message' => $e->getMessage()
         ],
         'method' => __METHOD__
@@ -300,7 +315,6 @@ class InventoryUpdateService
       $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_INTERRUPTED), [
         'additionalInfo' => [
           'full' => (string) $fullInventory,
-          'manual' => (string) $manual,
           'message' => $e->getMessage()
         ],
         'method' => __METHOD__
@@ -314,7 +328,6 @@ class InventoryUpdateService
       $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_NO_VARIATIONS), [
         'additionalInfo' => [
           'full' => (string) $fullInventory,
-          'manual' => (string) $manual,
           'message' => $e->getMessage()
         ],
         'method' => __METHOD__
@@ -330,7 +343,6 @@ class InventoryUpdateService
 
       $info = [
         'full' => (string) $fullInventory,
-        'manual' => (string) $manual,
         'exceptionType' => get_class($e),
         'errorMessage' => $e->getMessage(),
         'stackTrace' => $e->getTraceAsString()
@@ -347,7 +359,6 @@ class InventoryUpdateService
 
       $infoMap = [
         'full' => (string) $fullInventory,
-        'manual' => (string) $manual,
         'dtosAttempted' => $totalDtosAttempted,
         'dtosSaved' => $totalDtosSaved,
         'dtosFailed' => $totalDtosFailed,
@@ -365,7 +376,7 @@ class InventoryUpdateService
         $externalLogs->addInventoryLog('Inventory syncs completed', 'totalDtosSaved' . ($fullInventory ? 'Full' : ''), $totalDtosSaved, $totalTimeSpentSendingData);
         $externalLogs->addInventoryLog('Inventory syncs failed', 'totalDtosFailed' . ($fullInventory ? 'Full' : ''), $totalDtosFailed, $totalTimeSpentSendingData);
 
-        $externalLogs->addInfoLog("Finished " . ($manual ? "Manual " : "Automatic ") . ($fullInventory ? "Full " : "Partial ") . "inventory sync.");
+        $externalLogs->addInfoLog("Finished " . ($fullInventory ? "Full " : "Partial ") . "inventory sync.");
 
         $this->logSenderService->execute($externalLogs->getLogs());
       }

@@ -356,18 +356,18 @@ export class InventoryComponent {
 
   /**
    * Check if any syncs were attempted
-   * @param kind the kind of sync, or null for "any of the syncs"
+   * @param syncKind 'full' or 'partial' sync, or null for "any of the syncs"
    */
-  public syncsAttempted(kind?: string): boolean {
+  public syncsAttempted(syncKind?: string): boolean {
     if (!this.statusObject || !this.statusObject.details) {
       return false;
     }
 
-    if (kind) {
+    if (syncKind) {
       return (
-        this.statusObject.details[kind] &&
-        this.statusObject.details[kind].attemptedStart &&
-        this.statusObject.details[kind].attemptedStart.length > 0
+        this.statusObject.details[syncKind] &&
+        this.statusObject.details[syncKind].attemptedStart &&
+        this.statusObject.details[syncKind].attemptedStart.length > 0
       );
     }
 
@@ -385,18 +385,18 @@ export class InventoryComponent {
 
   /**
    * Check for the overdue flag
-   * @param kind the kind of sync, or null for "any of the syncs"
+   * @param syncKind 'full' or 'partial' sync, or null for "any of the syncs"
    */
-  public overdue(kind?: string): boolean {
+  public overdue(syncKind?: string): boolean {
     if (!this.statusObject || !this.statusObject.details) {
       // lack of data should be considered overdue
       return true;
     }
 
-    if (kind) {
+    if (syncKind) {
       return (
-        this.statusObject.details[kind] &&
-        this.statusObject.details[kind].overdue
+        this.statusObject.details[syncKind] &&
+        this.statusObject.details[syncKind].overdue
       );
     }
 
