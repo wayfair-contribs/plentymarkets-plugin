@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Providers;
@@ -32,50 +32,6 @@ class WayfairRouteServiceProvider extends RouteServiceProvider {
         'middleware' => ['oauth.cookie']
         ]
     );
-    $router->get(
-        'wayfair/test', [
-        'uses'       => 'Wayfair\Controllers\HomeController@test',
-        'middleware' => ['oauth.cookie']
-        ]
-    );
-    $router->get(
-        'wayfair/test/register', [
-        'uses' => 'Wayfair\Controllers\PurchaseRegisterController@test',
-        'middleware' => ['oauth.cookie']
-        ]
-    );
-    $router->get(
-        'wayfair/inventory', [
-        'uses'       => 'Wayfair\Controllers\InventoryController@fetch',
-        'middleware' => ['oauth.cookie']
-        ]
-    );
-    $router->get(
-        'wayfair/inventory/filtered', [
-        'uses'       => 'Wayfair\Controllers\InventoryController@filtered',
-        'middleware' => ['oauth.cookie']
-        ]
-    );
-    $router->get(
-        'wayfair/inventory/filtered1', [
-                                        'uses'       => 'Wayfair\Controllers\InventoryController@filtered1',
-                                        'middleware' => ['oauth.cookie']
-                                    ]
-    );
-    $router->get(
-        'wayfair/inventory/item', [
-        'uses'       => 'Wayfair\Controllers\InventoryController@getItem',
-        'middleware' => ['oauth.cookie']
-        ]
-    );
-    $router->get(
-        'wayfair/inventory/sync', [
-        'uses'       => 'Wayfair\Controllers\InventoryController@sync',
-        'middleware' => ['oauth.cookie']
-        ]
-    );
-
-    // Production URLs
 
     // Warehouse Supplier Mappings.
     $router->get(
@@ -87,19 +43,6 @@ class WayfairRouteServiceProvider extends RouteServiceProvider {
     $router->post(
         'wayfair/warehouseSupplier', [
         'uses'       => 'Wayfair\Controllers\WarehouseSupplierController@saveMappings',
-        'middleware' => ['oauth.cookie']
-        ]
-    );
-    // Full inventory
-    $router->post(
-        'wayfair/fullInventory', [
-        'uses'       => 'Wayfair\Controllers\FullInventoryController@sync',
-        'middleware' => ['oauth.cookie']
-        ]
-    );
-    $router->get(
-        'wayfair/fullInventory', [
-        'uses'       => 'Wayfair\Controllers\FullInventoryController@getState',
         'middleware' => ['oauth.cookie']
         ]
     );
@@ -154,6 +97,18 @@ class WayfairRouteServiceProvider extends RouteServiceProvider {
     $router->get(
         'wayfair/orderStatuses', [
         'uses'       => 'Wayfair\Controllers\OrderStatusController@fetch',
+        'middleware' => ['oauth.cookie']
+        ]
+    );
+    $router->get(
+        'wayfair/inventory', [
+        'uses'       => 'Wayfair\Controllers\InventoryController@getState',
+        'middleware' => ['oauth.cookie']
+        ]
+    );
+    $router->delete(
+        'wayfair/inventory', [
+        'uses'       => 'Wayfair\Controllers\InventoryController@clearState',
         'middleware' => ['oauth.cookie']
         ]
     );

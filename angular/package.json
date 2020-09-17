@@ -1,6 +1,6 @@
 {
 	"name": "wayfair-plugin",
-	"version": "1.1.4-alpha",
+	"version": "1.1.4-alpha.14",
 	"license": "SEE LICENSE at https://raw.githubusercontent.com/wayfair-contribs/plentymarkets-plugin/main/LICENSE.md",
 	"scripts": {
 		"server:dev": "webpack-dev-server --config config/webpack.dev.js --progress --profile --watch",
