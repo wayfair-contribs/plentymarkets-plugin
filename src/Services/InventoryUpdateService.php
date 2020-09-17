@@ -113,7 +113,7 @@ class InventoryUpdateService
 
         $currentSessionStartedAt = $this->statusService->getStartOfMostRecentAttempt();
 
-        if (isset($currentSessionStartedAt) && time() - strtotime($currentSessionStartedAt) < self::MAX_INVENTORY_TIME) {
+        if (isset($currentSessionStartedAt) && !empty($currentSessionStartedAt) && time() - strtotime($currentSessionStartedAt) < self::MAX_INVENTORY_TIME) {
           // other inventory sync is running within allowed time limits
           throw new InventorySyncBlockedException("Another inventory sync is in progress, preventing this one from starting");
         }
