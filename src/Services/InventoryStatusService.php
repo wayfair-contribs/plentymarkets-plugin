@@ -304,9 +304,10 @@ class InventoryStatusService
   /**
    * Clear all data for any type of sync
    *
+   * @param boolean $manual
    * @return void
    */
-  public function clearState(): void
+  public function clearState(bool $manual = false): void
   {
     foreach (self::DB_KEYS as $key) {
       // using 'putOrReplace' with null is a safe delete operation.
@@ -314,6 +315,7 @@ class InventoryStatusService
     }
 
     $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_STATE_CLEAR), [
+      'additionalInfo' => ['manual' => (string) $manual],
       'method' => __METHOD__
     ]);
   }
