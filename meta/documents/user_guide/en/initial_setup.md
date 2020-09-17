@@ -186,7 +186,7 @@ Once everything has been set up, then it is time for the Wayfair plugin to start
 
 ### Version 1.1.4 and later
 
-As of version 1.1.4, the Wayfair plugin's Inventory Synchronization process is fully automated and cannot be started by the Plentymarkets user. After completing of all earlier steps in this guide, it is important to ensure that the Wayfair plugin is able perform Inventory Synchronization:
+As of version 1.1.4, the Wayfair plugin's Inventory Synchronization process is fully automated and cannot be started by the Plentymarkets user. After completing all earlier steps in this guide, it is important to ensure that the Wayfair plugin is able to perform Inventory Synchronization:
 
 1. Locate [the `Inventory` page](settings_guide.md#inventory-page) in the [Wayfair Market Settings] **-- If the `Full Inventory` page does not exist, do not continue - you must follow [the steps outlined for early versions of the plugin](#version-1.1.3-and-earlier)**.
 
