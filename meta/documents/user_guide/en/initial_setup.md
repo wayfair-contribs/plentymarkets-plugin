@@ -81,37 +81,37 @@ This procedure is required only if [the `Send all inventory items to Wayfair` se
 
 1. From the main Plentymarkets page, go to `Item` >> `Edit item`
 
-2. Search for item(s) and open them
+2. Search for item(s) and open them **`Ensure that item says main variation`** see image below
 
-3. **For each item**, click `Variations` and open them
-
-4. **For each Variation**:
-
-    1. On the `Settings` tab, make sure that the `Active` checkbox in the `Availability` Section is checked:
-
-        ![variation active](../../../images/en/variation_active_field.png)
-
-    2. If the [`Send all inventory items to Wayfair?`](settings_guide.md#send-all-inventory-items-to-wayfair) setting is **disabled**, go to the `Availability` tab of the Variation and add "Wayfair" to the list in the `Markets` area:
-
-        1. Click in the area that says `Click to select markets`.
-
-        2. Scroll down to the `Wayfair` entry
-
-        3. Place a check mark next to `Wayfair`
-
-        4. Click the `+` button ![add button](../../../images/common/button_plus.png) in the `Markets` area.
-
-            ![adding wayfair market to variation](../../../images/en/variation_wayfair_market.png)
-
-        5. Observe that a `Wayfair` row now exists in `Markets`
-
-            ![adding wayfair market to variation](../../../images/en/variation_wayfair_market_added.png)
+    ![item main variation](../../../images/en/item_main_variation.png)
 
 
-    3. Click the `Save` left of the Variation `ID`, below the `Global` tab (not the higher-up button for the Item):
+3. On the `Settings` tab, make sure that the `Active` checkbox in the `Availability` Section is checked:
 
-        ![variation saving](../../../images/common/variation_save.png)
+    ![variation active](../../../images/en/variation_active_field.png)
 
+4. If the [`Send all inventory items to Wayfair?`](settings_guide.md#send-all-inventory-items-to-wayfair) setting is **disabled**, go to the `Availability` tab of the Variation and add "Wayfair" to the list in the `Markets` area:
+
+    1. Click in the area that says `Click to select markets`.
+
+    2. Scroll down to the `Wayfair` entry
+
+    3. Place a check mark next to `Wayfair`
+
+    4. Click the `+` button ![add button](../../../images/common/button_plus.png) in the `Markets` area.
+
+        ![adding wayfair market to variation](../../../images/en/variation_wayfair_market.png)
+
+    5. Observe that a `Wayfair` row now exists in `Markets`
+
+        ![adding wayfair market to variation](../../../images/en/variation_wayfair_market_added.png)
+
+
+5. Click the `Save` left of the Variation `ID`, below the `Global` tab (not the higher-up button for the Item):
+
+    The ![variation saving](../../../images/common/variation_save.png)
+
+**Note:** All variations of an item will inherit from the  main variation, unless **`Inheritance is deactivated`**
 
 ## 6. Configuring the Warehouse mappings to match Wayfair Supplier IDs.
 

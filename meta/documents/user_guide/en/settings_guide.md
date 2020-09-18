@@ -67,20 +67,6 @@ The `Default Order Status` setting determines which state a new Plentymarkets Or
 The `Default Shipping Provider` setting is a legacy setting that no longer impacts the behavior of the plugin.
 **If this setting appears in your system, Wayfair strongly recommends that you upgrade your plugin to a newer version.**
 
-### Item Variation
-When a new item is created or imported, a main variation that cannot be deleted is generated automatically. The variation tab is only used to create additional variation for items (known as child variation  in PlentyMarkets). These child variations will automatically inherit the properties/characteristics  from the main variation unless the inheritance option is deactivated. The inherited characteristics for children variation can be edited, by opening the child variation tab and editing the intended variation property.<br/>
-**Note:** Child variation are needed if multiple versions of the item exists.<br/>
-**Example:** <br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **item/main variation:** Couch<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **child variation:** Black Couch or White Couch.
-
-#### Adding Item Variations
-1. From the main Plentymarkets page, go to `Item` >> `Edit Item`
-2. Select the `Variations` tab
-3. Click the `+ New` button
-
-![add item variation](../../../images/en/add_item_variation.png)
-
 ### Item Mapping Method
 The `Item Mapping Method` setting determines the behavior for matching the Plentymarkets Item Variations to the Wayfair Products. It is used when the inventory listings are sent to Wayfair, and also to select the requested products in a Wayfair Purchase Order. The Plentymarkets user should configure this setting to match the way their Item Variations are populated.
 
