@@ -7,38 +7,17 @@
         <router-outlet></router-outlet>
       </div>
       <div id="page-footer">
-        <nav class="navbar navbar-default">
-          <div class="collapse navbar-collapse">
-            <ul class="nav navbar-nav">
-              <li>
-                <a
-                  class="nav-link"
-                  href="{{ 'releasesUrl' | translate: lang }}"
-                  target="_blank"
-                >
-                  {{ "plugin_version" | translate: lang }}
-                  {{ "copyright_footer" | translate: lang }}
-                </a>
-              </li>
-              <li>
-                <a
-                  class="nav-link"
-                  href="{{ 'troubleshootingGuideUrl' | translate: lang }}"
-                  target="_blank"
-                  >{{ "troubleshootingGuideLabel" | translate: lang }}</a
-                >
-              </li>
-              <li>
-                <a
-                  class="nav-link"
-                  href="{{ 'issueReportUrl' | translate: lang }}"
-                  target="_blank"
-                  >{{ "issueReportLabel" | translate: lang }}</a
-                >
-              </li>
-            </ul>
+        <div class="navbar">
+          <div class="text-center">
+            <a
+              href="https://github.com/wayfair-contribs/plentymarkets-plugin/releases"
+              target="_blank"
+            >
+              {{ "plugin_version" | translate: lang }}
+            </a>
+            {{ "copyright_footer" | translate: lang }}
           </div>
-        </nav>
+        </div>
       </div>
     </div>
   </div>

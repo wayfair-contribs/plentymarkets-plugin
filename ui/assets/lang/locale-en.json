@@ -61,5 +61,7 @@
   "troubleshootingGuideUrl": "https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide/en/troubleshooting.md",
   "troubleshootingGuideLabel": "Troubleshooting Guide",
   "issueReportUrl": "https://github.com/wayfair-contribs/plentymarkets-plugin/issues",
-  "issueReportLabel": "Report a problem to Wayfair"
+  "issueReportLabel": "Report an issue to Wayfair",
+  "helpMenuLabel": "Help",
+
 }
