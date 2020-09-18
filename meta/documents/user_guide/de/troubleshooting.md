@@ -12,9 +12,21 @@ Die bekannten Probleme für aktuelle und frühere Versionen des Wayfair-Plugins 
 Das Wayfair Plugin erstellt Informationen in den Plentymarkets Logs, die wichtige Informationen zur Untersuchung und Lösung von Problemen enthalten.
 
 ### Anzeigen der Logs
+
 Um die Plentymarkets-Protokolle anzeigen, Gehen Sie von der Hauptseite von Plentymarkets aus zu `Daten` >> `Log`.
 
 ![log im Datenmenü](../../../images/de/troubleshooting/menu_data_log.png)
+
+### Lesen der Logdetails
+
+Klicken Sie in der Sicht der Log auf eine Zeile, um die "Protokolldetails" für eine Nachricht anzuzeigen.
+
+![logdetails](../../../images/de/troubleshooting/log_details.png)
+
+* Wichtige Details werden häufig in ** zusammenklappbaren ** Bereichen der Protokolldetails versteckt.
+
+* Wenn Sie einen Fehlerbericht einreichen, kopieren Sie so viele Daten wie möglich aus den "Protokolldetails" in eine Datei, um sie an Wayfair zu senden.
+
 
 ### Legen Sie die Log Level für Wayfair fest
 
@@ -31,7 +43,7 @@ Die Standardeinstellungen für die Logs zeigen nicht alle Nachrichten vom Wayfai
 
 5. Stellen Sie die `Log level` auf `Debug` ein.
 
-6. Make sure the settings look like this:
+6. Stellen Sie sicher, dass die Details so aussehen:
 
     ![wayfair auf debug eingestellt](../../../images/de/troubleshooting/wayfair_logs_active_debug.png)
 
@@ -46,10 +58,6 @@ Die Standardeinstellungen für die Logs zeigen nicht alle Nachrichten vom Wayfai
     ![wayfair im filter](../../../images/de/troubleshooting/filter_logs_wayfair.png)
 
 3. Klicken Sie auf die Lupentaste ![suchschaltfläche](../../../images/common/button_search.png) um nur die Logs für wayfair anzuzeigen.
-
-4. Klicken Sie auf eine Zeile in der Liste der Logs, um weitere Details für eine Nachricht anzuzeigen.
-
-5. Kopieren Sie die Informationen den Log in eine Textdatei, um sie zum Ablegen eines Fehlerberichts zu verwenden.
 
 ## Häufige Probleme
 
@@ -69,4 +77,10 @@ Bevor Sie sich an Wayfair wenden, verwenden Sie bitte die folgende Tabelle, um P
 
 Wenn Sie ein Problem mit dem Wayfair-Plugin nicht beheben können, können Sie das Problem Wayfair auf [Die Issues Site für das Plugin auf GitHub](https://github.com/wayfair-contribs/plentymarkets-plugin/issues) melden.
 
-**Wenn Sie Wayfair kontaktieren, geben Sie bitte Informationen zu Einstellungen an, die kürzlich in Plentymarkets oder in des Wayfair-Plugins geändert wurden. Um Ihnen die bestmögliche Unterstützung zu bieten, müssen die Vertreter von Wayfair möglicherweise auch zusätzliche Fragen zu Ihrer spezifischen Konfiguration stellen.**
+**Wenn Sie Wayfair kontaktieren, geben Sie bitte diesen Informationen**:
+
+* Letzte Änderungen an den Einstellungen von Plentymarkets
+* Letzte Änderungen an den Einstellungen des Wayfair Plugins
+* Details der Plentymarkets Logs aus Zeiten, in denen Probleme aufgetreten sind
+
+**Um Ihnen den bestmöglichen Support zu bieten, müssen die Vertreter von Wayfair möglicherweise auch zusätzliche Fragen zu Ihrer spezifischen Konfiguration stellen.**
