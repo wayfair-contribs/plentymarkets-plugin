@@ -124,54 +124,31 @@ The optional `Import orders since` setting determines a date on which new Wayfai
 
 ### Send all inventory items to Wayfair?
 The optional `Send all inventory items to Wayfair?` setting determines if Plentymarkets Item Variations must be explicitly declared as eligible for sale on Wayfair or not.
-When `Send all inventory items to Wayfair?` is disabled, selling an Item on Wayfair requires having "Wayfair" present in the `Markets` list of the `Availability` tab of an Item's main Variation, as seen in this example:
-
+When `Send all inventory items to Wayfair?` is disabled, selling an Item on Wayfair requires having "Wayfair" present in the `Markets` list of the `Availability` tab of an Item, as seen in this example:
 ![item with Wayfair Market](../../../images/en/item_wayfair_market.png)
 
 Enabling `Send all inventory items to Wayfair?` will allow Wayfair to list any item that is determined to be currently in stock, including those Items for which "Wayfair" is **not** present in the `Markets` list.
 
-## Inventory page
-**(Since 1.1.4)**
-
-The 'Inventory' page does not contain any settings to configure.
-It is used for checking the status of syncing the Plentymarkets inventory with Wayfair.
-The page's data refreshes on a regular basis, as denoted by the timestamp toward the bottom.
-
-### Main synchronization status
-
-The top of the `Inventory` page always displays an icon and message to describe the overall health of the inventory synchronization process.
-
-* A calendar icon ![calendar](../../../images/common/icon_calendar.png) will appear if the Wayfair plugin has yet to attempt inventory synchronizations.
-
-    * This happens right after the plugin is installed.
-    * This may happen if the plugin was recently upgraded.
-    * The page will change within 15-30 minutes, as the synchronization system initializes.
-
-* An icon with a checkmark ![checked_cloud](../../../images/common/icon_cloud_check.png) will appear if the Wayfair plugin is regularly synchronizing inventory without detecting any issues.
-
-* An icon with a crossed-out cloud ![crossed_cloud](../../../images/common/icon_cloud_slash.png) will appear if the Wayfair plugin detects irregularities in inventory synchronization.
-
-    * Errors are expected if the Wayfair plugin was recently installed and [the setup process](initial_setup.md) has not been completed yet. Finish setting up the plugin prior to using the `Inventory` page again.
-    * Details may appear lower on the page, to help explain what is wrong.
-    * View the [Plentymarkets logs](troubleshooting.md#plentymarkets-logs) to obtain error details.
-    * View the Wayfair plugin's [troubleshooting guide](troubleshooting.md) for ideas on how to solve inventory synchronization issues.
-
-### Synchronization details
-
-When it is possible to do so, the `Inventory` page will provide details to support the main status that is displayed at the top of the page.
-
-* A calendar icon ![calendar](../../../images/common/icon_calendar.png) indicates a piece of information that is not yet available.
-* An icon with a checkmark ![checked_cloud](../../../images/common/icon_cloud_check.png) indicates a positive event.
-* An icon with a crossed-out cloud ![crossed_cloud](../../../images/common/icon_cloud_slash.png) indicates a negative event.
-* An icon with an arrow pointing upwards to a cloud ![upload_cloud](../../../images/common/icon_cloud_upload.png) indicates that an event is currently happening and will be reported on once it has been completed.
-
 
 ## Full Inventory page
-**(Removed in 1.1.4)**
+The `Full Inventory` page does not contain any settings to configure.
+It is used for checking the status of syncing the Plentymarkets inventory with Wayfair, or manually initiating a synchronization of all inventory items.
+The page's data will automatically refresh over time, but you may also manually refresh it.
 
-The `Full Inventory` page has been replaced by the [`Inventory`](#inventory-page) page. **If you are using a version of the Wayfair Plugin that contains the `Full Inventory` page, Wayfair recommends that you upgrade the plugin as soon as possible.**
+**The Wayfair plugin periodically sends inventory updates to Wayfair, without any further manual activations. The Full Inventory page only displays information about the daily updates that include all items in the inventory.**
 
-Detailed information about the `Full Inventory` page can be found in [the documentation for version 1.1.3](https://github.com/wayfair-contribs/plentymarkets-plugin/blob/release-1.1.3/meta/documents/user_guide/en/settings_guide.md#full-inventory-page).
+### Fields
+* The `Time of last successful inventory synchronization` fields keep track of the daily synchronizations that are normally preformed automatically.
+    * A "check mark" icon ![cloud with check](../../../images/common/icon_cloud_check.png) will appear if it has been less than 24 hours since the last successful synchronization. This indicates that no actions are required.
+    * A "warning" icon ![warning icon](../../../images/common/icon_warning.png) will appear if it has been over 24 hours since the last successful synchronization. Consider using the `Start Synchronization` button as described below.
+
+* The `Status of last attempt` fields are used to see if a full inventory synchronization is currently underway. Check this field after using the `Start Synchronization` button.
+    * The status `COMPLETE` indicates that the last automatic or manual synchronization was successful.
+    * The status `FAILED` indicates that the last automatic or manual synchronization was not successful. Check the Plentymarkets logs for issues.
+
+### Buttons
+* The `Start Synchronization` button ![start sync](../../../images/en/wayfair_settings/button_start_sync.png) is used for manually synchronizing all inventory. The status of the process will be displayed in the fields above the buttons.
+* The `Refresh` button ![refresh](../../../images/en/wayfair_settings/button_refresh_status.png) is used for updating the fields above the buttons to match the most recent results of automatic full inventory synchronization.
 
 
 ## Ship Confirmation (ASN) page
