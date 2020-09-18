@@ -39,7 +39,8 @@ To use the functions of the Wayfair plugin, it must be installed in the Plentyma
 
 2. Create the Plugin Set where the plugin is to be installed, if it the desired Plugin Set does not yet exist.
 
-    * If you already have other plugins installed, you may wish to use a copy of an existing Plugin Set via its dedicated `Copy plugin set` button: ![copy plugin set button](../../../images/en/installation/button_copy_plugin_set.png)
+    * If you already have other plugins installed, you may wish to use a copy of an existing Plugin Set via its dedicated `Copy plugin set` button:
+        ![copy plugin set button](../../../images/en/installation/button_copy_plugin_set.png)
 
     * Your Plentymarkets license may limit the number of Plugin Sets that can exist at one time.
 
@@ -52,42 +53,41 @@ To use the functions of the Wayfair plugin, it must be installed in the Plentyma
 
         ![link plugin sets button](../../../images/en/installation/button_link_plugin_sets.png)
 
-4. Click the `Edit plugin set` button ![pencil button](../../../images/common/button_pencil.png) for the Plugin Set in which the Wayfair plugin is to be installed.
 
-5. Click the `Add plugin` button:
+4. Click the `Add plugin` button:
 
     ![add plugin button](../../../images/en/installation/button_add_plugin.png)
 
-6. `Wayfair` should appear in the list of plugins. If there are many plugins, type "wayfair" into the `Search` box:
+5. `Wayfair` should appear in the list of plugins. If there are many plugins, type "wayfair" into the `Search` box:
 
     ![search_for_wayfair_plugin](../../../images/en/installation/search_for_wayfair_plugin.png)
 
-7. Click on the `Wayfair` entry in the list. If you have previously installed the Wayfair plugin via the "git" channel, there may multiple entries for "Wayfair." Please select the entry that has the `Marketplace` source (![marketplace icon](../../../images/common/icon_marketplace.png)).
+6. Click on the `Wayfair` entry in the list. If you have previously installed the Wayfair plugin via the "git" channel, there may multiple entries for "Wayfair." Please select the entry that has the `Marketplace` source (![marketplace icon](../../../images/common/icon_marketplace.png)).
 
-8. Review the information on the page:
+7. Review the information on the page:
 
     ![wayfair plugin info](../../../images/en/installation/marketplace_wayfair.png)
 
-9. In the `Select version` drop-down menu, choose [the newest plugin version](https://github.com/wayfair-contribs/plentymarkets-plugin/releases) if it is not already selected.
+8. In the `Select version` drop-down menu, choose [the newest plugin version](https://github.com/wayfair-contribs/plentymarkets-plugin/releases) if it is not already selected.
 
-10. Click the `Install` button ![install button](../../../images/en/installation/button_install.png) at the top of the page. You will be redirected to the individual Plugin Set's details.
+9. Click the `Install` button ![install button](../../../images/en/installation/button_install.png) at the top of the page. You will be redirected to the individual Plugin Set's details.
 
-11. Verify that a row exists on the page with the `Name` displayed as "Wayfair" and the `Installed` version showing as the desired version
+10. Verify that a row exists on the page with the `Name` displayed as "Wayfair" and the `Installed` version showing as the desired version
 
-12. In the `Active` column for the "Wayfair" row, click on the switch so that it moves to the right-side, enabled position. **Failure to activate the Wayfair plugin will prevent its functionalities from being available**.
+11. In the `Active` column for the "Wayfair" row, click on the switch so that it moves to the right-side, enabled position. **Failure to activate the Wayfair plugin will prevent its functionalities from being available**.
 
-13. Verify that the Wayfair plugin's row looks the same as the screenshot below (your `Installed` version may be different).
+12. Verify that the Wayfair plugin's row looks the same as the screenshot below (your `Installed` version may be different).
 
     ![wayfair plugin not yet deployed](../../../images/en/installation/wayfair_plugin_not_yet_deployed.png)
 
-14. Click the `Deploy plugin set` button (appears as a Save button):
+13. Click the `Deploy plugin set` button (appears as a Save button):
 
     ![deploy plugin set button](../../../images/en/installation/button_deploy_plugin_set.png)
 
-15. A progress bar will appear while the plugin is installed.
+14. A progress bar will appear while the plugin is installed.
 
-16. Confirm that the `Deployed` column for the "Wayfair" row is now populated, and it reflects the value in the `Installed` column (your `Installed` or `Deployed` version may be different).
+15. Confirm that the `Deployed` column for the "Wayfair" row is now populated, and it reflects the value in the `Installed` column (your `Installed` or `Deployed` version may be different).
 
     ![wayfair plugin deployed](../../../images/en/installation/wayfair_plugin_deployed.png)
 
-17. Log out of the Plentymarkets system, then log back in, to ensure that the changes are now in effect.
+16. Log out of the Plentymarkets system, then log back in, to ensure that the changes are now in effect.

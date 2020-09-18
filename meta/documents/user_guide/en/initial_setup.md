@@ -35,9 +35,8 @@ The authorization steps are as follows:
 
     ![linked clients](../../../images/en/plugin_sets_linked_clients.png)
 
-3. Click on the `Edit` button ![pencil button](../../../images/common/button_pencil.png) for the desired Plugin set.
 
-4. In the Wayfair row of the Plugin set, click on the `Settings` button ![gear button](../../../images/common/button_gear.png).
+3. In the Wayfair row of the Plugin set, click on the `Settings` button ![gear button](../../../images/common/button_gear.png).
 
 4. In the left-side menu, go to `Configuration` >> `Global Settings`:
 
