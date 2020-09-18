@@ -1,2 +1,16 @@
-
-            <h2 class="text-center center-block">{{ 'welcomeMessage' | translate:lang }}</h2>
+<div class="center-block">
+  <div class="form-group-row text-center" name="welcomeMessage">
+    <h2>
+      {{ "welcomeMessage" | translate: lang }}
+    </h2>
+  </div>
+  <div class="text-center" name="links">
+    <a class="form-group-row" href="{{ 'setupGuideUrl' | translate: lang }}" target="_blank"
+      >{{ "setupGuideLabel" | translate: lang }}
+    </a>
+    <br />
+    <a class="form-group-row" href="{{ 'settingsGuideUrl' | translate: lang }}" target="_blank"
+      >{{ "settingsGuideLabel" | translate: lang }}
+    </a>
+  </div>
+</div>
