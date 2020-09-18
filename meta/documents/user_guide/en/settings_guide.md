@@ -127,7 +127,9 @@ The optional `Send all inventory items to Wayfair?` setting determines if Plenty
 When `Send all inventory items to Wayfair?` is disabled, selling an Item on Wayfair requires having "Wayfair" present in the `Markets` list of the `Availability` tab of an Item, as seen in this example:
 ![item with Wayfair Market](../../../images/en/item_wayfair_market.png)
 
-Enabling `Send all inventory items to Wayfair?` will allow Wayfair to list any item that is determined to be currently in stock, including those Items for which "Wayfair" is **not** present in the `Markets` list.
+**Note:** All variations of an item will inherit from the  main variation, unless **`Inheritance is deactivated`**
+
+Enabling `Send all inventory items to Wayfair?` will allow Wayfair to list any item that is determined to be currently in stock, including those Item Variations for which "Wayfair" is **not** present in the `Markets` list.
 
 ## Inventory page
 **(Since 1.1.4)**
