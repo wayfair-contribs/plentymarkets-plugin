@@ -181,9 +181,33 @@ If Wayfair's shipping services are to be used, the Wayfair plugin's ASN settings
 
 16. Click the `Save` button ![save button](../../../images/common/button_save.png).
 
-## 8. Performing the first inventory synchronization
-Once everything has been set up, the it is time to start listing items for sale on Wayfair.
+## 8. First inventory synchronization
+Once everything has been set up, then it is time for the Wayfair plugin to start listing items for sale on Wayfair.
 
-Finalize the setup by initiating a full inventory synchronization on the [Full Inventory](settings_guide.md#full-inventory-page) page of the [Wayfair Market Settings](settings_guide.md).
+### Version 1.1.4 and later
 
-**After this first inventory synchronization, the Wayfair plugin will periodically send inventory updates to Wayfair, without any further manual activations.**
+As of version 1.1.4, the Wayfair plugin's Inventory Synchronization process is fully automated and cannot be started by the Plentymarkets user. After completing all earlier steps in this guide, it is important to ensure that the Wayfair plugin is able to perform Inventory Synchronization:
+
+1. Locate [the `Inventory` page](settings_guide.md#inventory-page) in the [Wayfair Market Settings](settings_guide.md) **-- If the `Inventory` page does not exist, do not continue - you must follow [the steps outlined for early versions of the plugin](#version-1.1.3-and-earlier)**.
+
+2. If the synchronization has yet to initialize or is reported as having issues, wait up to 30 minutes then check the page again.
+
+3. If issues are still reported 30 minutes after plugin setup, attempt to resolve them by reviewing [the instructions for the `Inventory` page](settings_guide.md#inventory-page), viewing [the Plentymarkets logs](troubleshooting.md#plentymarkets-logs) and using [the troubleshooting guide](troubleshooting.md).
+
+
+### Version 1.1.3 and earlier
+
+Older versions **(before 1.1.4)** of the Wayfair plugin are not able to automatically perform the first inventory synchronization, and require manual intervention:
+
+1. Locate the `Full Inventory` page in the [Wayfair Market Settings](settings_guide.md). **-- If the `Full Inventory` page does not exist, do not continue - view [the information for modern versions of the plugin](#version-1.1.4-and-later)**.
+
+2. Click the `Start Synchronization` button.
+
+3. Await the results.
+
+4. If the results indicate issues, attempt to resolve them by [viewing the Plentymarkets logs](troubleshooting.md#plentymarkets-logs) and using [the troubleshooting guide](troubleshooting.md).
+
+
+### Subsequent synchronizations
+
+**After the first inventory synchronization, the Wayfair plugin will periodically send inventory updates to Wayfair, without manual activation.**
