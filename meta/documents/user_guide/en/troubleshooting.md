@@ -16,6 +16,16 @@ To view the Plentymarkets logs, from the main Plentymarkets page, go to `Data` >
 
 ![log menu entry](../../../images/en/troubleshooting/menu_data_log.png)
 
+### Viewing log details
+
+Click on a row in the logs view in order to view the `Log details` for a message.
+
+![log details](../../../images/en/troubleshooting/log_details.png)
+
+* Important details are often hidden inside **collapsed** areas of the log details.
+
+* When filing a bug report, copy as much data as possible out of the `Log details` into a file for sending to Wayfair.
+
 ### Setting the log level for Wayfair
 
 The default settings for the logs do not show all messages from the Wayfair plugin. To get more details in the logs, change the level of logging for Wayfair to `Debug`:
@@ -47,10 +57,6 @@ The default settings for the logs do not show all messages from the Wayfair plug
 
 3. Click on the magnifying glass button ![search button](../../../images/common/button_search.png) to display only the Wayfair Plugin's log messages.
 
-4. Click on a row in the logs view in order to view the details for a message.
-
-5. Copy the Log information to a text file in order to use it for filing a bug report.
-
 
 ## Common issues
 
@@ -70,4 +76,9 @@ Prior to contacting Wayfair, please use the table below to self-diagnose issues 
 
 If you are unable to resolve an issue with the Wayfair plugin, you may file a report on [the issues page for the plugin](https://github.com/wayfair-contribs/plentymarkets-plugin/issues) so that it may be evaluated by the Wayfair team.
 
-**When contacting Wayfair, please include information on any settings that have recently been changed in Plentymarkets or in the Wayfair plugin's settings. In order to provide you with the best support, Wayfair's representatives may also need to ask you additional questions about your specific configuration.**
+**When contacting Wayfair, please include:**
+* Information on any settings that have recently been changed in Plentymarkets.
+* Information on any settings that have recently been changed in the Wayfair plugin.
+* Captures of Plentymarkets logs (and log details) from the time period when issues occurred.
+
+**In order to provide you with the best support, Wayfair's representatives may also need to ask you additional questions about your specific configuration.**
