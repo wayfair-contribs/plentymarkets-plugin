@@ -81,7 +81,7 @@ This procedure is required only if [the `Send all inventory items to Wayfair` se
 
 1. From the main Plentymarkets page, go to `Item` >> `Edit item`
 
-2. Search for item(s) and open them **`Ensure that item says main variation`** see image below
+2. Search for item(s) and open them Ensure that item says **`main variation`** see image below
 
     ![item main variation](../../../images/en/item_main_variation.png)
 
@@ -90,7 +90,7 @@ This procedure is required only if [the `Send all inventory items to Wayfair` se
 
     ![variation active](../../../images/en/variation_active_field.png)
 
-4. If the [`Send all inventory items to Wayfair?`](settings_guide.md#send-all-inventory-items-to-wayfair) setting is **disabled**, go to the `Availability` tab of the Variation and add "Wayfair" to the list in the `Markets` area:
+4. If the [`Send all inventory items to Wayfair?`](settings_guide.md#send-all-inventory-items-to-wayfair) setting is **disabled**, go to the `Availability` tab of the Item and add "Wayfair" to the list in the `Markets` area:
 
     1. Click in the area that says `Click to select markets`.
 
@@ -107,7 +107,7 @@ This procedure is required only if [the `Send all inventory items to Wayfair` se
         ![adding wayfair market to variation](../../../images/en/variation_wayfair_market_added.png)
 
 
-5. Click the `Save` left of the Variation `ID`, below the `Global` tab (not the higher-up button for the Item):
+5. Click the `Save` left of the `Item ID`, below the `Global` tab (not the higher-up button for the Item):
 
     The ![variation saving](../../../images/common/variation_save.png)
 
