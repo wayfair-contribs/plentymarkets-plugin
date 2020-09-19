@@ -56,7 +56,7 @@
   "releasesUrl": "https://github.com/wayfair-contribs/plentymarkets-plugin/releases",
   "gettingStartedLabel": "Click here for setup instructions",
   "gettingStartedUrl": "https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide/en/initial_setup.md",
-  "settingsGuideLabel": "Modifying the Wayfair Plugin configuration",
+  "settingsGuideLabel": "Changing the Wayfair settings",
   "settingsGuideUrl": "https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide/en/settings_guide.md",
   "troubleshootingGuideUrl": "https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide/en/troubleshooting.md",
   "troubleshootingGuideLabel": "Troubleshooting Guide",
