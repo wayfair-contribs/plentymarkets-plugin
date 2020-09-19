@@ -1,24 +1,20 @@
 <!-- <terra-breadcrumbs></terra-breadcrumbs> -->
 <div class="container">
-  <div class="row">
-    <div class="col-sm-12">
-      <menu></menu>
-      <div id="page-body">
-        <router-outlet></router-outlet>
-      </div>
-      <div id="page-footer">
-        <div class="navbar">
-          <div class="text-center">
-            <a
-              href="https://github.com/wayfair-contribs/plentymarkets-plugin/releases"
-              target="_blank"
-            >
-              {{ "plugin_version" | translate: lang }}
-            </a>
-            {{ "copyright_footer" | translate: lang }}
-          </div>
-        </div>
-      </div>
+  <menu></menu>
+  <div class="row" id="page-body">
+    <router-outlet></router-outlet>
+  </div>
+  <div class="row text-center" id="page-footer">
+    <div class="row">
+      <a
+        href="https://github.com/wayfair-contribs/plentymarkets-plugin/releases"
+        target="_blank"
+      >
+        {{ "plugin_version" | translate: lang }}
+      </a>
+    </div>
+    <div class="row">
+      {{ "copyright_footer" | translate: lang }}
     </div>
   </div>
 </div>

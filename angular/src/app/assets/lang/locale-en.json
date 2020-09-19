@@ -54,7 +54,7 @@
   "is_overdue": "is overdue",
   "and": "and",
   "releasesUrl": "https://github.com/wayfair-contribs/plentymarkets-plugin/releases",
-  "gettingStartedLabel": "How to set up the plugin before use",
+  "gettingStartedLabel": "Click here for setup instructions",
   "gettingStartedUrl": "https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide/en/initial_setup.md",
   "settingsGuideLabel": "Modifying the Wayfair Plugin configuration",
   "settingsGuideUrl": "https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide/en/settings_guide.md",
@@ -65,5 +65,5 @@
   "helpMenuLabel": "Help",
   "userGuideLabel": "User Guide",
   "userGuideUrl": "https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide_en.md",
-  "clickTheHelpButton": "Click the help button for more information"
+  "clickTheHelpButton": "Click Help for more information"
 }
