@@ -33,7 +33,7 @@ Die Schritte Autorisierung sind wie folgt:
 
     ![linked clients](../../../images/de/plugin_sets_linked_clients.png)
 
-3. Klicken Sie auf das gewünschte Plugin-Set..
+3. Klicken Sie auf das gewünschte Plugin-Set.
 
 4. Klicken Sie in der Wayfair-Zeile des Plugin-Sets auf die Schaltfläche `Einstellungen`. ![gear button](../../../images/common/button_gear.png).
 
