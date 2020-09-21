@@ -124,7 +124,7 @@ class InventoryMapper
     try {
       $supplierPartNumber = $this->getSupplierPartNumberFromVariation($variationData, $itemMappingMethod, $referrerId, $loggerContract);
     } catch (\Exception $e) {
-      $partNumberFailureMessage = gettype($e) . ' : ' . $e->getMessage();
+      $partNumberFailureMessage = get_class($e) . ' : ' . $e->getMessage();
     }
 
     if (!isset($supplierPartNumber) || empty($supplierPartNumber)) {
