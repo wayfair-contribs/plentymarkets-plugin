@@ -80,7 +80,8 @@ class ConfigHelper extends AbstractConfigHelper
     if ($cachingRepository->has(self::SETTINGS_ORDER_REFERRER_KEY)) {
       return $cachingRepository->get(self::SETTINGS_ORDER_REFERRER_KEY);
     }
-    $value = (int) $keyValueRepository->get(self::SETTINGS_ORDER_REFERRER_KEY);
+
+    $value =  $keyValueRepository->get(self::SETTINGS_ORDER_REFERRER_KEY);
     $cachingRepository->put(self::SETTINGS_ORDER_REFERRER_KEY, $value, self::CACHING_MINUTES);
     return $value;
   }
