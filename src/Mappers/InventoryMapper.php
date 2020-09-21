@@ -17,7 +17,6 @@ use Wayfair\Repositories\WarehouseSupplierRepository;
 
 class InventoryMapper
 {
-  const LOG_KEY_DEBUG = 'debugInventoryMapper';
   const LOG_KEY_STOCK_MISSING_WAREHOUSE = 'stockMissingWarehouse';
   const LOG_KEY_NO_SUPPLIER_ID_ASSIGNED_TO_WAREHOUSE = 'noSupplierIDForWarehouse';
   const LOG_KEY_UNDEFINED_MAPPING_METHOD = 'undefinedMappingMethod';
@@ -376,23 +375,8 @@ class InventoryMapper
           $allSkus = $variationData[self::VARIATION_COL_SKUS];
           if (isset($referrerId) && $referrerId > 0) {
             foreach ($allSkus as $variationSku) {
-              // TODO: verify that marketId is set to (matches) referrer ID value!
               if (array_key_exists(self::SKU_COL_MARKET_ID, $variationSku)) {
                 $skuReferrer = $variationSku[self::SKU_COL_MARKET_ID];
-
-                // TODO: remove after manual testing!
-                $logger->debug(
-                  TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
-                  [
-                    'additionalInfo' => [
-                      'message' => 'found a SKU',
-                      'variationId' => $variationData[self::VARIATION_COL_ID],
-                      'desiredReferrer' => $referrerId,
-                      'skuReferrer' => $skuReferrer,
-                    ],
-                    'method' => __METHOD__
-                  ]
-                );
 
                 if ($referrerId == $skuReferrer) {
                   return $variationSku[self::SKU_COL_SKU];

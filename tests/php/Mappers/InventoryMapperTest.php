@@ -77,10 +77,11 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
     /**
      * Test various cases for getting part numbers from variations
      *
-     * @param [mixed] $variation
-     * @param [mixed] $mappingMode
-     * @param [mixed] $expected
-     * @param [string] $msg
+     * @param mixed $variation
+     * @param mixed $mappingMode
+     * @param mixed $referrerId
+     * @param mixed $expected
+     * @param mixed $msg
      *
      * @dataProvider dataProviderForGetSupplierPartNumberFromVariation
      */

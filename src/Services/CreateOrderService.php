@@ -188,7 +188,7 @@ class CreateOrderService
       // Get referrer ID
       $referrerId = $configHelper->getOrderReferrerValue();
 
-      if (!$referrerId) {
+      if (!isset($referrerId) || $referrerId <= 0) {
         throw new \Exception("Cannot create order - no referrer value");
       }
 
