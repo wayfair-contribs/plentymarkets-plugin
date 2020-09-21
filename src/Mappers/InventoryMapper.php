@@ -100,10 +100,10 @@ class InventoryMapper
    *
    * @param array $variationData the Variation data from the Variation Repository
    * @param string $itemMappingMethod the item mapping method setting
-   * @param float $referrerId (optional) the referrer ID for Wayfair, for use with SKU mapping method
-   * @param int $stockBuffer (optional) amount of stock (per product) to withold from Wayfair
-   * @param string $timeWindowStartW3c (optional) start of time-based filter in W3C format
-   * @param string $timeWindowEndW3c (optional) end of time-based filter in W3C format
+   * @param float|null $referrerId (optional) the referrer ID for Wayfair, for use with SKU mapping method
+   * @param int|null $stockBuffer (optional) amount of stock (per product) to withold from Wayfair
+   * @param string|null $timeWindowStartW3c (optional) start of time-based filter in W3C format
+   * @param string|null $timeWindowEndW3c (optional) end of time-based filter in W3C format
    *
    * @return RequestDTO[]
    */
@@ -346,8 +346,8 @@ class InventoryMapper
    *
    * @param array $variationData
    * @param string $itemMappingMethod
-   * @param float $referrerId (optional) the referrer ID for Wayfair, for use with SKU mapping method
-   * @param LoggerContract $logger
+   * @param float|null $referrerId (optional) the referrer ID for Wayfair, for use with SKU mapping method
+   * @param LoggerContract|null $logger
    * @return mixed
    * @throws \Exception
    */
