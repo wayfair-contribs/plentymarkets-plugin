@@ -103,7 +103,7 @@ Dieses Verfahren ist nur erforderlich, wenn [die Einstellung `Vollständigen Bes
         ![adding wayfair market to variation](../../../images/de/variation_wayfair_market_added.png)
 
 
-5 Klicken Sie auf die Schaltfläche `Speichern` neben der Artikel-ID (nicht auf die obere Schaltfläche für den Artikel).
+5. Klicken Sie auf die Schaltfläche `Speichern` neben der Artikel-ID (nicht auf die obere Schaltfläche für den Artikel).
 
         ![variation saving](../../../images/common/variation_save.png)
 
