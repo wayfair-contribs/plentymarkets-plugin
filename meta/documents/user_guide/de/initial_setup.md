@@ -99,11 +99,11 @@ Dieses Verfahren ist nur erforderlich, wenn [die Einstellung `Vollständigen Bes
 
     4. Klicken Sie auf die Schaltfläche `+` ![add button](../../../images/common/button_plus.png) im Bereich `Märkte`.
 
-        ![adding wayfair market to variation](../../../images/de/variation_wayfair_market.png)
+    ![adding wayfair market to variation](../../../images/de/variation_wayfair_market.png)
 
     5. Beachten Sie, dass in `Märkte` jetzt eine `Wayfair` -Reihe vorhanden ist
 
-        ![adding wayfair market to variation](../../../images/de/variation_wayfair_market_added.png)
+    ![adding wayfair market to variation](../../../images/de/variation_wayfair_market_added.png)
 
 
 5. Klicken Sie auf die Schaltfläche `Speichern` neben der Artikel-ID (nicht auf die obere Schaltfläche für den Artikel).
@@ -113,7 +113,7 @@ Dieses Verfahren ist nur erforderlich, wenn [die Einstellung `Vollständigen Bes
 
 **Hinweis:** Alle Variationen eines Elements erben von der Hauptvariante, es sei denn der **`Vererbung deaktivieren`** Einstellung wurde angewendet.
 
-    ![inheritance status](../../../images/de/alternate_inheritance.png)
+![inheritance status](../../../images/de/alternate_inheritance.png)
 
 ## 6. Konfigurieren der Lagerzuordnungen so, dass sie mit den Wayfair-Lieferanten-IDs übereinstimmen.
 
