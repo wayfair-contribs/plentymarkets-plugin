@@ -119,26 +119,15 @@ class InventoryMapper
     $variationNumber = $variationData[self::VARIATION_COL_NUMBER];
 
     $supplierPartNumber = null;
+    $partNumberFailureMessage = null;
 
     try {
       $supplierPartNumber = $this->getSupplierPartNumberFromVariation($variationData, $itemMappingMethod, $referrerId, $loggerContract);
-      if (!isset($supplierPartNumber) || empty($supplierPartNumber)) {
-
-        $loggerContract->error(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_PART_NUMBER_MISSING),
-          [
-            'additionalInfo' => [
-              'variationID' => $mainVariationId,
-              'variationNumber' => $variationNumber,
-              'itemMappingMethod' => $itemMappingMethod
-            ],
-            'method' => __METHOD__
-          ]
-        );
-        // inventory is worthless without part numbers
-        return [];
-      }
     } catch (\Exception $e) {
+      $partNumberFailureMessage = gettype($e) . ' : ' . $e->getMessage();
+    }
+
+    if (!isset($supplierPartNumber) || empty($supplierPartNumber)) {
       $loggerContract->error(
         TranslationHelper::getLoggerKey(self::LOG_KEY_PART_NUMBER_MISSING),
         [
@@ -146,11 +135,13 @@ class InventoryMapper
             'variationID' => $mainVariationId,
             'variationNumber' => $variationNumber,
             'itemMappingMethod' => $itemMappingMethod,
-            'problem' => $e->getMessage()
+            'reason' => $partNumberFailureMessage
           ],
           'method' => __METHOD__
         ]
       );
+      // inventory is worthless without part numbers
+      return [];
     }
 
     $nextAvailableDate = $this->getAvailableDate($mainVariationId); // Pending. Need Item
