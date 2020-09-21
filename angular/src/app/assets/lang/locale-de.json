@@ -1,5 +1,5 @@
 {
-  "plugin_version": "Wayfair plugin v1.1.4-alpha.14",
+  "plugin_version": "Wayfair plugin v1.1.4-alpha.15",
   "copyright_footer": "© Copyright 2020 Wayfair LLC - Alle Rechte vorbehalten",
   "welcomeMessage": "Willkommen bei Wayfair",
   "warehouse_menu": "Lager",
@@ -52,5 +52,18 @@
   "inventory_synchronization_label": "Synchronisierung des Inventars mit Wayfair",
   "is_currently_running": "wird derzeit ausgeführt",
   "is_overdue": "ist überfällig",
-  "and": "und"
+  "and": "und",
+  "releasesUrl": "https://github.com/wayfair-contribs/plentymarkets-plugin/releases",
+  "gettingStartedLabel": "Klicken Sie hier, um Anweisungen zur Einrichtung zu erhalten",
+  "gettingStartedUrl": "https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide/de/initial_setup.md",
+  "settingsGuideLabel": "Ändern der Wayfair-Einstellungen",
+  "settingsGuideUrl": "https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide/de/settings_guide.md",
+  "troubleshootingGuideUrl": "https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide/de/troubleshooting.md",
+  "troubleshootingGuideLabel": "Anleitung zur Fehlerbehebung",
+  "issueReportUrl": "https://github.com/wayfair-contribs/plentymarkets-plugin/issues",
+  "issueReportLabel": "Melden Sie Wayfair ein Problem",
+  "helpMenuLabel": "Hilfe",
+  "userGuideLabel": "Benutzerhandbuch",
+  "userGuideUrl": "https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide_de.md",
+  "clickTheHelpButton": "Klicken Sie auf Hilfe, um weitere Informationen zu erhalten"
 }
