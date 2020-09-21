@@ -108,7 +108,8 @@ Dieses Verfahren ist nur erforderlich, wenn [die Einstellung `Vollständigen Bes
     ![variation saving](../../../images/common/variation_save.png)
 
 
-**Hinweis:** Alle Variationen eines Elements erben von der Hauptvariante, es sei denn, **`Vererbung deaktivieren`**
+**Hinweis:** Alle Variationen eines Elements erben von der Hauptvariante, es sei denn der **`Vererbung deaktivieren`** Einstellung wurde angewendet.
+
     ![inheritance status](../../../images/de/alternate_inheritance.png)
 
 ## 6. Konfigurieren der Lagerzuordnungen so, dass sie mit den Wayfair-Lieferanten-IDs übereinstimmen.
