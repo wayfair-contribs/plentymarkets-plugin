@@ -49,13 +49,13 @@ class PurchaseOrderMapper {
    * @param int         $billingAddressId
    * @param int         $billingContactId
    * @param int         $deliveryAddressId
-   * @param int         $referrerId
+   * @param float         $referrerId
    * @param string      $warehouseId
    * @param string      $paymentMethodId
    *
    * @return array
    */
-  public function map(ResponseDTO $dto, int $billingAddressId, int $billingContactId, int $deliveryAddressId, int $referrerId, string $warehouseId, string $paymentMethodId): array {
+  public function map(ResponseDTO $dto, int $billingAddressId, int $billingContactId, int $deliveryAddressId, float $referrerId, string $warehouseId, string $paymentMethodId): array {
 
     /** @var AbstractConfigHelper */
     $configHelper = pluginApp(AbstractConfigHelper::class);

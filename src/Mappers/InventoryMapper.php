@@ -6,6 +6,7 @@
 
 namespace Wayfair\Mappers;
 
+use InvalidArgumentException;
 use Plenty\Modules\StockManagement\Stock\Contracts\StockRepositoryContract;
 use Plenty\Modules\Item\VariationStock\Contracts\VariationStockRepositoryContract;
 use Wayfair\Core\Contracts\LoggerContract;
@@ -33,6 +34,9 @@ class InventoryMapper
   const STOCK_COL_VARIATION_ID = 'variationId';
   const STOCK_COL_WAREHOUSE_ID = 'warehouseId';
   const STOCK_COL_RESERVED_STOCK = 'reservedStock';
+
+  const SKU_COL_MARKET_ID = 'marketId';
+  const SKU_COL_SKU = 'sku';
 
   const STOCK_FILTER_UPDATED_AT_FROM = 'updatedAtFrom';
   const STOCK_FILTER_UPDATED_AT_TO = 'updatedAtTo';
@@ -69,12 +73,10 @@ class InventoryMapper
   /**
    * Determine the "Quantity On Hand" to report to Wayfair
    * @param int $netStock
-   * @param int $variationId
-   * @param LoggerContract $loggerContract
    *
    * @return int|mixed
    */
-  static function normalizeQuantityOnHand($netStock, $variationId, $loggerContract = null)
+  static function normalizeQuantityOnHand($netStock)
   {
     if (!isset($netStock)) {
       // API did not return a net stock
@@ -83,19 +85,6 @@ class InventoryMapper
     }
 
     if ($netStock <= -1) {
-      if (isset($loggerContract)) {
-
-        $loggerContract->info(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_NORMALIZING_INVENTORY),
-          [
-            'additionalInfo' => [
-              'variationId' => $variationId,
-              'originalNetStock' => $netStock
-            ],
-            'method' => __METHOD__
-          ]
-        );
-      }
 
       // Wayfair doesn't understand values below -1
       return -1;
@@ -111,13 +100,14 @@ class InventoryMapper
    *
    * @param array $variationData the Variation data from the Variation Repository
    * @param string $itemMappingMethod the item mapping method setting
-   * @param int $stockBuffer (optional) amount of stock (per product) to withold from Wayfair
-   * @param string $timeWindowStartW3c (optional) start of time-based filter in W3C format
-   * @param string $timeWindowEndW3c (optional) end of time-based filter in W3C format
+   * @param float|null $referrerId (optional) the referrer ID for Wayfair, for use with SKU mapping method
+   * @param int|null $stockBuffer (optional) amount of stock (per product) to withold from Wayfair
+   * @param string|null $timeWindowStartW3c (optional) start of time-based filter in W3C format
+   * @param string|null $timeWindowEndW3c (optional) end of time-based filter in W3C format
    *
    * @return RequestDTO[]
    */
-  public function createInventoryDTOsFromVariation($variationData, $itemMappingMethod, $stockBuffer, $timeWindowStartW3c = null, $timeWindowEndW3c = null)
+  public function createInventoryDTOsFromVariation($variationData, $itemMappingMethod, $referrerId = null, $stockBuffer = null, $timeWindowStartW3c = null, $timeWindowEndW3c = null)
   {
     /** @var LoggerContract $loggerContract */
     $loggerContract = pluginApp(LoggerContract::class);
@@ -128,22 +118,28 @@ class InventoryMapper
     $mainVariationId = $variationData[self::VARIATION_COL_ID];
     $variationNumber = $variationData[self::VARIATION_COL_NUMBER];
 
-    $supplierPartNumber = $this->getSupplierPartNumberFromVariation($variationData, $itemMappingMethod, $loggerContract);
+    $supplierPartNumber = null;
+    $partNumberFailureMessage = null;
+
+    try {
+      $supplierPartNumber = $this->getSupplierPartNumberFromVariation($variationData, $itemMappingMethod, $referrerId, $loggerContract);
+    } catch (\Exception $e) {
+      $partNumberFailureMessage = get_class($e) . ' : ' . $e->getMessage();
+    }
 
     if (!isset($supplierPartNumber) || empty($supplierPartNumber)) {
-
       $loggerContract->error(
         TranslationHelper::getLoggerKey(self::LOG_KEY_PART_NUMBER_MISSING),
         [
           'additionalInfo' => [
             'variationID' => $mainVariationId,
             'variationNumber' => $variationNumber,
-            'itemMappingMethod' => $itemMappingMethod
+            'itemMappingMethod' => $itemMappingMethod,
+            'reason' => $partNumberFailureMessage
           ],
           'method' => __METHOD__
         ]
       );
-
       // inventory is worthless without part numbers
       return [];
     }
@@ -208,7 +204,22 @@ class InventoryMapper
         }
 
         // Avl Immediately. ADJUSTED Net Stock (see Stock Buffer setting in Wayfair plugin).
-        $onHand = self::normalizeQuantityOnHand($stock[InventoryMapper::STOCK_COL_STOCK_NET], $loggerContract);
+        $originalStockNet = $stock[InventoryMapper::STOCK_COL_STOCK_NET];
+        $onHand = self::normalizeQuantityOnHand($originalStockNet);
+
+        if ($originalStockNet != $onHand) {
+          $loggerContract->info(
+            TranslationHelper::getLoggerKey(self::LOG_KEY_NORMALIZING_INVENTORY),
+            [
+              'additionalInfo' => [
+                'variationId' => $mainVariationId,
+                'originalStockNet' => $originalStockNet
+              ],
+              'method' => __METHOD__
+            ]
+          );
+        }
+
 
         if (!isset($onHand) || ($onHand < -1)) {
           // inventory amounts less than -1 are not accepted - do NOT send to Wayfair.
@@ -335,40 +346,54 @@ class InventoryMapper
    *
    * @param array $variationData
    * @param string $itemMappingMethod
-   * @param LoggerContract $logger
+   * @param float|null $referrerId (optional) the referrer ID for Wayfair, for use with SKU mapping method
+   * @param LoggerContract|null $logger
    * @return mixed
+   * @throws \Exception
    */
-  static function getSupplierPartNumberFromVariation($variationData, $itemMappingMethod, $logger = null)
+  static function getSupplierPartNumberFromVariation($variationData, $itemMappingMethod, $referrerId = null, $logger = null)
   {
-    if (!isset($variationData)) {
-      return null;
+    if (!isset($variationData) || empty($variationData)) {
+      throw new InvalidArgumentException("Variation data is not set");
     }
 
-    $supplierPartNumber = null;
-
     $variationNumber = $variationData[self::VARIATION_COL_NUMBER];
-
-    $supplierPartNumber = null;
 
     switch ($itemMappingMethod) {
       case AbstractConfigHelper::ITEM_MAPPING_SKU:
         if (array_key_exists(self::VARIATION_COL_SKUS, $variationData) && !empty($variationData[self::VARIATION_COL_SKUS])) {
-          // FIXME: should not blindly use the first SKU - only should use the one assigned to Wayfair!
-          $supplierPartNumber = $variationData[self::VARIATION_COL_SKUS][0]['sku'];
+
+          $allSkus = $variationData[self::VARIATION_COL_SKUS];
+          if (isset($referrerId) && $referrerId > 0) {
+            foreach ($allSkus as $variationSku) {
+              if (array_key_exists(self::SKU_COL_MARKET_ID, $variationSku)) {
+                $skuReferrer = $variationSku[self::SKU_COL_MARKET_ID];
+
+                if ($referrerId == $skuReferrer) {
+                  return $variationSku[self::SKU_COL_SKU];
+                }
+              }
+            }
+          }
+
+          // fall-back to original behavior of using first SKU
+          return $allSkus[0]['sku'];
         }
-        break;
+
+        throw new \Exception("No SKUs found");
+
       case AbstractConfigHelper::ITEM_MAPPING_EAN:
         if (array_key_exists(self::VARIATION_COL_BARCODES, $variationData) && !empty($variationData[self::VARIATION_COL_BARCODES])) {
           // TODO: find a way to avoid blindly using first barcode.
-          $supplierPartNumber = $variationData[self::VARIATION_COL_BARCODES][0]['code'];
+          return $variationData[self::VARIATION_COL_BARCODES][0]['code'];
         }
-        break;
+
+        throw new \Exception("No Barcodes found");
       case AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER:
-        $supplierPartNumber = $variationNumber;
-        break;
+        // variation number is always set - enforced by Plenty UI
+        return $variationNumber;
       default:
         // just in case - ConfigHelper should have validated the method value
-        $supplierPartNumber = $variationNumber;
         if (isset($logger)) {
           $logger->warning(
             TranslationHelper::getLoggerKey(self::LOG_KEY_UNDEFINED_MAPPING_METHOD),
@@ -381,9 +406,9 @@ class InventoryMapper
             ]
           );
         }
-    }
 
-    return $supplierPartNumber;
+        return $variationNumber;
+    }
   }
 
   /**

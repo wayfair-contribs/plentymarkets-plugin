@@ -65,9 +65,9 @@ class ConfigHelper extends AbstractConfigHelper
   }
 
   /**
-   * @return int
+   * @return float
    */
-  public function getOrderReferrerValue(): int
+  public function getOrderReferrerValue(): float
   {
     /**
      * @var KeyValueRepository $keyValueRepository
@@ -80,7 +80,8 @@ class ConfigHelper extends AbstractConfigHelper
     if ($cachingRepository->has(self::SETTINGS_ORDER_REFERRER_KEY)) {
       return $cachingRepository->get(self::SETTINGS_ORDER_REFERRER_KEY);
     }
-    $value = (int) $keyValueRepository->get(self::SETTINGS_ORDER_REFERRER_KEY);
+
+    $value =  $keyValueRepository->get(self::SETTINGS_ORDER_REFERRER_KEY);
     $cachingRepository->put(self::SETTINGS_ORDER_REFERRER_KEY, $value, self::CACHING_MINUTES);
     return $value;
   }
@@ -103,7 +104,7 @@ class ConfigHelper extends AbstractConfigHelper
    */
   public function getDryRun(): string
   {
-    return $this->config->get(self::PLUGIN_NAME . '.global.container.dryRunMode');
+    return (string) $this->config->get(self::PLUGIN_NAME . '.global.container.dryRunMode');
   }
 
   public function isAllItemsActive(): bool

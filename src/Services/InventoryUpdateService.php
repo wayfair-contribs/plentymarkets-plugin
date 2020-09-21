@@ -131,8 +131,12 @@ class InventoryUpdateService
         $externalLogs->addErrorLog('Inventory ' . ($fullInventory ? 'Full' : '') . ' overriding a currently running inventory sync process that started at ' . $currentSessionStartedAt);
       }
 
-      // look up item mapping method at this level to ensure consistency and improve efficiency
+      // look up item mapping method at this level to ensure consistency and efficiency
       $itemMappingMethod = $this->configHelper->getItemMappingMethod();
+
+      // look up referrer ID at this level to ensure consistency and efficiency
+      $referrerId = $this->configHelper->getOrderReferrerValue();
+
 
       // TODO: remove dependency on VariationSearchRepositoryContract by replacing with a Wayfair wrapper
       /** @var VariationSearchRepositoryContract */
@@ -210,7 +214,7 @@ class InventoryUpdateService
         foreach ($searchResults as $variationData) {
           $haveStockForVariation = false;
           /** @var RequestDTO[] */
-          $requestDTOsForVariation = $this->inventoryMapper->createInventoryDTOsFromVariation($variationData, $itemMappingMethod, $stockBuffer, $windowStart, $windowEnd);
+          $requestDTOsForVariation = $this->inventoryMapper->createInventoryDTOsFromVariation($variationData, $itemMappingMethod, $referrerId, $stockBuffer, $windowStart, $windowEnd);
 
           if (count($requestDTOsForVariation)) {
             $requestDTOsForPage = array_merge($requestDTOsForPage, $requestDTOsForVariation);
