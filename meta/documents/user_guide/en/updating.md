@@ -17,7 +17,7 @@ Prior to updating, review [the latest information on the Wayfair plugin's releas
 
         ![linked clients](../../../images/en/plugin_sets_linked_clients.png)
 
-3. Click on the `Edit` button ![pencil button](../../../images/common/button_pencil.png) button for the Plugin Set.
+3. Click on the Plugin Set.
 
 4. Verify that a row exists on the page with the `Name` displayed as "Wayfair" and that the `Deployed` column is also populated, indicating that the plugin is in use:
 

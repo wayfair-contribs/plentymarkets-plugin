@@ -33,7 +33,7 @@ Die Schritte Autorisierung sind wie folgt:
 
     ![linked clients](../../../images/de/plugin_sets_linked_clients.png)
 
-3. Klicken Sie auf die Schaltfläche `bearbeiten` ![pencil button](../../../images/common/button_pencil.png) für das gewünschte Plugin-Set.
+3. Klicken Sie auf das gewünschte Plugin-Set.
 
 4. Klicken Sie in der Wayfair-Zeile des Plugin-Sets auf die Schaltfläche `Einstellungen`. ![gear button](../../../images/common/button_gear.png).
 
@@ -79,36 +79,41 @@ Dieses Verfahren ist nur erforderlich, wenn [die Einstellung `Vollständigen Bes
 
 1. Gehen Sie auf der Hauptseite von Plentymarkets zu `Artikel` >> `Artikel bearbeiten`.
 
-2. Suchen Sie nach Artikeln und öffnen Sie sie
+2. Suchen Sie nach Artikeln und öffnen
+    **Hinweis:** Überprüfen Sie, ob die Artikelvariante **`Hauptvariante`** enthält ** siehe Abbildung unten
 
-3. **Klicken Sie für jedes Element** auf `Varianten` und öffnen Sie diese.
+    ![item main variation](../../../images/de/item_main_variation.png)
 
-4. **Für jede Variante**:
+     **`Klicken Sie für jedes Artikel`**
 
-    1. Stellen Sie auf der Registerkarte `Einstellungen` sicher, dass das Kontrollkästchen `Aktiv` im Abschnitt `Verfügbarkeit` aktiviert ist.
+3. Stellen Sie auf der Registerkarte `Einstellungen` sicher, dass das Kontrollkästchen `Aktiv` im Abschnitt `Verfügbarkeit` aktiviert ist.
 
-        ![variation active](../../../images/de/variation_active_field.png)
+    ![variation active](../../../images/de/variation_active_field.png)
 
-    2. Wenn [die Einstellung `Vollständigen Bestand an Wayfair senden?`](settings_guide.md#vollständigen-bestand-an-wayfair-senden) **deaktiviert** ist, wechseln Sie zur Registerkarte `Verfügbarkeit` der Variation und fügen Sie `Wayfair` zur Liste im Bereich `Märkte` hinzu.
-        1. Klicken Sie in den Bereich `Klicken, um Märkte auszuwählen`.
+4. Wenn [die Einstellung `Vollständigen Bestand an Wayfair senden?`](settings_guide.md#vollständigen-bestand-an-wayfair-senden) **deaktiviert** ist, wechseln Sie zur Registerkarte `Verfügbarkeit` des Artikels und fügen Sie `Wayfair` zur Liste im Bereich `Märkte` hinzu.
+    1. Klicken Sie in den Bereich `Klicken, um Märkte auszuwählen`.
 
-        2. Scrollen Sie nach unten zum Eintrag `Wayfair`
+    2. Scrollen Sie nach unten zum Eintrag `Wayfair`
 
-        3. Setzen Sie ein Häkchen neben `Wayfair`
+    3. Setzen Sie ein Häkchen neben `Wayfair`
 
-        4. Klicken Sie auf die Schaltfläche `+` ![add button](../../../images/common/button_plus.png) im Bereich `Märkte`.
+    4. Klicken Sie auf die Schaltfläche `+` ![add button](../../../images/common/button_plus.png) im Bereich `Märkte`.
 
-             ![adding wayfair market to variation](../../../images/de/variation_wayfair_market.png)
+    ![adding wayfair market to variation](../../../images/de/variation_wayfair_market.png)
 
-        5. Beachten Sie, dass in `Märkte` jetzt eine `Wayfair` -Reihe vorhanden ist
+    5. Beachten Sie, dass in `Märkte` jetzt eine `Wayfair` -Reihe vorhanden ist
 
-            ![adding wayfair market to variation](../../../images/de/variation_wayfair_market_added.png)
+    ![adding wayfair market to variation](../../../images/de/variation_wayfair_market_added.png)
 
 
-    3. Klicken Sie auf die Schaltfläche `Speichern` neben der Variations-ID (nicht auf die obere Schaltfläche für den Artikel).
+5. Klicken Sie auf die Schaltfläche `Speichern` neben der Artikel-ID (nicht auf die obere Schaltfläche für den Artikel).
 
-        ![variation saving](../../../images/common/variation_save.png)
+    ![variation saving](../../../images/common/variation_save.png)
 
+
+**Hinweis:** Alle Variationen eines Elements erben von der Hauptvariante, es sei denn der **`Vererbung deaktivieren`** Einstellung wurde angewendet.
+
+![inheritance status](../../../images/de/alternate_inheritance.png)
 
 ## 6. Konfigurieren der Lagerzuordnungen so, dass sie mit den Wayfair-Lieferanten-IDs übereinstimmen.
 

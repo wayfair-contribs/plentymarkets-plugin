@@ -49,7 +49,8 @@ Um die Funktionen des Wayfair-Plugins nutzen zu können, muss es in den aktiven 
     * Verwenden Sie optional die Schaltflächen `Mandanten und Plugin-Sets verknüpfen`, um die Verknüpfungen zwischen Mandanten und Plugin-Sets zu ändern.
         ![link plugin sets button](../../../images/de/installation/button_link_plugin_sets.png)
 
-4. Klicken Sie auf die Schaltfläche `Plugin-Set bearbeiten` ![pencil button](../../../images/common/button_pencil.png) für das Plugin-Set, in dem das Wayfair-Plugin installiert werden soll.
+4. Klicken Sie auf das Plugin-Set, an in es für das Wayfair-Plugin installiert werden.
+
 
 5. Klicken Sie auf die Schaltfläche `+ Plugin hinzufügen`
     ![add plugin button](../../../images/de/installation/button_add_plugin.png)

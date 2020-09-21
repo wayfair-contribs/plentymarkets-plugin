@@ -17,23 +17,23 @@ Lesen Sie vor dem Aktualisieren [die neuesten Informationen zu den Versionen des
 
         ![linked clients](../../../images/de/plugin_sets_linked_clients.png)
 
-3. Klicken Sie auf die Schaltfläche `Plugin-Set bearbeiten` ![pencil button](../../../images/common/button_pencil.png) für das Plugin-Set.
+3. Klicken Sie auf das Plugin Set.
 
 4. Stellen Sie sicher, dass auf der Seite eine Zeile mit dem Namen "Wayfair" vorhanden ist und dass auch die Spalte `Bereitgestellt` ausgefüllt ist, um anzuzeigen, dass das Plugin verwendet wird.
     ![wayfair plugin needs update](../../../images/de/installation/wayfair_plugin_needs_update.png)
 
 5. Bewegen Sie den Mauszeiger über die Schaltfläche `Aktualisieren` ![update button](../../../images/common/button_update.png) in der Spalte `Aktionen`.
 
-5. Wenn auf der Schaltfläche die Meldung `Keine Aktualisierung verfügbar` angezeigt wird, verfügen Sie bereits über die neueste Version des Wayfair-Plugins. **Fahren Sie nicht mit dieser Anleitung fort.** Andernfalls sollte `Aktualisierung verfügbar` und eine Versionsnummer angezeigt werden.
+6. Wenn auf der Schaltfläche die Meldung `Keine Aktualisierung verfügbar` angezeigt wird, verfügen Sie bereits über die neueste Version des Wayfair-Plugins. **Fahren Sie nicht mit dieser Anleitung fort.** Andernfalls sollte `Aktualisierung verfügbar` und eine Versionsnummer angezeigt werden.
 
       ![no update](../../../images/de/installation/no_update.png)
 
-6. Klicken Sie auf die Schaltfläche `Aktualisieren` ![update button](../../../images/common/button_update.png). Es wird eine Seite mit dem Wayfair-Logo, Informationen zum Wayfair-Plugin und einer Schaltfläche `Aktualisieren` oben angezeigt.
+7. Klicken Sie auf die Schaltfläche `Aktualisieren` ![update button](../../../images/common/button_update.png). Es wird eine Seite mit dem Wayfair-Logo, Informationen zum Wayfair-Plugin und einer Schaltfläche `Aktualisieren` oben angezeigt.
 
 
     ![update page](../../../images/de/installation/update_page.png)
 
-7. Überprüfen Sie die Informationen auf der Seite.
+8. Überprüfen Sie die Informationen auf der Seite.
 
 9. Wählen Sie im Dropdown-Menü `Version auswählen` die Option [die neueste Plugin-Version](https://github.com/wayfair-contribs/plentymarkets-plugin/releases), falls diese noch nicht ausgewählt ist.
 

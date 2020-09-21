@@ -71,6 +71,7 @@ Die Einstellung `Standard-Bestellstatus` bestimmt, in welchem ​​Status sich 
 
 **Hinweis:** Die Auftragserstellung gilt nicht als Änderung des Auftragsstatus. Wenn Sie den Standardbestellstatus auf einen höheren als die Statuswerte für konfigurierten Plentymarkets-Ereignisse setzen, können einige Ereignisse fehlschlagen.
 
+
 ### Standardversandanbieter **(nicht genutzt)**
 Die Einstellung `Standardversandanbieter` ist eine Legacy-Einstellung, die das Verhalten des Plugins nicht mehr beeinflusst.
 **Wenn diese Einstellung in Ihrem System angezeigt wird, empfiehlt Wayfair dringend, dass Sie Ihr Plugin auf eine neuere Version aktualisieren.**

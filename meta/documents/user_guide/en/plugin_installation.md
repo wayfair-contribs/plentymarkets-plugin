@@ -52,7 +52,7 @@ To use the functions of the Wayfair plugin, it must be installed in the Plentyma
 
         ![link plugin sets button](../../../images/en/installation/button_link_plugin_sets.png)
 
-4. Click the `Edit plugin set` button ![pencil button](../../../images/common/button_pencil.png) for the Plugin Set in which the Wayfair plugin is to be installed.
+4. Click the the Plugin Set to be installed for the Wayfair plugin.
 
 5. Click the `Add plugin` button:
 
