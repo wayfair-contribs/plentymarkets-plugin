@@ -81,7 +81,8 @@ This procedure is required only if [the `Send all inventory items to Wayfair` se
 
 1. From the main Plentymarkets page, go to `Item` >> `Edit item`
 
-2. Search for item(s) and open them Ensure that item says **`main variation`** see image below
+2. Search for item(s) and open them
+    **Note:** Verify item variation  says **`main variation`** see image below
 
     ![item main variation](../../../images/en/item_main_variation.png)
 
@@ -107,11 +108,12 @@ This procedure is required only if [the `Send all inventory items to Wayfair` se
         ![adding wayfair market to variation](../../../images/en/variation_wayfair_market_added.png)
 
 
-5. Click the `Save` left of the `Item ID`, below the `Global` tab (not the higher-up button for the Item):
+5. Click the `Save` left of the `Variation ID`, below the `Global` tab (not the higher-up button for the Item):
 
-    The ![variation saving](../../../images/common/variation_save.png)
+    ![variation saving](../../../images/common/variation_save.png)
 
 **Note:** All variations of an item will inherit from the  main variation, unless **`Inheritance is deactivated`**
+    ![inheritance status](../../../images/en/alternate_inheritance.png)
 
 ## 6. Configuring the Warehouse mappings to match Wayfair Supplier IDs.
 

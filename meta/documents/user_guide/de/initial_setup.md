@@ -85,7 +85,7 @@ Dieses Verfahren ist nur erforderlich, wenn [die Einstellung `Vollständigen Bes
 
 3. Stellen Sie auf der Registerkarte `Einstellungen` sicher, dass das Kontrollkästchen `Aktiv` im Abschnitt `Verfügbarkeit` aktiviert ist.
 
-        ![variation active](../../../images/de/variation_active_field.png)
+    ![variation active](../../../images/de/variation_active_field.png)
 
 4. Wenn [die Einstellung `Vollständigen Bestand an Wayfair senden?`](settings_guide.md#vollständigen-bestand-an-wayfair-senden) **deaktiviert** ist, wechseln Sie zur Registerkarte `Verfügbarkeit` des Artikels und fügen Sie `Wayfair` zur Liste im Bereich `Märkte` hinzu.
     1. Klicken Sie in den Bereich `Klicken, um Märkte auszuwählen`.
@@ -105,8 +105,11 @@ Dieses Verfahren ist nur erforderlich, wenn [die Einstellung `Vollständigen Bes
 
 5. Klicken Sie auf die Schaltfläche `Speichern` neben der Artikel-ID (nicht auf die obere Schaltfläche für den Artikel).
 
-        ![variation saving](../../../images/common/variation_save.png)
+    ![variation saving](../../../images/common/variation_save.png)
 
+
+**Hinweis:** Alle Variationen eines Elements erben von der Hauptvariante, es sei denn, **`Vererbung deaktivieren`**
+    ![inheritance status](../../../images/de/alternate_inheritance.png)
 
 ## 6. Konfigurieren der Lagerzuordnungen so, dass sie mit den Wayfair-Lieferanten-IDs übereinstimmen.
 
