@@ -79,9 +79,12 @@ Dieses Verfahren ist nur erforderlich, wenn [die Einstellung `Vollständigen Bes
 
 1. Gehen Sie auf der Hauptseite von Plentymarkets zu `Artikel` >> `Artikel bearbeiten`.
 
-2.  Suchen Sie nach Artikeln und öffnen Sie sie **`Stellen Sie sicher, dass auf dem Artikel die **`Hauptvariante`** steht`** siehe Bild unten
+2. Suchen Sie nach Artikeln und öffnen
+    **Hinweis:** Überprüfen Sie, ob die Artikelvariante **`Hauptvariante`** enthält ** siehe Abbildung unten
 
     ![item main variation](../../../images/de/item_main_variation.png)
+
+     **`Klicken Sie für jedes Artikel`**
 
 3. Stellen Sie auf der Registerkarte `Einstellungen` sicher, dass das Kontrollkästchen `Aktiv` im Abschnitt `Verfügbarkeit` aktiviert ist.
 

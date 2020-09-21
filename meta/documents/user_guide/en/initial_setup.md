@@ -87,6 +87,8 @@ This procedure is required only if [the `Send all inventory items to Wayfair` se
     ![item main variation](../../../images/en/item_main_variation.png)
 
 
+     **`For each Item`**
+
 3. On the `Settings` tab, make sure that the `Active` checkbox in the `Availability` Section is checked:
 
     ![variation active](../../../images/en/variation_active_field.png)
