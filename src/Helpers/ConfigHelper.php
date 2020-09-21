@@ -65,9 +65,9 @@ class ConfigHelper extends AbstractConfigHelper
   }
 
   /**
-   * @return int
+   * @return float
    */
-  public function getOrderReferrerValue(): int
+  public function getOrderReferrerValue(): float
   {
     /**
      * @var KeyValueRepository $keyValueRepository
@@ -103,7 +103,7 @@ class ConfigHelper extends AbstractConfigHelper
    */
   public function getDryRun(): string
   {
-    return $this->config->get(self::PLUGIN_NAME . '.global.container.dryRunMode');
+    return (string) $this->config->get(self::PLUGIN_NAME . '.global.container.dryRunMode');
   }
 
   public function isAllItemsActive(): bool
