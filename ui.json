@@ -3,7 +3,7 @@
   "namespace": "Wayfair",
   "menuEntries": [
     {
-      "label": "Home",
+      "label": "menu.home",
       "menu": "settings/markets/Wayfair",
       "urlKey": "warehouse",
       "entryPoint": "index.html"

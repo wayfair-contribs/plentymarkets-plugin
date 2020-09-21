@@ -45,3 +45,6 @@ The Wayfair plugin presents Plentymarkets users with the ability to customize an
 
 ## Tips and tricks
 Things are always changing at Plentymarkets as well as at Wayfair. [Click here for information on using the Wayfair plugin efficiently and securely](https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide/en/tips_and_tricks.md).
+
+## Troubleshooting
+Is the Wayfair Plugin not working as expected? [Click here for information on solving issues](https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide/en/troubleshooting.md).

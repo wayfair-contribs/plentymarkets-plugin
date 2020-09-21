@@ -5,19 +5,21 @@ export class UrlHelper {
     static URL_WAYFAIR_WAREHOUSE_SUPPLIER = 'warehouseSupplier';
     static URL_WAYFAIR_WAREHOUSES = 'warehouses'
     static URL_WAYFAIR_SETTINGS= 'stockBuffer'
-    static URL_WAYFAIR_FULL_INVENTORY= 'fullInventory'
+    static URL_WAYFAIR_INVENTORY= 'inventory'
     static URL_WAYFAIR_CARRIER_SCACS = 'carrierScacs'
     static URL_WAYFAIR_CARRIERS = 'carriers'
     static URL_WAYFAIR_SHIPPING_METHOD = 'shippingMethod'
+    static URL_WAYFAIR_ORDER_STATUSES = 'orderStatuses'
 
     static urls = {
         [UrlHelper.URL_WAYFAIR_WAREHOUSE_SUPPLIER]: '/warehouseSupplier',
         [UrlHelper.URL_WAYFAIR_WAREHOUSES]: '/warehouses',
         [UrlHelper.URL_WAYFAIR_SETTINGS]: '/settings',
-        [UrlHelper.URL_WAYFAIR_FULL_INVENTORY]: '/fullInventory',
+        [UrlHelper.URL_WAYFAIR_INVENTORY]: '/inventory',
         [UrlHelper.URL_WAYFAIR_CARRIER_SCACS]: '/carrierScacs',
         [UrlHelper.URL_WAYFAIR_CARRIERS] : '/carriers',
-        [UrlHelper.URL_WAYFAIR_SHIPPING_METHOD]: '/shippingMethod'
+        [UrlHelper.URL_WAYFAIR_SHIPPING_METHOD]: '/shippingMethod',
+        [UrlHelper.URL_WAYFAIR_ORDER_STATUSES]: '/orderStatuses'
     };
 
     static getBaseDomainUrl() {

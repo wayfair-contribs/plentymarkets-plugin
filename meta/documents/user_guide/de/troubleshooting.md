@@ -7,14 +7,26 @@ Dieses Dokument richtet sich an Benutzer des Wayfair-Plugins, bei denen Probleme
 Die bekannten Probleme für aktuelle und frühere Versionen des Wayfair-Plugins können auf [Die Issues Site auf GitHub](https://github.com/wayfair-contribs/plentymarkets-plugin/issues) eingesehen werden.
 
 
-## Plentymarkets logs
+## Plentymarkets Logs
 
-The Wayfair plugin produces information in the Plentymarkets logs, which contains critical information for investigating and resolving issues.
+Das Wayfair Plugin erstellt Informationen in den Plentymarkets Logs, die wichtige Informationen zur Untersuchung und Lösung von Problemen enthalten.
 
 ### Anzeigen der Logs
+
 Um die Plentymarkets-Protokolle anzeigen, Gehen Sie von der Hauptseite von Plentymarkets aus zu `Daten` >> `Log`.
 
 ![log im Datenmenü](../../../images/de/troubleshooting/menu_data_log.png)
+
+### Lesen der Logdetails
+
+Klicken Sie in der Sicht der Log auf eine Zeile, um die "Protokolldetails" für eine Nachricht anzuzeigen.
+
+![logdetails](../../../images/de/troubleshooting/log_details.png)
+
+* Wichtige Details werden häufig in ** zusammenklappbaren ** Bereichen der Protokolldetails versteckt.
+
+* Wenn Sie einen Fehlerbericht einreichen, kopieren Sie so viele Daten wie möglich aus den "Protokolldetails" in eine Datei, um sie an Wayfair zu senden.
+
 
 ### Legen Sie die Log Level für Wayfair fest
 
@@ -31,7 +43,7 @@ Die Standardeinstellungen für die Logs zeigen nicht alle Nachrichten vom Wayfai
 
 5. Stellen Sie die `Log level` auf `Debug` ein.
 
-6. Make sure the settings look like this:
+6. Stellen Sie sicher, dass die Details so aussehen:
 
     ![wayfair auf debug eingestellt](../../../images/de/troubleshooting/wayfair_logs_active_debug.png)
 
@@ -47,10 +59,6 @@ Die Standardeinstellungen für die Logs zeigen nicht alle Nachrichten vom Wayfai
 
 3. Klicken Sie auf die Lupentaste ![suchschaltfläche](../../../images/common/button_search.png) um nur die Logs für wayfair anzuzeigen.
 
-4. Klicken Sie auf eine Zeile in der Liste der Logs, um weitere Details für eine Nachricht anzuzeigen.
-
-5. Kopieren Sie die Informationen den Log in eine Textdatei, um sie zum Ablegen eines Fehlerberichts zu verwenden.
-
 ## Häufige Probleme
 
 Bevor Sie sich an Wayfair wenden, verwenden Sie bitte die folgende Tabelle, um Probleme im Wayfair-Plugin selbst zu diagnostizieren.
@@ -58,7 +66,7 @@ Bevor Sie sich an Wayfair wenden, verwenden Sie bitte die folgende Tabelle, um P
 | Problem | Mögliche Ursachen |
 | ----- | --------------- |
 | Allgemeiner Mangel an Daten, die von Wayfair stammen oder zu Wayfair gehen | <ul><li>[Anmeldeinformationen für das Plugin](initial_setup.md#1-autorisierung-des-wayfair-plugins-f%C3%BCr-den-zugriff-auf-wayfair-schnittstellen) fehlen oder sind im aktiven Plugin Set falsch.</li><li>Probleme mit der Internetverbindung.</li><li>Vorübergehende Ausfallzeiten bei Wayfair.</ul> |
-| In dem an Wayfair gesendeten Inventar fehlt ein Artikel | <ul><li>Die Einstellung [`Methode zur Artikelzuweisung`](settings_guide.md#methode-zur-artikelzuweisung) in den Einstellungen von Wayfair Plugin ist nicht auf den gewünschten Wert eingestellt.</li><li>Die Einstellung [`Vollständigen Bestand an Wayfair senden`](settings_guide.md#vollst%C3%A4ndigen-bestand-an-wayfair-senden) ist **deaktiviert** **disabled** und die Artikelvariation in Plentymarkets ist nicht [als für den Wayfair-Marktplatz verfügbar markiert](initial_setup.md#5-artikel-auf-wayfair-zum-verkauf-anbieten).</li><li>Die Artikelvariation in Plentymarkets ist einem Plentymarkets Lager zugeordnet, das keiner Wayfair Lieferanten ID auf der [Lager Seite](settings_guide.md#die-lager-seite) der Wayfair Plugin Einstellungen zugeordnet ist.</li><li>Die Artikelvariation in Plentymarkets hat einen leeren oder falschen Wert in dem Feld, das der Einstellung [`Methode zur Artikelzuweisung`](settings_guide.md#methode-zur-artikelzuweisung) der Wayfair Plugin Einstellungen ausgewählt ist.</li></ul> |
+| In dem an Wayfair gesendeten Inventar fehlt ein Artikel | <ul><li>Die Einstellung [`Methode zur Artikelzuweisung`](settings_guide.md#methode-zur-artikelzuweisung) in den Einstellungen von Wayfair Plugin ist nicht auf den gewünschten Wert eingestellt.</li><li>Die Einstellung [`Vollständigen Bestand an Wayfair senden`](settings_guide.md#vollst%C3%A4ndigen-bestand-an-wayfair-senden) ist **deaktiviert** und die Artikelvariation in Plentymarkets ist nicht [als für den Wayfair-Marktplatz verfügbar markiert](initial_setup.md#5-artikel-auf-wayfair-zum-verkauf-anbieten).</li><li>Die Artikelvariation in Plentymarkets ist einem Plentymarkets Lager zugeordnet, das keiner Wayfair Lieferanten ID auf der [Lager Seite](settings_guide.md#die-lager-seite) der Wayfair Plugin Einstellungen zugeordnet ist.</li><li>Die Artikelvariation in Plentymarkets hat einen leeren oder falschen Wert in dem Feld, das der Einstellung [`Methode zur Artikelzuweisung`](settings_guide.md#methode-zur-artikelzuweisung) der Wayfair Plugin Einstellungen ausgewählt ist.</li></ul> |
 | Ein an Wayfair gesendeter Inventarbetrag für einen Artikel liegt unter dem erwarteten Wert | <ul><li>Keines der [Plentymarkets Lager abgestimmt auf Wayfair](settings_guide.md#die-lager-seite) hat positive Lagerbestände für den Plentymarkets Artikelvariation.</li><li>Der Wert der [Lagerpuffer](settings_guide.md#lagerpuffer) ist größer oder gleich der Bestandsmenge für die Plentymarkets Artikelvariation in [Plentymarkets Lager abgestimmt auf Wayfair](settings_guide.md#die-lager-seite).</li></ul> |
 | Es kommen keine Bestellungen von Wayfair | <ul><li>Die Wayfair Lieferanten ID für die Wayfair-Bestellung nicht ist einem Plentymarkets Lager zugeordnet auf der [Lager Seite](settings_guide.md#die-lager-seite) der Wayfair Plugin Einstellungen.</li></ul> |
 | Bestellungen von Wayfair werden nicht ordnungsgemäß mit Artikeln in Plentymarkets verknüpft | <ul><li>Die Einstellung [`Methode zur Artikelzuweisung`](settings_guide.md#methode-zur-artikelzuweisung) in den Einstellungen von Wayfair Plugin ist nicht auf den gewünschten Wert eingestellt.</li><li>Die Artikelvariation in Plentymarkets hat einen leeren oder falschen Wert in dem Feld, das der Einstellung [`Methode zur Artikelzuweisung`](settings_guide.md#methode-zur-artikelzuweisung) der Wayfair Plugin Einstellungen ausgewählt ist.</li></ul> |
@@ -69,4 +77,10 @@ Bevor Sie sich an Wayfair wenden, verwenden Sie bitte die folgende Tabelle, um P
 
 Wenn Sie ein Problem mit dem Wayfair-Plugin nicht beheben können, können Sie das Problem Wayfair auf [Die Issues Site für das Plugin auf GitHub](https://github.com/wayfair-contribs/plentymarkets-plugin/issues) melden.
 
-**Wenn Sie Wayfair kontaktieren, geben Sie bitte Informationen zu Einstellungen an, die kürzlich in Plentymarkets oder in des Wayfair-Plugins geändert wurden. Um Ihnen die bestmögliche Unterstützung zu bieten, müssen die Vertreter von Wayfair möglicherweise auch zusätzliche Fragen zu Ihrer spezifischen Konfiguration stellen.**
+**Wenn Sie Wayfair kontaktieren, geben Sie bitte diesen Informationen**:
+
+* Letzte Änderungen an den Einstellungen von Plentymarkets
+* Letzte Änderungen an den Einstellungen des Wayfair Plugins
+* Details der Plentymarkets Logs aus Zeiten, in denen Probleme aufgetreten sind
+
+**Um Ihnen den bestmöglichen Support zu bieten, müssen die Vertreter von Wayfair möglicherweise auch zusätzliche Fragen zu Ihrer spezifischen Konfiguration stellen.**

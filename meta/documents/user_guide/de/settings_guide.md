@@ -23,7 +23,7 @@ So suchen Sie die Einstellungen:
 
     ![home button](../../../images/de/wayfair_settings/menu_markets_wayfair_home.png)
 
-6. Sie können jetzt die Wayfair-Navigationsleiste verwenden, um eine Einstellungsseite wie [`Lager`](#die-seite-lager) auszuwählen.
+6. Sie können jetzt die Wayfair-Navigationsleiste verwenden, um eine Einstellungsseite wie [`Lager`](#die-lager-seite) auszuwählen.
 
     ![wayfair nav bar](../../../images/de/wayfair_settings/wayfair_nav_bar.png)
 
@@ -130,31 +130,57 @@ Die optionale Einstellung `Aufträge importieren ab` bestimmt ein Datum, ab dem 
 
 ### Vollständigen Bestand an Wayfair senden?
 Die optionale Einstellung `Vollständigen Bestand an Wayfair senden?` legt fest, ob Plentymarkets-Artikelvariationen ausdrücklich als für den Verkauf auf Wayfair geeignet deklariert werden müssen oder nicht.
-Wenn `Vollständigen Bestand an Wayfair senden?` Deaktiviert ist, muss `Wayfair` in der Liste `Märkte` der Artikel enthalten sein, die auf Wayfair verkauft werden sollen, wie in diesem Beispiel dargestellt:
+Wenn `Vollständigen Bestand an Wayfair senden?` Deaktiviert ist, muss `Wayfair` in der Liste `Märkte` der Artikelvariationen enthalten sein, die auf Wayfair verkauft werden sollen, wie in diesem Beispiel dargestellt:
 ![Artikel mit Wayfair Market](../../../images/de/item_wayfair_market.png)
 
-Durch Aktivieren von `Vollständigen Bestand an Wayfair senden?` Kann Wayfair alle Artikel auflisten, von denen festgestellt wird, dass sie derzeit auf Lager sind, einschließlich der Artikel, für die "Wayfair" **nicht** in der "Märkte" -Liste enthalten ist.
+Durch Aktivieren von `Vollständigen Bestand an Wayfair senden?` Kann Wayfair alle Artikel auflisten, von denen festgestellt wird, dass sie derzeit auf Lager sind, einschließlich der Artikelvariationen, für die "Wayfair" **nicht** in der "Märkte" -Liste enthalten ist.
+
+
+## Die Seite Inventar
+**(Seit Version 1.1.4)**
+
+Die Seite `Inventar` enthält keine zu konfigurierenden Einstellungen.
+Sie wird verwendet, um den Status der Synchronisierung des Plentymarkets-Inventars mit Wayfair zu überprüfen
+Die Daten auf der Seite werden im Laufe der Zeit automatisch aktualisiert, wie durch den Zeitstempel am unteren Ende der Seite dargestellt.
+
+## Hauptstatusanzeige
+
+Oben auf der Seite "Inventar" werden immer ein Symbol und eine Meldung angezeigt, um den allgemeinen Zustand des Inventarsynchronisierungsprozesses zu beschreiben.
+
+* Ein Kalendersymbol ![kalender](../../../images/common/icon_calendar.png) wird angezeigt, wenn das Wayfair-Plugin noch keine Inventarsynchronisierung versucht hat.
+
+    * Dies geschieht direkt nach der Installation des Plugins.
+    * Dies kann passieren, wenn das Plugin kürzlich aktualisiert wurde.
+    * Die Seite ändert sich innerhalb von 15 bis 30 Minuten, sobald das Synchronisationssystem initialisiert wird.
+
+* Ein Symbol mit einem Häkchen ![checked_cloud](../../../images/common/icon_cloud_check.png) wird angezeigt, wenn das Wayfair Plugin das Inventar regelmäßig synchronisiert, ohne dass Probleme festgestellt werden.
+
+* Ein Symbol mit einer durchgestrichenen Wolke ![crossed_cloud](../../../images/common/icon_cloud_slash.png) wird angezeigt, wenn das Wayfair-Plugin Unregelmäßigkeiten bei der Inventarsynchronisierung feststellt.
+
+    * Fehler werden erwartet, wenn das Wayfair-Plugin kürzlich installiert wurde und [der Ersteinrichtung](initial_setup.md) noch nicht abgeschlossen wurde. Beenden Sie die Einrichtung des Plugins, bevor Sie die Seite `Inventar` erneut verwenden.
+    * Details werden möglicherweise weiter unten auf der Seite angezeigt, um zu erklären, was falsch ist.
+    * Zeigen Sie [die Plentymarkets Logs](troubleshooting.md#plentymarkets-logs) an, um Fehlerdetails zu erhalten.
+    * Im [Handbuch zur Fehlerbehebung](troubleshooting.md) des Wayfair-Plugins  finden Sie Ideen zur Lösung von Problemen bei der Inventarsynchronisierung.
+
+### Details zur Inventarsynchronisierung
+
+Wenn dies möglich ist, enthält die Seite "Inventar" Details zur Unterstützung des Hauptstatus, der oben auf der Seite angezeigt wird.
+
+* Ein Kalendersymbol ![kalender](../../../images/common/icon_calendar.png) zeigt an, dass eine Information noch nicht verfügbar ist.
+
+* Ein Symbol mit einem Häkchen ![checked_cloud](../../../images/common/icon_cloud_check.png) zeigt ein positives Ereignis an.
+
+* Ein Symbol mit einer durchgestrichenen Wolke ![crossed_cloud](../../../images/common/icon_cloud_slash.png) zeigt ein negatives Ereignis an.
+
+* Ein Symbol mit einem Pfeil nach oben zu einer Wolke ![Upload_cloud](../../../images/common/icon_cloud_upload.png) zeigt an, dass ein Ereignis gerade stattfindet und wird beschrieben, sobald es abgeschlossen ist.
 
 
 ## Die Seite Voll Inventar
-Die Seite `Voll Inventar` enthält keine zu konfigurierenden Einstellungen.
-Sie wird verwendet, um den Status der Synchronisierung des Plentymarkets-Inventars mit Wayfair zu überprüfen oder um manuell eine Synchronisierung aller Inventarelemente zu initiieren.
-Die Daten auf der Seite werden im Laufe der Zeit automatisch aktualisiert. Sie können diese jedoch auch manuell aktualisieren.
+**(In 1.1.4 entfernt)**
 
-**Das Wayfair-Plugin sendet regelmäßig Inventaraktualisierungen an Wayfair, ohne dass weitere manuelle Aktivierungen erforderlich sind. Auf der Seite "Vollständiges Inventar" werden nur Informationen zu den täglichen Aktualisierungen angezeigt, die alle Elemente im Inventar enthalten.**
+Die Seite `Voll Inventar` wurde durch die Seite [`Inventar`](#die-seite-inventar) ersetzt. **Wenn Sie eine Version des Wayfair Plugin verwenden, die die Seite `Voll Inventar` enthält, empfiehlt Wayfair, das Plugin so bald wie möglich zu aktualisieren.**
 
-### Datenfelder
-* Die Felder für `Zeitpunkt der letzten erfolgreichen Synchronisation` sind für die Zeit, zu der die vollständige Synchronisation aufgezeichnet wurde.
-    * Ein "Häkchen" -Symbol wird angezeigt ![cloud with check](../../../images/common/icon_cloud_check.png), wenn seit der letzten erfolgreichen Synchronisierung weniger als 24 Stunden vergangen sind. Dies zeigt an, dass keine Aktionen erforderlich sind.
-    * Ein "Warnsymbol" wird angezeigt ![warning icon](../../../images/common/icon_warning.png), wenn seit der letzten erfolgreichen Synchronisierung mehr als 24 Stunden vergangen sind. Verwenden Sie die Schaltfläche `Jetzt synchronisieren` wie unten beschrieben.
-
-* Die felder für `Status des letzten Versuchs` zeigen an, ob derzeit eine vollständige Inventarsynchronisierung durchgeführt wird. Die Felder spiegeln die Verwendung der Schaltflächen wider.
-    * Der Status `Abgeschlossen` zeigt an, dass die letzte automatische oder manuelle Synchronisierung erfolgreich war.
-    * Der Status `Fehler` zeigt an, dass die letzte automatische oder manuelle Synchronisierung nicht erfolgreich war. Überprüfen Sie die Plentymarkets-Protokolle auf Fehlerinformationen.
-
-### Schaltfläche
-* Die Schaltfläche `Jetzt synchronisieren` ![start sync](../../../images/de/wayfair_settings/button_start_sync.png) wird zum manuellen Synchronisieren des gesamten Inventars verwendet. Der Status des Prozesses wird in den Feldern über den Schaltflächen angezeigt.
-* Mit der Schaltfläche `Status aktualisieren` ![refresh](../../../images/de/wayfair_settings/button_refresh_status.png) werden die Felder über den Schaltflächen aktualisiert, um den neuesten Ergebnissen der automatischen vollständigen Inventarsynchronisierung zu entsprechen.
+Detaillierte Informationen zur Seite `Voll Inventar` finden Sie in [der Dokumentation zu Version 1.1.3](https://github.com/wayfair-contribs/plentymarkets-plugin/blob/release-1.1.3/meta/documents/user_guide/de/settings_guide.md#die-seite-voll-inventar).
 
 
 ## Die Seite Versandsbestätigung (ASN)
