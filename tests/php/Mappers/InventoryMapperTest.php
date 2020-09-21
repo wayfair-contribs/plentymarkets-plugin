@@ -6,7 +6,8 @@
 
 namespace Wayfair\Tests\Mappers;
 
-use Plenty\Modules\Item\VariationStock\Models\VariationStock;
+use Exception;
+use InvalidArgumentException;
 use Wayfair\Core\Dto\Inventory\RequestDTO;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Mappers\InventoryMapper;
@@ -25,19 +26,12 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Test various stocks and buffers making quantity on hand
-     * @dataProvider dataProviderForGetQuantityOnHand
+     * @dataProvider dataProviderForNormalizeQuantityOnHand
      */
-    public function testGetQuantityOnHand($netStock, $expected, $msg = null)
+    public function testNormalizeQuantityOnHand($netStock, $expected, $msg = null)
     {
-        $variationStock = null;
 
-        if (isset($netStock)) {
-            // phpUnit 6.x (required for PHP 7.0.x) does not have createStub method.
-            $variationStock = $this->createMock(VariationStock::class);
-            $variationStock->netStock = $netStock;
-        }
-
-        $result = InventoryMapper::getQuantityOnHand($variationStock);
+        $result = InventoryMapper::normalizeQuantityOnHand($netStock);
 
         $this->assertEquals($expected, $result, $msg);
     }
@@ -83,18 +77,31 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
     /**
      * Test various cases for getting part numbers from variations
      *
-     * @param [mixed] $variation
-     * @param [mixed] $mappingMode
-     * @param [mixed] $expected
-     * @param [string] $msg
+     * @param mixed $variation
+     * @param mixed $mappingMode
+     * @param mixed $referrerId
+     * @param mixed $expected
+     * @param mixed $msg
      *
      * @dataProvider dataProviderForGetSupplierPartNumberFromVariation
      */
-    public function testGetSupplierPartNumberFromVariation($variation, $mappingMode, $expected, $msg = null)
+    public function testGetSupplierPartNumberFromVariation($variation, $mappingMode, $referrerId = null, $expected = null, $msg = null)
     {
-        $result = InventoryMapper::getSupplierPartNumberFromVariation($variation, $mappingMode);
+        if (isset($mappingMode)) {
 
-        $this->assertEquals($expected, $result, $msg);
+            if (!isset($expected)) {
+                $this->expectException(Exception::class);
+            }
+        } else {
+            $this->expectException(InvalidArgumentException::class);
+        }
+
+
+        $result = InventoryMapper::getSupplierPartNumberFromVariation($variation, $mappingMode, $referrerId);
+
+        if (isset($mappingMode) && isset($expected)) {
+            $this->assertEquals($expected, $result, $msg);
+        }
     }
 
     public function dataProviderForInventoryQuantityMerge()
@@ -125,7 +132,7 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    public function dataProviderForGetQuantityOnHand()
+    public function dataProviderForNormalizeQuantityOnHand()
     {
         return [
             [null, null, "null stock should make null quantityOnHand"],
@@ -169,9 +176,9 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
 
         // cases with null variation
         $cases[] = [null, null, null, "Null inputs should result in not finding any part number"];
-        $cases[] = [null, AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER, null, "Null Variation with Number mode should result in not finding any part number"];
-        $cases[] = [null, AbstractConfigHelper::ITEM_MAPPING_EAN, null, "Null Variation with EAN mode should result in not finding any part number"];
-        $cases[] = [null, AbstractConfigHelper::ITEM_MAPPING_SKU, null, "Null Variation with SKU mode should result in not finding any part number"];
+        $cases[] = [null, AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER, null, null, "Null Variation with Number mode should throw InvalidArgumentException"];
+        $cases[] = [null, AbstractConfigHelper::ITEM_MAPPING_EAN, null, null, "Null Variation with EAN mode should throw InvalidArgumentException"];
+        $cases[] = [null, AbstractConfigHelper::ITEM_MAPPING_SKU, null, null, "Null Variation with SKU mode should throw InvalidArgumentException"];
 
         $keyId = 'id';
         $keyNumber = 'number';
@@ -179,29 +186,32 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
         $keyVariationSkus = 'variationSkus';
         $keyCode = 'code';
         $keySku = 'sku';
+        $keyMarketId = 'marketId';
+
+        $skuValFirst = 'ABCDEFG123';
+        $skuValKeyed = 'HIJ457';
+        $barcodeValFirst = '1234567891011';
 
         $mockId = 2;
         $mockNumber = 8000;
-        $mockBarcodes = [[$keyCode => '1234567891011']];
-        $mockSkus = [[$keySku => 'ABCDEFG123']];
+        $mockMarket = 14.0;
+        $mockBarcodes = [[$keyCode => $barcodeValFirst]];
+        $mockSkus = [[$keySku => $skuValFirst], [$keyMarketId => $mockMarket, $keySku => $skuValKeyed]];
 
         $variationWithNumberOnly = [];
         $variationWithNumberOnly[$keyId] = $mockId;
         $variationWithNumberOnly[$keyNumber] = $mockNumber;
 
-        /** @var Variation */
         $variationWithNumberAndBarcode = [];
         $variationWithNumberAndBarcode[$keyId] = $mockId;
         $variationWithNumberAndBarcode[$keyNumber] = $mockNumber;
         $variationWithNumberAndBarcode[$keyVariationBarcodes] = $mockBarcodes;
 
-        /** @var Variation */
         $variationWithNumberAndSku = [];
         $variationWithNumberAndSku[$keyId] = $mockId;
         $variationWithNumberAndSku[$keyNumber] = $mockNumber;
         $variationWithNumberAndSku[$keyVariationSkus] = $mockSkus;
 
-        /** @var Variation */
         $variationWithEverything = [];
         $variationWithEverything[$keyId] = $mockId;
         $variationWithEverything[$keyNumber] = $mockNumber;
@@ -210,34 +220,58 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
 
         $variationsUnderTest = [$variationWithNumberOnly, $variationWithNumberAndBarcode, $variationWithEverything];
         foreach ($variationsUnderTest as $variation) {
-            $cases[] = [$variation, "FakeItemMappingMethod", $variation[$keyNumber], "bogus mapping method defaults to Variation number"];
+            $cases[] = [$variation, "FakeItemMappingMethod", null, $variation[$keyNumber], "bogus mapping method defaults to Variation number"];
 
             $cases[] = [
-                $variation, AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER, $variation[$keyNumber],
+                $variation, AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER, null, $variation[$keyNumber],
                 "choosing variation number should return variation number regardless of other settings"
             ];
 
-            $expectedPartNo = null;
             if (isset($variation[$keyVariationBarcodes]) && !empty($variation[$keyVariationBarcodes])) {
-                $expectedPartNo = $variation[$keyVariationBarcodes][0][$keyCode];
+                $cases[] = [
+                    $variation, AbstractConfigHelper::ITEM_MAPPING_EAN, null, $barcodeValFirst,
+                    "choosing EAN should use EAN"
+                ];
+            } else {
+                $cases[] = [
+                    $variation, AbstractConfigHelper::ITEM_MAPPING_EAN, null, null,
+                    "choosing EAN when there are no barcodes should fail"
+                ];
             }
 
-            $cases[] = [
-                $variation, AbstractConfigHelper::ITEM_MAPPING_EAN, $expectedPartNo,
-                "choosing EAN should use EAN"
-            ];
-
-            $expectedPartNo = null;
             if (isset($variation[$keyVariationSkus]) && !empty($variation[$keyVariationSkus])) {
-                $expectedPartNo = $variation[$keyVariationSkus][0][$keySku];
+                $cases[] = [
+                    $variation, AbstractConfigHelper::ITEM_MAPPING_SKU, null, $skuValFirst,
+                    "choosing SKU and no referrer without referrer should use first SKU"
+                ];
+
+                $cases[] = [
+                    $variation, AbstractConfigHelper::ITEM_MAPPING_SKU, $mockMarket, $skuValKeyed,
+                    "choosing SKU and supplying a valid referrer should use correct market's SKU"
+                ];
+
+                $cases[] = [
+                    $variation, AbstractConfigHelper::ITEM_MAPPING_SKU, $mockMarket, $skuValFirst,
+                    "choosing SKU and supplying an invalid referrer should use first SKU"
+                ];
+            } else {
+                $cases[] = [
+                    $variation, AbstractConfigHelper::ITEM_MAPPING_SKU, null, null,
+                    "choosing SKU and no referrer without any SKUs should fail"
+                ];
+
+                $cases[] = [
+                    $variation, AbstractConfigHelper::ITEM_MAPPING_SKU, $mockMarket, null,
+                    "choosing SKU and supplying a valid referrer without any SKUs should fail"
+                ];
+
+                $cases[] = [
+                    $variation, AbstractConfigHelper::ITEM_MAPPING_SKU, $mockMarket, null,
+                    "choosing SKU and supplying an invalid referrer without any SKUs should fail"
+                ];
             }
 
-            $cases[] = [
-                $variation, AbstractConfigHelper::ITEM_MAPPING_SKU, $expectedPartNo,
-                "choosing SKU should use SKU"
-            ];
+            return $cases;
         }
-
-        return $cases;
     }
 }

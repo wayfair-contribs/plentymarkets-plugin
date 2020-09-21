@@ -41,13 +41,13 @@ class ProductMapper
 
   /**
    * @param ProductDTO $dto
-   * @param int        $referrerId
+   * @param float        $referrerId
    * @param string     $warehouseId
    * @param string     $poNumber
    *
    * @return array
    */
-  public function map(ProductDTO $dto, int $referrerId, string $warehouseId, string $poNumber, string $itemMappingMethod): array
+  public function map(ProductDTO $dto, float $referrerId, string $warehouseId, string $poNumber, string $itemMappingMethod): array
   {
     $partNumber = $dto->getPartNumber();
 

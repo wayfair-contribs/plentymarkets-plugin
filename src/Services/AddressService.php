@@ -69,13 +69,13 @@ class AddressService {
   /**
    * @param AddressDTO     $dto
    * @param BillingInfoDTO $billingInfoDto
-   * @param int            $referrerId
+   * @param float            $referrerId
    * @param int            $contactType
    * @param int            $addressRelationType
    *
    * @return array
    */
-  public function createContactAndAddress(AddressDTO $dto, BillingInfoDTO $billingInfoDto, int $referrerId, int $contactType, int $addressRelationType): array {
+  public function createContactAndAddress(AddressDTO $dto, BillingInfoDTO $billingInfoDto, float $referrerId, int $contactType, int $addressRelationType): array {
     $addressData = $this->addressMapper->map($dto);
     $contactId = $this->createContact($addressData, $referrerId, $contactType);
     $addressId = $this->createAddress($addressData, $contactId, $addressRelationType, $billingInfoDto);
@@ -85,12 +85,12 @@ class AddressService {
 
   /**
    * @param array $address
-   * @param int   $referrerId
+   * @param float   $referrerId
    * @param int   $typeId
    *
    * @return int
    */
-  public function createContact(array $address, int $referrerId, int $typeId): int {
+  public function createContact(array $address, float $referrerId, int $typeId): int {
     $address['typeId'] = $typeId;
     $address['referrerId'] = $referrerId;
     $contactRepo = pluginApp(ContactRepositoryContract::class);
