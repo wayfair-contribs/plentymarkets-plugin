@@ -70,7 +70,7 @@ Um eingehende Bestellungen von Wayfair ordnungsgemäß verarbeiten zu können, m
 
 ![variation number field](../../../images/de/variation_number_field.png)
 
-Wenn die Lieferanten-Teilenummern für Ihre Organisation in einem alternativen Feld in Ihren Plentymarkets-ArtikelVarianten angezeigt werden, ändern Sie den Wert von [`Item Mapping Method`](settings_guide.md#item-mapping-method).
+Wenn die Lieferanten-Teilenummern für Ihre Organisation in einem alternativen Feld in Ihren Plentymarkets-ArtikelVarianten angezeigt werden, ändern Sie den Wert von [`Methode zur Artikelzuweisung`](settings_guide.md#methode-zur-artikelzuweisung).
 
 ## 5. Artikel auf Wayfair zum Verkauf anbieten
 Artikel, die Sie auf Wayfair verkaufen möchten, müssen in Plentymarkets als aktiv markiert werden. Der Benutzer von Plentymarkets kann auch festlegen, welche Artikel auf Wayfair zum Verkauf stehen. **Beachten Sie, dass der Lagerbestand und die bestellten Artikel auf der Ebene "Varianten" gesteuert werden.**
