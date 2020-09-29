@@ -8,9 +8,6 @@ jobs:
   build-and-push:
 
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./angular
 
     steps:
     - uses: actions/checkout@v2
