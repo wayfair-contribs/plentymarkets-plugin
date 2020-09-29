@@ -1,4 +1,4 @@
-name: build UI with Node
+name: Build-UI
 
 on: [push]
 
