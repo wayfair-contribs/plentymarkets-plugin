@@ -1,11 +1,16 @@
-name: Build-UI
+name: Build-And-Push-UI
 
-on: [push]
+on:
+  push:
+    paths: ./angular/**
 
 jobs:
-  build:
+  build-and-push:
 
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./angular
 
     steps:
     - uses: actions/checkout@v2
@@ -13,8 +18,19 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: '12.x'
-    - run: npm install
-    - run: npm run build --if-present
-    - run: npm test
+    - run: |
+        cd ./angular
+        npm install
+        npm run build --if-present
+        npm test
+        npm run build
+        npm test --if-present
+        cd ..
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git add -A
+        git commit -m "automated UI code generation via github action"
+        git push
       env:
-        CI: true
+        CI: true    
+    
