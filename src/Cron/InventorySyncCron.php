@@ -20,7 +20,7 @@ class InventorySyncCron extends Cron
   const SECONDS_BETWEEN_TRIES = 300;
 
   /** @var bool */
-  private $fullInventory = false;
+  private $fullInventory;
 
   /** @var InventoryUpdateService */
   private $inventoryUpdateService;
@@ -33,7 +33,7 @@ class InventorySyncCron extends Cron
    *
    */
   public function __construct(
-    bool $fullInventory,
+    bool $fullInventory = false,
     InventoryUpdateservice $inventoryUpdateService,
     LoggerContract $loggerContract
   ) {
