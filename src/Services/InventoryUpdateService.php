@@ -12,6 +12,8 @@ use Wayfair\Core\Api\Services\InventoryService;
 use Wayfair\Core\Api\Services\LogSenderService;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\Inventory\RequestDTO;
+use Wayfair\Core\Exceptions\FullInventorySyncInProgressException;
+use Wayfair\Core\Exceptions\InventoryException;
 use Wayfair\Core\Exceptions\InventorySyncBlockedException;
 use Wayfair\Core\Exceptions\InventorySyncInterruptedException;
 use Wayfair\Core\Exceptions\WayfairVariationsMissingException;
@@ -20,6 +22,7 @@ use Wayfair\Core\Helpers\TimeHelper;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Mappers\InventoryMapper;
 use Wayfair\Models\ExternalLogs;
+use Wayfair\Models\InventoryUpdateResult;
 
 /**
  * Service module for sending inventory updates to Wayfair
@@ -92,9 +95,10 @@ class InventoryUpdateService
    *
    * @param bool $fullInventory flag for syncing entire inventory versus partial inventory update
    *
-   * @return array
+   * @return InventoryUpdateResult
+   * @throws InventoryException
    */
-  public function sync(bool $fullInventory): array
+  public function sync(bool $fullInventory): InventoryUpdateResult
   {
     $startTimeStamp = null;
 
@@ -107,38 +111,68 @@ class InventoryUpdateService
 
     /** @var ExternalLogs */
     $externalLogs = pluginApp(ExternalLogs::class);
+
     try {
-
       if ($this->statusService->isInventoryRunning()) {
+        $olderSyncStartedAt = $this->statusService->getStartOfMostRecentAttempt();
+        $olderSyncIsForAllItems = $this->statusService->isInventoryRunning(true);
 
-        $currentSessionStartedAt = $this->statusService->getStartOfMostRecentAttempt();
-
-        if (isset($currentSessionStartedAt) && !empty($currentSessionStartedAt) && time() - strtotime($currentSessionStartedAt) < self::MAX_INVENTORY_TIME) {
+        if (!$fullInventory && isset($olderSyncStartedAt) && !empty($olderSyncStartedAt) && time() - strtotime($olderSyncStartedAt) < self::MAX_INVENTORY_TIME) {
           // other inventory sync is running within allowed time limits
-          throw new InventorySyncBlockedException("Another inventory sync is in progress, preventing this one from starting");
+
+          $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_BLOCKED), [
+            'additionalInfo' => [
+              'full' => (string) $fullInventory
+            ],
+            'method' => __METHOD__
+          ]);
+
+          $externalLogs->addInventoryLog('Inventory blocked', 'inventoryBlocked' . ($fullInventory ? 'Full' : ''), 1, 0, false);
+
+          if ($olderSyncIsForAllItems) {
+            throw new FullInventorySyncInProgressException("A Full Inventory Sync is in progress, preventing this one from starting.");
+          }
+
+          throw new InventorySyncBlockedException("A regular inventory sync is in progress, preventing this one from starting");
         }
 
         // other inventory sync is stale or stalled, so a new one should start.
         $this->logger->warning(TranslationHelper::getLoggerKey(self::LOG_KEY_LONG_RUN), [
           'additionalInfo' => [
-
-            'syncStartedAt' => $currentSessionStartedAt,
+            'olderSyncStartedAt' => $olderSyncStartedAt,
+            'olderSyncIsForAllItems' => $olderSyncIsForAllItems,
             'maximumTime' => self::MAX_INVENTORY_TIME
           ],
           'method' => __METHOD__
         ]);
 
-        $externalLogs->addErrorLog('Inventory ' . ($fullInventory ? 'Full' : '') . ' overriding a currently running inventory sync process that started at ' . $currentSessionStartedAt);
+        $externalLogs->addErrorLog('Inventory ' . ($fullInventory ? 'Full' : '') . ' overriding a currently running inventory sync process that started at ' . $olderSyncStartedAt);
       }
+    } catch (\Exception $e) {
+      $externalLogs->addInventoryLog('Inventory status check caused exception: ' . $e->getMessage(), 'inventoryFailed' . ($fullInventory ? 'Full' : ''), 1, 0, false, $e->getTraceAsString());
 
+      $info = [
+        'full' => (string) $fullInventory,
+        'exceptionType' => get_class($e),
+        'errorMessage' => $e->getMessage(),
+        'stackTrace' => $e->getTraceAsString()
+      ];
+
+      $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_FAILED), [
+        'additionalInfo' => $info,
+        'method' => __METHOD__
+      ]);
+
+      throw new InventoryException($e->getMessage());
+    }
+
+    try {
       // look up item mapping method at this level to ensure consistency and efficiency
       $itemMappingMethod = $this->configHelper->getItemMappingMethod();
 
       // look up referrer ID at this level to ensure consistency and efficiency
       $referrerId = $this->configHelper->getOrderReferrerValue();
 
-
-      // TODO: remove dependency on VariationSearchRepositoryContract by replacing with a Wayfair wrapper
       /** @var VariationSearchRepositoryContract */
       $variationSearchRepository = pluginApp(VariationSearchRepositoryContract::class);
 
@@ -207,6 +241,16 @@ class InventoryUpdateService
 
         $searchResults = $variationSearchResponse->getResult();
         if ($pageNumber == 1 && !isset($searchResults) || empty($searchResults)) {
+          $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_NO_VARIATIONS), [
+            'additionalInfo' => [
+              'full' => (string) $fullInventory,
+              'message' => $e->getMessage()
+            ],
+            'method' => __METHOD__
+          ]);
+
+          $externalLogs->addInventoryLog('Inventory : no Wayfair variations', 'inventoryNoVariations' . ($fullInventory ? 'Full' : ''), 1, 0, false, $e->getTraceAsString());
+
           throw new WayfairVariationsMissingException("No Variations are currently linked to Wayfair");
         }
 
@@ -224,22 +268,7 @@ class InventoryUpdateService
 
         $amtOfDtosForPage = count($requestDTOsForPage);
 
-        if ($amtOfDtosForPage <= 0) {
-          $this->logger
-            ->debug(
-              TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
-              [
-                'additionalInfo' => [
-                  'full' => (string) $fullInventory,
-                  'pageNum' => $pageNumber,
-                  'info' => 'No request DTOs to send'
-                ],
-                'method' => __METHOD__
-              ]
-            );
-
-          $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': No items to update for page ' . $pageNumber);
-        } else {
+        if ($amtOfDtosForPage > 0) {
           $amtOfVariationsForPage = count($variationIdsForPage);
           $totalVariationIdsInDTOsForAllPages += $amtOfVariationsForPage;
 
@@ -305,6 +334,8 @@ class InventoryUpdateService
         $pageNumber++;
       } while (isset($variationSearchResponse) && !$variationSearchResponse->isLastPage());
 
+      $this->statusService->markInventoryIdle();
+
       $info = ['full' => (string) $fullInventory];
 
       if ($fullInventory && $totalDtosAttempted < 1) {
@@ -320,17 +351,6 @@ class InventoryUpdateService
       } else {
         $this->statusService->markInventoryComplete($fullInventory, $startTimeStamp, $totalDtosSaved);
       }
-    } catch (InventorySyncBlockedException $e) {
-
-      $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_BLOCKED), [
-        'additionalInfo' => [
-          'full' => (string) $fullInventory,
-          'message' => $e->getMessage()
-        ],
-        'method' => __METHOD__
-      ]);
-
-      $externalLogs->addInventoryLog('Inventory blocked: ' . $e->getMessage(), 'inventoryBlocked' . ($fullInventory ? 'Full' : ''), 1, 0, false, $e->getTraceAsString());
     } catch (InventorySyncInterruptedException $e) {
 
       $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_INTERRUPTED), [
@@ -343,19 +363,12 @@ class InventoryUpdateService
 
       $externalLogs->addInventoryLog('Inventory interrupted: ' . $e->getMessage(), 'inventoryInterrupted' . ($fullInventory ? 'Full' : ''), 1, 0, false, $e->getTraceAsString());
 
-      // don't update the inventory status - it will conflict with the run that interrupted this one.
-    } catch (WayfairVariationsMissingException $e) {
-
-      $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_NO_VARIATIONS), [
-        'additionalInfo' => [
-          'full' => (string) $fullInventory,
-          'message' => $e->getMessage()
-        ],
-        'method' => __METHOD__
-      ]);
-
-      $externalLogs->addInventoryLog('Inventory : ' . $e->getMessage(), 'inventoryNoVariations' . ($fullInventory ? 'Full' : ''), 1, 0, false, $e->getTraceAsString());
+      // re-throw so that we don't update the inventory status - it will conflict with the run that interrupted this one!
+      throw $e;
     } catch (\Exception $e) {
+
+      $this->statusService->markInventoryIdle();
+
       $externalLogs->addInventoryLog('Inventory exception: ' . $e->getMessage(), 'inventoryFailed' . ($fullInventory ? 'Full' : ''), 1, 0, false, $e->getTraceAsString());
 
       // bulk update failed, so everything we were going to save should be considered failing.
@@ -373,22 +386,27 @@ class InventoryUpdateService
         'additionalInfo' => $info,
         'method' => __METHOD__
       ]);
+
+      throw new InventoryException($e->getMessage());
     } finally {
-      $this->statusService->markInventoryIdle();
 
       $elapsedTime = time() - strtotime($startTimeStamp);
 
-      $infoMap = [
-        'full' => (string) $fullInventory,
-        'dtosAttempted' => $totalDtosAttempted,
-        'dtosSaved' => $totalDtosSaved,
-        'dtosFailed' => $totalDtosFailed,
-        'elapsedTime' => $elapsedTime,
-        'variationsAttempted' => $totalVariationIdsInDTOsForAllPages
-      ];
+      /** @var InventoryUpdateResult */
+      $resultObject = pluginApp(InventoryUpdateResult::class);
+
+      $resultObject->full =  $fullInventory;
+      $resultObject->dtosAttempted = $totalDtosAttempted;
+      $resultObject->dtosAttempted = $totalDtosAttempted;
+      $resultObject->dtosSaved = $totalDtosSaved;
+      $resultObject->dtosFailed = $totalDtosFailed;
+      $resultObject->elapsedTime = $elapsedTime;
+      $resultObject->variationsAttempted = $totalVariationIdsInDTOsForAllPages;
 
       $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_END), [
-        'additionalInfo' => $infoMap,
+        'additionalInfo' => [
+          'results' => $resultObject
+        ],
         'method' => __METHOD__
       ]);
 
@@ -403,7 +421,7 @@ class InventoryUpdateService
       }
     }
 
-    return $infoMap;
+    return $resultObject;
   }
 
   /**

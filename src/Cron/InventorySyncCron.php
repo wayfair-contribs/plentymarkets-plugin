@@ -6,23 +6,24 @@
 
 namespace Wayfair\Cron;
 
+use Exception;
 use Plenty\Modules\Cron\Contracts\CronHandler as Cron;
 use Wayfair\Core\Contracts\LoggerContract;
+use Wayfair\Core\Exceptions\FullInventorySyncInProgressException;
 use Wayfair\Helpers\TranslationHelper;
-use Wayfair\Services\InventoryStatusService;
 use Wayfair\Services\InventoryUpdateService;
 
 class InventorySyncCron extends Cron
 {
-  // amount of time between full syncs.
-  // slightly less than one day.
-  const MAX_SEC_BETWEEN_FULL_SYNCS = 86000;
+  const LOG_KEY_INVENTORY_ERRORS = 'inventoryErrors';
+
+  const SECONDS_BETWEEN_TRIES = 300;
+
+  /** @var bool */
+  private $fullInventory = false;
 
   /** @var InventoryUpdateService */
   private $inventoryUpdateService;
-
-  /** @var InventoryStatusService */
-  private $inventoryStatusService;
 
   /** @var LoggerContract */
   private $loggerContract;
@@ -32,12 +33,12 @@ class InventorySyncCron extends Cron
    *
    */
   public function __construct(
+    bool $fullInventory,
     InventoryUpdateservice $inventoryUpdateService,
-    InventoryStatusService $inventoryStatusService,
     LoggerContract $loggerContract
   ) {
+    $this->fullInventory = $fullInventory;
     $this->inventoryUpdateService = $inventoryUpdateService;
-    $this->inventoryStatusService = $inventoryStatusService;
     $this->loggerContract = $loggerContract;
   }
 
@@ -49,39 +50,67 @@ class InventorySyncCron extends Cron
   public function handle()
   {
     $this->loggerContract->debug(TranslationHelper::getLoggerKey('cronStartedMessage'), [
+      'additionalInfo' => [
+        'full' => $this->fullInventory
+      ],
       'method' => __METHOD__
     ]);
-    $syncResult = [];
-    $fullInventory = false;
+    $syncResult = null;
+    $maxAttempts = $this->fullInventory ? 3 : 1;
+    $attempts = 0;
+
     try {
-      $fullInventory = $this->isFullDue();
-      $syncResult = $this->inventoryUpdateService->sync($fullInventory);
+
+      while ($attempts++ <= $maxAttempts) {
+        try {
+          $syncResult = $this->inventoryUpdateService->sync($this->fullInventory);
+        } catch (FullInventorySyncInProgressException $e) {
+          $info = [
+            'full' => (string) $this->fullInventory,
+            'exceptionType' => get_class($e),
+            'errorMessage' => $e->getMessage(),
+            'stackTrace' => $e->getTraceAsString()
+          ];
+
+          // log at a low level because it's no big deal
+          $this->loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_ERRORS), [
+            'additionalInfo' => $info,
+            'method' => __METHOD__
+          ]);
+
+          //  an ongoing full sync should prevent retries of any sort
+          return;
+        } catch (Exception $e) {
+          $info = [
+            'full' => (string) $this->fullInventory,
+            'exceptionType' => get_class($e),
+            'errorMessage' => $e->getMessage(),
+            'stackTrace' => $e->getTraceAsString()
+          ];
+
+          // log at a high level because this is unexpected
+          $this->loggerContract->error(TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_ERRORS), [
+            'additionalInfo' => $info,
+            'method' => __METHOD__
+          ]);
+        }
+
+        if (!$this->fullInventory || (isset($syncResult) && $syncResult->isSuccessful())) {
+          // only full inventory should try again
+          return;
+        }
+
+        // sleep and try again
+        sleep(self::SECONDS_BETWEEN_TRIES);
+      }
     } finally {
       $this->loggerContract->debug(TranslationHelper::getLoggerKey('cronFinishedMessage'), [
         'additionalInfo' => [
-          'full' => $fullInventory,
-          'result' => $syncResult
+          'full' => $this->fullInventory,
+          'result' => $syncResult->toArray()
         ],
         'method' => __METHOD__
       ]);
     }
-  }
-
-  /**
-   * Check if the inventory sync should happen for all inventory, or just recent inventory changes.
-   *
-   * @return bool
-   */
-  private function isFullDue(): bool
-  {
-    $lastFullInventorySuccessStart = $this->inventoryStatusService->getLastCompletionStart(true);
-
-    if (!isset($lastFullInventorySuccessStart) || empty($lastFullInventorySuccessStart)) {
-      return true;
-    }
-
-    $numericStartTime = strtotime($lastFullInventorySuccessStart);
-
-    return ($numericStartTime <= 0 || time() >= $numericStartTime + self::MAX_SEC_BETWEEN_FULL_SYNCS);
   }
 }

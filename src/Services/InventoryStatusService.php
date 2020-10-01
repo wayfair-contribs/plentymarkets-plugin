@@ -171,11 +171,15 @@ class InventoryStatusService
   /**
    * Check if an Inventory sync is running
    *
+   * @param bool|null $fullOnly
+   *
    * @return boolean
    */
-  public function isInventoryRunning(): bool
+  public function isInventoryRunning(bool $fullOnly = false): bool
   {
-    return self::STATE_IDLE !== $this->getServiceStatusValue();
+    $curStatus = $this->getServiceStatusValue();
+
+    return $fullOnly ? self::FULL == $curStatus : self::STATE_IDLE !== $this->getServiceStatusValue();
   }
 
   /**
@@ -185,7 +189,7 @@ class InventoryStatusService
    *
    * @return string
    */
-  public function getLastCompletionEnd(bool $full): string
+  public function getLastCompletionEnd(bool $full = false): string
   {
     $key = $full ? self::DB_KEY_INVENTORY_LAST_COMPLETION_END_FULL : self::DB_KEY_INVENTORY_LAST_COMPLETION_END_PARTIAL;
 
@@ -323,12 +327,19 @@ class InventoryStatusService
   /**
    * Get the timestamp of the sync that was started most recently
    *
-   * @return string
+   * @return string|null
    */
-  public function getStartOfMostRecentAttempt(): string
+  public function getStartOfMostRecentAttempt(bool $fullOnly = false)
   {
-    $mostRecentPartial = $this->keyValueRepository->get(self::DB_KEY_INVENTORY_LAST_ATTEMPT_PARTIAL);
+
     $mostRecentFull = $this->keyValueRepository->get(self::DB_KEY_INVENTORY_LAST_ATTEMPT_FULL);
+
+    if ($fullOnly)
+    {
+      return $mostRecentFull;
+    }
+
+    $mostRecentPartial = $this->keyValueRepository->get(self::DB_KEY_INVENTORY_LAST_ATTEMPT_PARTIAL);
 
     if (!isset($mostRecentPartial) || empty($mostRecentPartial)) {
       return $mostRecentFull;

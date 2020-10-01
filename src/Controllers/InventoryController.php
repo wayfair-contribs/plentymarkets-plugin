@@ -97,15 +97,16 @@ class InventoryController extends Controller
       $fullInventory = isset($dataIn) && $dataIn['full'];
 
       $syncResults = $this->inventoryUpdateService->sync($fullInventory);
+      $payloadOut = $syncResults->toArray();
 
       $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_CONTROLLER_OUT), [
         'additionalInfo' => [
-          'payloadOut' => $syncResults
+          'payloadOut' => $payloadOut
         ],
         'method'         => __METHOD__
       ]);
 
-      return $response->json($syncResults);
+      return $response->json($payloadOut);
     } catch (\Exception $e) {
 
       return $response->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
