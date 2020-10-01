@@ -7,6 +7,8 @@ import {
 import { UrlHelper } from "../../helpers/url-helper";
 import { Observable } from "rxjs";
 import { InventoryStatusInterface } from "./data/inventoryStatus.interface";
+import { InventorySyncRequestInterface } from "./data/inventorySyncRequest.interface";
+import { InventorySyncResponseInterface } from "./data/inventorySyncResponse.interface";
 @Injectable()
 export class InventoryService extends TerraBaseService {
   constructor(loadingBarService: TerraLoadingSpinnerService, http: Http) {
@@ -20,5 +22,12 @@ export class InventoryService extends TerraBaseService {
   getState(): Observable<InventoryStatusInterface> {
     this.setAuthorization();
     return this.mapRequest(this.http.get(this.url));
+  }
+
+  sync(
+    request: InventorySyncRequestInterface
+  ): Observable<InventorySyncResponseInterface> {
+    this.setAuthorization();
+    return this.mapRequest(this.http.post(this.url, {data: request}));
   }
 }

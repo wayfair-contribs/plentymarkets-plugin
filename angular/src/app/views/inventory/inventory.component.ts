@@ -122,6 +122,18 @@ export class InventoryComponent {
     this.refreshState();
     // repeatedly pull state from the DB on the prescribed interval
     setInterval(() => this.refreshState(), InventoryComponent.REFRESH_INTERVAL);
+
+    if (this.needsFullSync) {
+      // avoid subscribing, as this could take a long time.
+      this.inventoryService.sync({ full: true });
+    }
+  }
+
+  public needsFullSync(): boolean {
+    return (
+      this.statusObject.status != "full" &&
+      (!this.syncsAttempted || this.overdue("full"))
+    );
   }
 
   /**

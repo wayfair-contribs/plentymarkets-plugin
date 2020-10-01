@@ -7,6 +7,8 @@
 namespace Wayfair\Controllers;
 
 use Plenty\Plugin\Controller;
+use Plenty\Plugin\Http\Request;
+use Plenty\Plugin\Http\Response;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Services\InventoryStatusService;
 use Wayfair\Services\InventoryUpdateService;
@@ -80,5 +82,33 @@ class InventoryController extends Controller
       ],
       'method'         => __METHOD__
     ]);
+  }
+
+  public function sync(Request $request, Response $response)
+  {
+    try {
+      $dataIn = $request->input('data');
+
+      $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_CONTROLLER_IN), [
+        'additionalInfo' => ['payloadIn' => json_encode($dataIn)],
+        'method'         => __METHOD__
+      ]);
+
+      $fullInventory = isset($dataIn) && $dataIn['full'];
+
+      $syncResults = $this->inventoryUpdateService->sync($fullInventory);
+
+      $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_CONTROLLER_OUT), [
+        'additionalInfo' => [
+          'payloadOut' => $syncResults
+        ],
+        'method'         => __METHOD__
+      ]);
+
+      return $response->json($syncResults);
+    } catch (\Exception $e) {
+
+      return $response->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
+    }
   }
 }

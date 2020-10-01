@@ -112,5 +112,12 @@ class WayfairRouteServiceProvider extends RouteServiceProvider {
         'middleware' => ['oauth.cookie']
         ]
     );
+    $router->post(
+        'wayfair/inventory',
+        [
+            'uses'       => 'Wayfair\Controllers\InventoryController@sync',
+            'middleware' => ['oauth.cookie']
+        ]
+    );
   }
 }
