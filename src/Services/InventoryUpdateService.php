@@ -395,7 +395,7 @@ class InventoryUpdateService
       /** @var InventoryUpdateResult */
       $resultObject = pluginApp(InventoryUpdateResult::class);
 
-      $resultObject->full =  $fullInventory;
+      $resultObject->fullInventory =  $fullInventory;
       $resultObject->dtosAttempted = $totalDtosAttempted;
       $resultObject->dtosAttempted = $totalDtosAttempted;
       $resultObject->dtosSaved = $totalDtosSaved;
