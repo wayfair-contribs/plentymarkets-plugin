@@ -241,16 +241,6 @@ class InventoryUpdateService
 
         $searchResults = $variationSearchResponse->getResult();
         if ($pageNumber == 1 && !isset($searchResults) || empty($searchResults)) {
-          $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_NO_VARIATIONS), [
-            'additionalInfo' => [
-              'full' => (string) $fullInventory,
-              'message' => $e->getMessage()
-            ],
-            'method' => __METHOD__
-          ]);
-
-          $externalLogs->addInventoryLog('Inventory : no Wayfair variations', 'inventoryNoVariations' . ($fullInventory ? 'Full' : ''), 1, 0, false, $e->getTraceAsString());
-
           throw new WayfairVariationsMissingException("No Variations are currently linked to Wayfair");
         }
 
@@ -351,6 +341,24 @@ class InventoryUpdateService
       } else {
         $this->statusService->markInventoryComplete($fullInventory, $startTimeStamp, $totalDtosSaved);
       }
+
+    } catch (WayfairVariationsMissingException $e) {
+
+      $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_NO_VARIATIONS), [
+        'additionalInfo' => [
+          'full' => (string) $fullInventory,
+          'message' => $e->getMessage()
+        ],
+        'method' => __METHOD__
+      ]);
+
+      $externalLogs->addInventoryLog('Inventory : no Wayfair variations', 'inventoryNoVariations' . ($fullInventory ? 'Full' : ''), 1, 0, false, $e->getTraceAsString());
+
+      $this->statusService->markInventoryIdle();
+
+      // re-throw so that caller can decide what to do about it
+      throw $e
+
     } catch (InventorySyncInterruptedException $e) {
 
       $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_INTERRUPTED), [

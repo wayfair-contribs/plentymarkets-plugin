@@ -10,6 +10,7 @@ use Exception;
 use Plenty\Modules\Cron\Contracts\CronHandler as Cron;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Exceptions\FullInventorySyncInProgressException;
+use Wayfair\Core\Exceptions\WayfairVariationsMissingException;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Services\InventoryUpdateService;
 
@@ -57,42 +58,40 @@ class InventorySyncCron extends Cron
     ]);
     $syncResult = null;
     $maxAttempts = $this->fullInventory ? 3 : 1;
-    $attempts = 0;
+    $attempt = 0;
 
     try {
 
-      while ($attempts++ <= $maxAttempts) {
+      while ($attempt++ <= $maxAttempts) {
         try {
           $syncResult = $this->inventoryUpdateService->sync($this->fullInventory);
         } catch (FullInventorySyncInProgressException $e) {
-          $info = [
-            'full' => (string) $this->fullInventory,
-            'exceptionType' => get_class($e),
-            'errorMessage' => $e->getMessage(),
-            'stackTrace' => $e->getTraceAsString()
-          ];
 
-          // log at a low level because it's no big deal
+          // log at a low level because sync service should have mentioned it
           $this->loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_ERRORS), [
-            'additionalInfo' => $info,
+            'additionalInfo' => self::getInfoMapForException($e, $this->fullInventory),
             'method' => __METHOD__
           ]);
 
           //  an ongoing full sync should prevent retries of any sort
           return;
-        } catch (Exception $e) {
-          $info = [
-            'full' => (string) $this->fullInventory,
-            'exceptionType' => get_class($e),
-            'errorMessage' => $e->getMessage(),
-            'stackTrace' => $e->getTraceAsString()
-          ];
-
-          // log at a high level because this is unexpected
-          $this->loggerContract->error(TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_ERRORS), [
-            'additionalInfo' => $info,
+        } catch (WayfairVariationsMissingException $e) {
+          // log at a low level because sync service should have mentioned it
+          $this->loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_ERRORS), [
+            'additionalInfo' => self::getInfoMapForException($e, $this->fullInventory),
             'method' => __METHOD__
           ]);
+
+          // no use in retrying because there are no Variations to sync inventory for.
+          return;
+        } catch (Exception $e) {
+          // log at a high level because this is unexpected
+          $this->loggerContract->error(TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_ERRORS), [
+            'additionalInfo' => self::getInfoMapForException($e, $this->fullInventory),
+            'method' => __METHOD__
+          ]);
+
+          // allow re-try as this exception could reflect a momentary issue
         }
 
         if (!$this->fullInventory || (isset($syncResult) && $syncResult->isSuccessful())) {
@@ -100,8 +99,10 @@ class InventorySyncCron extends Cron
           return;
         }
 
-        // sleep and try again
-        sleep(self::SECONDS_BETWEEN_TRIES);
+        if ($attempt < $maxAttempts) {
+          // sleep and let loop
+          sleep(self::SECONDS_BETWEEN_TRIES);
+        }
       }
     } finally {
       $this->loggerContract->debug(TranslationHelper::getLoggerKey('cronFinishedMessage'), [
@@ -112,5 +113,15 @@ class InventorySyncCron extends Cron
         'method' => __METHOD__
       ]);
     }
+  }
+
+  private static function getInfoMapForException(\Exception $e, $fullInventory)
+  {
+    return [
+      'full' => (string) $fullInventory,
+      'exceptionType' => get_class($e),
+      'errorMessage' => $e->getMessage(),
+      'stackTrace' => $e->getTraceAsString()
+    ];
   }
 }
