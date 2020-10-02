@@ -9,7 +9,7 @@
 		"clean:dist": "npm run rimraf -- ../ui",
 		"rimraf": "rimraf",
 		"test": "npm run lint",
-		"lint": "tslint --type-check -p tsconfig.json -c tslint.json 'src/**/*.ts'",
+		"lint": "tslint --type-check -p tsconfig.json -c tslint.json",
 		"reinstall": "rm -rf node_modules/ && npm i"
 	},
 	"private": true,
