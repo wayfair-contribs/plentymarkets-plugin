@@ -122,17 +122,17 @@ export class InventoryComponent {
     this.refreshState();
     // repeatedly pull state from the DB on the prescribed interval
     setInterval(() => this.refreshState(), InventoryComponent.REFRESH_INTERVAL);
-
-    if (this.needsFullSync) {
-      // avoid subscribing, as this could take a long time.
-      this.inventoryService.sync({ full: true });
-    }
   }
 
+  /**
+   * Check if a Full Sync should be performed now, separately from the Cron Job
+   * - Cron Job is not allowed to run until 24 hours after plugin deployment
+   * - Cron Job could have failed last time
+   */
   public needsFullSync(): boolean {
     return (
       this.statusObject.status != "full" &&
-      (!this.syncsAttempted || this.overdue("full"))
+      (!this.syncsAttempted() || this.overdue("full"))
     );
   }
 
@@ -145,6 +145,11 @@ export class InventoryComponent {
     this.inventoryService.getState().subscribe(
       (data) => {
         this.refreshStateFromData(data);
+
+        if (this.needsFullSync) {
+          // avoid subscribing, as this could take a long time.
+          this.inventoryService.sync({ full: true });
+        }
       },
       (err) => {
         this.statusObject = null;
