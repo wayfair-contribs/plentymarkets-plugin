@@ -32,14 +32,8 @@ jobs:
           sudo chmod +x ./run_tests
           ./run_tests testCoverage
 
-      - name: zip up the test artifacts
-        run: |
-          sudo apt-get update
-          sudo apt-get install zip
-          zip -r test_results.zip test_results
-
-      - name: upload the test artifacts zip
+      - name: upload the test artifacts
         uses: actions/upload-artifact@v2
         with:
           name: test_results
-          path: test_results.zip
+          path: test_results
