@@ -1,6 +1,7 @@
 name: build-ui
 
 on:
+  workflow_dispatch:
   push:
     paths: 
       - ./angular/**
