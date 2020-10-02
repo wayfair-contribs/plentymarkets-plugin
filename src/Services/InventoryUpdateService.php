@@ -357,7 +357,7 @@ class InventoryUpdateService
       $this->statusService->markInventoryIdle();
 
       // re-throw so that caller can decide what to do about it
-      throw $e
+      throw $e;
 
     } catch (InventorySyncInterruptedException $e) {
 
