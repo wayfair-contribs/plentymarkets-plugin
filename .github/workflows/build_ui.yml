@@ -1,11 +1,11 @@
 name: build-ui
 
 on:
-  workflow_dispatch:
   push:
     paths: 
       - ./angular/**
       - ./ui/**
+  workflow_dispatch:
 
 jobs:
   build-then-push:
