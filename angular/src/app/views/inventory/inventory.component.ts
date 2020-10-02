@@ -1,25 +1,10 @@
-import { Component } from "@angular/core";
-import { InventoryStatusInterface } from "../../core/services/inventory/data/inventoryStatus.interface";
-import { InventoryService } from "../../core/services/inventory/inventory.service";
-import { Language, TranslationService } from "angular-l10n";
-import * as moment from "moment";
-
-class Icon {
-  iconClass: string = "";
-  iconDrawings: string[] = [];
-}
-
-class DisplayedState {
-  public static readonly TEXT_CLASS_WARNING = "text-warning";
-  public static readonly TEXT_CLASS_DANGER = "text-danger";
-  public static readonly TEXT_CLASS_INFO = "text-info";
-  public static readonly TEXT_CLASS_SUCCESS = "text-success";
-  public static readonly TEXT_CLASS_BODY = "text-body";
-
-  public message = "";
-  public style = "";
-  public icon: Icon;
-}
+import { Component } from '@angular/core';
+import { InventoryStatusInterface } from '../../core/services/inventory/data/inventoryStatus.interface';
+import { InventoryService } from '../../core/services/inventory/inventory.service';
+import { Language, TranslationService } from 'angular-l10n';
+import * as moment from 'moment';
+import { Icon } from './icon.struct';
+import { DisplayedState } from './displayedState.struct';
 
 @Component({
   selector: "inventory",
