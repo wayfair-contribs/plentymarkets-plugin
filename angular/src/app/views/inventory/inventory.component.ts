@@ -132,7 +132,7 @@ export class InventoryComponent {
   public needsFullSync(): boolean {
     return (
       this.statusObject.status != "full" &&
-      (!this.syncsAttempted() || this.overdue("full"))
+      (!this.syncsAttempted("full") || this.overdue("full"))
     );
   }
 

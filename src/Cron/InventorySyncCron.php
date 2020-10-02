@@ -17,7 +17,7 @@ class InventorySyncCron extends Cron
 {
   const LOG_KEY_INVENTORY_ERRORS = 'inventoryErrors';
 
-  const SECONDS_BETWEEN_TRIES = 300;
+  const SECONDS_BETWEEN_TRIES = 600;
 
   /** @var bool */
   private $fullInventory;
