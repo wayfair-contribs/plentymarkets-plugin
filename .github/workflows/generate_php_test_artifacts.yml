@@ -1,0 +1,45 @@
+name: Generate PHP Test Artifacts
+
+on:
+  workflow_dispatch:
+
+jobs:
+  php-test-artifacts:
+    # ubuntu 16.04 has PHP 7.0 installed by default.
+    # Plenty plugin code must be PHP 7.0 only.
+    # other OSes / ubuntu versions will not be compatible.
+    runs-on: ubuntu-16.04
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v2
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: Install dependencies
+        if: steps.composer-cache.outputs.cache-hit != 'true'
+        run: composer install --prefer-dist --no-progress --no-suggest
+
+      - name: Run test suite
+        run: |
+          sudo chmod +x ./run_tests
+          ./run_tests testCoverage
+
+      - name: zip up the test artifacts
+        run: |
+          sudo apt-get update
+          sudo apt-get install zip
+          zip -r test_results.zip test_results
+
+      - name: upload the test artifacts zip
+        uses: actions/upload-artifact@v2
+        with:
+          name: test_results
+          path: test_results.zip
