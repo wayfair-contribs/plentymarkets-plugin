@@ -1,0 +1,35 @@
+name: Build UI
+
+on:
+  push:
+    paths:
+      - "angular/**"
+      - "ui/**"
+  workflow_dispatch:
+
+jobs:
+  build-ui-and-push-changes-if-possible:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: setup-node
+        uses: actions/setup-node@v1
+        with:
+          node-version: "12.x"
+      - name: build-ui-with-npm
+        working-directory: ./angular
+        env:
+          CI: true
+        run: |
+          npm install
+          npm run build
+      - name: push-ui-changes-if-branch-not-protected
+        if: false == (endsWith(github.ref, '/master') || endsWith(github.ref, '/main') || contains(github.ref, 'release-'))
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "automated UI code generation via github action"
+          git push

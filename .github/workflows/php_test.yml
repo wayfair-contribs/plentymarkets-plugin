@@ -1,0 +1,38 @@
+name: PHP Tests
+
+on:
+  push:
+    paths-ignore:
+      - "angular/**"
+      - "ui/**"
+
+  workflow_dispatch:
+
+jobs:
+  build-and-test-php:
+    # ubuntu 16.04 has PHP 7.0 installed by default.
+    # Plenty plugin code must be PHP 7.0 only.
+    # other OSes / ubuntu versions will not be compatible.
+    runs-on: ubuntu-16.04
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v2
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: Install dependencies
+        if: steps.composer-cache.outputs.cache-hit != 'true'
+        run: composer install --prefer-dist --no-progress --no-suggest
+
+      - name: Run test suite
+        run: |
+          sudo chmod +x ./run_tests
+          ./run_tests test
