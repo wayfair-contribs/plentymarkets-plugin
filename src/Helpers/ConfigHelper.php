@@ -13,6 +13,9 @@ use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Repositories\KeyValueRepository;
 
+/**
+ * ConfigHelper
+ */
 class ConfigHelper extends AbstractConfigHelper
 {
 
