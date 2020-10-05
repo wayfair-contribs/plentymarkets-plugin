@@ -1,5 +1,6 @@
 import { Component } from "@angular/core";
 import { Language } from "angular-l10n";
+import { InventoryStatusInterface } from "../../core/services/inventory/data/inventoryStatus.interface";
 import { InventoryService } from "../../core/services/inventory/inventory.service";
 
 @Component({
@@ -21,12 +22,12 @@ export class HomeComponent {
   /**
    * Silently attempt to do a full inventory sync in case it is due
    */
-  protected conditionallyPerformAFullInventorySync() {
+  protected conditionallyPerformAFullInventorySync(): void {
     this.inventoryService.getState().subscribe(
-      (data) => {
+      (data: InventoryStatusInterface) => {
         this.inventoryService.performFullSyncIfNeeded(data);
       },
-      (err) => {
+      (err: any) => {
         // eat error
         // the inventory page is available for further sync attempts
       }

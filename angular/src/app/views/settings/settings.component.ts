@@ -24,7 +24,7 @@ export class SettingsComponent {
   public importOrdersSince = null;
   public isAllInventorySyncEnabled = null;
 
-  private orderStatuses: OrderStatusInterface[] = [];
+  private orderStatuses: Array<OrderStatusInterface> = [];
 
   public constructor(
     private settingsService: SettingsService,
@@ -109,13 +109,13 @@ export class SettingsComponent {
 
   private chooseOrderStatusAfterRefreshingList(statusId): void {
     this.orderStatusService.fetch().subscribe(
-      (data) => {
+      (data: Array<OrderStatusInterface>) => {
         // store this so that the UI can show in drop-down
         this.orderStatuses = data;
         if (statusId) {
           if (this.orderStatuses.length > 0) {
             for (let option of this.orderStatuses) {
-              if (option.statusId == statusId) {
+              if (option.statusId === statusId) {
                 this.defaultOrderStatus = statusId;
                 return;
               }
@@ -125,7 +125,7 @@ export class SettingsComponent {
         // status ID not set or not a valid option - use default
         this.defaultOrderStatus = SettingsComponent.DEFAULT_ORDER_STATUS_ID;
       },
-      (err) => {
+      (err: any) => {
         this.showErrorVerbose(this.translation.translate("error_fetch"));
         return;
       }

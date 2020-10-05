@@ -1,4 +1,3 @@
-export interface InventorySyncRequestInterface
-{
-    full?: boolean
+export interface InventorySyncRequestInterface {
+  full?: boolean;
 }

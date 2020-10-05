@@ -1,4 +1,4 @@
 export class Icon {
-  iconClass: string = "";
-  iconDrawings: string[] = [];
+  public iconClass: string = "";
+  public iconDrawings: Array<string> = [];
 }
