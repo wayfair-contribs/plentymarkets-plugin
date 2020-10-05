@@ -16,7 +16,7 @@ use Wayfair\Core\Exceptions\FullInventorySyncInProgressException;
 use Wayfair\Core\Exceptions\InventoryException;
 use Wayfair\Core\Exceptions\InventorySyncBlockedException;
 use Wayfair\Core\Exceptions\InventorySyncInterruptedException;
-use Wayfair\Core\Exceptions\WayfairVariationsMissingException;
+use Wayfair\Core\Exceptions\NoReferencePointForPartialInventorySyncException;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Core\Helpers\TimeHelper;
 use Wayfair\Helpers\TranslationHelper;
@@ -109,6 +109,9 @@ class InventoryUpdateService
     $totalTimeSpentSendingData = 0;
     $totalVariationIdsInDTOsForAllPages = 0;
 
+    $windowStart = null;
+    $windowEnd = null;
+
     /** @var ExternalLogs */
     $externalLogs = pluginApp(ExternalLogs::class);
 
@@ -133,7 +136,7 @@ class InventoryUpdateService
             throw new FullInventorySyncInProgressException("A Full Inventory Sync is in progress, preventing this one from starting.");
           }
 
-          throw new InventorySyncBlockedException("A regular inventory sync is in progress, preventing this one from starting");
+          throw new InventorySyncBlockedException("A Partial inventory sync is in progress, preventing this one from starting");
         }
 
         // other inventory sync is stale or stalled, so a new one should start.
@@ -148,8 +151,18 @@ class InventoryUpdateService
 
         $externalLogs->addErrorLog('Inventory ' . ($fullInventory ? 'Full' : '') . ' overriding a currently running inventory sync process that started at ' . $olderSyncStartedAt);
       }
-    } catch (\Exception $e) {
-      $externalLogs->addInventoryLog('Inventory status check caused exception: ' . $e->getMessage(), 'inventoryFailed' . ($fullInventory ? 'Full' : ''), 1, 0, false, $e->getTraceAsString());
+
+      if (!$fullInventory) {
+        $windowStart = $this->getStartOfDeltaSyncWindow($externalLogs);
+        $windowEnd = (date_create($startTimeStamp))->format(DateTime::W3C);
+      }
+    } catch (InventoryException $ie)
+    {
+      // re-throw exceptions that were purposely thrown
+      throw $ie;
+    }catch (\Exception $e) {
+      // unexpected exception that was not thrown on purpose - DB issues, etc.
+      $externalLogs->addErrorLog('Inventory status checks caused exception: ' . $e->getMessage(), $e->getTraceAsString());
 
       $info = [
         'full' => (string) $fullInventory,
@@ -197,14 +210,6 @@ class InventoryUpdateService
 
       $variationSearchRepository->setFilters($this->getDefaultFilters());
 
-      $windowStart = null;
-      $windowEnd = null;
-
-      if (!$fullInventory) {
-        $windowStart = $this->getStartOfDeltaSyncWindow($externalLogs);
-        $windowEnd = (date_create($startTimeStamp))->format(DateTime::W3C);
-      }
-
       do {
         $startTimeInDatabase = $this->statusService->getStartOfMostRecentAttempt();
 
@@ -241,7 +246,20 @@ class InventoryUpdateService
 
         $searchResults = $variationSearchResponse->getResult();
         if ($pageNumber == 1 && !isset($searchResults) || empty($searchResults)) {
-          throw new WayfairVariationsMissingException("No Variations are currently linked to Wayfair");
+          // let the user know why syncs are not doing anything
+          $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_NO_VARIATIONS), [
+            'additionalInfo' => [
+              'full' => (string) $fullInventory,
+              'message' => $e->getMessage()
+            ],
+            'method' => __METHOD__
+          ]);
+
+          // let Wayfair know that no Inventory DTOs are expected due to lack of Wayfair Variations
+          $externalLogs->addErrorLog('Inventory : no Wayfair Variations');
+
+          // let this sync be marked as "successful" with zeroes for every piece of data
+          break;
         }
 
         /** @var array $variationData information about a single Variation */
@@ -324,6 +342,7 @@ class InventoryUpdateService
         $pageNumber++;
       } while (isset($variationSearchResponse) && !$variationSearchResponse->isLastPage());
 
+      // make sure not to let this get called while another sync is running!
       $this->statusService->markInventoryIdle();
 
       $info = ['full' => (string) $fullInventory];
@@ -341,25 +360,8 @@ class InventoryUpdateService
       } else {
         $this->statusService->markInventoryComplete($fullInventory, $startTimeStamp, $totalDtosSaved);
       }
-
-    } catch (WayfairVariationsMissingException $e) {
-
-      $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_NO_VARIATIONS), [
-        'additionalInfo' => [
-          'full' => (string) $fullInventory,
-          'message' => $e->getMessage()
-        ],
-        'method' => __METHOD__
-      ]);
-
-      $externalLogs->addInventoryLog('Inventory : no Wayfair variations', 'inventoryNoVariations' . ($fullInventory ? 'Full' : ''), 1, 0, false, $e->getTraceAsString());
-
-      $this->statusService->markInventoryIdle();
-
-      // re-throw so that caller can decide what to do about it
-      throw $e;
-
     } catch (InventorySyncInterruptedException $e) {
+      // DO NOT change inventory status as it will conflict with the sync that interrupted this one!
 
       $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_INTERRUPTED), [
         'additionalInfo' => [
@@ -371,7 +373,7 @@ class InventoryUpdateService
 
       $externalLogs->addInventoryLog('Inventory interrupted: ' . $e->getMessage(), 'inventoryInterrupted' . ($fullInventory ? 'Full' : ''), 1, 0, false, $e->getTraceAsString());
 
-      // re-throw so that we don't update the inventory status - it will conflict with the run that interrupted this one!
+      // re-throw so that caller can decide what to do about it
       throw $e;
     } catch (\Exception $e) {
 
@@ -501,11 +503,10 @@ class InventoryUpdateService
   /**
    * Get the W3C-formatted time for the start of a partial sync
    *
-   * @param ExternalLogs $externalLogs
-   *
    * @return string
+   * @throws NoReferencePointForPartialInventorySyncException
    */
-  private function getStartOfDeltaSyncWindow(ExternalLogs $externalLogs = null): string
+  private function getStartOfDeltaSyncWindow(): string
   {
     $windowStart = 0;
 
@@ -527,12 +528,8 @@ class InventoryUpdateService
     }
 
     if ($windowStart <= 0) {
-      if (isset($externalLogs)) {
-        $externalLogs->addErrorLog("Starting a partial inventory sync when no inventory syncs of any sort have been completed.");
-      }
-
-      // in case we somehow got here, use an arbitrary window so that some data gets updated
-      $windowStart = time() - 7200;
+      // prevent sync from starting as the full sync needs to complete first
+      throw new NoReferencePointForPartialInventorySyncException();
     }
 
     // date_create does NOT accept epoch time as an integer.

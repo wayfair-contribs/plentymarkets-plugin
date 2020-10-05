@@ -6,6 +6,6 @@
 
 namespace Wayfair\Core\Exceptions;
 
-class WayfairVariationsMissingException extends InventoryException
+class NoReferencePointForPartialInventorySyncException extends InventorySyncBlockedException
 {
 }

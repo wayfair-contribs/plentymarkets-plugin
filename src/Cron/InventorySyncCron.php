@@ -10,6 +10,8 @@ use Exception;
 use Plenty\Modules\Cron\Contracts\CronHandler as Cron;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Exceptions\FullInventorySyncInProgressException;
+use Wayfair\Core\Exceptions\InventorySyncBlockedException;
+use Wayfair\Core\Exceptions\NoReferencePointForPartialInventorySyncException;
 use Wayfair\Core\Exceptions\WayfairVariationsMissingException;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Services\InventoryUpdateService;
@@ -66,7 +68,6 @@ class InventorySyncCron extends Cron
         try {
           $syncResult = $this->inventoryUpdateService->sync($this->fullInventory);
         } catch (FullInventorySyncInProgressException $e) {
-
           // log at a low level because sync service should have mentioned it
           $this->loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_ERRORS), [
             'additionalInfo' => self::getInfoMapForException($e, $this->fullInventory),
@@ -74,15 +75,6 @@ class InventorySyncCron extends Cron
           ]);
 
           //  an ongoing full sync should prevent retries of any sort
-          return;
-        } catch (WayfairVariationsMissingException $e) {
-          // log at a low level because sync service should have mentioned it
-          $this->loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_ERRORS), [
-            'additionalInfo' => self::getInfoMapForException($e, $this->fullInventory),
-            'method' => __METHOD__
-          ]);
-
-          // no use in retrying because there are no Variations to sync inventory for.
           return;
         } catch (Exception $e) {
           // log at a high level because this is unexpected
@@ -95,7 +87,7 @@ class InventorySyncCron extends Cron
         }
 
         if (!$this->fullInventory || (isset($syncResult) && $syncResult->isSuccessful())) {
-          // only full inventory should try again
+          // only a failed full inventory should result in retries
           return;
         }
 

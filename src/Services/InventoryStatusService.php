@@ -416,8 +416,8 @@ class InventoryStatusService
 
     if ($timeSinceLastGoodFullStart < self::OVERDUE_TIME_PARTIAL)
     {
-      // partial sync doesn't need to happen if a full sync did not happen yet,
-      // or if a full sync happened recently.
+      // partial sync should not happen if a full sync did not happen yet,
+      // or if a full sync just happened.
       return false;
     }
 

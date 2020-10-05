@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
-import { InventoryStatusInterface } from '../../core/services/inventory/data/inventoryStatus.interface';
-import { InventoryService } from '../../core/services/inventory/inventory.service';
-import { Language, TranslationService } from 'angular-l10n';
-import * as moment from 'moment';
-import { Icon } from './icon.struct';
-import { DisplayedState } from './displayedState.struct';
+import { Component } from "@angular/core";
+import { InventoryStatusInterface } from "../../core/services/inventory/data/inventoryStatus.interface";
+import { InventoryService } from "../../core/services/inventory/inventory.service";
+import { Language, TranslationService } from "angular-l10n";
+import * as moment from "moment";
+import { Icon } from "./icon.struct";
+import { DisplayedState } from "./displayedState.struct";
 
 @Component({
   selector: "inventory",
@@ -110,18 +110,6 @@ export class InventoryComponent {
   }
 
   /**
-   * Check if a Full Sync should be performed now, separately from the Cron Job
-   * - Cron Job is not allowed to run until 24 hours after plugin deployment
-   * - Cron Job could have failed last time
-   */
-  public needsFullSync(): boolean {
-    return (
-      this.statusObject.status != "full" &&
-      (!this.syncsAttempted("full") || this.overdue("full"))
-    );
-  }
-
-  /**
    * Load the Inventory Sync state from the DB and update UI to match
    */
   public refreshState(): void {
@@ -131,10 +119,9 @@ export class InventoryComponent {
       (data) => {
         this.refreshStateFromData(data);
 
-        if (this.needsFullSync) {
-          // avoid subscribing, as this could take a long time.
-          this.inventoryService.sync({ full: true });
-        }
+        // kick the full inventory sync, if it is overdue
+        this.inventoryService.performFullSyncIfNeeded(this.statusObject);
+
       },
       (err) => {
         this.statusObject = null;
@@ -164,7 +151,7 @@ export class InventoryComponent {
    * Update the icon, text, and style of the big state in the UI
    */
   private updateMainState() {
-    if (!this.syncsAttempted()) {
+    if (!InventoryService.syncsAttempted(this.statusObject)) {
       this.mainState.message =
         this.translation.translate(
           InventoryComponent.TRANSLATION_KEY_INV_SYNC_LABEL
@@ -181,7 +168,7 @@ export class InventoryComponent {
       return;
     }
 
-    if (this.overdue()) {
+    if (InventoryService.overdue(this.statusObject)) {
       if (
         this.mainState.style != DisplayedState.TEXT_CLASS_DANGER &&
         this.statusObject.status != InventoryComponent.STATE_IDLE
@@ -264,7 +251,7 @@ export class InventoryComponent {
       !this.mainState ||
       this.mainState.icon == InventoryComponent.ICON_LOADING ||
       this.mainState.icon == InventoryComponent.ICON_ERROR ||
-      !this.syncsAttempted()
+      !InventoryService.syncsAttempted(this.statusObject)
     ) {
       // don't show a table
       return;
@@ -288,8 +275,8 @@ export class InventoryComponent {
             InventoryComponent.TRANSLATION_KEY_IS_CURRENTLY_RUNNING
           );
         nextRow.icon = InventoryComponent.ICON_RUNNING;
-      } else if (this.syncsAttempted(key)) {
-        if (this.overdue(key)) {
+      } else if (InventoryService.syncsAttempted(this.statusObject, key)) {
+        if (InventoryService.overdue(this.statusObject, key)) {
           nextRow.style = DisplayedState.TEXT_CLASS_DANGER;
           nextRow.message +=
             " " +
@@ -354,62 +341,5 @@ export class InventoryComponent {
       nextRow.message += ".";
       this.table.push(nextRow);
     }
-  }
-
-  /**
-   * Check if any syncs were attempted
-   * @param syncKind 'full' or 'partial' sync, or null for "any of the syncs"
-   */
-  public syncsAttempted(syncKind?: string): boolean {
-    if (!this.statusObject || !this.statusObject.details) {
-      return false;
-    }
-
-    if (syncKind) {
-      return (
-        this.statusObject.details[syncKind] &&
-        this.statusObject.details[syncKind].attemptedStart &&
-        this.statusObject.details[syncKind].attemptedStart.length > 0
-      );
-    }
-
-    for (const key in this.statusObject.details) {
-      if (
-        this.statusObject.details[key] &&
-        this.statusObject.details[key].attemptedStart &&
-        this.statusObject.details[key].attemptedStart.length > 0
-      )
-        return true;
-    }
-
-    return false;
-  }
-
-  /**
-   * Check for the overdue flag
-   * @param syncKind 'full' or 'partial' sync, or null for "any of the syncs"
-   */
-  public overdue(syncKind?: string): boolean {
-    if (!this.statusObject || !this.statusObject.details) {
-      // lack of data should be considered overdue
-      return true;
-    }
-
-    if (syncKind) {
-      return (
-        this.statusObject.details[syncKind] &&
-        this.statusObject.details[syncKind].overdue
-      );
-    }
-
-    for (const key in this.statusObject.details) {
-      if (
-        this.statusObject.details[key] &&
-        this.statusObject.details[key].overdue
-      )
-        return true;
-    }
-
-    return false;
   }
 }
