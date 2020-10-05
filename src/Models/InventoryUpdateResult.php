@@ -63,6 +63,6 @@ class InventoryUpdateResult
 
     public function isSuccessful()
     {
-        return $this->variationsAttempted == 0 xor $this->dtosFailed == 0;
+        return $this->variationsAttempted == 0 || $this->dtosFailed == 0;
     }
 }
