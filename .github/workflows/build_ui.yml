@@ -14,10 +14,12 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v2
+
       - name: setup-node
         uses: actions/setup-node@v1
         with:
           node-version: "12.x"
+
       - name: build-ui-with-npm
         working-directory: ./angular
         env:
