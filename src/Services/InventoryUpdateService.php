@@ -153,7 +153,7 @@ class InventoryUpdateService
       }
 
       if (!$fullInventory) {
-        $windowStart = $this->getStartOfDeltaSyncWindow($externalLogs);
+        $windowStart = $this->getStartOfDeltaSyncWindow();
         $windowEnd = (date_create($startTimeStamp))->format(DateTime::W3C);
       }
     } catch (InventoryException $ie)
