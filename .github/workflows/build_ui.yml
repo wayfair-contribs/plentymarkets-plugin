@@ -25,8 +25,19 @@ jobs:
         run: |
           npm install
           npm run build
-      - name: push-ui-changes-if-branch-not-protected
-        if: false == (endsWith(github.ref, '/master') || endsWith(github.ref, '/main') || contains(github.ref, 'release-'))
+
+      - id: check_for_changed_files
+        name: check_for_changed_files
+        run: echo "::set-output name=GIT_STATUS::$(git status -s)"
+
+      - name: fail-out-if-protected-branch-needs-UI-generation
+        if: steps.check_for_changed_files.outputs.GIT_STATUS != '' && (endsWith(github.ref, '/master') || endsWith(github.ref, '/main') || contains(github.ref, 'release-'))
+        run: |
+          echo "branch is protected - differences between Angular and UI must be resolved before pushing to a protected branch!"
+          exit 1
+
+      - name: push-ui-changes-if-present
+        if: steps.check_for_changed_files.outputs.GIT_STATUS != ''
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
