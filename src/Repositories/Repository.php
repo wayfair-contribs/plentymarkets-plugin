@@ -1,39 +1,35 @@
 <?php
+
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Repositories;
 
-use Plenty\Modules\Frontend\Services\AccountService;
+use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 use Wayfair\Core\Contracts\LoggerContract;
 
-class Repository {
-  /**
-   * @var AccountService
-   */
-  private $accountService;
-
+class Repository
+{
   /**
    * @var LoggerContract
    */
-  private $loggerContract;
+  protected $loggerContract;
 
   /**
-   * WarehouseSupplierRepository constructor.
+   * @var DataBase
+   */
+  protected $database;
+
+  /**
+   * Repository constructor.
    *
-   * @param AccountService $accountService
+   * @param DataBase $database
+   * @param LoggerContract $loggerContract
    */
-  public function __construct(AccountService $accountService) {
-    $this->accountService = $accountService;
-    $this->loggerContract = pluginApp(LoggerContract::class);
+  public function __construct(DataBase $database, LoggerContract $loggerContract)
+  {
+    $this->loggerContract = $loggerContract;
+    $this->database = $database;
   }
-
-  /**
-   * @return int
-   */
-  public function getLoggedInUserId() {
-    return $this->accountService->getAccountContactId();
-  }
-
 }

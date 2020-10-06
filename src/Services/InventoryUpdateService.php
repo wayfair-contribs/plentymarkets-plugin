@@ -168,7 +168,7 @@ class InventoryUpdateService
       }
 
       if (!$fullInventory) {
-        $windowStart = $this->getStartOfDeltaSyncWindow();
+        $windowStart = self::getStartOfDeltaSyncWindow($this->statusService);
         $windowEnd = (date_create($startTimeStamp))->format(DateTime::W3C);
       }
     } catch (InventoryException $ie) {
@@ -518,12 +518,12 @@ class InventoryUpdateService
    * @return string
    * @throws NoReferencePointForPartialInventorySyncException
    */
-  private function getStartOfDeltaSyncWindow(): string
+  static function getStartOfDeltaSyncWindow(InventoryStatusService $statusService): string
   {
     $windowStart = 0;
 
-    $lastGoodPartialStart = $this->statusService->getLastCompletionStart(false);
-    $lastGoodFullStart = $this->statusService->getLastCompletionStart(true);
+    $lastGoodPartialStart = $statusService->getLastCompletionStart(false);
+    $lastGoodFullStart = $statusService->getLastCompletionStart(true);
 
     if (isset($lastGoodPartialStart) && !empty($lastGoodPartialStart)) {
       // new window should be directly after the previous window

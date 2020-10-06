@@ -1,13 +1,11 @@
 <?php
 
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Repositories;
 
-use Plenty\Modules\Frontend\Services\AccountService;
-use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Models\CarrierScac;
 
@@ -23,23 +21,9 @@ class CarrierScacRepository extends Repository
   const LOG_KEY_QUERY_FAILED = "scacCodeQueryFailed";
 
   /**
-   * @var Database $database
-   */
-  private $database;
-
-  /**
-   * CarrierScacRepository constructor.
-   *
-   * @param AccountService $accountService
-   */
-  public function __construct(AccountService $accountService)
-  {
-    parent::__construct($accountService);
-    $this->database = pluginApp(DataBase::class);
-  }
-
-  /**
    * Create a CarrierScac mapping
+   *
+   * TODO: move this to a factory
    *
    * @return CarrierScac
    */

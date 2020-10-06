@@ -32,20 +32,42 @@ class ConfigHelper extends AbstractConfigHelper
   protected $config;
 
   /**
-   * Flag to set after boot has been completed
-   *
-   * @var boolean
+   * @var KeyValueRepository
    */
-  private static $bootFlag = false;
+  private $keyValueRepository;
+
+  /**
+   * @var CachingRepository
+   */
+  private $cachingRepository;
+
+  /**
+   * @var PluginRepositoryContract
+   */
+  private $pluginRepository;
+
+  /**
+   * @var LoggerContract
+   */
+  private $logger;
 
   /**
    * ConfigHelper constructor.
    *
    * @param ConfigRepository $config
    */
-  public function __construct(ConfigRepository $config)
-  {
+  public function __construct(
+    ConfigRepository $config,
+    KeyValueRepository $keyValueRepository,
+    CachingRepository $cachingRepository,
+    PluginRepositoryContract $pluginRepository,
+    LoggerContract $logger
+  ) {
     $this->config = $config;
+    $this->keyValueRepository = $keyValueRepository;
+    $this->cachingRepository = $cachingRepository;
+    $this->pluginRepository = $pluginRepository;
+    $this->logger = $logger;
   }
 
   /**
@@ -69,20 +91,12 @@ class ConfigHelper extends AbstractConfigHelper
    */
   public function getOrderReferrerValue(): float
   {
-    /**
-     * @var KeyValueRepository $keyValueRepository
-     */
-    $keyValueRepository = pluginApp(KeyValueRepository::class);
-    /**
-     * @var CachingRepository $cachingRepository
-     */
-    $cachingRepository = pluginApp(CachingRepository::class);
-    if ($cachingRepository->has(self::SETTINGS_ORDER_REFERRER_KEY)) {
-      return $cachingRepository->get(self::SETTINGS_ORDER_REFERRER_KEY);
+    if ($this->cachingRepository->has(self::SETTINGS_ORDER_REFERRER_KEY)) {
+      return $this->cachingRepository->get(self::SETTINGS_ORDER_REFERRER_KEY);
     }
 
-    $value =  $keyValueRepository->get(self::SETTINGS_ORDER_REFERRER_KEY);
-    $cachingRepository->put(self::SETTINGS_ORDER_REFERRER_KEY, $value, self::CACHING_MINUTES);
+    $value = $this->keyValueRepository->get(self::SETTINGS_ORDER_REFERRER_KEY);
+    $this->cachingRepository->put(self::SETTINGS_ORDER_REFERRER_KEY, $value, self::CACHING_MINUTES);
     return $value;
   }
 
@@ -91,12 +105,7 @@ class ConfigHelper extends AbstractConfigHelper
    */
   public function getStockBufferValue()
   {
-    /**
-     * @var KeyValueRepository $keyValueRepository
-     */
-    $keyValueRepository = pluginApp(KeyValueRepository::class);
-
-    return (int) $keyValueRepository->get(self::SETTINGS_STOCK_BUFFER_KEY);
+    return (int) $this->keyValueRepository->get(self::SETTINGS_STOCK_BUFFER_KEY);
   }
 
   /**
@@ -109,12 +118,7 @@ class ConfigHelper extends AbstractConfigHelper
 
   public function isAllItemsActive(): bool
   {
-    /**
-     * @var KeyValueRepository $keyValueRepository
-     */
-    $keyValueRepository = pluginApp(KeyValueRepository::class);
-
-    return (bool) $keyValueRepository->get(self::SETTINGS_SEND_ALL_ITEMS_KEY);
+    return (bool) ($this->keyValueRepository->get(self::SETTINGS_SEND_ALL_ITEMS_KEY) ?? false);
   }
 
   /**
@@ -122,12 +126,7 @@ class ConfigHelper extends AbstractConfigHelper
    */
   public function getImportOrderSince()
   {
-    /**
-     * @var KeyValueRepository $keyValueRepository
-     */
-    $keyValueRepository = pluginApp(KeyValueRepository::class);
-
-    return $keyValueRepository->get(self::IMPORT_ORDER_SINCE);
+    return $this->keyValueRepository->get(self::IMPORT_ORDER_SINCE);
   }
 
   /**
@@ -135,10 +134,8 @@ class ConfigHelper extends AbstractConfigHelper
    */
   public function getPluginVersion(): string
   {
-    /** @var PluginRepositoryContract */
-    $pluginRepo = pluginApp(PluginRepositoryContract::class);
-    $plugin = $pluginRepo->getPluginByName(AbstractConfigHelper::PLUGIN_NAME);
-    $plugin = $pluginRepo->decoratePlugin($plugin);
+    $plugin = $this->pluginRepository->getPluginByName(AbstractConfigHelper::PLUGIN_NAME);
+    $plugin = $this->pluginRepository->decoratePlugin($plugin);
     return $plugin->versionProductive;
   }
 
@@ -157,14 +154,8 @@ class ConfigHelper extends AbstractConfigHelper
    */
   public function getItemMappingMethod()
   {
-    /** @var KeyValueRepository $keyValueRepository */
-    $keyValueRepository = pluginApp(KeyValueRepository::class);
-    $itemMappingMethod = $keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD);
-
-    /** @var LoggerContract $logger */
-    $logger = pluginApp(LoggerContract::class);
-
-    return $this->normalizeItemMappingMethod($itemMappingMethod, $logger);
+    $itemMappingMethod = $this->keyValueRepository->get(AbstractConfigHelper::SETTINGS_DEFAULT_ITEM_MAPPING_METHOD);
+    return $this->normalizeItemMappingMethod($itemMappingMethod);
   }
 
   /**
@@ -185,27 +176,23 @@ class ConfigHelper extends AbstractConfigHelper
    * @param string $itemMappingMethod
    * @return string
    */
-  function normalizeItemMappingMethod($itemMappingMethod, $logger = null)
+  function normalizeItemMappingMethod($itemMappingMethod)
   {
     if (!$this->validateItemMappingMethod($itemMappingMethod)) {
-
-      if (isset($logger)) {
-        $logger->warning(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_UNDEFINED_MAPPING_METHOD),
-          [
-            'additionalInfo' => [
-              'itemMappingMethodFound' => $itemMappingMethod,
-              'defaultingTo' => AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER,
-            ],
-            'method' => __METHOD__
-          ]
-        );
-      }
+      $this->logger->warning(
+        TranslationHelper::getLoggerKey(self::LOG_KEY_UNDEFINED_MAPPING_METHOD),
+        [
+          'additionalInfo' => [
+            'itemMappingMethodFound' => $itemMappingMethod,
+            'defaultingTo' => AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER,
+          ],
+          'method' => __METHOD__
+        ]
+      );
 
       return AbstractConfigHelper::ITEM_MAPPING_VARIATION_NUMBER;
     }
 
     return $itemMappingMethod;
   }
-
 }

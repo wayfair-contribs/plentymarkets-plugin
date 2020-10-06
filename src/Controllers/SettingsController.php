@@ -65,6 +65,9 @@ class SettingsController
    * @param KeyValueRepository $keyValueRepository
    * @param AbstractConfigHelper $configHelper
    * @param LoggerContract $logger
+   * @param LogSenderService $logSenderService
+   * @param ExternalLogsFactory $externalLogsFactory
+   * @param OrderStatusRepositoryFactory $orderStatusRepositoryFactory
    */
   public function __construct(
     KeyValueRepository $keyValueRepository,

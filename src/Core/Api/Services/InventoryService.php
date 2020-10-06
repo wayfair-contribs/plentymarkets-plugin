@@ -26,12 +26,6 @@ class InventoryService extends APIService
   const LOG_KEY_INVENTORY_QUERY_ERROR = 'inventoryQueryError';
   const LOG_KEY_INVENTORY_QUERY_DEBUG = 'debugInventoryQuery';
 
-  /** @var LogSenderService */
-  private $logSenderService;
-
-  /** @var ExternalLogsFactory */
-  private $externalLogsFactory;
-
   private $inventoryResponseDtoFactory;
 
   /**

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright 2019 Wayfair LLC - All rights reserved
  */
@@ -7,12 +8,16 @@ namespace Wayfair\Models;
 
 use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 
-class KeyValue extends Model {
+class KeyValue extends Model
+{
+  const FIELD_NAME_KEY = 'key';
+
+  const FIELD_NAME_VALUE = 'value';
 
   /**
    * @var string
    */
-  protected $primaryKeyFieldName = 'key';
+  protected $primaryKeyFieldName = KeyValue::FIELD_NAME_KEY;
 
   /**
    * @var string
@@ -35,12 +40,36 @@ class KeyValue extends Model {
   /**
    * @return string
    */
-  public function getTableName(): string {
+  public function getTableName(): string
+  {
     return 'Wayfair::KeyValue';
   }
 
   /**
    * @var array
    */
-  protected $textFields = ['value'];
+  protected $textFields = [KeyValue::FIELD_NAME_VALUE];
+
+  /**
+   * @return array
+   */
+  public function toArray()
+  {
+    $result = [];
+    $result[self::FIELD_NAME_KEY] = $this->key;
+    $result[self::FIELD_NAME_VALUE] = $this->value;
+  }
+
+  /**
+   * Adopt the array's data into this Model
+   *
+   * @param array $params Params
+   *
+   * @return void
+   */
+  public function adoptArray(array $params): void
+  {
+    $this->key = $params[self::FIELD_NAME_KEY] ?? '';
+    $this->key = $params[self::FIELD_NAME_VALUE] ?? null;
+  }
 }
