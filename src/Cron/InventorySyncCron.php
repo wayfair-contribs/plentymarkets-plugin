@@ -9,18 +9,12 @@ namespace Wayfair\Cron;
 use Exception;
 use Plenty\Modules\Cron\Contracts\CronHandler as Cron;
 use Wayfair\Core\Contracts\LoggerContract;
-use Wayfair\Core\Exceptions\FullInventorySyncInProgressException;
-use Wayfair\Core\Exceptions\InventorySyncBlockedException;
-use Wayfair\Core\Exceptions\NoReferencePointForPartialInventorySyncException;
-use Wayfair\Core\Exceptions\WayfairVariationsMissingException;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Services\InventoryUpdateService;
 
 class InventorySyncCron extends Cron
 {
   const LOG_KEY_INVENTORY_ERRORS = 'inventoryErrors';
-
-  const SECONDS_BETWEEN_TRIES = 600;
 
   /** @var bool */
   private $fullInventory;
@@ -58,49 +52,21 @@ class InventorySyncCron extends Cron
       ],
       'method' => __METHOD__
     ]);
+
     $syncResult = null;
-    $maxAttempts = $this->fullInventory ? 3 : 1;
-    $attempt = 0;
-
     try {
-
-      while ($attempt++ <= $maxAttempts) {
-        try {
-          $syncResult = $this->inventoryUpdateService->sync($this->fullInventory);
-        } catch (FullInventorySyncInProgressException $e) {
-          // log at a low level because sync service should have mentioned it
-          $this->loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_ERRORS), [
-            'additionalInfo' => self::getInfoMapForException($e, $this->fullInventory),
-            'method' => __METHOD__
-          ]);
-
-          //  an ongoing full sync should prevent retries of any sort
-          return;
-        } catch (Exception $e) {
-          // log at a high level because this is unexpected
-          $this->loggerContract->error(TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_ERRORS), [
-            'additionalInfo' => self::getInfoMapForException($e, $this->fullInventory),
-            'method' => __METHOD__
-          ]);
-
-          // allow re-try as this exception could reflect a momentary issue
-        }
-
-        if (!$this->fullInventory || (isset($syncResult) && $syncResult->isSuccessful())) {
-          // only a failed full inventory should result in retries
-          return;
-        }
-
-        if ($attempt < $maxAttempts) {
-          // sleep and let loop
-          sleep(self::SECONDS_BETWEEN_TRIES);
-        }
-      }
+      $syncResult = $this->inventoryUpdateService->sync($this->fullInventory);
+    } catch (Exception $e) {
+      // log at a high level because this is unexpected
+      $this->loggerContract->error(TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_ERRORS), [
+        'additionalInfo' => self::getInfoMapForException($e, $this->fullInventory),
+        'method' => __METHOD__
+      ]);
     } finally {
       $this->loggerContract->debug(TranslationHelper::getLoggerKey('cronFinishedMessage'), [
         'additionalInfo' => [
           'full' => $this->fullInventory,
-          'result' => $syncResult->toArray()
+          'result' => $syncResult
         ],
         'method' => __METHOD__
       ]);
