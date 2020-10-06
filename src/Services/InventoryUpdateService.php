@@ -262,8 +262,7 @@ class InventoryUpdateService
           // let the user know why syncs are not doing anything
           $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_NO_VARIATIONS), [
             'additionalInfo' => [
-              'full' => (string) $fullInventory,
-              'message' => $e->getMessage()
+              'full' => (string) $fullInventory
             ],
             'method' => __METHOD__
           ]);
@@ -410,7 +409,7 @@ class InventoryUpdateService
         'method' => __METHOD__
       ]);
 
-      throw new InventoryException($e->getMessage());
+      throw new InventoryException($e->getMessage() . ' at ' .$e->getTraceAsString());
     } finally {
 
       $elapsedTime = time() - strtotime($startTimeStamp);

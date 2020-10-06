@@ -63,8 +63,6 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
             'quantityOnOrder' => 6,
         ];
 
-        // RequestDTO::createFromArray uses PluginApp which doesn't work in test context.
-        /** @var RequestDTO */
         $dto = new RequestDTO();
         $dto->setQuantityOnHand($onHand);
 
