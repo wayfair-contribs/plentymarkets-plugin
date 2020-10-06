@@ -11,6 +11,7 @@ use Wayfair\Core\Dto\Inventory\ResponseDTO;
 use Wayfair\Core\Exceptions\GraphQLQueryException;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Factories\ExternalLogsFactory;
+use Wayfair\Factories\InventoryResponseDtoFactory;
 
 /**
  * Class InventoryService
@@ -31,11 +32,17 @@ class InventoryService extends APIService
   /** @var ExternalLogsFactory */
   private $externalLogsFactory;
 
-  public function __construct(AbstractConfigHelper $configHelper, LogSenderService $logSenderService, ExternalLogsFactory $externalLogsFactory)
+  private $inventoryResponseDtoFactory;
+
+  public function __construct(AbstractConfigHelper $configHelper,
+  LogSenderService $logSenderService,
+  ExternalLogsFactory $externalLogsFactory,
+  InventoryResponseDtoFactory $inventoryResponseDtoFactory)
   {
     $this->configHelper = $configHelper;
     $this->logSenderService = $logSenderService;
     $this->externalLogsFactory = $externalLogsFactory;
+    $this->inventoryResponseDtoFactory = $inventoryResponseDtoFactory;
   }
 
   /**
@@ -83,12 +90,11 @@ class InventoryService extends APIService
 
   /**
    * @param array $listOfRequestDto
-   * @param bool $fullInventory
    *
    * @return ResponseDTO
    * @throws \Exception
    */
-  public function updateBulk(array $listOfRequestDto, bool $fullInventory = false)
+  public function updateBulk(array $listOfRequestDto)
   {
     $externalLogs = $this->externalLogsFactory->create();
 
@@ -128,8 +134,7 @@ class InventoryService extends APIService
           " Response from  Wayfair: " . \json_encode($responseBody));
       }
 
-
-      return ResponseDTO::createFromArray($inventory['save']);
+      return $this->inventoryResponseDtoFactory->create($inventory['save']);
     } finally {
       if (count($externalLogs->getLogs())) {
         $this->logSenderService->execute($externalLogs->getLogs());

@@ -313,7 +313,7 @@ class InventoryUpdateService
 
           $totalDtosAttempted +=  $amtOfDtosForPage;
 
-          $responseDto = $this->inventoryService->updateBulk($requestDTOsForPage, $fullInventory);
+          $responseDto = $this->inventoryService->updateBulk($requestDTOsForPage);
 
           $totalTimeSpentSendingData += TimeHelper::getMilliseconds() - $unixTimeBeforeSendingData;
 

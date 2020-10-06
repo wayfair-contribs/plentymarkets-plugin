@@ -1,11 +1,21 @@
 <?php
+
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Core\Dto\Inventory;
 
-class ResponseDTO {
+class ResponseDTO
+{
+
+  const KEY_ID = 'id';
+  const KEY_HANDLE = 'handle';
+  const KEY_STATUS = 'status';
+  const KEY_SUBMITTED_AT = 'submittedAt';
+  const KEY_COMPLETED_AT = 'completedAt';
+  const KEY_ERRORS = 'errors';
+
   /**
    * @var int
    */
@@ -39,7 +49,8 @@ class ResponseDTO {
   /**
    * @return int
    */
-  public function getId() {
+  public function getId()
+  {
     return $this->id;
   }
 
@@ -48,14 +59,16 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setId($id) {
+  public function setId($id)
+  {
     $this->id = $id;
   }
 
   /**
    * @return string
    */
-  public function getHandle() {
+  public function getHandle()
+  {
     return $this->handle;
   }
 
@@ -64,14 +77,16 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setHandle($handle) {
+  public function setHandle($handle)
+  {
     $this->handle = $handle;
   }
 
   /**
    * @return string
    */
-  public function getStatus() {
+  public function getStatus()
+  {
     return $this->status;
   }
 
@@ -80,14 +95,16 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setStatus($status) {
+  public function setStatus($status)
+  {
     $this->status = $status;
   }
 
   /**
    * @return string
    */
-  public function getSubmittedAt() {
+  public function getSubmittedAt()
+  {
     return $this->submittedAt;
   }
 
@@ -96,14 +113,16 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setSubmittedAt($submittedAt) {
+  public function setSubmittedAt($submittedAt)
+  {
     $this->submittedAt = $submittedAt;
   }
 
   /**
    * @return string
    */
-  public function getCompletedAt() {
+  public function getCompletedAt()
+  {
     return $this->completedAt;
   }
 
@@ -112,14 +131,16 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setCompletedAt($completedAt) {
+  public function setCompletedAt($completedAt)
+  {
     $this->completedAt = $completedAt;
   }
 
   /**
    * @return array
    */
-  public function getErrors() {
+  public function getErrors()
+  {
     return $this->errors;
   }
 
@@ -128,7 +149,8 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setErrors($errors) {
+  public function setErrors($errors)
+  {
     $this->errors = [];
     foreach ($errors as $key => $error) {
       $this->errors[] = ErrorDTO::createFromArray($error);
@@ -136,39 +158,36 @@ class ResponseDTO {
   }
 
   /**
-   * Static function to create a new Response DTO from array
+   * Adopt the array's data into this DTO
    *
    * @param array $params Params
    *
-   * @return self
+   * @return void
    */
-  public static function createFromArray(array $params): self {
-    /**
-     * @var ResponseDTO $dto
-     */
-    $dto = pluginApp(ResponseDTO::class);
-    $dto->setId($params['id'] ?? null);
-    $dto->setHandle($params['handle'] ?? null);
-    $dto->setStatus($params['status'] ?? null);
-    $dto->setSubmittedAt($params['submittedAt'] ?? null);
-    $dto->setCompletedAt($params['completedAt'] ?? null);
-    $dto->setErrors($params['errors'] ?? []);
-    return $dto;
+  public function adoptArray(array $params): void
+  {
+    $this->setId($params[self::KEY_ID] ?? null);
+    $this>setHandle($params[self::KEY_HANDLE] ?? null);
+    $this->setStatus($params[self::KEY_STATUS] ?? null);
+    $this->setSubmittedAt($params[self::KEY_SUBMITTED_AT] ?? null);
+    $this->setCompletedAt($params[self::KEY_COMPLETED_AT] ?? null);
+    $this->setErrors($params[self::KEY_ERRORS] ?? []);
   }
 
   /**
    * @return array
    */
-  public function toArray() {
+  public function toArray()
+  {
     $data = [];
-    $data['id'] = $this->getId();
-    $data['handle'] = $this->getHandle();
-    $data['status'] = $this->getStatus();
-    $data['submittedAt'] = $this->getSubmittedAt();
-    $data['completedAt'] = $this->getCompletedAt();
-    $data['errors'] = [];
+    $data[self::KEY_ID] = $this->getId();
+    $data[self::KEY_HANDLE] = $this->getHandle();
+    $data[self::KEY_STATUS] = $this->getStatus();
+    $data[self::KEY_SUBMITTED_AT] = $this->getSubmittedAt();
+    $data[self::KEY_COMPLETED_AT] = $this->getCompletedAt();
+    $data[self::KEY_ERRORS] = [];
     foreach ($this->getErrors() as $error) {
-      $data['errors'][] = $error->toArray();
+      $data[self::KEY_ERRORS][] = $error->toArray();
     }
     return $data;
   }
