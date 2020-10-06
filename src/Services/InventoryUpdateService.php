@@ -103,7 +103,7 @@ class InventoryUpdateService
     $this->logSenderService = $logSenderService;
     $this->externalLogsFactory = $externalLogsFactory;
     $this->variationSearchRepositoryFactory = $variationSearchRepositoryFactory;
-    $this->$inventoryUpdateResultFactory = $inventoryUpdateResultFactory;
+    $this->inventoryUpdateResultFactory = $inventoryUpdateResultFactory;
   }
 
   /**
