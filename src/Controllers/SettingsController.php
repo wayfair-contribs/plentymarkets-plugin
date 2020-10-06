@@ -7,15 +7,15 @@
 namespace Wayfair\Controllers;
 
 use Plenty\Exceptions\ValidationException;
-use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 use Plenty\Modules\Order\Status\Models\OrderStatus;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Wayfair\Core\Api\Services\LogSenderService;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Factories\ExternalLogsFactory;
+use Wayfair\Factories\OrderStatusRepositoryFactory;
 use Wayfair\Helpers\TranslationHelper;
-use Wayfair\Models\ExternalLogs;
 use Wayfair\Repositories\KeyValueRepository;
 
 /**
@@ -50,6 +50,16 @@ class SettingsController
   private $logSenderService;
 
   /**
+   * @var ExternalLogsFactory
+   */
+  private $externalLogsFactory;
+
+  /**
+   * @var OrderStatusRepositoryFactory
+   */
+  private $orderStatusRepositoryFactory;
+
+  /**
    * SettingsController constructor.
    *
    * @param KeyValueRepository $keyValueRepository
@@ -60,12 +70,16 @@ class SettingsController
     KeyValueRepository $keyValueRepository,
     AbstractConfigHelper $configHelper,
     LoggerContract $logger,
-    LogSenderService $logSenderService
+    LogSenderService $logSenderService,
+    ExternalLogsFactory $externalLogsFactory,
+    OrderStatusRepositoryFactory $orderStatusRepositoryFactory
   ) {
     $this->keyValueRepository = $keyValueRepository;
     $this->logger = $logger;
     $this->configHelper = $configHelper;
     $this->logSenderService = $logSenderService;
+    $this->externalLogsFactory = $externalLogsFactory;
+    $this->orderStatusRepositoryFactory = $orderStatusRepositoryFactory;
   }
 
   /**
@@ -75,8 +89,7 @@ class SettingsController
    */
   public function get()
   {
-    /** @var ExternalLogs */
-    $externalLogs = pluginApp(ExternalLogs::class);
+    $externalLogs = $this->externalLogsFactory->create();
 
     try {
       $stockBuffer = $this->keyValueRepository->get(AbstractConfigHelper::SETTINGS_STOCK_BUFFER_KEY);
@@ -126,8 +139,7 @@ class SettingsController
    */
   public function post(Request $request, Response $response)
   {
-    /** @var ExternalLogs */
-    $externalLogs = pluginApp(ExternalLogs::class);
+    $externalLogs = $this->externalLogsFactory->create();
 
     try {
       $settingMappings = null;
@@ -148,7 +160,7 @@ class SettingsController
         // get and validate all user input
         $stockBuffer = self::getAndValidateStockBufferFromInput($dataIn);
         $defaultShippingProviderId = self::getAndValidateDefaultShippingProviderFromInput($dataIn);
-        $defaultOrderStatusId = self::getAndValidateDefaultOrderStatusFromInput($dataIn);
+        $defaultOrderStatusId = $this->getAndValidateDefaultOrderStatusFromInput($dataIn);
         $defaultItemMappingMethod = $this->getAndValidateDefaultItemMappingMethodFromInput($dataIn);
         $importOrderSince = self::getAndValidateImportOrdersSinceFromInput($dataIn);
         $isAllInventorySyncEnabled = self::getAndValidateAllInventorySyncFromInput($dataIn);
@@ -276,7 +288,7 @@ class SettingsController
    * @return float|null
    * @throws ValidationException
    */
-  private static function getAndValidateDefaultOrderStatusFromInput($inputData)
+  private function getAndValidateDefaultOrderStatusFromInput($inputData)
   {
     $inputDefaultOrderStatus = $inputData[AbstractConfigHelper::SETTINGS_DEFAULT_ORDER_STATUS_KEY];
 
@@ -291,9 +303,7 @@ class SettingsController
 
     $orderStatus = (float) $inputDefaultOrderStatus;
 
-    /** @var OrderStatusRepositoryContract */
-    $orderStatusRepository = pluginApp(OrderStatusRepositoryContract::class);
-
+    $orderStatusRepository = $this->orderStatusRepositoryFactory->create();
     $statusModel = null;
 
     try {

@@ -1,11 +1,23 @@
 <?php
+
 /**
  * @copyright 2019 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Core\Dto\Inventory;
 
-class RequestDTO {
+class RequestDTO
+{
+
+  const KEY_SUPPLIER_ID = 'supplierId';
+  const KEY_SUPPLIER_PART_NUMBER = 'supplierPartNumber';
+  const KEY_QUANTITY_ON_HAND = 'quantityOnHand';
+  const KEY_QUANTITY_BACKORDER = 'quantityBackorder';
+  const KEY_QUANTITY_ON_ORDER = 'quantityOnOrder';
+  const KEY_ITEM_NEXT_AVAILABILITY_DATE = 'itemNextAvailabilityDate';
+  const KEY_PRODUCT_NAME_AND_OPTIONS = 'productNameAndOptions';
+  const KEY_DISCONTINUED = 'discontinued';
+
   /**
    * @var int
    */
@@ -49,7 +61,8 @@ class RequestDTO {
   /**
    * @return int
    */
-  public function getSupplierId() {
+  public function getSupplierId()
+  {
     return $this->supplierId;
   }
 
@@ -58,14 +71,16 @@ class RequestDTO {
    *
    * @return void
    */
-  public function setSupplierId($supplierId) {
+  public function setSupplierId($supplierId)
+  {
     $this->supplierId = $supplierId;
   }
 
   /**
    * @return string
    */
-  public function getSupplierPartNumber() {
+  public function getSupplierPartNumber()
+  {
     return $this->supplierPartNumber;
   }
 
@@ -74,14 +89,16 @@ class RequestDTO {
    *
    * @return void
    */
-  public function setSupplierPartNumber($supplierPartNumber) {
+  public function setSupplierPartNumber($supplierPartNumber)
+  {
     $this->supplierPartNumber = $supplierPartNumber;
   }
 
   /**
    * @return int|null
    */
-  public function getQuantityOnHand() {
+  public function getQuantityOnHand()
+  {
     return $this->quantityOnHand;
   }
 
@@ -90,14 +107,16 @@ class RequestDTO {
    *
    * @return void
    */
-  public function setQuantityOnHand($quantityOnHand) {
+  public function setQuantityOnHand($quantityOnHand)
+  {
     $this->quantityOnHand = $quantityOnHand;
   }
 
   /**
    * @return int|null
    */
-  public function getQuantityBackorder() {
+  public function getQuantityBackorder()
+  {
     return $this->quantityBackorder;
   }
 
@@ -106,14 +125,16 @@ class RequestDTO {
    *
    * @return void
    */
-  public function setQuantityBackorder($quantityBackorder) {
+  public function setQuantityBackorder($quantityBackorder)
+  {
     $this->quantityBackorder = $quantityBackorder;
   }
 
   /**
    * @return int|null
    */
-  public function getQuantityOnOrder() {
+  public function getQuantityOnOrder()
+  {
     return $this->quantityOnOrder;
   }
 
@@ -122,14 +143,16 @@ class RequestDTO {
    *
    * @return void
    */
-  public function setQuantityOnOrder($quantityOnOrder) {
+  public function setQuantityOnOrder($quantityOnOrder)
+  {
     $this->quantityOnOrder = $quantityOnOrder;
   }
 
   /**
    * @return string
    */
-  public function getItemNextAvailabilityDate() {
+  public function getItemNextAvailabilityDate()
+  {
     return $this->itemNextAvailabilityDate;
   }
 
@@ -138,14 +161,16 @@ class RequestDTO {
    *
    * @return void
    */
-  public function setItemNextAvailabilityDate($itemNextAvailabilityDate) {
+  public function setItemNextAvailabilityDate($itemNextAvailabilityDate)
+  {
     $this->itemNextAvailabilityDate = $itemNextAvailabilityDate;
   }
 
   /**
    * @return string
    */
-  public function getProductNameAndOptions() {
+  public function getProductNameAndOptions()
+  {
     return $this->productNameAndOptions;
   }
 
@@ -154,14 +179,16 @@ class RequestDTO {
    *
    * @return void
    */
-  public function setProductNameAndOptions($productNameAndOptions) {
+  public function setProductNameAndOptions($productNameAndOptions)
+  {
     $this->productNameAndOptions = $productNameAndOptions;
   }
 
   /**
    * @return bool
    */
-  public function isDiscontinued() {
+  public function isDiscontinued()
+  {
     return $this->discontinued;
   }
 
@@ -170,46 +197,44 @@ class RequestDTO {
    *
    * @return void
    */
-  public function setDiscontinued($discontinued) {
+  public function setDiscontinued($discontinued)
+  {
     $this->discontinued = $discontinued;
   }
 
   /**
-   * Static function to create a new RequestDTO from array
+   * Adopt the data in the array into the DTO
    *
    * @param array $params Params
    *
-   * @return self
+   * @return void
    */
-  public static function createFromArray(array $params): self {
-    /**
-     * @var RequestDTO $dto
-     */
-    $dto = pluginApp(RequestDTO::class);
-    $dto->setSupplierId($params['supplierId'] ?? null);
-    $dto->setSupplierPartNumber($params['supplierPartNumber'] ?? null);
-    $dto->setQuantityOnHand($params['quantityOnHand'] ?? null);
-    $dto->setQuantityBackorder($params['quantityBackorder'] ?? null);
-    $dto->setQuantityOnOrder($params['quantityOnOrder'] ?? null);
-    $dto->setItemNextAvailabilityDate($params['itemNextAvailabilityDate'] ?? null);
-    $dto->setProductNameAndOptions($params['productNameAndOptions'] ?? null);
-    $dto->setDiscontinued($params['discontinued'] ?? null);
-    return $dto;
+  public function adoptArray(array $params): void
+  {
+    $this->setSupplierId($params[self::KEY_SUPPLIER_ID] ?? null);
+    $this->setSupplierPartNumber($params[self::KEY_SUPPLIER_PART_NUMBER] ?? null);
+    $this->setQuantityOnHand($params[self::KEY_QUANTITY_ON_HAND] ?? null);
+    $this->setQuantityBackorder($params[self::KEY_QUANTITY_BACKORDER] ?? null);
+    $this->setQuantityOnOrder($params[self::KEY_QUANTITY_ON_ORDER] ?? null);
+    $this->setItemNextAvailabilityDate($params[self::KEY_ITEM_NEXT_AVAILABILITY_DATE] ?? null);
+    $this->setProductNameAndOptions($params[self::KEY_PRODUCT_NAME_AND_OPTIONS] ?? null);
+    $this->setDiscontinued($params[self::KEY_DISCONTINUED] ?? null);
   }
 
   /**
    * @return array
    */
-  public function toArray() {
+  public function toArray()
+  {
     $data = [];
-    $data['supplierId'] = $this->getSupplierId();
-    $data['supplierPartNumber'] = $this->getSupplierPartNumber();
-    $data['quantityOnHand'] = $this->getQuantityOnHand();
-    $data['quantityBackorder'] = $this->getQuantityBackorder();
-    $data['quantityOnOrder'] = $this->getQuantityOnOrder();
-    $data['itemNextAvailabilityDate'] = $this->getItemNextAvailabilityDate();
-    $data['productNameAndOptions'] = $this->getProductNameAndOptions();
-    $data['discontinued'] = $this->isDiscontinued();
+    $data[self::KEY_SUPPLIER_ID] = $this->getSupplierId();
+    $data[self::KEY_SUPPLIER_PART_NUMBER] = $this->getSupplierPartNumber();
+    $data[self::KEY_QUANTITY_ON_HAND] = $this->getQuantityOnHand();
+    $data[self::KEY_QUANTITY_BACKORDER] = $this->getQuantityBackorder();
+    $data[self::KEY_QUANTITY_ON_ORDER] = $this->getQuantityOnOrder();
+    $data[self::KEY_ITEM_NEXT_AVAILABILITY_DATE] = $this->getItemNextAvailabilityDate();
+    $data[self::KEY_PRODUCT_NAME_AND_OPTIONS] = $this->getProductNameAndOptions();
+    $data[self::KEY_DISCONTINUED] = $this->isDiscontinued();
     return $data;
   }
 }

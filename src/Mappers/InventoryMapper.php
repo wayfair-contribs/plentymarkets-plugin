@@ -7,13 +7,14 @@
 namespace Wayfair\Mappers;
 
 use InvalidArgumentException;
-use Plenty\Modules\StockManagement\Stock\Contracts\StockRepositoryContract;
-use Plenty\Modules\Item\VariationStock\Contracts\VariationStockRepositoryContract;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\Inventory\RequestDTO;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Factories\InventoryRequestDtoFactory;
+use Wayfair\Factories\StockRepositoryFactory;
+use Wayfair\Factories\VariationStockRepositoryFactory;
+use Wayfair\Factories\WarehouseSupplierRepositoryFactory;
 use Wayfair\Helpers\TranslationHelper;
-use Wayfair\Repositories\WarehouseSupplierRepository;
 
 class InventoryMapper
 {
@@ -48,18 +49,45 @@ class InventoryMapper
     self::STOCK_COL_RESERVED_STOCK
   ];
 
+  /** @var LoggerContract */
+  private $logger;
+
+  /** @var InventoryRequestDtoFactory */
+  private $inventoryRequestDtoFactory;
+
+  /** @var WarehouseSupplierRepositoryFactory */
+  private $warehouseSupplierRepositoryFactory;
+
+  /** @var StockRepositoryFactory */
+  private $stockRepositoryFactory;
+
+  /** @var VariationStockRepositoryFactory */
+  private $variationStockRepositoryFactory;
+
+  public function __construct(
+    LoggerContract $logger,
+    InventoryRequestDtoFactory $inventoryRequestDtoFactory,
+    WarehouseSupplierRepositoryFactory $warehouseSupplierRepositoryFactory,
+    StockRepositoryFactory $stockRepositoryFactory,
+    VariationStockRepositoryFactory $variationStockRepositoryFactory
+  ) {
+    $this->logger = $logger;
+    $this->inventoryRequestDtoFactory = $inventoryRequestDtoFactory;
+    $this->warehouseSupplierRepositoryFactory = $warehouseSupplierRepositoryFactory;
+    $this->stockRepositoryFactory = $stockRepositoryFactory;
+    $this->variationStockRepositoryFactory = $variationStockRepositoryFactory;
+  }
+
   /**
+   * TODO: verify behavior and add function description
+   * FIXME: should be calculated at the Wayfair Product level, not the Plentymarkets Variation level!
    * @param $mainVariationId
    *
    * @return mixed
    */
   public function getAvailableDate($mainVariationId)
   {
-    // TODO: verify behavior and add function description
-    /**
-     * @var VariationStockRepositoryContract $variationStockRepositoryContract
-     */
-    $variationStockRepositoryContract = pluginApp(VariationStockRepositoryContract::class);
+    $variationStockRepositoryContract = $this->variationStockRepositoryFactory->create();
     $variationStockMovements = $variationStockRepositoryContract->listStockMovements($mainVariationId, ['processRowType', 'bestBeforeDate'], 1, 50);
     $bestBeforeDateForIncomingStock = null;
     foreach ($variationStockMovements as $variationStockMovement) {
@@ -107,11 +135,14 @@ class InventoryMapper
    *
    * @return RequestDTO[]
    */
-  public function createInventoryDTOsFromVariation($variationData, $itemMappingMethod, $referrerId = null, $stockBuffer = null, $timeWindowStartW3c = null, $timeWindowEndW3c = null)
-  {
-    /** @var LoggerContract $loggerContract */
-    $loggerContract = pluginApp(LoggerContract::class);
-
+  public function createInventoryDTOsFromVariation(
+    $variationData,
+    $itemMappingMethod,
+    $referrerId = null,
+    $stockBuffer = null,
+    $timeWindowStartW3c = null,
+    $timeWindowEndW3c = null
+  ) {
     /** @var array<string,RequestDTO> $requestDtosBySuID */
     $requestDtosBySuID = [];
 
@@ -122,13 +153,13 @@ class InventoryMapper
     $partNumberFailureMessage = null;
 
     try {
-      $supplierPartNumber = $this->getSupplierPartNumberFromVariation($variationData, $itemMappingMethod, $referrerId, $loggerContract);
+      $supplierPartNumber = $this->getSupplierPartNumberFromVariation($variationData, $itemMappingMethod, $referrerId, $this->logger);
     } catch (\Exception $e) {
       $partNumberFailureMessage = get_class($e) . ' : ' . $e->getMessage();
     }
 
     if (!isset($supplierPartNumber) || empty($supplierPartNumber)) {
-      $loggerContract->error(
+      $this->logger->error(
         TranslationHelper::getLoggerKey(self::LOG_KEY_PART_NUMBER_MISSING),
         [
           'additionalInfo' => [
@@ -148,7 +179,6 @@ class InventoryMapper
 
     $filters = [self::STOCK_COL_VARIATION_ID => $mainVariationId];
     if (isset($timeWindowStartW3c) && !empty($timeWindowStartW3c)) {
-      // FIXME: these conversions should happen before calling into here
       $filters[self::STOCK_FILTER_UPDATED_AT_FROM] = $timeWindowStartW3c;
 
       if (isset($timeWindowEndW3c) && !empty($timeWindowEndW3c)) {
@@ -156,10 +186,7 @@ class InventoryMapper
       }
     }
 
-    /**
-     * @var StockRepositoryContract
-     */
-    $stockRepository = pluginApp(StockRepositoryContract::class);
+    $stockRepository = $this->stockRepositoryFactory->create();
     $stockRepository->setFilters($filters);
 
     $pageNumber = 1;
@@ -172,7 +199,7 @@ class InventoryMapper
         if (!isset($warehouseId)) {
           // we don't know the warehouse, so we can't figure out the supplier ID.
           // Not an error, but unexpected.
-          $loggerContract->info(
+          $this->logger->info(
             TranslationHelper::getLoggerKey(self::LOG_KEY_STOCK_MISSING_WAREHOUSE),
             [
               'additionalInfo' => [
@@ -190,7 +217,7 @@ class InventoryMapper
 
         if (!isset($supplierId) || $supplierId === 0 || $supplierId === '0') {
           // no supplier assigned to this warehouse - NOT an error - we should NOT sync it
-          $loggerContract->debug(
+          $this->logger->debug(
             TranslationHelper::getLoggerKey(self::LOG_KEY_NO_SUPPLIER_ID_ASSIGNED_TO_WAREHOUSE),
             [
               'additionalInfo' => [
@@ -208,7 +235,7 @@ class InventoryMapper
         $onHand = self::normalizeQuantityOnHand($originalStockNet);
 
         if ($originalStockNet != $onHand) {
-          $loggerContract->info(
+          $this->logger->info(
             TranslationHelper::getLoggerKey(self::LOG_KEY_NORMALIZING_INVENTORY),
             [
               'additionalInfo' => [
@@ -223,7 +250,7 @@ class InventoryMapper
 
         if (!isset($onHand) || ($onHand < -1)) {
           // inventory amounts less than -1 are not accepted - do NOT send to Wayfair.
-          $loggerContract->warning(
+          $this->logger->warning(
             TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_INVENTORY_AMOUNT),
             [
               'additionalInfo' => [
@@ -261,17 +288,16 @@ class InventoryMapper
           $onOrder = self::mergeInventoryQuantities($onOrder, $existingDTO->getQuantityOnOrder());
         }
 
-        $dtoData = [
-          'supplierId' => $supplierId,
-          'supplierPartNumber' => $supplierPartNumber,
-          'quantityOnHand' => $onHand,
-          'quantityOnOrder' => $onOrder,
-          'itemNextAvailabilityDate' => $nextAvailableDate,
-          'productNameAndOptions' => $variationData['name']
-        ];
+        $requestDto = $this->inventoryRequestDtoFactory->create();
+        $requestDto->setSupplierId($supplierId);
+        $requestDto->setSupplierPartNumber($supplierPartNumber);
+        $requestDto->setQuantityOnHand($onHand);
+        $requestDto->setQuantityOnOrder($onOrder);
+        $requestDto->setItemNextAvailabilityDate($nextAvailableDate);
+        $requestDto->setProductNameAndOptions($variationData['name']);
 
         // replaces any existing DTO with a "merge" for this suID
-        $requestDtosBySuID[$dtoKey] = RequestDTO::createFromArray($dtoData);
+        $requestDtosBySuID[$dtoKey] = $requestDto;
       } // end of loop over stock items on page
       $pageNumber++;
     } while (!$stockSearchResponsePage->isLastPage());
@@ -325,12 +351,9 @@ class InventoryMapper
    * @param int $warehouseId
    * @return mixed
    */
-  private static function getSupplierIDForWarehouseID($warehouseId)
+  private function getSupplierIDForWarehouseID($warehouseId)
   {
-    /**
-     * @var WarehouseSupplierRepository $warehouseSupplierRepository
-     */
-    $warehouseSupplierRepository = pluginApp(WarehouseSupplierRepository::class);
+    $warehouseSupplierRepository = $this->warehouseSupplierRepositoryFactory->create();
 
     $warehouseSupplierMapping = $warehouseSupplierRepository->findByWarehouseId($warehouseId);
 

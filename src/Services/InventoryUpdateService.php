@@ -7,7 +7,6 @@
 namespace Wayfair\Services;
 
 use DateTime;
-use Plenty\Modules\Item\Variation\Contracts\VariationSearchRepositoryContract;
 use Wayfair\Core\Api\Services\InventoryService;
 use Wayfair\Core\Api\Services\LogSenderService;
 use Wayfair\Core\Contracts\LoggerContract;
@@ -19,9 +18,11 @@ use Wayfair\Core\Exceptions\InventorySyncInterruptedException;
 use Wayfair\Core\Exceptions\NoReferencePointForPartialInventorySyncException;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Core\Helpers\TimeHelper;
+use Wayfair\Factories\ExternalLogsFactory;
+use Wayfair\Factories\InventoryUpdateResultFactory;
+use Wayfair\Factories\VariationSearchRepositoryFactory;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Mappers\InventoryMapper;
-use Wayfair\Models\ExternalLogs;
 use Wayfair\Models\InventoryUpdateResult;
 
 /**
@@ -74,13 +75,25 @@ class InventoryUpdateService
   /** @var LogSenderService */
   private $logSenderService;
 
+  /** @var ExternalLogsFactory */
+  private $externalLogsFactory;
+
+  /** @var VariationSearchRepositoryFactory */
+  private $variationSearchRepositoryFactory;
+
+  /** @var inventoryUpdateResultFactory */
+  private $inventoryUpdateResultFactory;
+
   public function __construct(
     InventoryService $inventoryService,
     InventoryMapper $inventoryMapper,
     InventoryStatusService $statusService,
     AbstractConfigHelper $configHelper,
     LoggerContract $logger,
-    LogSenderService $logSenderService
+    LogSenderService $logSenderService,
+    ExternalLogsFactory $externalLogsFactory,
+    VariationSearchRepositoryFactory $variationSearchRepositoryFactory,
+    InventoryUpdateResultFactory $inventoryUpdateResultFactory
   ) {
     $this->inventoryService = $inventoryService;
     $this->inventoryMapper = $inventoryMapper;
@@ -88,6 +101,9 @@ class InventoryUpdateService
     $this->configHelper = $configHelper;
     $this->logger = $logger;
     $this->logSenderService = $logSenderService;
+    $this->externalLogsFactory = $externalLogsFactory;
+    $this->variationSearchRepositoryFactory = $variationSearchRepositoryFactory;
+    $this->$inventoryUpdateResultFactory = $inventoryUpdateResultFactory;
   }
 
   /**
@@ -112,8 +128,7 @@ class InventoryUpdateService
     $windowStart = null;
     $windowEnd = null;
 
-    /** @var ExternalLogs */
-    $externalLogs = pluginApp(ExternalLogs::class);
+    $externalLogs = $this->externalLogsFactory->create();
 
     try {
       if ($this->statusService->isInventoryRunning()) {
@@ -156,11 +171,10 @@ class InventoryUpdateService
         $windowStart = $this->getStartOfDeltaSyncWindow();
         $windowEnd = (date_create($startTimeStamp))->format(DateTime::W3C);
       }
-    } catch (InventoryException $ie)
-    {
+    } catch (InventoryException $ie) {
       // re-throw exceptions that were purposely thrown
       throw $ie;
-    }catch (\Exception $e) {
+    } catch (\Exception $e) {
       // unexpected exception that was not thrown on purpose - DB issues, etc.
       $externalLogs->addErrorLog('Inventory status checks caused exception: ' . $e->getMessage(), $e->getTraceAsString());
 
@@ -186,8 +200,7 @@ class InventoryUpdateService
       // look up referrer ID at this level to ensure consistency and efficiency
       $referrerId = $this->configHelper->getOrderReferrerValue();
 
-      /** @var VariationSearchRepositoryContract */
-      $variationSearchRepository = pluginApp(VariationSearchRepositoryContract::class);
+      $variationSearchRepository = $this->variationSearchRepositoryFactory->create();
 
       // stock buffer should be the same across all pages of inventory
       $stockBuffer = $this->getNormalizedStockBuffer();
@@ -402,16 +415,15 @@ class InventoryUpdateService
 
       $elapsedTime = time() - strtotime($startTimeStamp);
 
-      /** @var InventoryUpdateResult */
-      $resultObject = pluginApp(InventoryUpdateResult::class);
+      $resultObject = $this->inventoryUpdateResultFactory->create();
 
-      $resultObject->fullInventory =  $fullInventory;
-      $resultObject->dtosAttempted = $totalDtosAttempted;
-      $resultObject->dtosAttempted = $totalDtosAttempted;
-      $resultObject->dtosSaved = $totalDtosSaved;
-      $resultObject->dtosFailed = $totalDtosFailed;
-      $resultObject->elapsedTime = $elapsedTime;
-      $resultObject->variationsAttempted = $totalVariationIdsInDTOsForAllPages;
+      $resultObject->setFullInventory($fullInventory);
+      $resultObject->setDtosAttempted($totalDtosAttempted);
+      $resultObject->setDtosAttempted($totalDtosAttempted);
+      $resultObject->setDtosSaved($totalDtosSaved);
+      $resultObject->setDtosFailed($totalDtosFailed);
+      $resultObject->setElapsedTime($elapsedTime);
+      $resultObject->setVariationsAttempted($totalVariationIdsInDTOsForAllPages);
 
       $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_END), [
         'additionalInfo' => [

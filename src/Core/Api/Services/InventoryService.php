@@ -10,7 +10,7 @@ use Wayfair\Core\Api\APIService;
 use Wayfair\Core\Dto\Inventory\ResponseDTO;
 use Wayfair\Core\Exceptions\GraphQLQueryException;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
-use Wayfair\Models\ExternalLogs;
+use Wayfair\Factories\ExternalLogsFactory;
 
 /**
  * Class InventoryService
@@ -22,18 +22,30 @@ class InventoryService extends APIService
   const LOG_KEY_INVENTORY_QUERY_ERROR = 'inventoryQueryError';
   const LOG_KEY_INVENTORY_QUERY_DEBUG = 'debugInventoryQuery';
 
+  /** @var AbstractConfigHelper */
+  private $configHelper;
+
+  /** @var LogSenderService */
+  private $logSenderService;
+
+  /** @var ExternalLogsFactory */
+  private $externalLogsFactory;
+
+  public function __construct(AbstractConfigHelper $configHelper, LogSenderService $logSenderService, ExternalLogsFactory $externalLogsFactory)
+  {
+    $this->configHelper = $configHelper;
+    $this->logSenderService = $logSenderService;
+    $this->externalLogsFactory = $externalLogsFactory;
+  }
+
   /**
    * @param array $listOfRequestDTOs
-   * @param bool $fullInventory
+   * @param AbstractConfigHelper $configHelper
    *
    * @return array
    */
-  public function buildQuery(array $listOfRequestDTOs, bool $fullInventory = false)
+  private function buildQuery(array $listOfRequestDTOs)
   {
-    /**
-     * @var AbstractConfigHelper $configHelper
-     */
-    $configHelper = pluginApp(AbstractConfigHelper::class);
     $fullData = [];
     foreach ($listOfRequestDTOs as $requestDTO) {
       $fullData[] = [
@@ -53,7 +65,7 @@ class InventoryService extends APIService
       . 'save('
       . 'inventory: $inventory,'
       . 'feedKind: DIFFERENTIAL,'
-      . 'dryRun: ' . $configHelper->getDryRun()
+      . 'dryRun: ' . $this->configHelper->getDryRun()
       . ') {'
       . 'id,'
       . 'handle,'
@@ -78,8 +90,7 @@ class InventoryService extends APIService
    */
   public function updateBulk(array $listOfRequestDto, bool $fullInventory = false)
   {
-    /** @var ExternalLogs $externalLogs */
-    $externalLogs = pluginApp(ExternalLogs::class);
+    $externalLogs = $this->externalLogsFactory->create();
 
     try {
 
@@ -121,9 +132,7 @@ class InventoryService extends APIService
       return ResponseDTO::createFromArray($inventory['save']);
     } finally {
       if (count($externalLogs->getLogs())) {
-        /** @var LogSenderService $logSenderService */
-        $logSenderService = pluginApp(LogSenderService::class);
-        $logSenderService->execute($externalLogs->getLogs());
+        $this->logSenderService->execute($externalLogs->getLogs());
       }
     }
   }

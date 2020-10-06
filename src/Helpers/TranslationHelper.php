@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Helpers;
@@ -24,6 +24,7 @@ class TranslationHelper {
    */
   private static function getTranslator() {
     if (self::$translator === null) {
+      // FIXME: dependency on pluginApp will break tests that get here
       self::$translator = pluginApp(Translator::class);
     }
 
