@@ -81,7 +81,7 @@ class InventoryUpdateService
   /** @var VariationSearchRepositoryFactory */
   private $variationSearchRepositoryFactory;
 
-  /** @var inventoryUpdateResultFactory */
+  /** @var InventoryUpdateResultFactory */
   private $inventoryUpdateResultFactory;
 
   public function __construct(

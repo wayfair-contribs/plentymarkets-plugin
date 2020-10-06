@@ -94,7 +94,7 @@ class InventoryService extends APIService
 
     try {
 
-      $queryData = $this->buildQuery($listOfRequestDto, $fullInventory);
+      $queryData = $this->buildQuery($listOfRequestDto);
 
       $response = $this->query($queryData['query'], 'post', $queryData['variables']);
 
