@@ -88,4 +88,10 @@ abstract class AbstractConfigHelper {
    * @return bool
    */
   abstract public function validateItemMappingMethod($itemMappingMethod);
+
+  /**
+   * Get the Integration agent header
+   * @return string
+   */
+  abstract public function getIntegrationAgentHeader();
 }

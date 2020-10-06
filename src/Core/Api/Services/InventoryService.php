@@ -7,6 +7,9 @@
 namespace Wayfair\Core\Api\Services;
 
 use Wayfair\Core\Api\APIService;
+use Wayfair\Core\Contracts\AuthContract;
+use Wayfair\Core\Contracts\ClientInterfaceContract;
+use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\Inventory\ResponseDTO;
 use Wayfair\Core\Exceptions\GraphQLQueryException;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
@@ -23,9 +26,6 @@ class InventoryService extends APIService
   const LOG_KEY_INVENTORY_QUERY_ERROR = 'inventoryQueryError';
   const LOG_KEY_INVENTORY_QUERY_DEBUG = 'debugInventoryQuery';
 
-  /** @var AbstractConfigHelper */
-  private $configHelper;
-
   /** @var LogSenderService */
   private $logSenderService;
 
@@ -34,20 +34,35 @@ class InventoryService extends APIService
 
   private $inventoryResponseDtoFactory;
 
-  public function __construct(AbstractConfigHelper $configHelper,
-  LogSenderService $logSenderService,
-  ExternalLogsFactory $externalLogsFactory,
-  InventoryResponseDtoFactory $inventoryResponseDtoFactory)
-  {
-    $this->configHelper = $configHelper;
-    $this->logSenderService = $logSenderService;
-    $this->externalLogsFactory = $externalLogsFactory;
+  /**
+   * @param ClientInterfaceContract $clientInterfaceContract
+   * @param AuthContract            $authContract
+   * @param AbstractConfigHelper    $configHelper
+   * @param LoggerContract          $loggerContract
+   */
+  public function __construct(
+    ClientInterfaceContract $clientInterfaceContract,
+    AuthContract $authContract,
+    AbstractConfigHelper $configHelper,
+    LoggerContract $loggerContract,
+    LogSenderService $logSenderService,
+    ExternalLogsFactory $externalLogsFactory,
+    InventoryResponseDtoFactory $inventoryResponseDtoFactory
+
+  ) {
+    parent::__construct(
+      $clientInterfaceContract,
+      $authContract,
+      $configHelper,
+      $loggerContract,
+      $logSenderService,
+      $externalLogsFactory
+    );
     $this->inventoryResponseDtoFactory = $inventoryResponseDtoFactory;
   }
 
   /**
    * @param array $listOfRequestDTOs
-   * @param AbstractConfigHelper $configHelper
    *
    * @return array
    */

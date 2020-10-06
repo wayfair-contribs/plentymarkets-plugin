@@ -10,8 +10,10 @@ use Wayfair\Core\Contracts\AuthContract;
 use Wayfair\Core\Contracts\ClientInterfaceContract;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Exceptions\AuthException;
+use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Core\Helpers\URLHelper;
-use Wayfair\Helpers\ConfigHelper;
+use Wayfair\Core\Api\Services\LogSenderService;
+use Wayfair\Factories\ExternalLogsFactory;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Helpers\StringHelper;
 use Wayfair\Http\WayfairResponse;
@@ -38,22 +40,40 @@ class APIService
   protected $loggerContract;
 
   /**
-   * @var ConfigHelper
+   * @var AbstractConfigHelper
    */
   protected $configHelper;
 
   /**
+   * @var LogSenderService
+   */
+  protected $logSenderService;
+
+  /**
+   * @var ExternalLogsFactory
+   */
+  protected $externalLogsFactory;
+
+  /**
    * @param ClientInterfaceContract $clientInterfaceContract
    * @param AuthContract            $authContract
-   * @param ConfigHelper            $configHelper
+   * @param AbstractConfigHelper    $configHelper
    * @param LoggerContract          $loggerContract
    */
-  public function __construct(ClientInterfaceContract $clientInterfaceContract, AuthContract $authContract, ConfigHelper $configHelper, LoggerContract $loggerContract)
-  {
+  public function __construct(
+    ClientInterfaceContract $clientInterfaceContract,
+    AuthContract $authContract,
+    AbstractConfigHelper $configHelper,
+    LoggerContract $loggerContract,
+    LogSenderService $logSenderService,
+    ExternalLogsFactory $externalLogsFactory
+  ) {
     $this->client = $clientInterfaceContract;
     $this->authService = $authContract;
     $this->configHelper = $configHelper;
     $this->loggerContract = $loggerContract;
+    $this->logSenderService = $logSenderService;
+    $this->externalLogsFactory = $externalLogsFactory;
   }
 
   /**
@@ -71,7 +91,7 @@ class APIService
       // currently, all requests to go to Wayfair endpoints that require authorization
       $headers['Authorization'] = $this->authService->generateAuthHeader();
       $headers['Content-Type'] = ['application/json'];
-      $headers[ConfigHelper::WAYFAIR_INTEGRATION_HEADER] = $this->configHelper->getIntegrationAgentHeader();
+      $headers[AbstractConfigHelper::WAYFAIR_INTEGRATION_HEADER] = $this->configHelper->getIntegrationAgentHeader();
 
       $url = $this->getUrl();
 
@@ -113,7 +133,7 @@ class APIService
     } catch (AuthException $ae) {
       $this->loggerContract
         ->error(TranslationHelper::getLoggerKey(self::LOG_KEY_AUTH_FAILURE), ['additionalInfo' => ['message' => $ae->getMessage()], 'method' => __METHOD__]);
-        throw $ae;
+      throw $ae;
     }
   }
 
