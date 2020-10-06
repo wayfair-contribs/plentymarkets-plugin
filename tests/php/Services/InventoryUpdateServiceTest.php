@@ -13,6 +13,7 @@ use Wayfair\Core\Api\Services\LogSenderService;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Exceptions\InventorySyncInProgressException;
 use Wayfair\Core\Exceptions\InventorySyncBlockedException;
+use Wayfair\Core\Exceptions\InventorySyncInterruptedException;
 use Wayfair\Factories\ExternalLogsFactory;
 use Wayfair\Factories\InventoryUpdateResultFactory;
 use Wayfair\Factories\VariationSearchRepositoryFactory;
@@ -123,6 +124,9 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
 
         $cases[] = ["no variations should cause a clean exit", $emptyResult, null, false, [], [], [], self::TIMESTAMP_EARLIER, self::TIMESTAMP_LATER, InventoryStatusService::STATE_IDLE];
 
+        $cases[] = ["partial sync should be interrupted by a new sync", null, InventorySyncInterruptedException::class, false, [], [], [], self::TIMESTAMP_EARLIER, self::TIMESTAMP_LATER, InventoryStatusService::STATE_IDLE, self::TIMESTAMP_FUTURE];
+        $cases[] = ["full sync should be interrupted by a new sync", null, InventorySyncInterruptedException::class, true, [], [], [], self::TIMESTAMP_EARLIER, self::TIMESTAMP_LATER, InventoryStatusService::STATE_IDLE, self::TIMESTAMP_FUTURE];
+
         $cases[] = ["partial syncs are blocked when no sync of any type is recorded", null, InventorySyncBlockedException::class, false, [], [], [], '', '', InventoryStatusService::STATE_IDLE];
 
         $cases[] = ["partial syncs are blocked when no full sync has been recorded", null, InventorySyncBlockedException::class, false, [], [], [], self::TIMESTAMP_LATER, '', InventoryStatusService::STATE_IDLE];
@@ -151,10 +155,23 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
         $cases[] = ["partial syncs are blocked when a full sync is running v20", null, InventorySyncInProgressException::class, false, [], [], [], self::TIMESTAMP_LATER, self::TIMESTAMP_EARLIER, InventoryStatusService::FULL, self::TIMESTAMP_FUTURE];
         $cases[] = ["partial syncs are blocked when a full sync is running v21", null, InventorySyncInProgressException::class, false, [], [], [], self::TIMESTAMP_LATER, self::TIMESTAMP_LATER, InventoryStatusService::FULL, self::TIMESTAMP_FUTURE];
 
-        // TODO: running a partial sync alongside another partial sync
+        // TODO: partial sync blocked by partial sync that has not timed out yet
+        // TODO: overriding a partial sync that has timed out, with a partial sync
+        // TODO: full sync should never be blocked by partial sync
         // TODO: interrupting a partial sync with a full sync (use the FUTURE timestamp)
         // TODO: interrupting a full sync with a new full sync (use the FUTURE timestamp)
-        // TODO: find a way to pepper in a timestamp change to test interruption on a page in the middle of the sync
+
+        // TODO: find a way to pepper in a timestamp changes to test interruption on a page in the middle of the sync (instead of page 1)
+
+        // TODO: single page of Variations
+        // TODO: multiple pages of Variations
+        // TODO: No inventory found for Variations
+        // TODO: Inventory Service failures?
+        // TODO: incomplete Variation Data?
+        // TODO: incomplete Inventory Data?
+
+
+        // TODO: load testing in separate file that does not run during normal test suite
 
         return $cases;
     }
