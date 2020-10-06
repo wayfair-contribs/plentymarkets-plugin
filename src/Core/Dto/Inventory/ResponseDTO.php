@@ -167,7 +167,7 @@ class ResponseDTO
   public function adoptArray(array $params): void
   {
     $this->setId($params[self::KEY_ID] ?? null);
-    $this>setHandle($params[self::KEY_HANDLE] ?? null);
+    $this->setHandle($params[self::KEY_HANDLE] ?? null);
     $this->setStatus($params[self::KEY_STATUS] ?? null);
     $this->setSubmittedAt($params[self::KEY_SUBMITTED_AT] ?? null);
     $this->setCompletedAt($params[self::KEY_COMPLETED_AT] ?? null);
