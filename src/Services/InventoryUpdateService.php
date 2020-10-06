@@ -11,9 +11,9 @@ use Wayfair\Core\Api\Services\InventoryService;
 use Wayfair\Core\Api\Services\LogSenderService;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\Inventory\RequestDTO;
-use Wayfair\Core\Exceptions\FullInventorySyncInProgressException;
 use Wayfair\Core\Exceptions\InventoryException;
 use Wayfair\Core\Exceptions\InventorySyncBlockedException;
+use Wayfair\Core\Exceptions\InventorySyncInProgressException;
 use Wayfair\Core\Exceptions\InventorySyncInterruptedException;
 use Wayfair\Core\Exceptions\NoReferencePointForPartialInventorySyncException;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
@@ -43,9 +43,6 @@ class InventoryUpdateService
   const LOG_KEY_NO_VARIATIONS = 'inventoryNoVariations';
   const LOG_KEY_NO_STOCKS = 'inventoryNoStocks';
   const LOG_KEY_INVENTORY_ERRORS = 'inventoryErrors';
-
-  // TODO: make these user-configurable in a future update
-  const MAX_INVENTORY_TIME = 14400;
 
   const INVENTORY_SAVE_TOTAL = 'inventorySaveTotal';
   const INVENTORY_SAVE_SUCCESS = 'inventorySaveSuccess';
@@ -131,13 +128,11 @@ class InventoryUpdateService
     $externalLogs = $this->externalLogsFactory->create();
 
     try {
-      if ($this->statusService->isInventoryRunning()) {
-        $olderSyncStartedAt = $this->statusService->getStartOfMostRecentAttempt();
-        $olderSyncIsForAllItems = $this->statusService->isInventoryRunning(true);
 
-        if (!$fullInventory && isset($olderSyncStartedAt) && !empty($olderSyncStartedAt) && time() - strtotime($olderSyncStartedAt) < self::MAX_INVENTORY_TIME) {
-          // other inventory sync is running within allowed time limits
+      $runState = $this->statusService->getServiceStatusValue();
 
+      if ($runState == InventoryStatusService::FULL || ($runState == InventoryStatusService::PARTIAL)) {
+        if (!$this->statusService->hasGoneOverTimeLimit() && !($fullInventory && $runState == InventoryStatusService::PARTIAL)) {
           $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_BLOCKED), [
             'additionalInfo' => [
               'full' => (string) $fullInventory
@@ -147,24 +142,19 @@ class InventoryUpdateService
 
           $externalLogs->addInventoryLog('Inventory blocked', 'inventoryBlocked' . ($fullInventory ? 'Full' : ''), 1, 0, false);
 
-          if ($olderSyncIsForAllItems) {
-            throw new FullInventorySyncInProgressException("A Full Inventory Sync is in progress, preventing this one from starting.");
-          }
-
-          throw new InventorySyncBlockedException("A Partial inventory sync is in progress, preventing this one from starting");
+          throw new InventorySyncInProgressException("An Inventory Sync is in progress, preventing this one from starting.");
         }
 
         // other inventory sync is stale or stalled, so a new one should start.
         $this->logger->warning(TranslationHelper::getLoggerKey(self::LOG_KEY_LONG_RUN), [
           'additionalInfo' => [
-            'olderSyncStartedAt' => $olderSyncStartedAt,
-            'olderSyncIsForAllItems' => $olderSyncIsForAllItems,
-            'maximumTime' => self::MAX_INVENTORY_TIME
+            'newerSyncIsFullInventory' => $fullInventory,
+            'olderSyncType' => $runState,
           ],
           'method' => __METHOD__
         ]);
 
-        $externalLogs->addErrorLog('Inventory ' . ($fullInventory ? 'Full' : '') . ' overriding a currently running inventory sync process that started at ' . $olderSyncStartedAt);
+        $externalLogs->addErrorLog('Inventory ' . ($fullInventory ? 'Full' : '') . ' overriding a currently running inventory sync process.');
       }
 
       if (!$fullInventory) {
@@ -409,7 +399,7 @@ class InventoryUpdateService
         'method' => __METHOD__
       ]);
 
-      throw new InventoryException($e->getMessage() . ' at ' .$e->getTraceAsString());
+      throw new InventoryException($e->getMessage() . ' at ' . $e->getTraceAsString());
     } finally {
 
       $elapsedTime = time() - strtotime($startTimeStamp);
@@ -521,26 +511,24 @@ class InventoryUpdateService
   {
     $windowStart = 0;
 
-    $lastGoodPartialStart = $statusService->getLastCompletionStart(false);
     $lastGoodFullStart = $statusService->getLastCompletionStart(true);
 
-    if (isset($lastGoodPartialStart) && !empty($lastGoodPartialStart)) {
-      // new window should be directly after the previous window
-      $windowStart = strtotime($lastGoodPartialStart);
-    }
-
     if (isset($lastGoodFullStart) && !empty($lastGoodFullStart)) {
-      $numericTimeForFullSync = strtotime($lastGoodFullStart);
-      if ($windowStart <= 0 || $numericTimeForFullSync > $windowStart) {
-        // no partial sync yet,
-        // or full sync happened more recently than partial sync - use that time.
-        $windowStart = $numericTimeForFullSync;
-      }
+      // default to syncing what happened after last full sync
+      $windowStart = strtotime($lastGoodFullStart);
     }
 
     if ($windowStart <= 0) {
-      // prevent sync from starting as the full sync needs to complete first
-      throw new NoReferencePointForPartialInventorySyncException();
+      throw new NoReferencePointForPartialInventorySyncException("Cannot start a partial sync before a full sync");
+    }
+
+    $lastGoodPartialStart = $statusService->getLastCompletionStart(false);
+
+    if (isset($lastGoodPartialStart) && !empty($lastGoodPartialStart)) {
+      $numericTimeForPartialSync = strtotime($lastGoodPartialStart);
+      if ($numericTimeForPartialSync > $windowStart) {
+        $windowStart = $numericTimeForPartialSync;
+      }
     }
 
     // date_create does NOT accept epoch time as an integer.

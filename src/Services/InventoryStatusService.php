@@ -19,6 +19,10 @@ class InventoryStatusService
   const OVERDUE_TIME_FULL = 90000;
   const OVERDUE_TIME_PARTIAL = 1800;
 
+  // TODO: make these user-configurable in a future update
+  const MAX_INVENTORY_RUN_TIME_FULL = 21600;
+  const MAX_INVENTORY_RUN_TIME_PARTIAL = 3600;
+
   const LOG_KEY_STATE_CHANGE = 'inventoryStateChange';
   const LOG_KEY_STATE_CHECK = 'inventoryStateCheck';
   const LOG_KEY_STATE_CLEAR = 'inventoryStateClear';
@@ -157,7 +161,7 @@ class InventoryStatusService
    *
    * @return string
    */
-  private function getServiceStatusValue(): string
+  public function getServiceStatusValue(): string
   {
     $state = $this->keyValueRepository->get(self::DB_KEY_INVENTORY_STATUS);
 
@@ -166,20 +170,6 @@ class InventoryStatusService
     }
 
     return $state;
-  }
-
-  /**
-   * Check if an Inventory sync is running
-   *
-   * @param bool|null $fullOnly
-   *
-   * @return boolean
-   */
-  public function isInventoryRunning(bool $fullOnly = false): bool
-  {
-    $curStatus = $this->getServiceStatusValue();
-
-    return $fullOnly ? self::FULL == $curStatus : self::STATE_IDLE !== $this->getServiceStatusValue();
   }
 
   /**
@@ -334,8 +324,7 @@ class InventoryStatusService
 
     $mostRecentFull = $this->keyValueRepository->get(self::DB_KEY_INVENTORY_LAST_ATTEMPT_FULL);
 
-    if ($fullOnly)
-    {
+    if ($fullOnly) {
       return $mostRecentFull;
     }
 
@@ -414,8 +403,7 @@ class InventoryStatusService
       return $timeSinceLastGoodFullStart < 0 || $timeSinceLastGoodFullStart > self::OVERDUE_TIME_FULL;
     }
 
-    if ($timeSinceLastGoodFullStart < self::OVERDUE_TIME_PARTIAL)
-    {
+    if ($timeSinceLastGoodFullStart < self::OVERDUE_TIME_PARTIAL) {
       // partial sync should not happen if a full sync did not happen yet,
       // or if a full sync just happened.
       return false;
@@ -455,5 +443,21 @@ class InventoryStatusService
     }
 
     return false;
+  }
+
+  public function hasGoneOverTimeLimit(): bool
+  {
+    $curStatus = $this->getServiceStatusValue();
+
+    if (!isset($curStatus) || empty($curStatus) || self::STATE_IDLE == $curStatus)
+    {
+      return false;
+    }
+
+    $maxTime = self::FULL == $curStatus ? self::MAX_INVENTORY_RUN_TIME_FULL : self::MAX_INVENTORY_RUN_TIME_PARTIAL;
+    $startTime = $this->getStartOfMostRecentAttempt();
+    $elapsedTime = time() - $startTime;
+
+    return $elapsedTime >= $maxTime;
   }
 }

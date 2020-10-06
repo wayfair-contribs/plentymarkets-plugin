@@ -11,6 +11,7 @@ use Plenty\Repositories\Models\PaginatedResult;
 use Wayfair\Core\Api\Services\InventoryService;
 use Wayfair\Core\Api\Services\LogSenderService;
 use Wayfair\Core\Contracts\LoggerContract;
+use Wayfair\Core\Exceptions\InventorySyncInProgressException;
 use Wayfair\Core\Exceptions\InventorySyncBlockedException;
 use Wayfair\Factories\ExternalLogsFactory;
 use Wayfair\Factories\InventoryUpdateResultFactory;
@@ -28,6 +29,7 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
 
     const TIMESTAMP_EARLIER = '2020-10-05 12:34:02.000000 +02:00';
     const TIMESTAMP_LATER = '2020-10-06 17:44:02.000000 +02:00';
+    const TIMESTAMP_FUTURE = '2035-10-06 17:44:02.000000 +02:00';
     const W3C_LATER = '2020-10-06T15:44:02+00:00';
 
     /**
@@ -38,9 +40,9 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider dataProviderForTestGetStartOfDeltaSyncWindow
      */
-    public function testGetStartOfDeltaSyncWindow($expected, $lastCompletionStartPartial, $lastCompletionStartFull)
+    public function testGetStartOfDeltaSyncWindow($name, $expected, $lastCompletionStartPartial, $lastCompletionStartFull)
     {
-        $inventoryStatusService = $this->createInventoryStatusService($lastCompletionStartPartial, $lastCompletionStartFull);
+        $inventoryStatusService = $this->createInventoryStatusService($lastCompletionStartPartial, $lastCompletionStartFull, InventoryStatusService::STATE_IDLE);
 
         if (!isset($expected) || empty($expected)) {
             $this->expectException(InventorySyncBlockedException::class);
@@ -48,23 +50,23 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
 
         $result = InventoryUpdateService::getStartOfDeltaSyncWindow($inventoryStatusService);
 
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected, $result, $name);
     }
 
     public function dataProviderForTestGetStartOfDeltaSyncWindow()
     {
 
-        $cases[] = [null, '', ''];
+        $cases[] = ['Lack of data should cause exception', null, '', ''];
 
-        $cases[] = [self::W3C_LATER, self::TIMESTAMP_LATER, ''];
+        $cases[] = ['lack of full sync should cause exception', null, self::TIMESTAMP_LATER, ''];
 
-        $cases[] = [self::W3C_LATER, '', self::TIMESTAMP_LATER];
+        $cases[] = ['knowing only full sync should return full sync time', self::W3C_LATER, '', self::TIMESTAMP_LATER];
 
-        $cases[] = [self::W3C_LATER, self::TIMESTAMP_LATER, self::TIMESTAMP_EARLIER];
+        $cases[] = ['partial sync happening more recently than full sync should return partial sync time', self::W3C_LATER, self::TIMESTAMP_LATER, self::TIMESTAMP_EARLIER];
 
-        $cases[] = [self::W3C_LATER, self::TIMESTAMP_EARLIER, self::TIMESTAMP_LATER];
+        $cases[] = ['full sync happening more recently than partial sync should return full sync time', self::W3C_LATER, self::TIMESTAMP_EARLIER, self::TIMESTAMP_LATER];
 
-        $cases[] = [self::W3C_LATER, self::TIMESTAMP_LATER, self::TIMESTAMP_LATER];
+        $cases[] = ['both kinds of sync happening at the same time should return that duplicated time', self::W3C_LATER, self::TIMESTAMP_LATER, self::TIMESTAMP_LATER];
 
         return $cases;
     }
@@ -72,16 +74,12 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
     /**
      * Test Inventory Sync
      *
-     * @param boolean $fullInventory
-     * @param InventoryUpdateResult $expectedResult
-     * @param array $cannedRequestDtos
-     * @param array $cannedResponseDtos
-     * @param array $cannedVariationDataArrays
      * @return void
      *
      * @dataProvider dataProviderForTestSync
      */
     public function testSync(
+        string $name,
         $expectedResult,
         $expectedExceptionClass,
         bool $fullInventory,
@@ -89,14 +87,18 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
         array $cannedResponseDtos,
         array $cannedVariationDataArrays,
         $lastCompletionStartPartial,
-        $lastCompletionStartFull
+        $lastCompletionStartFull,
+        $currentInventoryStatus,
+        $currentStartTime = null
     ) {
         $inventoryUpdateService = $this->createInventoryUpdateService(
             $cannedRequestDtos,
             $cannedResponseDtos,
             $cannedVariationDataArrays,
             $lastCompletionStartPartial,
-            $lastCompletionStartFull
+            $lastCompletionStartFull,
+            $currentInventoryStatus,
+            $currentStartTime
         );
 
         if (isset($expectedExceptionClass) && !empty($expectedExceptionClass)) {
@@ -105,13 +107,12 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
 
         $actualResult = $inventoryUpdateService->sync($fullInventory);
 
-        if (isset($actualResult) && isset($expectedResult))
-        {
+        if (isset($actualResult) && isset($expectedResult)) {
             // hack so that we can use built-in PHP equality
             $expectedResult->setElapsedTime($actualResult->getElapsedTime());
         }
 
-        $this->assertEquals($expectedResult, $actualResult);
+        $this->assertEquals($expectedResult, $actualResult, $name);
     }
 
     public function dataProviderForTestSync()
@@ -120,21 +121,56 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
 
         $cases = [];
 
-        $cases[] = [$emptyResult, null, false, [], [], [], self::TIMESTAMP_EARLIER, self::TIMESTAMP_LATER];
+        $cases[] = ["no variations should cause a clean exit", $emptyResult, null, false, [], [], [], self::TIMESTAMP_EARLIER, self::TIMESTAMP_LATER, InventoryStatusService::STATE_IDLE];
 
-        // TODO: populate cases
+        $cases[] = ["partial syncs are blocked when no sync of any type is recorded", null, InventorySyncBlockedException::class, false, [], [], [], '', '', InventoryStatusService::STATE_IDLE];
+
+        $cases[] = ["partial syncs are blocked when no full sync has been recorded", null, InventorySyncBlockedException::class, false, [], [], [], self::TIMESTAMP_LATER, '', InventoryStatusService::STATE_IDLE];
+
+        $cases[] = ["partial syncs are blocked when a full sync is running v1", null, InventorySyncInProgressException::class, false, [], [], [], '', '', InventoryStatusService::FULL, self::TIMESTAMP_EARLIER];
+        $cases[] = ["partial syncs are blocked when a full sync is running v2", null, InventorySyncInProgressException::class, false, [], [], [], self::TIMESTAMP_EARLIER, '', InventoryStatusService::FULL, self::TIMESTAMP_EARLIER];
+        $cases[] = ["partial syncs are blocked when a full sync is running v3", null, InventorySyncInProgressException::class, false, [], [], [], self::TIMESTAMP_EARLIER, self::TIMESTAMP_EARLIER, InventoryStatusService::FULL, self::TIMESTAMP_EARLIER];
+        $cases[] = ["partial syncs are blocked when a full sync is running v4", null, InventorySyncInProgressException::class, false, [], [], [], self::TIMESTAMP_EARLIER, self::TIMESTAMP_LATER, InventoryStatusService::FULL, self::TIMESTAMP_EARLIER];
+        $cases[] = ["partial syncs are blocked when a full sync is running v5", null, InventorySyncInProgressException::class, false, [], [], [], self::TIMESTAMP_LATER, '', InventoryStatusService::FULL, self::TIMESTAMP_EARLIER];
+        $cases[] = ["partial syncs are blocked when a full sync is running v6", null, InventorySyncInProgressException::class, false, [], [], [], self::TIMESTAMP_LATER, self::TIMESTAMP_EARLIER, InventoryStatusService::FULL, self::TIMESTAMP_EARLIER];
+        $cases[] = ["partial syncs are blocked when a full sync is running v7", null, InventorySyncInProgressException::class, false, [], [], [], self::TIMESTAMP_LATER, self::TIMESTAMP_LATER, InventoryStatusService::FULL, self::TIMESTAMP_EARLIER];
+
+        $cases[] = ["partial syncs are blocked when a full sync is running v8", null, InventorySyncInProgressException::class, false, [], [], [], '', '', InventoryStatusService::FULL, self::TIMESTAMP_LATER];
+        $cases[] = ["partial syncs are blocked when a full sync is running v9", null, InventorySyncInProgressException::class, false, [], [], [], self::TIMESTAMP_EARLIER, '', InventoryStatusService::FULL, self::TIMESTAMP_LATER];
+        $cases[] = ["partial syncs are blocked when a full sync is running v10", null, InventorySyncInProgressException::class, false, [], [], [], self::TIMESTAMP_EARLIER, self::TIMESTAMP_EARLIER, InventoryStatusService::FULL, self::TIMESTAMP_LATER];
+        $cases[] = ["partial syncs are blocked when a full sync is running v11", null, InventorySyncInProgressException::class, false, [], [], [], self::TIMESTAMP_EARLIER, self::TIMESTAMP_LATER, InventoryStatusService::FULL, self::TIMESTAMP_LATER];
+        $cases[] = ["partial syncs are blocked when a full sync is running v12", null, InventorySyncInProgressException::class, false, [], [], [], self::TIMESTAMP_LATER, '', InventoryStatusService::FULL, self::TIMESTAMP_LATER];
+        $cases[] = ["partial syncs are blocked when a full sync is running v13", null, InventorySyncInProgressException::class, false, [], [], [], self::TIMESTAMP_LATER, self::TIMESTAMP_EARLIER, InventoryStatusService::FULL, self::TIMESTAMP_LATER];
+        $cases[] = ["partial syncs are blocked when a full sync is running v14", null, InventorySyncInProgressException::class, false, [], [], [], self::TIMESTAMP_LATER, self::TIMESTAMP_LATER, InventoryStatusService::FULL, self::TIMESTAMP_LATER];
+
+        $cases[] = ["partial syncs are blocked when a full sync is running v15", null, InventorySyncInProgressException::class, false, [], [], [], '', '', InventoryStatusService::FULL, self::TIMESTAMP_FUTURE];
+        $cases[] = ["partial syncs are blocked when a full sync is running v16", null, InventorySyncInProgressException::class, false, [], [], [], self::TIMESTAMP_EARLIER, '', InventoryStatusService::FULL, self::TIMESTAMP_FUTURE];
+        $cases[] = ["partial syncs are blocked when a full sync is running v17", null, InventorySyncInProgressException::class, false, [], [], [], self::TIMESTAMP_EARLIER, self::TIMESTAMP_EARLIER, InventoryStatusService::FULL, self::TIMESTAMP_FUTURE];
+        $cases[] = ["partial syncs are blocked when a full sync is running v18", null, InventorySyncInProgressException::class, false, [], [], [], self::TIMESTAMP_EARLIER, self::TIMESTAMP_LATER, InventoryStatusService::FULL, self::TIMESTAMP_FUTURE];
+        $cases[] = ["partial syncs are blocked when a full sync is running v19", null, InventorySyncInProgressException::class, false, [], [], [], self::TIMESTAMP_LATER, '', InventoryStatusService::FULL, self::TIMESTAMP_FUTURE];
+        $cases[] = ["partial syncs are blocked when a full sync is running v20", null, InventorySyncInProgressException::class, false, [], [], [], self::TIMESTAMP_LATER, self::TIMESTAMP_EARLIER, InventoryStatusService::FULL, self::TIMESTAMP_FUTURE];
+        $cases[] = ["partial syncs are blocked when a full sync is running v21", null, InventorySyncInProgressException::class, false, [], [], [], self::TIMESTAMP_LATER, self::TIMESTAMP_LATER, InventoryStatusService::FULL, self::TIMESTAMP_FUTURE];
+
+        // TODO: running a partial sync alongside another partial sync
+        // TODO: interrupting a partial sync with a full sync (use the FUTURE timestamp)
+        // TODO: interrupting a full sync with a new full sync (use the FUTURE timestamp)
+        // TODO: find a way to pepper in a timestamp change to test interruption on a page in the middle of the sync
 
         return $cases;
     }
 
-    private function createInventoryStatusService($lastCompletionStartPartial, $lastCompletionStartFull): InventoryStatusService
+    private function createInventoryStatusService($lastCompletionStartPartial, $lastCompletionStartFull, $currentInventoryStatus, $currentStartTime = null): InventoryStatusService
     {
         /** @var InventoryStatusService&\PHPUnit\Framework\MockObject\MockObject */
         $inventoryStatusService = $this->createMock(InventoryStatusService::class);
         $inventoryStatusService->method('getLastCompletionStart')->willReturnMap([
             [false, $lastCompletionStartPartial],
-            [true, $lastCompletionStartFull]
+            [true, $lastCompletionStartFull],
         ]);
+
+        $inventoryStatusService->method('getServiceStatusValue')->willReturn($currentInventoryStatus);
+
+        $inventoryStatusService->method('getStartOfMostRecentAttempt')->willReturn($currentStartTime);
 
         return $inventoryStatusService;
     }
@@ -212,7 +248,9 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
         array $cannedResponseDtos,
         array $cannedVariationDataArrays,
         $lastCompletionStartPartial,
-        $lastCompletionStartFull
+        $lastCompletionStartFull,
+        $currentInventoryStatus,
+        $currentStartTime = null
     ): InventoryUpdateService {
         /** @var InventoryUpdateResultFactory&\PHPUnit\Framework\MockObject\MockObject */
         $inventoryUpdateResultFactory = $this->createMock(InventoryUpdateResultFactory::class);
@@ -222,7 +260,7 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
 
         $inventoryMapper = $this->createInventoryMapper($cannedRequestDtos);
 
-        $statusService = $this->createInventoryStatusService($lastCompletionStartPartial, $lastCompletionStartFull);
+        $statusService = $this->createInventoryStatusService($lastCompletionStartPartial, $lastCompletionStartFull, $currentInventoryStatus, $currentStartTime);
 
         /** @var ConfigHelper&\PHPUnit\Framework\MockObject\MockObject */
         $configHelper = $this->createMock(ConfigHelper::class);
