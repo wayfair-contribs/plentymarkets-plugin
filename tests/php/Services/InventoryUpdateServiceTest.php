@@ -8,7 +8,7 @@ namespace Wayfair\Tests\Mappers;
 
 require_once(dirname(__DIR__) . DIRECTORY_SEPARATOR
     . 'lib' . DIRECTORY_SEPARATOR
-    . 'plentyMockets' . DIRECTORY_SEPARATOR
+    . 'plentymockets' . DIRECTORY_SEPARATOR
     . 'Factories' . DIRECTORY_SEPARATOR
     . 'MockVariationSearchRepositoryFactory.php');
 
