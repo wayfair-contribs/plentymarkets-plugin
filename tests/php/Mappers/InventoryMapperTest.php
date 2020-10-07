@@ -12,6 +12,11 @@ use Wayfair\Core\Dto\Inventory\RequestDTO;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Mappers\InventoryMapper;
 
+/**
+ * Tests for InventoryMapper
+ *
+ * TODO: add tests for "createInventoryDTOsFromVariation" method
+ */
 final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
 {
     /**

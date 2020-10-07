@@ -30,6 +30,9 @@ use Wayfair\Services\InventoryStatusService;
 use Wayfair\Services\InventoryUpdateService;
 use Wayfair\PlentyMockets\Factories\MockVariationSearchRepositoryFactory;
 
+/**
+ * Tests for InventoryUpdateService
+ */
 final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
 {
     const METHOD_CREATE = 'create';
@@ -204,8 +207,6 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
         $cases[] = ["full syncs can start when a partial sync is running v6", $emptyResultFull, null, true, [], [], [], self::TIMESTAMP_RECENT, self::TIMESTAMP_OVERDUE, InventoryStatusService::PARTIAL, self::TIMESTAMP_RECENT];
         $cases[] = ["full syncs can start when a partial sync is running v7", $emptyResultFull, null, true, [], [], [], self::TIMESTAMP_RECENT, self::TIMESTAMP_RECENT, InventoryStatusService::PARTIAL, self::TIMESTAMP_RECENT];
 
-
-
         // TODO: single page of Variations
         // TODO: two or more pages of Variations
         // TODO: No inventory found for Variations (no RequestDTOs out of InventoryMapper->createInventoryDTOsFromVariation)
@@ -218,11 +219,9 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
         // TODO: incomplete Variation Data?
         // TODO: incomplete Inventory Data?
 
-
         // TODO: load testing in separate file that does not run during normal test suite
 
-
-        // TODO: maximum pages of Variations (if implemented)
+        // TODO: maximum pages of Variations (when/if implemented)
 
         return $cases;
     }
