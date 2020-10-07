@@ -27,8 +27,7 @@ jobs:
         if: steps.composer-cache.outputs.cache-hit != 'true'
         run: composer install --prefer-dist --no-progress --no-suggest
 
-      - name: Run test suite
-        # FIXME: failing tests does not make the step fail
+      - name: Run test suite to generate artifacts
         run: |
           sudo chmod -R 755 .
           ./run_tests testCoverage
