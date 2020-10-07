@@ -36,4 +36,6 @@ jobs:
         # FIXME: failing tests does not make the step fail
         run: |
           sudo chmod -R 755 .
+          ls /home/runner/work/plentymarkets-plugin/plentymarkets-plugin/tests/php/
+          ls /home/runner/work/plentymarkets-plugin/plentymarkets-plugin/tests/php/lib/plentyMockets
           ./run_tests test
