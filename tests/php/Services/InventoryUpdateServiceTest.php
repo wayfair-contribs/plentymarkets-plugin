@@ -6,7 +6,11 @@
 
 namespace Wayfair\Tests\Mappers;
 
-require_once(__DIR__ . '/../lib/plentyMockets/Factories/MockVariationSearchRepositoryFactory.php');
+require_once(dirname(__DIR__) . DIRECTORY_SEPARATOR
+    . 'lib' . DIRECTORY_SEPARATOR
+    . 'plentyMockets' . DIRECTORY_SEPARATOR
+    . 'Factories' . DIRECTORY_SEPARATOR
+    . 'MockVariationSearchRepositoryFactory.php');
 
 use Wayfair\Core\Api\Services\InventoryService;
 use Wayfair\Core\Api\Services\LogSenderService;
