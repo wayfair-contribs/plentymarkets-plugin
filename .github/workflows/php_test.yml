@@ -36,4 +36,6 @@ jobs:
         # FIXME: failing tests does not make the step fail
         run: |
           sudo chmod -R 755 .
-          ./run_tests test
+          ./run_tests test > test_results.txt
+          cat ./test_results.txt
+          if ! grep -q OK "test_results.txt"; then exit 1 fi;
