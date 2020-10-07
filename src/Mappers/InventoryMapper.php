@@ -150,7 +150,7 @@ class InventoryMapper
     $variationNumber = $variationData[self::VARIATION_COL_NUMBER];
 
     $supplierPartNumber = null;
-    $partNumberFailureMessage = null;
+    $partNumberFailureMessage = 'product number data is missing from Variation';
 
     try {
       $supplierPartNumber = $this->getSupplierPartNumberFromVariation($variationData, $itemMappingMethod, $referrerId, $this->logger);
@@ -198,8 +198,7 @@ class InventoryMapper
 
         if (!isset($warehouseId)) {
           // we don't know the warehouse, so we can't figure out the supplier ID.
-          // Not an error, but unexpected.
-          $this->logger->info(
+          $this->logger->error(
             TranslationHelper::getLoggerKey(self::LOG_KEY_STOCK_MISSING_WAREHOUSE),
             [
               'additionalInfo' => [
@@ -216,7 +215,8 @@ class InventoryMapper
         $supplierId = $this->getSupplierIDForWarehouseID($warehouseId);
 
         if (!isset($supplierId) || $supplierId === 0 || $supplierId === '0') {
-          // no supplier assigned to this warehouse - NOT an error - we should NOT sync it
+          // no supplier assigned to this warehouse - NOT an error
+          // we should NOT send this stock to Wayfair
           $this->logger->debug(
             TranslationHelper::getLoggerKey(self::LOG_KEY_NO_SUPPLIER_ID_ASSIGNED_TO_WAREHOUSE),
             [
@@ -246,7 +246,6 @@ class InventoryMapper
             ]
           );
         }
-
 
         if (!isset($onHand) || ($onHand < -1)) {
           // inventory amounts less than -1 are not accepted - do NOT send to Wayfair.

@@ -129,10 +129,10 @@ class InventoryUpdateService
 
     try {
 
-      $runState = $this->statusService->getServiceStatusValue();
+      $runStateInDatabase = $this->statusService->getServiceStatusValue();
 
-      if ($runState == InventoryStatusService::FULL || ($runState == InventoryStatusService::PARTIAL)) {
-        if (!$this->statusService->hasGoneOverTimeLimit() && !($fullInventory && $runState == InventoryStatusService::PARTIAL)) {
+      if ($runStateInDatabase == InventoryStatusService::FULL || ($runStateInDatabase == InventoryStatusService::PARTIAL)) {
+        if (!$this->statusService->hasGoneOverTimeLimit() && !($fullInventory && $runStateInDatabase == InventoryStatusService::PARTIAL)) {
           $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_BLOCKED), [
             'additionalInfo' => [
               'full' => (string) $fullInventory
@@ -149,7 +149,7 @@ class InventoryUpdateService
         $this->logger->warning(TranslationHelper::getLoggerKey(self::LOG_KEY_LONG_RUN), [
           'additionalInfo' => [
             'newerSyncIsFullInventory' => $fullInventory,
-            'olderSyncType' => $runState,
+            'olderSyncType' => $runStateInDatabase,
           ],
           'method' => __METHOD__
         ]);
@@ -158,8 +158,8 @@ class InventoryUpdateService
       }
 
       if (!$fullInventory) {
+        // check window now before changing service state to "started"
         $windowStart = self::getStartOfDeltaSyncWindow($this->statusService);
-        $windowEnd = (date_create($startTimeStamp))->format(DateTime::W3C);
       }
     } catch (InventoryException $ie) {
       // re-throw exceptions that were purposely thrown
@@ -209,6 +209,12 @@ class InventoryUpdateService
       ]);
 
       $startTimeStamp = $this->statusService->markInventoryStarted($fullInventory);
+      if (!$fullInventory) {
+        // end time of Inventory change filter is the moment the sync begins
+        // this provides redundancy in case this sync fails!
+        $windowEnd = (date_create($startTimeStamp))->format(DateTime::W3C);
+      }
+
       $externalLogs->addInfoLog("Starting " . ($fullInventory ? "Full " : "Partial ") . "inventory sync.");
 
       $variationSearchRepository->setFilters($this->getDefaultFilters());
@@ -343,6 +349,7 @@ class InventoryUpdateService
 
         $pageNumber++;
       } while (isset($variationSearchResponse) && !$variationSearchResponse->isLastPage());
+      // TODO: consider introducing page limits to avoid letting the job run for too long?
 
       // make sure not to let this get called while another sync is running!
       $this->statusService->markInventoryIdle();
