@@ -6,7 +6,7 @@
 
 namespace Wayfair\PlentyMockets\Factories;
 
-require_once(__DIR__ . '/AbstractMockFactory.php');
+require_once(__DIR__ . DIRECTORY_SEPARATOR . 'AbstractMockFactory.php');
 
 use Plenty\Repositories\Models\PaginatedResult;
 use Wayfair\PlentyMockets\AbstractMockFactory;

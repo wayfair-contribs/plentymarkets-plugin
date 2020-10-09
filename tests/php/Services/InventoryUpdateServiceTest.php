@@ -6,11 +6,16 @@
 
 namespace Wayfair\Tests\Mappers;
 
-require_once(dirname(__DIR__) . DIRECTORY_SEPARATOR
+$plentymocketsFactoriesDirPath = dirname(__DIR__) . DIRECTORY_SEPARATOR
     . 'lib' . DIRECTORY_SEPARATOR
     . 'plentymockets' . DIRECTORY_SEPARATOR
-    . 'Factories' . DIRECTORY_SEPARATOR
+    . 'Factories' . DIRECTORY_SEPARATOR;
+
+require_once($plentymocketsFactoriesDirPath
     . 'MockVariationSearchRepositoryFactory.php');
+
+require_once($plentymocketsFactoriesDirPath
+    . 'VariationDataFactory.php');
 
 use Wayfair\Core\Api\Services\InventoryService;
 use Wayfair\Core\Api\Services\LogSenderService;
@@ -26,9 +31,11 @@ use Wayfair\Helpers\ConfigHelper;
 use Wayfair\Mappers\InventoryMapper;
 use Wayfair\Models\ExternalLogs;
 use Wayfair\Models\InventoryUpdateResult;
+use Wayfair\PlentyMockets\Factories\MockVariationSearchRepositoryFactory;
+use Wayfair\PlentyMockets\Factories\VariationDataFactory;
 use Wayfair\Services\InventoryStatusService;
 use Wayfair\Services\InventoryUpdateService;
-use Wayfair\PlentyMockets\Factories\MockVariationSearchRepositoryFactory;
+
 
 /**
  * Tests for InventoryUpdateService
@@ -42,6 +49,8 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
     const TIMESTAMP_NOW = '2020-10-06 17:45:02.000000 +02:00';
     const TIMESTAMP_FUTURE = '2035-10-06 17:44:02.000000 +02:00';
     const W3C_LATER = '2020-10-06T15:44:02+00:00';
+
+    const MARKET_ID_WAYFAIR = 12345;
 
     /**
      * Test the partial sync window calculations
@@ -128,6 +137,8 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
 
     public function dataProviderForTestSync()
     {
+        $variationDataFactory = new VariationDataFactory();
+
         $emptyResultPartial = new InventoryUpdateResult();
         $emptyResultFull = new InventoryUpdateResult();
         $emptyResultFull->setFullInventory(true);
@@ -188,7 +199,6 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
         $cases[] = ["partial syncs can start when a full sync has been running for too long v3", $emptyResultPartial, null, false, [], [], [], self::TIMESTAMP_RECENT, self::TIMESTAMP_OVERDUE, InventoryStatusService::FULL, self::TIMESTAMP_OVERDUE];
         $cases[] = ["partial syncs can start when a full sync has been running for too long v4", $emptyResultPartial, null, false, [], [], [], self::TIMESTAMP_RECENT, self::TIMESTAMP_RECENT, InventoryStatusService::FULL, self::TIMESTAMP_OVERDUE];
 
-
         $cases[] = ["full syncs can start when a partial sync has been running for too long v1", $emptyResultFull, null, true, [], [], [], self::TIMESTAMP_OVERDUE, self::TIMESTAMP_OVERDUE, InventoryStatusService::PARTIAL, self::TIMESTAMP_OVERDUE];
         $cases[] = ["full syncs can start when a partial sync has been running for too long v2", $emptyResultFull, null, true, [], [], [], self::TIMESTAMP_OVERDUE, self::TIMESTAMP_RECENT, InventoryStatusService::PARTIAL, self::TIMESTAMP_OVERDUE];
         $cases[] = ["full syncs can start when a partial sync has been running for too long v3", $emptyResultFull, null, true, [], [], [], self::TIMESTAMP_RECENT, self::TIMESTAMP_OVERDUE, InventoryStatusService::PARTIAL, self::TIMESTAMP_OVERDUE];
@@ -206,6 +216,10 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
         $cases[] = ["full syncs can start when a partial sync is running v5", $emptyResultFull, null, true, [], [], [], self::TIMESTAMP_RECENT, '', InventoryStatusService::PARTIAL, self::TIMESTAMP_RECENT];
         $cases[] = ["full syncs can start when a partial sync is running v6", $emptyResultFull, null, true, [], [], [], self::TIMESTAMP_RECENT, self::TIMESTAMP_OVERDUE, InventoryStatusService::PARTIAL, self::TIMESTAMP_RECENT];
         $cases[] = ["full syncs can start when a partial sync is running v7", $emptyResultFull, null, true, [], [], [], self::TIMESTAMP_RECENT, self::TIMESTAMP_RECENT, InventoryStatusService::PARTIAL, self::TIMESTAMP_RECENT];
+
+        // TODO: make sure sync method applies filter for Partial sync
+
+        // TODO: make sure sync method does NOT apply filter for Full sync
 
         // TODO: single page of Variations
         // TODO: two or more pages of Variations
