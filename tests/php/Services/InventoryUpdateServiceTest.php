@@ -161,7 +161,7 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
             $collectionFiveVariations[] = $variationDataFactory->create(1, [12345]);
         }
 
-        $collectionFiveHundreddVariations = [];
+        $collectionFiveHundredVariations = [];
         for ($i=0; $i < 500; $i++) {
             $collectionFiveHundredVariations[] = $variationDataFactory->create(1, [12345]);
         }
@@ -241,9 +241,13 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
         $cases[] = ["full syncs can start when a partial sync is running v7", $emptyResultFull, null, true, [], [], [], self::TIMESTAMP_RECENT, self::TIMESTAMP_RECENT, InventoryStatusService::PARTIAL, self::TIMESTAMP_RECENT];
 
 
-        // TODO: make sure sync method supplies "start time" and "end time" filters to InventoryMapper for Partial sync
+        // TODO: make sure sync method supplies "start time" and "end time" filters to Stock Repository for Partial sync
 
-        // TODO: make sure sync method does NOT supply filters to InventoryMapper for Full sync
+        // TODO: make sure sync method does NOT supply filters to Stock Repository for Full sync
+
+        // TODO: make sure sync method supplies Wayfair filter to Variation Repository when "sync all products" is disabled
+
+        // TODO: make sure sync method does NOT supply Wayfair filter to Variation Repository when "sync all products" is enabled
 
         // TODO: make sure sync method visits all pages when there is more than one page
 
@@ -267,7 +271,7 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
         return $cases;
     }
 
-    private function createInventoryStatusService($lastCompletionStartPartial, $lastCompletionStartFull, $currentInventoryStatus, $currentStartTime = null): InventoryStatusService
+    private function createInventoryStatusService($lastCompletionStartPartial, $lastCompletionStartFull, $currentInventoryStatus, $mostRecentAttemptTime = null): InventoryStatusService
     {
         /** @var InventoryStatusService&\PHPUnit\Framework\MockObject\MockObject */
         $inventoryStatusService = $this->createMock(InventoryStatusService::class);
@@ -278,9 +282,9 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
 
         $inventoryStatusService->method('getServiceStatusValue')->willReturn($currentInventoryStatus);
 
-        $inventoryStatusService->method('getStartOfMostRecentAttempt')->willReturn($currentStartTime);
+        $inventoryStatusService->method('getStartOfMostRecentAttempt')->willReturn($mostRecentAttemptTime);
 
-        $overDue = $currentStartTime == self::TIMESTAMP_OVERDUE;
+        $overDue = $mostRecentAttemptTime == self::TIMESTAMP_OVERDUE;
         $overLimit = $overDue && isset($currentInventoryStatus) && '' != $currentInventoryStatus &&  InventoryStatusService::STATE_IDLE != $currentInventoryStatus;
         $inventoryStatusService->method('isOverdue')->willReturn($overDue);
         $inventoryStatusService->method('hasGoneOverTimeLimit')->willReturn($overLimit);
@@ -330,7 +334,7 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
         $lastCompletionStartPartial,
         $lastCompletionStartFull,
         $currentInventoryStatus,
-        $currentStartTime = null
+        $mostRecentAttemptTime = null
     ): InventoryUpdateService {
         /** @var InventoryUpdateResultFactory&\PHPUnit\Framework\MockObject\MockObject */
         $inventoryUpdateResultFactory = $this->createMock(InventoryUpdateResultFactory::class);
@@ -340,7 +344,7 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
 
         $inventoryMapper = $this->createInventoryMapper($cannedRequestDtos, count($cannedVariationDataArrays), $fullInventory);
 
-        $statusService = $this->createInventoryStatusService($lastCompletionStartPartial, $lastCompletionStartFull, $currentInventoryStatus, $currentStartTime);
+        $statusService = $this->createInventoryStatusService($lastCompletionStartPartial, $lastCompletionStartFull, $currentInventoryStatus, $mostRecentAttemptTime);
 
         /** @var ConfigHelper&\PHPUnit\Framework\MockObject\MockObject */
         $configHelper = $this->createMock(ConfigHelper::class);
@@ -374,6 +378,8 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
 
         $expectedWindowCalculations = (!$shouldStartSyncing || $fullInventory || count($cannedVariationDataArrays) < 1) ? 0: 1;
 
+        // TODO: remove window calculation checks if this gets too flaky
+        // these are much less important than checking the filters supplied to Plenty APIs
         $inventoryUpdateService->expects($this->exactly($expectedWindowCalculations))->method('getStartOfDeltaSyncWindow');
         $inventoryUpdateService->expects($this->exactly($expectedWindowCalculations))->method('getEndOfDeltaSyncWindow');
 

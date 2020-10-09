@@ -22,16 +22,14 @@ class MockVariationSearchRepositoryFactory extends AbstractMockFactory
         $variationSearchRepository  = $this->createMock(VariationSearchRepositoryContract::class);
 
         $pages = [];
+        $dataForLastPage = [];
+
         $amtPages = count($cannedVariationDataArrays);
 
-        $page = 0;
-        while ($page++ < $amtPages - 1) {
+        for ($page = 0; $page < $amtPages - 1; $page++) {
             $pages[] = $pageFactory->create($cannedVariationDataArrays[$page], false);
         }
 
-        $dataForLastPage = [];
-
-        // put in the last page
         if ($amtPages > 0) {
             $dataForLastPage = $cannedVariationDataArrays[$amtPages - 1];
         }
