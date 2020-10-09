@@ -178,6 +178,7 @@ class InventoryMapper
     $nextAvailableDate = $this->getAvailableDate($mainVariationId); // Pending. Need Item
 
     $filters = [self::STOCK_COL_VARIATION_ID => $mainVariationId];
+
     if (isset($timeWindowStartW3c) && !empty($timeWindowStartW3c)) {
       $filters[self::STOCK_FILTER_UPDATED_AT_FROM] = $timeWindowStartW3c;
 

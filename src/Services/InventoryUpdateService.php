@@ -159,7 +159,7 @@ class InventoryUpdateService
 
       if (!$fullInventory) {
         // check window now before changing service state to "started"
-        $windowStart = self::getStartOfDeltaSyncWindow($this->statusService);
+        $windowStart = $this->getStartOfDeltaSyncWindow();
       }
     } catch (InventoryException $ie) {
       // re-throw exceptions that were purposely thrown
@@ -212,7 +212,7 @@ class InventoryUpdateService
       if (!$fullInventory) {
         // end time of Inventory change filter is the moment the sync begins
         // this provides redundancy in case this sync fails!
-        $windowEnd = (date_create($startTimeStamp))->format(DateTime::W3C);
+        $windowEnd = $this->getEndOfDeltaSyncWindow($startTimeStamp);
       }
 
       $externalLogs->addInfoLog("Starting " . ($fullInventory ? "Full " : "Partial ") . "inventory sync.");
@@ -509,12 +509,29 @@ class InventoryUpdateService
   }
 
   /**
-   * Get the W3C-formatted time for the start of a partial sync
+   * Wrapper around calculateStartOfDeltaSyncWindow
+   * Exists so that test frameworks can track calls
    *
    * @return string
    * @throws NoReferencePointForPartialInventorySyncException
    */
-  static function getStartOfDeltaSyncWindow(InventoryStatusService $statusService): string
+  function getStartOfDeltaSyncWindow(): string
+  {
+    return self::calculateStartOfDeltaSyncWindow($this->statusService);
+  }
+
+  /**
+   * Get the W3C-formatted time for the start of a partial sync.
+   * Internal logic for getStartOfDeltaSyncWindow
+   *
+   * Static so that unit tests can call it easily.
+   *
+   * @param InventoryStatusService $statusService
+   *
+   * @return string
+   * @throws NoReferencePointForPartialInventorySyncException
+   */
+  static function calculateStartOfDeltaSyncWindow(InventoryStatusService $statusService): string
   {
     $windowStart = 0;
 
@@ -541,5 +558,16 @@ class InventoryUpdateService
     // date_create does NOT accept epoch time as an integer.
     // cannot use 'new' operator in Plenty.
     return date_create("@$windowStart")->format(DateTime::W3C);
+  }
+
+  /**
+   * Wrapper around formatting a timestamp,
+   * in its own method in order to detect calls to it during unit tests.
+   *
+   * @return string
+   */
+  function getEndOfDeltaSyncWindow($startTimeStamp): string
+  {
+    return (date_create($startTimeStamp))->format(DateTime::W3C);
   }
 }

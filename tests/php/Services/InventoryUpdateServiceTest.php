@@ -58,9 +58,9 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
      * @param mixed $expected
      * @return void
      *
-     * @dataProvider dataProviderForTestGetStartOfDeltaSyncWindow
+     * @dataProvider dataProviderForTestCalculateStartOfDeltaSyncWindow
      */
-    public function testGetStartOfDeltaSyncWindow($name, $expected, $lastCompletionStartPartial, $lastCompletionStartFull)
+    public function testCalculateStartOfDeltaSyncWindow($name, $expected, $lastCompletionStartPartial, $lastCompletionStartFull)
     {
         $inventoryStatusService = $this->createInventoryStatusService($lastCompletionStartPartial, $lastCompletionStartFull, InventoryStatusService::STATE_IDLE);
 
@@ -68,12 +68,13 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
             $this->expectException(InventorySyncBlockedException::class);
         }
 
-        $result = InventoryUpdateService::getStartOfDeltaSyncWindow($inventoryStatusService);
+
+        $result = InventoryUpdateService::calculateStartOfDeltaSyncWindow($inventoryStatusService);
 
         $this->assertEquals($expected, $result, $name);
     }
 
-    public function dataProviderForTestGetStartOfDeltaSyncWindow()
+    public function dataProviderForTestCalculateStartOfDeltaSyncWindow()
     {
 
         $cases[] = ['Lack of data should cause exception', null, '', ''];
@@ -111,7 +112,11 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
         $currentInventoryStatus,
         $currentStartTime = null
     ) {
+        $shouldStartSyncing = (!isset($expectedExceptionClass) || empty($expectedExceptionClass) || $expectedExceptionClass == InventorySyncInterruptedException::class);
+
         $inventoryUpdateService = $this->createInventoryUpdateService(
+            $fullInventory,
+            $shouldStartSyncing,
             $cannedRequestDtos,
             $cannedResponseDtos,
             $cannedVariationDataArrays,
@@ -128,7 +133,13 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
         $actualResult = $inventoryUpdateService->sync($fullInventory);
 
         if (isset($actualResult) && isset($expectedResult)) {
-            // hack so that we can use built-in PHP equality
+
+            if ($actualResult->getElapsedTime() <= 0)
+            {
+                $this->fail("Sync method should have spent some time doing work");
+            }
+
+            // hack so that we can use built-in object equality
             $expectedResult->setElapsedTime($actualResult->getElapsedTime());
         }
 
@@ -142,6 +153,18 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
         $emptyResultPartial = new InventoryUpdateResult();
         $emptyResultFull = new InventoryUpdateResult();
         $emptyResultFull->setFullInventory(true);
+
+        $collectionOneVariation[] = $variationDataFactory->create(1, [12345]);
+
+        $collectionFiveVariations[] = [];
+        for ($i=0; $i < 5; $i++) {
+            $collectionFiveVariations[] = $variationDataFactory->create(1, [12345]);
+        }
+
+        $collectionFiveHundreddVariations = [];
+        for ($i=0; $i < 500; $i++) {
+            $collectionFiveHundredVariations[] = $variationDataFactory->create(1, [12345]);
+        }
 
         $cases = [];
 
@@ -217,13 +240,17 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
         $cases[] = ["full syncs can start when a partial sync is running v6", $emptyResultFull, null, true, [], [], [], self::TIMESTAMP_RECENT, self::TIMESTAMP_OVERDUE, InventoryStatusService::PARTIAL, self::TIMESTAMP_RECENT];
         $cases[] = ["full syncs can start when a partial sync is running v7", $emptyResultFull, null, true, [], [], [], self::TIMESTAMP_RECENT, self::TIMESTAMP_RECENT, InventoryStatusService::PARTIAL, self::TIMESTAMP_RECENT];
 
-        // TODO: make sure sync method applies filter for Partial sync
 
-        // TODO: make sure sync method does NOT apply filter for Full sync
+        // TODO: make sure sync method supplies "start time" and "end time" filters to InventoryMapper for Partial sync
 
-        // TODO: single page of Variations
-        // TODO: two or more pages of Variations
-        // TODO: No inventory found for Variations (no RequestDTOs out of InventoryMapper->createInventoryDTOsFromVariation)
+        // TODO: make sure sync method does NOT supply filters to InventoryMapper for Full sync
+
+        // TODO: make sure sync method visits all pages when there is more than one page
+
+        // TODO: make sure sync method returns correct number of failures
+
+        // TODO: make sure sync method returns correct number of successfully sent DTOs
+
         // TODO: No ResponseDTOs from InventoryService->updateBulk
 
         // TODO: find a way to pepper in a timestamp changes to test interruption on page 2+ ?
@@ -262,11 +289,14 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
         return $inventoryStatusService;
     }
 
-    private function createInventoryMapper(array $cannedRequestDtos): InventoryMapper
+    private function createInventoryMapper(array $cannedRequestDtoCollections, int $numVariations, bool $fullInventory): InventoryMapper
     {
+        $expectedWindowCalculations = $fullInventory ? 0 : 1;
+
         /** @var InventoryMapper&\PHPUnit\Framework\MockObject\MockObject */
-        $inventoryMapper = $this->createMock(InventoryMapper::class);
-        $inventoryMapper->method('createInventoryDTOsFromVariation')->willReturnOnConsecutiveCalls(...$cannedRequestDtos);
+        $inventoryMapper = $this->createPartialMock(InventoryMapper::class, ['createInventoryDTOsFromVariation']);
+
+        $inventoryMapper->expects($this->exactly($numVariations))->method('createInventoryDTOsFromVariation')->willReturnOnConsecutiveCalls(...$cannedRequestDtoCollections);
 
         return $inventoryMapper;
     }
@@ -292,6 +322,8 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
     }
 
     private function createInventoryUpdateService(
+        bool $fullInventory,
+        bool $shouldStartSyncing,
         array $cannedRequestDtos,
         array $cannedResponseDtos,
         array $cannedVariationDataArrays,
@@ -306,7 +338,7 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
 
         $inventoryService = $this->createInventoryService($cannedResponseDtos);
 
-        $inventoryMapper = $this->createInventoryMapper($cannedRequestDtos);
+        $inventoryMapper = $this->createInventoryMapper($cannedRequestDtos, count($cannedVariationDataArrays), $fullInventory);
 
         $statusService = $this->createInventoryStatusService($lastCompletionStartPartial, $lastCompletionStartFull, $currentInventoryStatus, $currentStartTime);
 
@@ -329,16 +361,22 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
         $inventoryUpdateResultFactory = $this->createMock(InventoryUpdateResultFactory::class);
         $inventoryUpdateResultFactory->method(self::METHOD_CREATE)->willReturn(new InventoryUpdateResult());
 
-        return new InventoryUpdateService(
-            $inventoryService,
-            $inventoryMapper,
-            $statusService,
-            $configHelper,
-            $logger,
-            $logSenderService,
-            $externalLogsFactory,
-            $variationSearchRepositoryFactory,
-            $inventoryUpdateResultFactory
-        );
+        /** @var InventoryUpdateService&\PHPUnit\Framework\MockObject\MockObject */
+        $inventoryUpdateService = $this->createTestProxy(InventoryUpdateService::class, [$inventoryService,
+        $inventoryMapper,
+        $statusService,
+        $configHelper,
+        $logger,
+        $logSenderService,
+        $externalLogsFactory,
+        $variationSearchRepositoryFactory,
+        $inventoryUpdateResultFactory]);
+
+        $expectedWindowCalculations = (!$shouldStartSyncing || $fullInventory || count($cannedVariationDataArrays) < 1) ? 0: 1;
+
+        $inventoryUpdateService->expects($this->exactly($expectedWindowCalculations))->method('getStartOfDeltaSyncWindow');
+        $inventoryUpdateService->expects($this->exactly($expectedWindowCalculations))->method('getEndOfDeltaSyncWindow');
+
+        return $inventoryUpdateService;
     }
 }

@@ -206,7 +206,6 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
 
         $variationDataFactory = new VariationDataFactory();
 
-        $variationsUnderTest = [];
         $marketCombinations = [null, [], [self::OTHER_MARKET_ID], [self::KNOWN_MARKET_ID], [self::KNOWN_MARKET_ID, self::OTHER_MARKET_ID], [self::OTHER_MARKET_ID, self::KNOWN_MARKET_ID]];
         foreach ($marketCombinations as $markets) {
             for ($numBarcodes = 0; $numBarcodes < 3; $numBarcodes++) {
