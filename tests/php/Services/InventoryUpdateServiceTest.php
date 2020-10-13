@@ -283,7 +283,7 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
     private function createInventoryMapper(array $cannedRequestDtoCollections, int $numVariations, bool $fullInventory): InventoryMapper
     {
         /** @var InventoryMapper&\PHPUnit\Framework\MockObject\MockObject */
-        $inventoryMapper = $this->createPartialMock(InventoryMapper::class, ['createInventoryDTOsFromVariation']);
+        $inventoryMapper = $this->createPartialMock(InventoryMapper::class, ['createInventoryDTOsFromVariation'])
 
         $inventoryMapper->expects($this->exactly($numVariations))->method('createInventoryDTOsFromVariation')->willReturnOnConsecutiveCalls(...$cannedRequestDtoCollections);
 

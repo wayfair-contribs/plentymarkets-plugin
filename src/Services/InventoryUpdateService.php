@@ -271,7 +271,6 @@ class InventoryUpdateService
 
         /** @var array $variationData information about a single Variation */
         foreach ($searchResults as $variationData) {
-          $responseDto = null;
           /** @var RequestDTO[] */
           $requestDTOsForVariation = $this->inventoryMapper->createInventoryDTOsFromVariation($variationData, $itemMappingMethod, $referrerId, $stockBuffer, $windowStart, $windowEnd);
 
@@ -340,7 +339,8 @@ class InventoryUpdateService
               'fullInventory' => (string) $fullInventory,
               'page_num' => (string) $pageNumber,
               'info' => 'page done',
-              'resultsForPage' => $responseDto
+              'numSavedForPage' => $amtOfDtosForPage - $amtErrors,
+              'numErrorsForPage' => $amtErrors;
             ],
             'method' => __METHOD__
           ]
