@@ -5,8 +5,6 @@
 
 namespace Wayfair\Repositories;
 
-use Plenty\Modules\Frontend\Services\AccountService;
-use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\Constants;
 use Wayfair\Helpers\TranslationHelper;
@@ -20,20 +18,6 @@ use Wayfair\Models\OrderASN;
 class OrderASNRepository extends Repository {
 
   const LOG_KEY_QUERY_FAILED = 'asnQueryFailed';
-
-  /** @var DataBase $database */
-  private $database;
-
-  /**
-   * OrderASNRepository constructor.
-   *
-   * @param AccountService $accountService
-   */
-  public function __construct(AccountService $accountService) {
-    parent::__construct($accountService);
-    /** @var DataBase database */
-    $this->database = pluginApp(DataBase::class);
-  }
 
   /**
    * Find an order ASN sending log using order id.
