@@ -243,6 +243,8 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
         $cases[] = ["full syncs can start when a partial sync is running v6", $emptyResultFull, null, true, [], [], [], self::TIMESTAMP_RECENT, self::TIMESTAMP_OVERDUE, InventoryStatusService::PARTIAL, false, self::TIMESTAMP_RECENT];
         $cases[] = ["full syncs can start when a partial sync is running v7", $emptyResultFull, null, true, [], [], [], self::TIMESTAMP_RECENT, self::TIMESTAMP_RECENT, InventoryStatusService::PARTIAL, false, self::TIMESTAMP_RECENT];
 
+        $cases[] = ["full sync", $emptyResultFull, null, true, [], [], [$collectionOneVariation], self::TIMESTAMP_RECENT, self::TIMESTAMP_RECENT, InventoryStatusService::PARTIAL, false, self::TIMESTAMP_RECENT];
+
         // TODO: make sure sync method returns all DTOs that InventoryService returns to it
 
         // TODO: make sure sync method returns correct summation of failures
@@ -349,7 +351,13 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
 
         $inventoryService = $this->createInventoryService($cannedResponseDtos);
 
-        $inventoryMapper = $this->createInventoryMapper($cannedRequestDtos, count($variationDataArraysForPages), $fullInventory);
+        $numVariations = 0;
+        foreach($variationDataArraysForPages as $page)
+        {
+            $numVariations += count($page);
+        }
+
+        $inventoryMapper = $this->createInventoryMapper($cannedRequestDtos, $numVariations, $fullInventory);
 
         $statusService = $this->createInventoryStatusService($lastCompletionStartPartial, $lastCompletionStartFull, $currentInventoryStatus, $mostRecentAttemptTime);
 

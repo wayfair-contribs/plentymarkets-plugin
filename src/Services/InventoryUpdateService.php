@@ -271,7 +271,7 @@ class InventoryUpdateService
 
         /** @var array $variationData information about a single Variation */
         foreach ($searchResults as $variationData) {
-          $haveStockForVariation = false;
+          $responseDto = null;
           /** @var RequestDTO[] */
           $requestDTOsForVariation = $this->inventoryMapper->createInventoryDTOsFromVariation($variationData, $itemMappingMethod, $referrerId, $stockBuffer, $windowStart, $windowEnd);
 
