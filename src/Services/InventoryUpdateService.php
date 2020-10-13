@@ -198,7 +198,7 @@ class InventoryUpdateService
 
       // The Plentymarkets team instructed to start on page 1, not page 0.
       $pageNumber = 1;
-      $amtOfDtosForPage = 0;
+
 
       $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_START), [
         'additionalInfo' => [
@@ -219,6 +219,8 @@ class InventoryUpdateService
       $variationSearchRepository->setFilters($this->getDefaultFilters());
 
       do {
+        $amtErrors = 0;
+        $amtOfDtosForPage = 0;
         $startTimeInDatabase = $this->statusService->getStartOfMostRecentAttempt();
 
         if (isset($startTimeInDatabase) && !empty($startTimeInDatabase) && strtotime($startTimeInDatabase) > strtotime($startTimeStamp)) {
@@ -310,7 +312,6 @@ class InventoryUpdateService
 
           $totalTimeSpentSendingData += TimeHelper::getMilliseconds() - $unixTimeBeforeSendingData;
 
-          $amtErrors = 0;
           $errors = $responseDto->getErrors();
 
           if (isset($errors) && !empty($errors)) {
@@ -340,7 +341,7 @@ class InventoryUpdateService
               'page_num' => (string) $pageNumber,
               'info' => 'page done',
               'numSavedForPage' => $amtOfDtosForPage - $amtErrors,
-              'numErrorsForPage' => $amtErrors;
+              'numErrorsForPage' => $amtErrors
             ],
             'method' => __METHOD__
           ]
