@@ -20,19 +20,28 @@ require_once($plentymocketsFactoriesDirPath
 require_once($plentymocketsFactoriesDirPath
     . 'VariationSkuDataFactory.php');
 
+require_once($plentymocketsFactoriesDirPath
+    . 'MockStockRepositoryFactory.php');
+
 use Exception;
 use InvalidArgumentException;
+use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
+use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\Inventory\RequestDTO;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Factories\InventoryRequestDtoFactory;
+use Wayfair\Factories\StockRepositoryFactory;
+use Wayfair\Factories\VariationStockRepositoryFactory;
+use Wayfair\Factories\WarehouseSupplierRepositoryFactory;
 use Wayfair\Mappers\InventoryMapper;
+use Wayfair\PlentyMockets\Factories\MockStockRepositoryFactory;
 use Wayfair\PlentyMockets\Factories\VariationBarcodeDataFactory;
 use Wayfair\PlentyMockets\Factories\VariationSkuDataFactory;
 use Wayfair\PlentyMockets\Factories\VariationDataFactory;
+use Wayfair\Repositories\WarehouseSupplierRepository;
 
 /**
  * Tests for InventoryMapper
- *
- * TODO: add tests for "createInventoryDTOsFromVariation" method
  */
 final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
 {
@@ -40,13 +49,193 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
     const UNUSED_MARKET_ID = 9999999;
     const OTHER_MARKET_ID = 22222;
 
+    const REFERRER_ID = 12345;
+
+    const MAPPING_METHOD_NUMBER = 'numberExact';
+
+    const TIMESTAMP_START = '2020-10-06T12:44:02+00:00';
+    const TIMESTAMP_END = '2020-10-06T15:44:02+00:00';
+
+    const VARIATION_COL_ID = 'id';
+    const VARIATION_COL_NUMBER = 'number';
+
+    const ID_WITH_STOCK = '1111';
+    const ID_NO_STOCK = '2222';
+    const ARBITRARY_VAR_NUM = 'varFoo';
+
+    const PART_NUM = 'part_123';
+
+    const STOCK_COL_STOCK_NET = 'stockNet';
+    const STOCK_COL_VARIATION_ID = 'variationId';
+    const STOCK_COL_WAREHOUSE_ID = 'warehouseId';
+    const STOCK_COL_RESERVED_STOCK = 'reservedStock';
+
+    const STOCK_FILTER_UPDATED_AT_FROM = 'updatedAtFrom';
+    const STOCK_FILTER_UPDATED_AT_TO = 'updatedAtTo';
+
+    const VARIATION_WITH_ID_ONLY  = [self::VARIATION_COL_ID => self::ID_WITH_STOCK];
+    const VARIATION_WITH_NUMBER_ONLY = [self::VARIATION_COL_NUMBER => self::ARBITRARY_VAR_NUM];
+    const VARIATION_WITHOUT_ANY_STOCK = [self::VARIATION_COL_ID => self::ID_NO_STOCK, self::VARIATION_COL_NUMBER => self::ARBITRARY_VAR_NUM];
+    const VARIATION_WITH_STOCK = [self::VARIATION_COL_ID => self::ID_WITH_STOCK, self::VARIATION_COL_NUMBER => self::ARBITRARY_VAR_NUM];
+
+    /**
+     * Undocumented function
+     *
+     * @param array $variationData
+     * @param string $itemMappingMethod
+     * @param integer $stockBuffer
+     * @param boolean $filtered
+     * @return void
+     *
+     * @dataProvider dataProviderForCreateInventoryDtosFromVariation
+     */
+    public function testCreateInventoryDTOsFromVariation(
+        string $name,
+        $expectedResult,
+        $expectedExceptionClass,
+        array $variationData = null,
+        int $stockBuffer = null,
+        $filterStart = null,
+        $filterEnd = null
+    ) {
+
+        $stockDataArraysForPages = [];
+
+        /** @var InventoryMapper&\PHPUnit\Framework\MockObject\MockObject */
+        $inventoryMapper = $this->createInventoryMapper($expectedResult, $variationData, $stockDataArraysForPages, (isset($stockBuffer) && $stockBuffer > 0), $filterStart, $filterEnd);
+
+        $inventoryMapper->method('getSupplierPartNumberFromVariation')->willReturn(self::PART_NUM);
+
+        $inventoryMapper->method('getAvailableDate')->willReturn(self::TIMESTAMP_START);
+
+        if (isset($expectedExceptionClass) && !empty($expectedExceptionClass)) {
+            $this->expectException($expectedExceptionClass);
+        }
+
+        $actualResult = $inventoryMapper->createInventoryDTOsFromVariation($variationData, self::MAPPING_METHOD_NUMBER, self::REFERRER_ID, $stockBuffer, $filterStart, $filterEnd);
+
+        $this->assertEquals($expectedResult, $actualResult, $name);
+    }
+
+    public function dataProviderForCreateInventoryDtosFromVariation()
+    {
+        $cases = [];
+
+        $cases[] = ['null variation data should cause InvalidArgumentException', null, InvalidArgumentException::class, null];
+
+        $cases[] = ['empty variation data should cause InvalidArgumentException', null, InvalidArgumentException::class, []];
+
+        $cases[] = ['variation missing ID should cause InvalidArgumentException', null, InvalidArgumentException::class, self::VARIATION_WITH_NUMBER_ONLY];
+
+        $cases[] = ['variation missing Number should cause InvalidArgumentException', null, InvalidArgumentException::class, self::VARIATION_WITH_ID_ONLY];
+
+        $cases[] = ['variation without stock should return an empty array', [], null, self::VARIATION_WITHOUT_ANY_STOCK];
+
+        $cases[] = ['timestamps should be passed to Stock Repository', [], null, self::VARIATION_WITHOUT_ANY_STOCK, null, self::TIMESTAMP_START, self::TIMESTAMP_END];
+
+        $cases[] = ['stockBuffer should not be used when no stock is returned: -5', [], null, self::VARIATION_WITHOUT_ANY_STOCK, -5];
+
+        $cases[] = ['stockBuffer should not be used when no stock is returned: -1', [], null, self::VARIATION_WITHOUT_ANY_STOCK, -1];
+
+        $cases[] = ['stockBuffer should not be used when no stock is returned: 0', [], null, self::VARIATION_WITHOUT_ANY_STOCK, 0];
+
+        $cases[] = ['stockBuffer should not be used when no stock is returned: 1', [], null, self::VARIATION_WITHOUT_ANY_STOCK, 1];
+
+        $cases[] = ['stockBuffer should not be used when no stock is returned: 5', [], null, self::VARIATION_WITHOUT_ANY_STOCK, 5];
+
+        // TODO: tests that have the stock repository returning stock
+
+        // TODO: stock buffer should not be called when null or less than 1, when there are stocks returned
+
+        return $cases;
+    }
+
+    public function createInventoryMapper(
+        $expectedResult = null,
+        $variationData = null,
+        $stockDataArraysForPages = [],
+        bool $stockBufferSet = false,
+        $filterStart = null,
+        $filterEnd = null
+    ): InventoryMapper {
+
+        $expectedFilters = null;
+        $expectedSearches = 0;
+
+        $validVariation = isset($variationData)
+            && array_key_exists(self::VARIATION_COL_ID, $variationData)
+            && !empty($variationData[self::VARIATION_COL_ID])
+            && array_key_exists(self::VARIATION_COL_NUMBER, $variationData)
+            && !empty($variationData[self::VARIATION_COL_NUMBER]);
+
+        if ($validVariation) {
+            $expectedFilters = [self::STOCK_COL_VARIATION_ID => $variationData[self::VARIATION_COL_ID]];
+
+            if (isset($filterStart) && !empty($filterStart)) {
+                $expectedFilters[self::STOCK_FILTER_UPDATED_AT_FROM] = $filterStart;
+            }
+            if (isset($filterEnd) && !empty($filterEnd)) {
+                $expectedFilters[self::STOCK_FILTER_UPDATED_AT_TO] = $filterEnd;
+            }
+
+            $expectedSearches = count($stockDataArraysForPages);
+            if ($expectedSearches < 1) {
+                // even if we are not supplying data we're expecting to search once and get an empty page
+                $expectedSearches = 1;
+            }
+        }
+
+        /** @var LoggerContract&\PHPUnit\Framework\MockObject\MockObject */
+        $logger = $this->createMock(LoggerContract::class);
+
+        /** @var InventoryRequestDtoFactory&\PHPUnit\Framework\MockObject\MockObject */
+        $inventoryRequestDtoFactory = $this->createMock(InventoryRequestDtoFactory::class);
+        $inventoryRequestDtoFactory->method('create')->willReturn(new RequestDTO());
+
+        /** @var DataBase&\PHPUnit\Framework\MockObject\MockObject */
+        $database = $this->createMock(DataBase::class);
+
+        /** @var LoggerContract&\PHPUnit\Framework\MockObject\MockObject */
+        $logger = $this->createMock(LoggerContract::class);
+
+        /** @var WarehouseSupplierRepositoryFactory&\PHPUnit\Framework\MockObject\MockObject */
+        $warehouseSupplierRepositoryFactory = $this->createMock(WarehouseSupplierRepositoryFactory::class);
+        $warehouseSupplierRepositoryFactory->method('create')->willReturn(new WarehouseSupplierRepository($database, $logger));
+
+        /** @var StockRepositoryFactory&\PHPUnit\Framework\MockObject\MockObject */
+        $stockRepositoryFactory = $this->createMock(StockRepositoryFactory::class);
+
+        $stockRepository = (new MockStockRepositoryFactory($this))->create($stockDataArraysForPages, $expectedFilters, $expectedSearches);
+        $stockRepositoryFactory->method('create')->willReturn($stockRepository);
+
+        /** @var VariationStockRepositoryFactory&\PHPUnit\Framework\MockObject\MockObject */
+        $variationStockRepositoryFactory = $this->createMock(VariationStockRepositoryFactory::class);
+
+        /** @var InventoryMapper&\PHPUnit\Framework\MockObject\MockObject */
+        $inventoryMapper = $this->createTestProxy(InventoryMapper::class, [
+            $logger,
+            $inventoryRequestDtoFactory,
+            $warehouseSupplierRepositoryFactory,
+            $stockRepositoryFactory,
+            $variationStockRepositoryFactory
+        ]);
+
+        if ($stockBufferSet && isset($expectedResult) && count($expectedResult)) {
+            $inventoryMapper->expects($this->atLeastOnce())->method('applyStockBuffer');
+        }
+
+        return $inventoryMapper;
+    }
+
     /**
      * Test various cases of Merging Quantities
      * @dataProvider dataProviderForInventoryQuantityMerge
      */
     public function testMergeQuantities($msg, $expected, $left, $right)
     {
-        $result = InventoryMapper::mergeInventoryQuantities($left, $right);
+        $inventoryMapper = $this->createInventoryMapper();
+
+        $result = $inventoryMapper->mergeInventoryQuantities($left, $right);
         $this->assertEquals($expected, $result, $msg);
     }
 
@@ -69,11 +258,13 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
      */
     public function testApplyStockBufferNullDTO()
     {
-        $this->assertNull(InventoryMapper::applyStockBuffer(null, -5));
-        $this->assertNull(InventoryMapper::applyStockBuffer(null, -1));
-        $this->assertNull(InventoryMapper::applyStockBuffer(null, 0));
-        $this->assertNull(InventoryMapper::applyStockBuffer(null, 1));
-        $this->assertNull(InventoryMapper::applyStockBuffer(null, 5));
+        $inventoryMapper = $this->createInventoryMapper();
+
+        $this->assertNull($inventoryMapper->applyStockBuffer(null, -5));
+        $this->assertNull($inventoryMapper->applyStockBuffer(null, -1));
+        $this->assertNull($inventoryMapper->applyStockBuffer(null, 0));
+        $this->assertNull($inventoryMapper->applyStockBuffer(null, 1));
+        $this->assertNull($inventoryMapper->applyStockBuffer(null, 5));
     }
 
     /**
@@ -92,7 +283,9 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
         $dto = new RequestDTO();
         $dto->setQuantityOnHand($onHand);
 
-        $dto = InventoryMapper::applyStockBuffer($dto, $buffer);
+        $inventoryMapper = $this->createInventoryMapper();
+
+        $dto = $inventoryMapper->applyStockBuffer($dto, $buffer);
         $result = $dto->getQuantityOnHand();
 
         $this->assertEquals($expected, $result, $msg);
@@ -120,8 +313,37 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
             $this->expectException(InvalidArgumentException::class);
         }
 
+        /** @var LoggerContract&\PHPUnit\Framework\MockObject\MockObject */
+        $logger = $this->createMock(LoggerContract::class);
 
-        $result = InventoryMapper::getSupplierPartNumberFromVariation($variation, $mappingMode, $referrerId);
+        /** @var InventoryRequestDtoFactory&\PHPUnit\Framework\MockObject\MockObject */
+        $inventoryRequestDtoFactory = $this->createMock(InventoryRequestDtoFactory::class);
+
+        /** @var DataBase&\PHPUnit\Framework\MockObject\MockObject */
+        $database = $this->createMock(DataBase::class);
+
+        /** @var LoggerContract&\PHPUnit\Framework\MockObject\MockObject */
+        $logger = $this->createMock(LoggerContract::class);
+
+        /** @var WarehouseSupplierRepositoryFactory&\PHPUnit\Framework\MockObject\MockObject */
+        $warehouseSupplierRepositoryFactory = $this->createMock(WarehouseSupplierRepositoryFactory::class);
+
+        /** @var StockRepositoryFactory&\PHPUnit\Framework\MockObject\MockObject */
+        $stockRepositoryFactory = $this->createMock(StockRepositoryFactory::class);
+
+        /** @var VariationStockRepositoryFactory&\PHPUnit\Framework\MockObject\MockObject */
+        $variationStockRepositoryFactory = $this->createMock(VariationStockRepositoryFactory::class);
+
+        /** @var InventoryMapper&\PHPUnit\Framework\MockObject\MockObject */
+        $inventoryMapper = $this->createTestProxy(InventoryMapper::class, [
+            $logger,
+            $inventoryRequestDtoFactory,
+            $warehouseSupplierRepositoryFactory,
+            $stockRepositoryFactory,
+            $variationStockRepositoryFactory
+        ]);
+
+        $result = $inventoryMapper->getSupplierPartNumberFromVariation($variation, $mappingMode, $referrerId);
 
         if (isset($mappingMode) && isset($expected)) {
             $this->assertEquals($expected, $result, $msg);

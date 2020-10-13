@@ -12,7 +12,6 @@ use Wayfair\Core\Api\Services\LogSenderService;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\Inventory\RequestDTO;
 use Wayfair\Core\Exceptions\InventoryException;
-use Wayfair\Core\Exceptions\InventorySyncBlockedException;
 use Wayfair\Core\Exceptions\InventorySyncInProgressException;
 use Wayfair\Core\Exceptions\InventorySyncInterruptedException;
 use Wayfair\Core\Exceptions\NoReferencePointForPartialInventorySyncException;

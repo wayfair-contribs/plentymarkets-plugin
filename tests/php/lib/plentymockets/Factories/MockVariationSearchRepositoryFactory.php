@@ -7,38 +7,18 @@
 namespace Wayfair\PlentyMockets\Factories;
 
 require_once(__DIR__ . DIRECTORY_SEPARATOR . 'AbstractMockFactory.php');
-require_once(__DIR__ . DIRECTORY_SEPARATOR . 'MockPaginatedResultFactory.php');
 
 use Plenty\Modules\Item\Variation\Contracts\VariationSearchRepositoryContract;
 use Wayfair\PlentyMockets\AbstractMockFactory;
 
 class MockVariationSearchRepositoryFactory extends AbstractMockFactory
 {
-    public function create(array $cannedVariationDataArrays): VariationSearchRepositoryContract
+    public function create(array $variationDataArraysForPages, array $expectedFilters = null, int $searchesExpected = null): VariationSearchRepositoryContract
     {
-        $pageFactory = new MockPaginatedResultFactory($this->getTestCase());
-
         /** @var VariationSearchRepositoryContract&\PHPUnit\Framework\MockObject\MockObject */
         $variationSearchRepository  = $this->createMock(VariationSearchRepositoryContract::class);
 
-        $pages = [];
-        $dataForLastPage = [];
-
-        $amtPages = count($cannedVariationDataArrays);
-
-        for ($page = 0; $page < $amtPages - 1; $page++) {
-            $pages[] = $pageFactory->create($cannedVariationDataArrays[$page], false);
-        }
-
-        if ($amtPages > 0) {
-            $dataForLastPage = $cannedVariationDataArrays[$amtPages - 1];
-        }
-
-        // there's always at least one page returned by Plenty, even if there are no results.
-        // the last page MUST report that it is the last page, or there will be infinite looping!
-        $pages[] = $pageFactory->create($dataForLastPage, true);
-
-        $variationSearchRepository->method('search')->willReturnOnConsecutiveCalls(...$pages);
+        $this->configureRepository('search', $variationSearchRepository, $variationDataArraysForPages, $expectedFilters, $searchesExpected);
 
         return $variationSearchRepository;
     }

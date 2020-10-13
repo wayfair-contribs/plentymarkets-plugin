@@ -81,14 +81,14 @@ class InventoryMapper
   /**
    * TODO: verify behavior and add function description
    * FIXME: should be calculated at the Wayfair Product level, not the Plentymarkets Variation level!
-   * @param $mainVariationId
+   * @param $variationId
    *
    * @return mixed
    */
-  public function getAvailableDate($mainVariationId)
+  public function getAvailableDate($variationId)
   {
     $variationStockRepositoryContract = $this->variationStockRepositoryFactory->create();
-    $variationStockMovements = $variationStockRepositoryContract->listStockMovements($mainVariationId, ['processRowType', 'bestBeforeDate'], 1, 50);
+    $variationStockMovements = $variationStockRepositoryContract->listStockMovements($variationId, ['processRowType', 'bestBeforeDate'], 1, 50);
     $bestBeforeDateForIncomingStock = null;
     foreach ($variationStockMovements as $variationStockMovement) {
       if ($variationStockMovement['processRowType'] === 1) {
@@ -143,11 +143,27 @@ class InventoryMapper
     $timeWindowStartW3c = null,
     $timeWindowEndW3c = null
   ) {
-    /** @var array<string,RequestDTO> $requestDtosBySuID */
-    $requestDtosBySuID = [];
+    if (!isset($variationData) || empty($variationData)) {
+      throw new InvalidArgumentException("No Variation data provided");
+    }
 
-    $mainVariationId = $variationData[self::VARIATION_COL_ID];
-    $variationNumber = $variationData[self::VARIATION_COL_NUMBER];
+    $variationId = null;
+    if (key_exists(self::VARIATION_COL_ID, $variationData)) {
+      $variationId = $variationData[self::VARIATION_COL_ID];
+    }
+
+    if (!isset($variationId) || empty($variationId)) {
+      throw new InvalidArgumentException('ID is a required field for Variation');
+    }
+
+    $variationNumber = null;
+    if (key_exists(self::VARIATION_COL_NUMBER, $variationData)) {
+      $variationNumber = $variationData[self::VARIATION_COL_NUMBER];
+    }
+
+    if (!isset($variationNumber) || empty($variationNumber)) {
+      throw new InvalidArgumentException('Variation Number is a required field for Variation');
+    }
 
     $supplierPartNumber = null;
     $partNumberFailureMessage = 'product number data is missing from Variation';
@@ -163,7 +179,7 @@ class InventoryMapper
         TranslationHelper::getLoggerKey(self::LOG_KEY_PART_NUMBER_MISSING),
         [
           'additionalInfo' => [
-            'variationID' => $mainVariationId,
+            'variationID' => $variationId,
             'variationNumber' => $variationNumber,
             'itemMappingMethod' => $itemMappingMethod,
             'reason' => $partNumberFailureMessage
@@ -175,9 +191,9 @@ class InventoryMapper
       return [];
     }
 
-    $nextAvailableDate = $this->getAvailableDate($mainVariationId); // Pending. Need Item
+    $nextAvailableDate = $this->getAvailableDate($variationId); // Pending. Need Item
 
-    $filters = [self::STOCK_COL_VARIATION_ID => $mainVariationId];
+    $filters = [self::STOCK_COL_VARIATION_ID => $variationId];
 
     if (isset($timeWindowStartW3c) && !empty($timeWindowStartW3c)) {
       $filters[self::STOCK_FILTER_UPDATED_AT_FROM] = $timeWindowStartW3c;
@@ -189,6 +205,9 @@ class InventoryMapper
 
     $stockRepository = $this->stockRepositoryFactory->create();
     $stockRepository->setFilters($filters);
+
+    /** @var array<string,RequestDTO> $requestDtosBySuID */
+    $requestDtosBySuID = [];
 
     $pageNumber = 1;
     do {
@@ -203,7 +222,7 @@ class InventoryMapper
             TranslationHelper::getLoggerKey(self::LOG_KEY_STOCK_MISSING_WAREHOUSE),
             [
               'additionalInfo' => [
-                'variationID' => $mainVariationId,
+                'variationID' => $variationId,
                 'variationNumber' => $variationNumber
               ],
               'method' => __METHOD__
@@ -223,7 +242,7 @@ class InventoryMapper
             [
               'additionalInfo' => [
                 'warehouseID' => $warehouseId,
-                'variationID' => $mainVariationId
+                'variationID' => $variationId
               ],
               'method' => __METHOD__
             ]
@@ -240,7 +259,7 @@ class InventoryMapper
             TranslationHelper::getLoggerKey(self::LOG_KEY_NORMALIZING_INVENTORY),
             [
               'additionalInfo' => [
-                'variationId' => $mainVariationId,
+                'variationId' => $variationId,
                 'originalStockNet' => $originalStockNet
               ],
               'method' => __METHOD__
@@ -254,7 +273,7 @@ class InventoryMapper
             TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_INVENTORY_AMOUNT),
             [
               'additionalInfo' => [
-                'variationID' => $mainVariationId,
+                'variationID' => $variationId,
                 'variationNumber' => $variationNumber,
                 'warehouseId' => $warehouseId,
                 'amount' => json_encode($onHand)
@@ -282,10 +301,10 @@ class InventoryMapper
           */
 
           // all null $onHand values are thrown out before this calculation happens.
-          $onHand = self::mergeInventoryQuantities($onHand, $existingDTO->getQuantityOnHand());
+          $onHand = $this->mergeInventoryQuantities($onHand, $existingDTO->getQuantityOnHand());
 
           // quantityOnOrder IS nullable.
-          $onOrder = self::mergeInventoryQuantities($onOrder, $existingDTO->getQuantityOnOrder());
+          $onOrder = $this->mergeInventoryQuantities($onOrder, $existingDTO->getQuantityOnOrder());
         }
 
         $requestDto = $this->inventoryRequestDtoFactory->create();
@@ -306,8 +325,10 @@ class InventoryMapper
     $inventoryDTOs = array_values($requestDtosBySuID);
 
     // apply the stock buffer setting to each DTO sent to Wayfair, not to each warehouse
-    foreach ($inventoryDTOs as $idx => $oneDTO) {
-      $dtos[$idx] = self::applyStockBuffer($oneDTO, $stockBuffer);
+    if (isset($stockBuffer) && $stockBuffer > 0) {
+      foreach ($inventoryDTOs as $idx => $oneDTO) {
+        $dtos[$idx] = $this->applyStockBuffer($oneDTO, $stockBuffer);
+      }
     }
 
     return $inventoryDTOs;
@@ -319,7 +340,7 @@ class InventoryMapper
    * @param RequestDTO $dto
    * @return RequestDTO
    */
-  static function applyStockBuffer($dto, $stockBuffer)
+  function applyStockBuffer($dto, $stockBuffer)
   {
     if (!isset($dto) || !isset($stockBuffer) || $stockBuffer <= 0) {
       // no buffer to apply
@@ -374,7 +395,7 @@ class InventoryMapper
    * @return mixed
    * @throws \Exception
    */
-  static function getSupplierPartNumberFromVariation($variationData, $itemMappingMethod, $referrerId = null, $logger = null)
+  function getSupplierPartNumberFromVariation($variationData, $itemMappingMethod, $referrerId = null, $logger = null)
   {
     if (!isset($variationData) || empty($variationData)) {
       throw new InvalidArgumentException("Variation data is not set");
@@ -445,7 +466,7 @@ class InventoryMapper
    * @param [bool] $nullable
    * @return float|null
    */
-  static function mergeInventoryQuantities($left, $right)
+  function mergeInventoryQuantities($left, $right)
   {
     // protecting against values below -1
     if (isset($left) && $left < -1) {

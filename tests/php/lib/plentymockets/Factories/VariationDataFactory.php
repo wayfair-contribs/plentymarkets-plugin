@@ -6,9 +6,6 @@
 
 namespace Wayfair\PlentyMockets\Factories;
 
-require_once(__DIR__ . DIRECTORY_SEPARATOR . 'VariationBarcodeDataFactory.php');
-require_once(__DIR__ . DIRECTORY_SEPARATOR . 'VariationSkuDataFactory.php');
-
 use Wayfair\PlentyMockets\Factories\VariationBarcodeDataFactory;
 use Wayfair\PlentyMockets\Factories\VariationSkuDataFactory;
 
