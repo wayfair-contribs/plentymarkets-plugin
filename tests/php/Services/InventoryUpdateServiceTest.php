@@ -243,7 +243,7 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
         $cases[] = ["full syncs can start when a partial sync is running v6", $emptyResultFull, null, true, [], [], [], self::TIMESTAMP_RECENT, self::TIMESTAMP_OVERDUE, InventoryStatusService::PARTIAL, false, self::TIMESTAMP_RECENT];
         $cases[] = ["full syncs can start when a partial sync is running v7", $emptyResultFull, null, true, [], [], [], self::TIMESTAMP_RECENT, self::TIMESTAMP_RECENT, InventoryStatusService::PARTIAL, false, self::TIMESTAMP_RECENT];
 
-        $cases[] = ["full sync", $emptyResultFull, null, true, [], [], [$collectionOneVariation], self::TIMESTAMP_RECENT, self::TIMESTAMP_RECENT, InventoryStatusService::PARTIAL, false, self::TIMESTAMP_RECENT];
+        $cases[] = ["full sync with no request DTOs", $emptyResultFull, null, true, [[]], [], [$collectionOneVariation], self::TIMESTAMP_RECENT, self::TIMESTAMP_RECENT, InventoryStatusService::PARTIAL, false, self::TIMESTAMP_RECENT];
 
         // TODO: make sure sync method returns all DTOs that InventoryService returns to it
 
@@ -280,7 +280,7 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
         return $inventoryStatusService;
     }
 
-    private function createInventoryMapper(array $cannedRequestDtoCollections, int $numVariations, bool $fullInventory): InventoryMapper
+    private function createInventoryMapper(array $cannedRequestDtoCollections, int $numVariations): InventoryMapper
     {
         /** @var InventoryMapper&\PHPUnit\Framework\MockObject\MockObject */
         $inventoryMapper = $this->createPartialMock(InventoryMapper::class, ['createInventoryDTOsFromVariation']);
@@ -357,7 +357,7 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
             $numVariations += count($page);
         }
 
-        $inventoryMapper = $this->createInventoryMapper($cannedRequestDtos, $numVariations, $fullInventory);
+        $inventoryMapper = $this->createInventoryMapper($cannedRequestDtos, $numVariations);
 
         $statusService = $this->createInventoryStatusService($lastCompletionStartPartial, $lastCompletionStartFull, $currentInventoryStatus, $mostRecentAttemptTime);
 
