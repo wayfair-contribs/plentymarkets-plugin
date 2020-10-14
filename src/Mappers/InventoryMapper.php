@@ -7,8 +7,8 @@
 namespace Wayfair\Mappers;
 
 use InvalidArgumentException;
-use Plenty\Modules\StockManagement\Stock\Contracts\StockRepositoryContract;
 use Plenty\Modules\Item\VariationStock\Contracts\VariationStockRepositoryContract;
+use Plenty\Modules\StockManagement\Stock\Contracts\StockRepositoryContract;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\Inventory\RequestDTO;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
@@ -48,19 +48,28 @@ class InventoryMapper
     self::STOCK_COL_RESERVED_STOCK
   ];
 
+  /** @var LoggerContract */
+  private $logger;
+
+  public function __construct(
+    LoggerContract $logger
+  ) {
+    $this->logger = $logger;
+  }
+
   /**
-   * @param $mainVariationId
+   * TODO: verify behavior and add function description
+   * FIXME: should be calculated at the Wayfair Product level, not the Plentymarkets Variation level!
+   *
+   * @param int $variationId
    *
    * @return mixed
    */
-  public function getAvailableDate($mainVariationId)
+  public function getAvailableDate($variationId)
   {
-    // TODO: verify behavior and add function description
-    /**
-     * @var VariationStockRepositoryContract $variationStockRepositoryContract
-     */
+    /** @var $VariationStockRepositoryContract */
     $variationStockRepositoryContract = pluginApp(VariationStockRepositoryContract::class);
-    $variationStockMovements = $variationStockRepositoryContract->listStockMovements($mainVariationId, ['processRowType', 'bestBeforeDate'], 1, 50);
+    $variationStockMovements = $variationStockRepositoryContract->listStockMovements($variationId, ['processRowType', 'bestBeforeDate'], 1, 50);
     $bestBeforeDateForIncomingStock = null;
     foreach ($variationStockMovements as $variationStockMovement) {
       if ($variationStockMovement['processRowType'] === 1) {
@@ -107,32 +116,51 @@ class InventoryMapper
    *
    * @return RequestDTO[]
    */
-  public function createInventoryDTOsFromVariation($variationData, $itemMappingMethod, $referrerId = null, $stockBuffer = null, $timeWindowStartW3c = null, $timeWindowEndW3c = null)
-  {
-    /** @var LoggerContract $loggerContract */
-    $loggerContract = pluginApp(LoggerContract::class);
+  public function createInventoryDTOsFromVariation(
+    $variationData,
+    $itemMappingMethod,
+    $referrerId = null,
+    $stockBuffer = null,
+    $timeWindowStartW3c = null,
+    $timeWindowEndW3c = null
+  ) {
+    if (!isset($variationData) || empty($variationData)) {
+      throw new InvalidArgumentException("No Variation data provided");
+    }
 
-    /** @var array<string,RequestDTO> $requestDtosBySuID */
-    $requestDtosBySuID = [];
+    $variationId = null;
+    if (key_exists(self::VARIATION_COL_ID, $variationData)) {
+      $variationId = $variationData[self::VARIATION_COL_ID];
+    }
 
-    $mainVariationId = $variationData[self::VARIATION_COL_ID];
-    $variationNumber = $variationData[self::VARIATION_COL_NUMBER];
+    if (!isset($variationId) || empty($variationId)) {
+      throw new InvalidArgumentException('ID is a required field for Variation');
+    }
+
+    $variationNumber = null;
+    if (key_exists(self::VARIATION_COL_NUMBER, $variationData)) {
+      $variationNumber = $variationData[self::VARIATION_COL_NUMBER];
+    }
+
+    if (!isset($variationNumber) || empty($variationNumber)) {
+      throw new InvalidArgumentException('Variation Number is a required field for Variation');
+    }
 
     $supplierPartNumber = null;
-    $partNumberFailureMessage = null;
+    $partNumberFailureMessage = 'product number data is missing from Variation';
 
     try {
-      $supplierPartNumber = $this->getSupplierPartNumberFromVariation($variationData, $itemMappingMethod, $referrerId, $loggerContract);
+      $supplierPartNumber = $this->getSupplierPartNumberFromVariation($variationData, $itemMappingMethod, $referrerId, $this->logger);
     } catch (\Exception $e) {
       $partNumberFailureMessage = get_class($e) . ' : ' . $e->getMessage();
     }
 
     if (!isset($supplierPartNumber) || empty($supplierPartNumber)) {
-      $loggerContract->error(
+      $this->logger->error(
         TranslationHelper::getLoggerKey(self::LOG_KEY_PART_NUMBER_MISSING),
         [
           'additionalInfo' => [
-            'variationID' => $mainVariationId,
+            'variationID' => $variationId,
             'variationNumber' => $variationNumber,
             'itemMappingMethod' => $itemMappingMethod,
             'reason' => $partNumberFailureMessage
@@ -144,11 +172,11 @@ class InventoryMapper
       return [];
     }
 
-    $nextAvailableDate = $this->getAvailableDate($mainVariationId); // Pending. Need Item
+    $nextAvailableDate = $this->getAvailableDate($variationId); // Pending. Need Item
 
-    $filters = [self::STOCK_COL_VARIATION_ID => $mainVariationId];
+    $filters = [self::STOCK_COL_VARIATION_ID => $variationId];
+
     if (isset($timeWindowStartW3c) && !empty($timeWindowStartW3c)) {
-      // FIXME: these conversions should happen before calling into here
       $filters[self::STOCK_FILTER_UPDATED_AT_FROM] = $timeWindowStartW3c;
 
       if (isset($timeWindowEndW3c) && !empty($timeWindowEndW3c)) {
@@ -156,11 +184,11 @@ class InventoryMapper
       }
     }
 
-    /**
-     * @var StockRepositoryContract
-     */
-    $stockRepository = pluginApp(StockRepositoryContract::class);
+    $stockRepository= pluginApp(StockRepositoryContract::class);
     $stockRepository->setFilters($filters);
+
+    /** @var array<string,RequestDTO> $requestDtosBySuID */
+    $requestDtosBySuID = [];
 
     $pageNumber = 1;
     do {
@@ -171,12 +199,11 @@ class InventoryMapper
 
         if (!isset($warehouseId)) {
           // we don't know the warehouse, so we can't figure out the supplier ID.
-          // Not an error, but unexpected.
-          $loggerContract->info(
+          $this->logger->error(
             TranslationHelper::getLoggerKey(self::LOG_KEY_STOCK_MISSING_WAREHOUSE),
             [
               'additionalInfo' => [
-                'variationID' => $mainVariationId,
+                'variationID' => $variationId,
                 'variationNumber' => $variationNumber
               ],
               'method' => __METHOD__
@@ -189,13 +216,14 @@ class InventoryMapper
         $supplierId = $this->getSupplierIDForWarehouseID($warehouseId);
 
         if (!isset($supplierId) || $supplierId === 0 || $supplierId === '0') {
-          // no supplier assigned to this warehouse - NOT an error - we should NOT sync it
-          $loggerContract->debug(
+          // no supplier assigned to this warehouse - NOT an error
+          // we should NOT send this stock to Wayfair
+          $this->logger->debug(
             TranslationHelper::getLoggerKey(self::LOG_KEY_NO_SUPPLIER_ID_ASSIGNED_TO_WAREHOUSE),
             [
               'additionalInfo' => [
                 'warehouseID' => $warehouseId,
-                'variationID' => $mainVariationId
+                'variationID' => $variationId
               ],
               'method' => __METHOD__
             ]
@@ -208,11 +236,11 @@ class InventoryMapper
         $onHand = self::normalizeQuantityOnHand($originalStockNet);
 
         if ($originalStockNet != $onHand) {
-          $loggerContract->info(
+          $this->logger->info(
             TranslationHelper::getLoggerKey(self::LOG_KEY_NORMALIZING_INVENTORY),
             [
               'additionalInfo' => [
-                'variationId' => $mainVariationId,
+                'variationId' => $variationId,
                 'originalStockNet' => $originalStockNet
               ],
               'method' => __METHOD__
@@ -220,14 +248,13 @@ class InventoryMapper
           );
         }
 
-
         if (!isset($onHand) || ($onHand < -1)) {
           // inventory amounts less than -1 are not accepted - do NOT send to Wayfair.
-          $loggerContract->warning(
+          $this->logger->warning(
             TranslationHelper::getLoggerKey(self::LOG_KEY_INVALID_INVENTORY_AMOUNT),
             [
               'additionalInfo' => [
-                'variationID' => $mainVariationId,
+                'variationID' => $variationId,
                 'variationNumber' => $variationNumber,
                 'warehouseId' => $warehouseId,
                 'amount' => json_encode($onHand)
@@ -255,23 +282,24 @@ class InventoryMapper
           */
 
           // all null $onHand values are thrown out before this calculation happens.
-          $onHand = self::mergeInventoryQuantities($onHand, $existingDTO->getQuantityOnHand());
+          $onHand = $this->mergeInventoryQuantities($onHand, $existingDTO->getQuantityOnHand());
 
           // quantityOnOrder IS nullable.
-          $onOrder = self::mergeInventoryQuantities($onOrder, $existingDTO->getQuantityOnOrder());
+          $onOrder = $this->mergeInventoryQuantities($onOrder, $existingDTO->getQuantityOnOrder());
         }
 
-        $dtoData = [
-          'supplierId' => $supplierId,
-          'supplierPartNumber' => $supplierPartNumber,
-          'quantityOnHand' => $onHand,
-          'quantityOnOrder' => $onOrder,
-          'itemNextAvailabilityDate' => $nextAvailableDate,
-          'productNameAndOptions' => $variationData['name']
-        ];
+        /** @var RequestDTO */
+        $requestDto = pluginApp(RequestDTO::class);
+
+        $requestDto->setSupplierId($supplierId);
+        $requestDto->setSupplierPartNumber($supplierPartNumber);
+        $requestDto->setQuantityOnHand($onHand);
+        $requestDto->setQuantityOnOrder($onOrder);
+        $requestDto->setItemNextAvailabilityDate($nextAvailableDate);
+        $requestDto->setProductNameAndOptions($variationData['name']);
 
         // replaces any existing DTO with a "merge" for this suID
-        $requestDtosBySuID[$dtoKey] = RequestDTO::createFromArray($dtoData);
+        $requestDtosBySuID[$dtoKey] = $requestDto;
       } // end of loop over stock items on page
       $pageNumber++;
     } while (!$stockSearchResponsePage->isLastPage());
@@ -280,8 +308,10 @@ class InventoryMapper
     $inventoryDTOs = array_values($requestDtosBySuID);
 
     // apply the stock buffer setting to each DTO sent to Wayfair, not to each warehouse
-    foreach ($inventoryDTOs as $idx => $oneDTO) {
-      $dtos[$idx] = self::applyStockBuffer($oneDTO, $stockBuffer);
+    if (isset($stockBuffer) && $stockBuffer > 0) {
+      foreach ($inventoryDTOs as $idx => $oneDTO) {
+        $dtos[$idx] = $this->applyStockBuffer($oneDTO, $stockBuffer);
+      }
     }
 
     return $inventoryDTOs;
@@ -293,7 +323,7 @@ class InventoryMapper
    * @param RequestDTO $dto
    * @return RequestDTO
    */
-  static function applyStockBuffer($dto, $stockBuffer)
+  function applyStockBuffer($dto, $stockBuffer)
   {
     if (!isset($dto) || !isset($stockBuffer) || $stockBuffer <= 0) {
       // no buffer to apply
@@ -325,11 +355,8 @@ class InventoryMapper
    * @param int $warehouseId
    * @return mixed
    */
-  private static function getSupplierIDForWarehouseID($warehouseId)
+  private function getSupplierIDForWarehouseID($warehouseId)
   {
-    /**
-     * @var WarehouseSupplierRepository $warehouseSupplierRepository
-     */
     $warehouseSupplierRepository = pluginApp(WarehouseSupplierRepository::class);
 
     $warehouseSupplierMapping = $warehouseSupplierRepository->findByWarehouseId($warehouseId);
@@ -351,7 +378,7 @@ class InventoryMapper
    * @return mixed
    * @throws \Exception
    */
-  static function getSupplierPartNumberFromVariation($variationData, $itemMappingMethod, $referrerId = null, $logger = null)
+  function getSupplierPartNumberFromVariation($variationData, $itemMappingMethod, $referrerId = null, $logger = null)
   {
     if (!isset($variationData) || empty($variationData)) {
       throw new InvalidArgumentException("Variation data is not set");
@@ -417,12 +444,12 @@ class InventoryMapper
    * Note that -1 is a VALID input for the inventory APIs!
    * Note that this MAY return null
    *
-   * @param [float] $left
-   * @param [float] $right
-   * @param [bool] $nullable
+   * @param float $left
+   * @param float $right
+   * @param bool $nullable
    * @return float|null
    */
-  static function mergeInventoryQuantities($left, $right)
+  function mergeInventoryQuantities($left, $right)
   {
     // protecting against values below -1
     if (isset($left) && $left < -1) {

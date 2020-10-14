@@ -6,23 +6,27 @@
 
 namespace Wayfair\Cron;
 
+use Exception;
 use Plenty\Modules\Cron\Contracts\CronHandler as Cron;
 use Wayfair\Core\Contracts\LoggerContract;
+use Wayfair\Core\Exceptions\FullInventorySyncInProgressException;
+use Wayfair\Core\Exceptions\InventorySyncBlockedException;
+use Wayfair\Core\Exceptions\NoReferencePointForPartialInventorySyncException;
+use Wayfair\Core\Exceptions\WayfairVariationsMissingException;
 use Wayfair\Helpers\TranslationHelper;
-use Wayfair\Services\InventoryStatusService;
 use Wayfair\Services\InventoryUpdateService;
 
 class InventorySyncCron extends Cron
 {
-  // amount of time between full syncs.
-  // slightly less than one day.
-  const MAX_SEC_BETWEEN_FULL_SYNCS = 86000;
+  const LOG_KEY_INVENTORY_ERRORS = 'inventoryErrors';
+
+  const SECONDS_BETWEEN_TRIES = 600;
+
+  /** @var bool */
+  private $fullInventory;
 
   /** @var InventoryUpdateService */
   private $inventoryUpdateService;
-
-  /** @var InventoryStatusService */
-  private $inventoryStatusService;
 
   /** @var LoggerContract */
   private $loggerContract;
@@ -32,12 +36,12 @@ class InventorySyncCron extends Cron
    *
    */
   public function __construct(
+    bool $fullInventory = false,
     InventoryUpdateservice $inventoryUpdateService,
-    InventoryStatusService $inventoryStatusService,
     LoggerContract $loggerContract
   ) {
+    $this->fullInventory = $fullInventory;
     $this->inventoryUpdateService = $inventoryUpdateService;
-    $this->inventoryStatusService = $inventoryStatusService;
     $this->loggerContract = $loggerContract;
   }
 
@@ -49,39 +53,67 @@ class InventorySyncCron extends Cron
   public function handle()
   {
     $this->loggerContract->debug(TranslationHelper::getLoggerKey('cronStartedMessage'), [
+      'additionalInfo' => [
+        'full' => $this->fullInventory
+      ],
       'method' => __METHOD__
     ]);
-    $syncResult = [];
-    $fullInventory = false;
+    $syncResult = null;
+    $maxAttempts = $this->fullInventory ? 3 : 1;
+    $attempt = 0;
+
     try {
-      $fullInventory = $this->isFullDue();
-      $syncResult = $this->inventoryUpdateService->sync($fullInventory);
+
+      while ($attempt++ <= $maxAttempts) {
+        try {
+          $syncResult = $this->inventoryUpdateService->sync($this->fullInventory);
+        } catch (FullInventorySyncInProgressException $e) {
+          // log at a low level because sync service should have mentioned it
+          $this->loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_ERRORS), [
+            'additionalInfo' => self::getInfoMapForException($e, $this->fullInventory),
+            'method' => __METHOD__
+          ]);
+
+          //  an ongoing full sync should prevent retries of any sort
+          return;
+        } catch (Exception $e) {
+          // log at a high level because this is unexpected
+          $this->loggerContract->error(TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_ERRORS), [
+            'additionalInfo' => self::getInfoMapForException($e, $this->fullInventory),
+            'method' => __METHOD__
+          ]);
+
+          // allow re-try as this exception could reflect a momentary issue
+        }
+
+        if (!$this->fullInventory || (isset($syncResult) && $syncResult->isSuccessful())) {
+          // only a failed full inventory should result in retries
+          return;
+        }
+
+        if ($attempt < $maxAttempts) {
+          // sleep and let loop
+          sleep(self::SECONDS_BETWEEN_TRIES);
+        }
+      }
     } finally {
       $this->loggerContract->debug(TranslationHelper::getLoggerKey('cronFinishedMessage'), [
         'additionalInfo' => [
-          'full' => $fullInventory,
-          'result' => $syncResult
+          'full' => $this->fullInventory,
+          'result' => $syncResult->toArray()
         ],
         'method' => __METHOD__
       ]);
     }
   }
 
-  /**
-   * Check if the inventory sync should happen for all inventory, or just recent inventory changes.
-   *
-   * @return bool
-   */
-  private function isFullDue(): bool
+  private static function getInfoMapForException(\Exception $e, $fullInventory)
   {
-    $lastFullInventorySuccessStart = $this->inventoryStatusService->getLastCompletionStart(true);
-
-    if (!isset($lastFullInventorySuccessStart) || empty($lastFullInventorySuccessStart)) {
-      return true;
-    }
-
-    $numericStartTime = strtotime($lastFullInventorySuccessStart);
-
-    return ($numericStartTime <= 0 || time() >= $numericStartTime + self::MAX_SEC_BETWEEN_FULL_SYNCS);
+    return [
+      'full' => (string) $fullInventory,
+      'exceptionType' => get_class($e),
+      'errorMessage' => $e->getMessage(),
+      'stackTrace' => $e->getTraceAsString()
+    ];
   }
 }

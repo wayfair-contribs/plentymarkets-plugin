@@ -3,55 +3,42 @@ import { InventoryStatusInterface } from "../../core/services/inventory/data/inv
 import { InventoryService } from "../../core/services/inventory/inventory.service";
 import { Language, TranslationService } from "angular-l10n";
 import * as moment from "moment";
-
-class Icon {
-  iconClass: string = "";
-  iconDrawings: string[] = [];
-}
-
-class DisplayedState {
-  public static readonly TEXT_CLASS_WARNING = "text-warning";
-  public static readonly TEXT_CLASS_DANGER = "text-danger";
-  public static readonly TEXT_CLASS_INFO = "text-info";
-  public static readonly TEXT_CLASS_SUCCESS = "text-success";
-  public static readonly TEXT_CLASS_BODY = "text-body";
-
-  public message = "";
-  public style = "";
-  public icon: Icon;
-}
+import { Icon } from "./icon.struct";
+import { DisplayedState } from "./displayedState.struct";
 
 @Component({
   selector: "inventory",
   template: require("./inventory.component.html"),
 })
 export class InventoryComponent {
-  private static readonly TRANSLATION_KEY_LOADING = "loading";
-  private static readonly TRANSLATION_KEY_ERROR_FETCH = "error_fetch";
-  private static readonly TRANSLATION_KEY_NO_ISSUES = "inventory_no_issues";
-  private static readonly TRANSLATION_KEY_SYNC_HAS_ISSUES =
+  private static readonly TRANSLATION_KEY_LOADING: string = "loading";
+  private static readonly TRANSLATION_KEY_ERROR_FETCH: string = "error_fetch";
+  private static readonly TRANSLATION_KEY_NO_ISSUES: string =
+    "inventory_no_issues";
+  private static readonly TRANSLATION_KEY_SYNC_HAS_ISSUES: string =
     "inventory_has_issues";
-  private static readonly TRANSLATION_KEY_AT = "at";
-  private static readonly TRANSLATION_KEY_COMPLETED_WITH = "completed_with";
-  private static readonly TRANSLATION_KEY_PRODUCTS = "products";
-  private static readonly TRANSLATION_KEY_SKIPPED = "inventory_skipped";
-  private static readonly TRANSLATION_KEY_HAS_NEVER_SUCCEEDED =
+  private static readonly TRANSLATION_KEY_AT: string = "at";
+  private static readonly TRANSLATION_KEY_COMPLETED_WITH: string =
+    "completed_with";
+  private static readonly TRANSLATION_KEY_PRODUCTS: string = "products";
+  private static readonly TRANSLATION_KEY_SKIPPED: string = "inventory_skipped";
+  private static readonly TRANSLATION_KEY_HAS_NEVER_SUCCEEDED: string =
     "has_never_succeeded";
-  private static readonly TRANSLATION_KEY_HAS_NEVER_BEEN_ATTEMPTED =
+  private static readonly TRANSLATION_KEY_HAS_NEVER_BEEN_ATTEMPTED: string =
     "has_never_been_attempted";
-  private static readonly TRANSLATION_KEY_INV_SYNC_LABEL =
+  private static readonly TRANSLATION_KEY_INV_SYNC_LABEL: string =
     "inventory_synchronization_label";
-  private static readonly TRANSLATION_KEY_IS_CURRENTLY_RUNNING =
+  private static readonly TRANSLATION_KEY_IS_CURRENTLY_RUNNING: string =
     "is_currently_running";
-  private static readonly TRANSLATION_KEY_AND = "and";
-  private static readonly TRANSLATION_KEY_IS_OVERDUE = "is_overdue";
+  private static readonly TRANSLATION_KEY_AND: string = "and";
+  private static readonly TRANSLATION_KEY_IS_OVERDUE: string = "is_overdue";
 
-  private static readonly STATE_IDLE = "idle";
+  private static readonly STATE_IDLE: string = "idle";
 
   /**
    * The interval on which the UI will automatically refresh
    */
-  private static readonly REFRESH_INTERVAL = 60000;
+  private static readonly REFRESH_INTERVAL: number = 60000;
 
   private static readonly ICON_LOADING: Icon = {
     iconClass: "bi bi-arrow-repeat",
@@ -108,7 +95,7 @@ export class InventoryComponent {
     icon: InventoryComponent.ICON_ERROR,
   };
 
-  public table: DisplayedState[];
+  public table: Array<DisplayedState>;
 
   public fetchTime: string;
 
@@ -131,10 +118,13 @@ export class InventoryComponent {
     this.showLoading();
 
     this.inventoryService.getState().subscribe(
-      (data) => {
+      (data: InventoryStatusInterface) => {
         this.refreshStateFromData(data);
+
+        // kick the full inventory sync, if it is overdue
+        this.inventoryService.performFullSyncIfNeeded(this.statusObject);
       },
-      (err) => {
+      (err: any) => {
         this.statusObject = null;
         this.showError();
       }
@@ -149,7 +139,7 @@ export class InventoryComponent {
    * Update the UI to match back-end data provided in the argument
    * @param data InventoryStatusInterface
    */
-  private refreshStateFromData(data: InventoryStatusInterface) {
+  private refreshStateFromData(data: InventoryStatusInterface): void {
     this.statusObject = data;
 
     this.updateFetchTime();
@@ -161,8 +151,8 @@ export class InventoryComponent {
   /**
    * Update the icon, text, and style of the big state in the UI
    */
-  private updateMainState() {
-    if (!this.syncsAttempted()) {
+  private updateMainState(): void {
+    if (!InventoryService.syncsAttempted(this.statusObject)) {
       this.mainState.message =
         this.translation.translate(
           InventoryComponent.TRANSLATION_KEY_INV_SYNC_LABEL
@@ -179,10 +169,10 @@ export class InventoryComponent {
       return;
     }
 
-    if (this.overdue()) {
+    if (InventoryService.overdue(this.statusObject)) {
       if (
-        this.mainState.style != DisplayedState.TEXT_CLASS_DANGER &&
-        this.statusObject.status != InventoryComponent.STATE_IDLE
+        this.mainState.style !== DisplayedState.TEXT_CLASS_DANGER &&
+        this.statusObject.status !== InventoryComponent.STATE_IDLE
       ) {
         // avoid saying there are issues - this is newly overdue and we're actively syncing
         // this is also where we are during the first sync!
@@ -228,7 +218,7 @@ export class InventoryComponent {
   /**
    * Put the UI in the "loading" state.
    */
-  private showLoading() {
+  private showLoading(): void {
     this.mainState.message = this.translation.translate(
       InventoryComponent.TRANSLATION_KEY_LOADING
     );
@@ -240,7 +230,7 @@ export class InventoryComponent {
   /**
    * Put the UI in the "error" state
    */
-  private showError() {
+  private showError(): void {
     this.mainState.message = this.translation.translate(
       InventoryComponent.TRANSLATION_KEY_ERROR_FETCH
     );
@@ -254,160 +244,109 @@ export class InventoryComponent {
    * Update the table data.
    * Always run this AFTER updating the main state, as the main state may influence the table.
    */
-  public updateTable() {
+  public updateTable(): void {
     this.table = [];
     if (
       !this.statusObject ||
       !this.statusObject.details ||
       !this.mainState ||
-      this.mainState.icon == InventoryComponent.ICON_LOADING ||
-      this.mainState.icon == InventoryComponent.ICON_ERROR ||
-      !this.syncsAttempted()
+      this.mainState.icon === InventoryComponent.ICON_LOADING ||
+      this.mainState.icon === InventoryComponent.ICON_ERROR ||
+      !InventoryService.syncsAttempted(this.statusObject)
     ) {
       // don't show a table
       return;
     }
 
     for (const key in this.statusObject.details) {
-      let rowLabel = this.translation.translate(
-        "inventory_status_label_" + key
-      );
+      if (this.statusObject.details.hasOwnProperty(key)) {
+        let rowLabel: string = this.translation.translate(
+          "inventory_status_label_" + key
+        );
 
-      let nextRow: DisplayedState = {
-        icon: InventoryComponent.ICON_CLOUD_CHECK,
-        message: rowLabel,
-        style: DisplayedState.TEXT_CLASS_BODY,
-      };
+        let nextRow: DisplayedState = {
+          icon: InventoryComponent.ICON_CLOUD_CHECK,
+          message: rowLabel,
+          style: DisplayedState.TEXT_CLASS_BODY,
+        };
 
-      if (this.statusObject.status == key) {
-        nextRow.message +=
-          " " +
-          this.translation.translate(
-            InventoryComponent.TRANSLATION_KEY_IS_CURRENTLY_RUNNING
-          );
-        nextRow.icon = InventoryComponent.ICON_RUNNING;
-      } else if (this.syncsAttempted(key)) {
-        if (this.overdue(key)) {
-          nextRow.style = DisplayedState.TEXT_CLASS_DANGER;
+        if (this.statusObject.status === key) {
           nextRow.message +=
             " " +
             this.translation.translate(
-              InventoryComponent.TRANSLATION_KEY_IS_OVERDUE
-            ) +
-            " " +
-            this.translation.translate(InventoryComponent.TRANSLATION_KEY_AND) +
-            " ";
-        }
-
-        if (this.statusObject.details[key].completedStart) {
-          nextRow.message +=
-            " " +
-            this.translation.translate(InventoryComponent.TRANSLATION_KEY_AT) +
-            " " +
-            moment(
-              new Date(this.statusObject.details[key].completedStart)
-            ).toLocaleString();
-
-          let amt = this.statusObject.details[key].completedAmount;
-
-          if (amt && amt > 0) {
+              InventoryComponent.TRANSLATION_KEY_IS_CURRENTLY_RUNNING
+            );
+          nextRow.icon = InventoryComponent.ICON_RUNNING;
+        } else if (InventoryService.syncsAttempted(this.statusObject, key)) {
+          if (InventoryService.overdue(this.statusObject, key)) {
+            nextRow.style = DisplayedState.TEXT_CLASS_DANGER;
             nextRow.message +=
               " " +
               this.translation.translate(
-                InventoryComponent.TRANSLATION_KEY_COMPLETED_WITH
+                InventoryComponent.TRANSLATION_KEY_IS_OVERDUE
               ) +
               " " +
-              amt +
+              this.translation.translate(
+                InventoryComponent.TRANSLATION_KEY_AND
+              ) +
+              " ";
+          }
+
+          if (this.statusObject.details[key].completedStart) {
+            nextRow.message +=
               " " +
               this.translation.translate(
-                InventoryComponent.TRANSLATION_KEY_PRODUCTS
-              );
+                InventoryComponent.TRANSLATION_KEY_AT
+              ) +
+              " " +
+              moment(
+                new Date(this.statusObject.details[key].completedStart)
+              ).toLocaleString();
+
+            let amt: number = this.statusObject.details[key].completedAmount;
+
+            if (amt && amt > 0) {
+              nextRow.message +=
+                " " +
+                this.translation.translate(
+                  InventoryComponent.TRANSLATION_KEY_COMPLETED_WITH
+                ) +
+                " " +
+                amt +
+                " " +
+                this.translation.translate(
+                  InventoryComponent.TRANSLATION_KEY_PRODUCTS
+                );
+            } else {
+              nextRow.message +=
+                " " +
+                this.translation.translate(
+                  InventoryComponent.TRANSLATION_KEY_SKIPPED
+                );
+            }
           } else {
             nextRow.message +=
               " " +
               this.translation.translate(
-                InventoryComponent.TRANSLATION_KEY_SKIPPED
+                InventoryComponent.TRANSLATION_KEY_HAS_NEVER_SUCCEEDED
               );
+
+            nextRow.style = DisplayedState.TEXT_CLASS_DANGER;
+            nextRow.icon = InventoryComponent.ICON_CLOUD_SLASH;
           }
         } else {
           nextRow.message +=
             " " +
             this.translation.translate(
-              InventoryComponent.TRANSLATION_KEY_HAS_NEVER_SUCCEEDED
+              InventoryComponent.TRANSLATION_KEY_HAS_NEVER_BEEN_ATTEMPTED
             );
 
-          nextRow.style = DisplayedState.TEXT_CLASS_DANGER;
-          nextRow.icon = InventoryComponent.ICON_CLOUD_SLASH;
+          nextRow.icon = InventoryComponent.ICON_SCHEDULED;
         }
-      } else {
-        nextRow.message +=
-          " " +
-          this.translation.translate(
-            InventoryComponent.TRANSLATION_KEY_HAS_NEVER_BEEN_ATTEMPTED
-          );
 
-        nextRow.icon = InventoryComponent.ICON_SCHEDULED;
+        nextRow.message += ".";
+        this.table.push(nextRow);
       }
-
-      nextRow.message += ".";
-      this.table.push(nextRow);
     }
-  }
-
-  /**
-   * Check if any syncs were attempted
-   * @param syncKind 'full' or 'partial' sync, or null for "any of the syncs"
-   */
-  public syncsAttempted(syncKind?: string): boolean {
-    if (!this.statusObject || !this.statusObject.details) {
-      return false;
-    }
-
-    if (syncKind) {
-      return (
-        this.statusObject.details[syncKind] &&
-        this.statusObject.details[syncKind].attemptedStart &&
-        this.statusObject.details[syncKind].attemptedStart.length > 0
-      );
-    }
-
-    for (const key in this.statusObject.details) {
-      if (
-        this.statusObject.details[key] &&
-        this.statusObject.details[key].attemptedStart &&
-        this.statusObject.details[key].attemptedStart.length > 0
-      )
-        return true;
-    }
-
-    return false;
-  }
-
-  /**
-   * Check for the overdue flag
-   * @param syncKind 'full' or 'partial' sync, or null for "any of the syncs"
-   */
-  public overdue(syncKind?: string): boolean {
-    if (!this.statusObject || !this.statusObject.details) {
-      // lack of data should be considered overdue
-      return true;
-    }
-
-    if (syncKind) {
-      return (
-        this.statusObject.details[syncKind] &&
-        this.statusObject.details[syncKind].overdue
-      );
-    }
-
-    for (const key in this.statusObject.details) {
-      if (
-        this.statusObject.details[key] &&
-        this.statusObject.details[key].overdue
-      )
-        return true;
-    }
-
-    return false;
   }
 }
