@@ -9,7 +9,7 @@ namespace Wayfair\PlentyMockets\Helpers;
 use PHPUnit\Framework\MockObject\MockBuilder;
 use PHPUnit\Framework\TestCase;
 
-class PluginAppHelper
+class MockPluginApp
 {
     private $testCase;
 

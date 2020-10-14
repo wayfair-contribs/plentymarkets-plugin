@@ -20,7 +20,7 @@ require_once($plentymocketsFactoriesDirPath
 require_once(dirname(__DIR__) . DIRECTORY_SEPARATOR
     . 'lib' . DIRECTORY_SEPARATOR
     . 'plentymockets' . DIRECTORY_SEPARATOR
-    . 'Helpers' . DIRECTORY_SEPARATOR . 'PluginAppHelper.php');
+    . 'Helpers' . DIRECTORY_SEPARATOR . 'MockPluginApp.php');
 
 require_once(dirname(__DIR__) . DIRECTORY_SEPARATOR
     . 'lib' . DIRECTORY_SEPARATOR
@@ -40,7 +40,7 @@ use Wayfair\Mappers\InventoryMapper;
 use Wayfair\Models\InventoryUpdateResult;
 use Wayfair\PlentyMockets\Factories\MockVariationSearchRepositoryFactory;
 use Wayfair\PlentyMockets\Factories\VariationDataFactory;
-use Wayfair\PlentyMockets\Helpers\PluginAppHelper;
+use Wayfair\PlentyMockets\Helpers\MockPluginApp;
 use Wayfair\Services\InventoryStatusService;
 use Wayfair\Services\InventoryUpdateService;
 
@@ -345,11 +345,11 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
         $mostRecentAttemptTime = null
     ): InventoryUpdateService {
 
-        global $pluginAppHelper;
-        $pluginAppHelper = new PluginAppHelper($this);
+        global $mockPluginApp;
+        $mockPluginApp = new MockPluginApp($this);
 
         // FIXME: needs to return subsequent Result objects
-        $pluginAppHelper->willReturn(InventoryUpdateResult::class, [], new InventoryUpdateResult());
+        $mockPluginApp->willReturn(InventoryUpdateResult::class, [], new InventoryUpdateResult());
 
         $inventoryService = $this->createInventoryService($cannedResponseDtos);
 
@@ -374,7 +374,7 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
         $logSenderService = $this->createMock(LogSenderService::class);
 
         $variationSearchRepository = $this->createVariationSearchRepository($variationDataArraysForPages, $allItemsActive, $shouldStartSyncing);
-        $pluginAppHelper->willReturn(VariationSearchRepositoryContract::class, [], $variationSearchRepository);
+        $mockPluginApp->willReturn(VariationSearchRepositoryContract::class, [], $variationSearchRepository);
 
         /** @var InventoryUpdateService&\PHPUnit\Framework\MockObject\MockObject */
         $inventoryUpdateService = $this->createTestProxy(InventoryUpdateService::class, [

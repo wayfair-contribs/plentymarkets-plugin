@@ -26,7 +26,7 @@ require_once($plentymocketsFactoriesDirPath
 require_once(dirname(__DIR__) . DIRECTORY_SEPARATOR
     . 'lib' . DIRECTORY_SEPARATOR
     . 'plentymockets' . DIRECTORY_SEPARATOR
-    . 'Helpers' . DIRECTORY_SEPARATOR . 'PluginAppHelper.php');
+    . 'Helpers' . DIRECTORY_SEPARATOR . 'MockPluginApp.php');
 
 require_once(dirname(__DIR__) . DIRECTORY_SEPARATOR
     . 'lib' . DIRECTORY_SEPARATOR
@@ -44,7 +44,7 @@ use Wayfair\PlentyMockets\Factories\MockStockRepositoryFactory;
 use Wayfair\PlentyMockets\Factories\VariationBarcodeDataFactory;
 use Wayfair\PlentyMockets\Factories\VariationSkuDataFactory;
 use Wayfair\PlentyMockets\Factories\VariationDataFactory;
-use Wayfair\PlentyMockets\Helpers\PluginAppHelper;
+use Wayfair\PlentyMockets\Helpers\MockPluginApp;
 
 /**
  * Tests for InventoryMapper
@@ -194,17 +194,17 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
         /** @var LoggerContract&\PHPUnit\Framework\MockObject\MockObject */
         $logger = $this->createMock(LoggerContract::class);
 
-        global $pluginAppHelper;
-        $pluginAppHelper = new PluginAppHelper($this);
+        global $mockPluginApp;
+        $mockPluginApp = new MockPluginApp($this);
 
         // FIXME: needs to return subsequent DTOs
-        $pluginAppHelper->willReturn(RequestDTO::class, [], new RequestDTO());
+        $mockPluginApp->willReturn(RequestDTO::class, [], new RequestDTO());
 
         // TODO: put in a WarehouseSupplierRepository, configured for the variations / warehouses
 
         $stockRepository = (new MockStockRepositoryFactory($this))->create($stockDataArraysForPages, $expectedFilters, $expectedSearches);
 
-        $pluginAppHelper->willReturn(StockRepositoryContract::class, [], $stockRepository);
+        $mockPluginApp->willReturn(StockRepositoryContract::class, [], $stockRepository);
 
         /** @var InventoryMapper&\PHPUnit\Framework\MockObject\MockObject */
         $inventoryMapper = $this->createTestProxy(InventoryMapper::class, [
@@ -307,8 +307,8 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
         /** @var LoggerContract&\PHPUnit\Framework\MockObject\MockObject */
         $logger = $this->createMock(LoggerContract::class);
 
-        global $pluginAppHelper;
-        $pluginAppHelper = new PluginAppHelper($this);
+        global $mockPluginApp;
+        $mockPluginApp = new MockPluginApp($this);
 
         /** @var InventoryMapper&\PHPUnit\Framework\MockObject\MockObject */
         $inventoryMapper = $this->createTestProxy(InventoryMapper::class, [

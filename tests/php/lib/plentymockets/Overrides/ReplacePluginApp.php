@@ -6,7 +6,7 @@
 
 function pluginApp($abstract, $params = [])
 {
-    global $pluginAppHelper;
+    global $mockPluginApp;
 
-    return $pluginAppHelper->pluginApp($abstract, $params);
+    return $mockPluginApp->pluginApp($abstract, $params);
 }
