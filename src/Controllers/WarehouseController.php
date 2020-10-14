@@ -32,6 +32,7 @@ class WarehouseController extends Controller {
    */
   public function __construct(LoggerContract $logger)
   {
+    parent::__construct();
     $this->logger = $logger;
   }
 

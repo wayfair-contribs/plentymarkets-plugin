@@ -8,6 +8,7 @@ namespace Wayfair\Controllers;
 
 use Plenty\Exceptions\ValidationException;
 use Plenty\Modules\Order\Status\Models\OrderStatus;
+use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Wayfair\Core\Api\Services\LogSenderService;
@@ -21,7 +22,7 @@ use Wayfair\Repositories\KeyValueRepository;
 /**
  * Controller for the "Settings" tab in the Wayfair plugin
  */
-class SettingsController
+class SettingsController extends Controller
 {
   const LOG_KEY_CONTROLLER_IN = "controllerInput";
   const LOG_KEY_CONTROLLER_OUT = "controllerOutput";
@@ -77,6 +78,7 @@ class SettingsController
     ExternalLogsFactory $externalLogsFactory,
     OrderStatusRepositoryFactory $orderStatusRepositoryFactory
   ) {
+    parent::__construct();
     $this->keyValueRepository = $keyValueRepository;
     $this->logger = $logger;
     $this->configHelper = $configHelper;
@@ -138,7 +140,7 @@ class SettingsController
    * @param Request  $request
    * @param Response $response
    *
-   * @return false|string
+   * @return Response
    */
   public function post(Request $request, Response $response)
   {

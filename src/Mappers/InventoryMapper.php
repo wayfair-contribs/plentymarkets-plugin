@@ -81,7 +81,8 @@ class InventoryMapper
   /**
    * TODO: verify behavior and add function description
    * FIXME: should be calculated at the Wayfair Product level, not the Plentymarkets Variation level!
-   * @param $variationId
+   *
+   * @param int $variationId
    *
    * @return mixed
    */
@@ -461,9 +462,9 @@ class InventoryMapper
    * Note that -1 is a VALID input for the inventory APIs!
    * Note that this MAY return null
    *
-   * @param [float] $left
-   * @param [float] $right
-   * @param [bool] $nullable
+   * @param float $left
+   * @param float $right
+   * @param bool $nullable
    * @return float|null
    */
   function mergeInventoryQuantities($left, $right)

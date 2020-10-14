@@ -128,7 +128,7 @@ class InventoryUpdateResult
         ];
     }
 
-    public function adoptArray(array $data): void
+    public function adoptArray(array $data)
     {
         if (!isset($data) || empty($data)) {
             return;

@@ -158,10 +158,10 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
 
   /**
    * Get the query text for fetching a tracking number
-   * @param string $poNumber
+   * @param int $poNumber
    * @return string
    */
-  private function getTrackingNumberQuery(string $poNumber): string
+  private function getTrackingNumberQuery(int $poNumber): string
   {
     return 'query labelGenerationEvents { '
       . ' labelGenerationEvents( '

@@ -11,7 +11,7 @@ interface LoggerContract {
    * Detailed debug information.
    *
    * @param string $code
-   * @param null   $loggingInfo
+   * @param array   $loggingInfo
    */
   public function debug(string $code, $loggingInfo = null);
 
@@ -19,7 +19,7 @@ interface LoggerContract {
    * Logs info.
    *
    * @param string $code
-   * @param null   $loggingInfo
+   * @param array   $loggingInfo
    */
   public function info(string $code, $loggingInfo = null);
 
@@ -27,7 +27,7 @@ interface LoggerContract {
    * Errors that should be logged and monitored.
    *
    * @param string $code
-   * @param null   $loggingInfo
+   * @param array   $loggingInfo
    */
   public function error(string $code, $loggingInfo = null);
 
@@ -35,7 +35,7 @@ interface LoggerContract {
    * Warnings that should be logged and monitored.
    *
    * @param string $code
-   * @param null   $loggingInfo
+   * @param array   $loggingInfo
    */
   public function warning(string $code, $loggingInfo = null);
 

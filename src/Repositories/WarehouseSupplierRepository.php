@@ -30,6 +30,7 @@ class WarehouseSupplierRepository extends Repository {
      * @var DataBase $database
      */
     $database                              = pluginApp(DataBase::class);
+    /** @var WarehouseSupplier */
     $warehouseSupplierMapping              = pluginApp(WarehouseSupplier::class);
     $warehouseSupplierMapping->supplierId  = $data['supplierId'];
     $warehouseSupplierMapping->warehouseId = $data['warehouseId'];
@@ -45,7 +46,7 @@ class WarehouseSupplierRepository extends Repository {
    * @return mixed
    */
   public function updateMapping($data = []) {
-    
+
     $mappingData = [];
 
     try
@@ -72,7 +73,7 @@ class WarehouseSupplierRepository extends Repository {
           ]
         );
     }
-    
+
     if (isset($mappingData) && !empty($mappingData) && isset($mappingData[0])) {
       $mappingDatum              = $mappingData[0];
       $mappingDatum->supplierId  = $data['supplierId'];
@@ -89,7 +90,7 @@ class WarehouseSupplierRepository extends Repository {
    * @return mixed|null
    */
   public function findByWarehouseId($warehouseId) {
-    
+
     $mappingData = [];
 
     try
@@ -122,7 +123,7 @@ class WarehouseSupplierRepository extends Repository {
 
       return $mappingDatum;
     }
-  
+
     return null;
   }
 
@@ -160,7 +161,7 @@ class WarehouseSupplierRepository extends Repository {
             ]
           );
       }
-      
+
       if (isset($mappingData) && !empty($mappingData) && isset($mappingData[0])) {
         $database->delete($mappingData[0]);
       }
@@ -203,7 +204,7 @@ class WarehouseSupplierRepository extends Repository {
    * @return mixed
    */
   public function getAllMappings() {
-    
+
     try
     {
       /**

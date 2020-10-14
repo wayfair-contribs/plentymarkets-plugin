@@ -40,6 +40,7 @@ class InventoryController extends Controller
     InventoryStatusService $inventoryStatusService,
     LoggerContract $logger
   ) {
+    parent::__construct();
     $this->inventoryUpdateService = $inventoryUpdateService;
     $this->inventoryStatusService = $inventoryStatusService;
     $this->logger = $logger;

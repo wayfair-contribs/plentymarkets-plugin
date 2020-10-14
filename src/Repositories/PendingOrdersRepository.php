@@ -41,6 +41,7 @@ class PendingOrdersRepository extends Repository {
 
     try
     {
+      /** @var DataBase */
       $database = pluginApp(DataBase::class);
       $data = $database->query(PendingOrders::class)->where('poNum', '=', $poNum)
           ->limit(1)
@@ -85,7 +86,7 @@ class PendingOrdersRepository extends Repository {
    * @return array|null
    */
   public function get(string $poNum) {
-    
+
     try
     {
       $database = pluginApp(DataBase::class);

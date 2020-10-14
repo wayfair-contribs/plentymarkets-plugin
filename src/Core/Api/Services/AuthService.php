@@ -75,7 +75,7 @@ class AuthService implements AuthContract
    *
    * @param ClientInterfaceContract  $clientInterfaceContract
    * @param StorageInterfaceContract $storageInterfaceContract
-   * @param AbstractConfigHelper     $abstractConfigHelper
+   * @param AbstractConfigHelper     $configHelper
    * @param LoggerContract           $loggerContract
    */
   public function __construct(
@@ -92,7 +92,6 @@ class AuthService implements AuthContract
 
   /**
    * Fetch a new auth token using the wayfair auth service
-   * @param string $audience
    * @return WayfairResponse
    */
   private function fetchWayfairAuthToken()
@@ -346,7 +345,7 @@ class AuthService implements AuthContract
    *
    * @return void
    */
-  private function clearToken(): void
+  private function clearToken()
   {
     // storage contract has no remove
     $this->saveToken([]);

@@ -6,6 +6,7 @@
 namespace Wayfair\Controllers;
 
 use Plenty\Exceptions\ValidationException;
+use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Services\ShipmentProviderService;
@@ -17,7 +18,7 @@ use Wayfair\Helpers\TranslationHelper;
  *
  * @package Wayfair\Controllers
  */
-class CarrierScacController {
+class CarrierScacController extends Controller {
   const LOG_KEY_CONTROLLER_IN = "controllerInput";
   const LOG_KEY_CONTROLLER_OUT = "controllerOutput";
 
@@ -40,6 +41,7 @@ class CarrierScacController {
    * @param LoggerContract $logger
    */
   public function __construct(ShipmentProviderService $shipmentProviderService, LoggerContract $logger) {
+    parent::__construct();
     $this->shipmentProviderService = $shipmentProviderService;
     $this->logger = $logger;
   }

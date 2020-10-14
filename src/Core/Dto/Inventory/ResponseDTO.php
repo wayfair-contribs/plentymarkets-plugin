@@ -164,7 +164,7 @@ class ResponseDTO
    *
    * @return void
    */
-  public function adoptArray(array $params): void
+  public function adoptArray(array $params)
   {
     $this->setId($params[self::KEY_ID] ?? null);
     $this->setHandle($params[self::KEY_HANDLE] ?? null);

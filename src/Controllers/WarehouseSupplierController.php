@@ -7,8 +7,9 @@ namespace Wayfair\Controllers;
 use Plenty\Plugin\Http\Request;
 use Wayfair\Repositories\WarehouseSupplierRepository;
 use Plenty\Exceptions\ValidationException;
+use Plenty\Plugin\Controller;
 
-class WarehouseSupplierController {
+class WarehouseSupplierController extends Controller {
 
   /**
    * @var WarehouseSupplierRepository
@@ -21,6 +22,7 @@ class WarehouseSupplierController {
    * @param WarehouseSupplierRepository $warehouseSupplierRepository
    */
   public function __construct(WarehouseSupplierRepository $warehouseSupplierRepository) {
+    parent::__construct();
     $this->warehouseSupplierRepository = $warehouseSupplierRepository;
   }
 

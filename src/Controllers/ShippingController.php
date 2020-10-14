@@ -33,6 +33,7 @@ class ShippingController extends Controller {
    * @param ShipmentRegisterService $shipmentRegisterService
    */
   public function __construct(ShipmentRegisterService $shipmentRegisterService, LoggerContract $loggerContract) {
+    parent::__construct();
     $this->shipmentRegisterService = $shipmentRegisterService;
     $this->loggerContract = $loggerContract;
   }

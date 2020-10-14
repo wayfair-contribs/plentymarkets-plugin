@@ -58,7 +58,7 @@ class OrderASNRepository extends Repository {
   /**
    * Create or update an ASN sending history record.
    *
-   * @param $data
+   * @param mixed $data
    *
    * @return OrderASN|null
    */
@@ -80,7 +80,7 @@ class OrderASNRepository extends Repository {
     }
     $orderId = $data['orderId'];
     $model = $this->findByOrderId($orderId);
-    if (empty($model)) {
+    if (!isset($model) || empty($model)) {
       /** @var OrderASN $model */
       $model = pluginApp(OrderASN::class);
       $model->orderId = $orderId;

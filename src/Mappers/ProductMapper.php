@@ -92,7 +92,7 @@ class ProductMapper
 
   /**
    * @param string $partNumber
-   * @param string @itemMappingMethod
+   * @param string $itemMappingMethod
    * @param string $poNumber
    *
    * @return int

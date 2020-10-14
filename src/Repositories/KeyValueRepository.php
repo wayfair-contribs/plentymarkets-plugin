@@ -157,7 +157,7 @@ class KeyValueRepository extends Repository
 
     try {
       /**
-       * @var Database
+       * @var DataBase
        */
       $database  = pluginApp(DataBase::class);
       $allModels = $database->query(KeyValue::class)->get();

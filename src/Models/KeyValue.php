@@ -67,7 +67,7 @@ class KeyValue extends Model
    *
    * @return void
    */
-  public function adoptArray(array $params): void
+  public function adoptArray(array $params)
   {
     $this->key = $params[self::FIELD_NAME_KEY] ?? '';
     $this->key = $params[self::FIELD_NAME_VALUE] ?? null;

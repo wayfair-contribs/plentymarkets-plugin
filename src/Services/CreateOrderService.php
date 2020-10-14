@@ -354,7 +354,7 @@ class CreateOrderService
    * if not already existing.
    * @param ResponseDTO $dto
    *
-   * @return void
+   * @return bool
    */
   private function createPendingOrder(ResponseDTO $dto): bool
   {

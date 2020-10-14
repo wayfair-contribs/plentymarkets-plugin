@@ -209,7 +209,7 @@ class RequestDTO
    *
    * @return void
    */
-  public function adoptArray(array $params): void
+  public function adoptArray(array $params)
   {
     $this->setSupplierId($params[self::KEY_SUPPLIER_ID] ?? null);
     $this->setSupplierPartNumber($params[self::KEY_SUPPLIER_PART_NUMBER] ?? null);

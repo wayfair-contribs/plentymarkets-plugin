@@ -101,9 +101,7 @@ class InventoryStatusService
    * Set the global status for full or partial inventory syncing,
 
    * returning the old state.
-   * @param bool $full
    * @param string $statusValue
-   * @param string $timestamp
    * @return string
    */
   private function setServiceStatusValue($statusValue): string
@@ -236,7 +234,7 @@ class InventoryStatusService
    * Set the global timestamp for an attempt to sync,
    * and return it.
    *
-   * @param $full
+   * @param bool $full
    *
    * @return string
    */
@@ -255,10 +253,9 @@ class InventoryStatusService
 
   /**
    * Set the status back to idle state
-   * @param bool $full
    * @return void
    */
-  public function markInventoryIdle(): void
+  public function markInventoryIdle()
   {
     $this->setServiceStatusValue(self::STATE_IDLE);
   }
@@ -270,7 +267,7 @@ class InventoryStatusService
    * @param string $startTime
    * @return void
    */
-  public function markInventoryComplete(bool $full, string $startTime, int $amount): void
+  public function markInventoryComplete(bool $full, string $startTime, int $amount)
   {
 
     $keyCompletionStart = $full ? self::DB_KEY_INVENTORY_LAST_COMPLETION_START_FULL : self::DB_KEY_INVENTORY_LAST_COMPLETION_START_PARTIAL;
@@ -301,7 +298,7 @@ class InventoryStatusService
    * @param boolean $manual
    * @return void
    */
-  public function clearState(bool $manual = false): void
+  public function clearState(bool $manual = false)
   {
     foreach (self::DB_KEYS as $key) {
       // using 'putOrReplace' with null is a safe delete operation.
