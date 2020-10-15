@@ -188,15 +188,17 @@ If Wayfair's shipping services are to be used, the Wayfair plugin's ASN settings
 ## 8. First inventory synchronization
 Once everything has been set up, then it is time for the Wayfair plugin to start listing items for sale on Wayfair.
 
-### Version 1.1.4 and later
+### Version 1.1.5 and later
 
 As of version 1.1.4, the Wayfair plugin's Inventory Synchronization process is fully automated and cannot be started by the Plentymarkets user. After completing all earlier steps in this guide, it is important to ensure that the Wayfair plugin is able to perform Inventory Synchronization:
 
-1. Locate [the `Inventory` page](settings_guide.md#inventory-page) in the [Wayfair Market Settings](settings_guide.md) **-- If the `Inventory` page does not exist, do not continue - you must follow [the steps outlined for early versions of the plugin](#version-1.1.3-and-earlier)**.
+1. Navigate to [the `Inventory` page](settings_guide.md#inventory-page) in the [Wayfair Market Settings](settings_guide.md) **-- If the `Inventory` page does not exist, do not continue - you must follow [the steps outlined for early versions of the plugin](#version-1.1.3-and-earlier)**.
 
-2. If the synchronization has yet to initialize or is reported as having issues, wait up to 30 minutes then check the page again.
+2. The page may initially display errors, if inventory synchronizations have already been attempted. Wait a few minutes while the system initializes.
 
-3. If issues are still reported 30 minutes after plugin setup, attempt to resolve them by reviewing [the instructions for the `Inventory` page](settings_guide.md#inventory-page), viewing [the Plentymarkets logs](troubleshooting.md#plentymarkets-logs) and using [the troubleshooting guide](troubleshooting.md).
+3. Review the information displayed on the page.
+
+4. If issues are reported for the full inventory synchronization, attempt to resolve them by reviewing [the instructions for the `Inventory` page](settings_guide.md#inventory-page), viewing [the Plentymarkets logs](troubleshooting.md#plentymarkets-logs) and using [the troubleshooting guide](troubleshooting.md).
 
 
 ### Version 1.1.3 and earlier
