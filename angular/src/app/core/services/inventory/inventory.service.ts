@@ -5,7 +5,7 @@ import {
   TerraLoadingSpinnerService,
 } from "@plentymarkets/terra-components";
 import { UrlHelper } from "../../helpers/url-helper";
-import { Observable } from "rxjs";
+import { Observable, Subscription } from "rxjs";
 import { InventoryStatusInterface } from "./data/inventoryStatus.interface";
 import { InventorySyncRequestInterface } from "./data/inventorySyncRequest.interface";
 import { InventorySyncResponseInterface } from "./data/inventorySyncResponse.interface";
@@ -19,14 +19,21 @@ export class InventoryService extends TerraBaseService {
     );
   }
 
+  private syncSubscription: Subscription;
+
   public getState(): Observable<InventoryStatusInterface> {
     this.setAuthorization();
     return this.mapRequest(this.http.get(this.url));
   }
 
   public sync(request: InventorySyncRequestInterface): void {
+    if (this.syncSubscription && ! this.syncSubscription.closed)
+    {
+      this.syncSubscription.unsubscribe();
+    }
+
     this.setAuthorization();
-    this.mapRequest(this.http.post(this.url, { data: request })).subscribe();
+    this.syncSubscription = this.mapRequest(this.http.post(this.url, { data: request })).subscribe();
   }
 
   /**
