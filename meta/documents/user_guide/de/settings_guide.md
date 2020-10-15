@@ -138,7 +138,7 @@ Durch Aktivieren von `Vollständigen Bestand an Wayfair senden?` Kann Wayfair al
 
 
 ## Die Seite Inventar
-**(Seit Version 1.1.4)**
+**(Seit Version 1.1.5)**
 
 Die Seite `Inventar` enthält keine zu konfigurierenden Einstellungen.
 Sie wird verwendet, um den Status der Synchronisierung des Plentymarkets-Inventars mit Wayfair zu überprüfen
@@ -177,7 +177,7 @@ Wenn dies möglich ist, enthält die Seite "Inventar" Details zur Unterstützung
 
 
 ## Die Seite Voll Inventar
-**(In 1.1.4 entfernt)**
+**(In 1.1.5 entfernt)**
 
 Die Seite `Voll Inventar` wurde durch die Seite [`Inventar`](#die-seite-inventar) ersetzt. **Wenn Sie eine Version des Wayfair Plugin verwenden, die die Seite `Voll Inventar` enthält, empfiehlt Wayfair, das Plugin so bald wie möglich zu aktualisieren.**
 
