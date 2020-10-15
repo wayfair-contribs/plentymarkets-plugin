@@ -24,11 +24,9 @@ export class InventoryService extends TerraBaseService {
     return this.mapRequest(this.http.get(this.url));
   }
 
-  public sync(
-    request: InventorySyncRequestInterface
-  ): Observable<InventorySyncResponseInterface> {
+  public sync(request: InventorySyncRequestInterface): void {
     this.setAuthorization();
-    return this.mapRequest(this.http.post(this.url, { data: request }));
+    this.mapRequest(this.http.post(this.url, { data: request })).subscribe();
   }
 
   /**
@@ -117,7 +115,6 @@ export class InventoryService extends TerraBaseService {
    */
   public performFullSyncIfNeeded(statusObject: InventoryStatusInterface): void {
     if (InventoryService.needsFullSync(statusObject)) {
-      // avoid subscribing, as this could take a long time.
       this.sync({ full: true });
     }
   }
