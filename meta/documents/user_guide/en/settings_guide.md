@@ -132,7 +132,7 @@ When `Send all inventory items to Wayfair?` is disabled, selling an Item on Wayf
 Enabling `Send all inventory items to Wayfair?` will allow Wayfair to list any item that is determined to be currently in stock, including those Item Variations for which "Wayfair" is **not** present in the `Markets` list.
 
 ## Inventory page
-**(Since 1.1.4)**
+**(Since 1.1.5)**
 
 The 'Inventory' page does not contain any settings to configure.
 It is used for checking the status of syncing the Plentymarkets inventory with Wayfair.
@@ -168,7 +168,7 @@ When it is possible to do so, the `Inventory` page will provide details to suppo
 
 
 ## Full Inventory page
-**(Removed in 1.1.4)**
+**(Removed in 1.1.5)**
 
 The `Full Inventory` page has been replaced by the [`Inventory`](#inventory-page) page. **If you are using a version of the Wayfair Plugin that contains the `Full Inventory` page, Wayfair recommends that you upgrade the plugin as soon as possible.**
 
