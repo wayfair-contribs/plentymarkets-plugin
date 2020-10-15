@@ -19,7 +19,7 @@ export class InventoryService extends TerraBaseService {
     );
   }
 
-  private syncSubscription: Subscription;
+  private static syncSubscription: Subscription;
 
   public getState(): Observable<InventoryStatusInterface> {
     this.setAuthorization();
@@ -27,13 +27,13 @@ export class InventoryService extends TerraBaseService {
   }
 
   public sync(request: InventorySyncRequestInterface): void {
-    if (this.syncSubscription && ! this.syncSubscription.closed)
+    if (InventoryService.syncSubscription && ! InventoryService.syncSubscription.closed)
     {
-      this.syncSubscription.unsubscribe();
+      InventoryService.syncSubscription.unsubscribe();
     }
 
     this.setAuthorization();
-    this.syncSubscription = this.mapRequest(this.http.post(this.url, { data: request })).subscribe();
+    InventoryService.syncSubscription = this.mapRequest(this.http.post(this.url, { data: request })).subscribe();
   }
 
   /**
