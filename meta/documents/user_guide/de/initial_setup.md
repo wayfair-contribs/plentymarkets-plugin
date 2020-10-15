@@ -185,22 +185,24 @@ Wenn die Versanddienste von Wayfair verwendet werden sollen, sollten die ASN-Ein
 ## 8. Ersten Inventar Synchronisation
 Sobald alles eingerichtet ist, ist es Zeit für das Wayfair Plugin, Artikel zum Verkauf auf Wayfair aufzulisten.
 
-### Version 1.1.4 und höher
+### Version 1.1.5 und höher
 
-Ab Version 1.1.4, ist der Inventarsynchronisierungsprozess des Wayfair-Plugins vollständig automatisiert und kann vom Plentymarkets-Benutzer nicht gestartet werden. Nachdem Sie alle früheren Schritte in diesem Handbuch ausgeführt haben, müssen Sie sicherstellen, dass das Wayfair-Plugin aktiv Inventarsynchronisierungen durchführt:
+Ab Version 1.1.5, ist der Inventarsynchronisierungsprozess des Wayfair-Plugins vollständig automatisiert und kann vom Plentymarkets-Benutzer nicht gestartet werden. Nachdem Sie alle früheren Schritte in diesem Handbuch ausgeführt haben, müssen Sie sicherstellen, dass das Wayfair-Plugin aktiv Inventarsynchronisierungen durchführt:
 
 1. Suchen Sie [die Seite `Inventar`](settings_guide.md#die-seite-inventar) in den [Einstellungen für Wayfair Markt](settings_guide.md) **- Wenn die Seite `Vollständiges Inventar` nicht vorhanden ist, fahren Sie nicht fort - Sie müssen [die beschriebenen Schritte für frühere Versionen des Plugins](#version-1.1.3-und-niedriger)**.
 
-2. Wenn die Inventar Synchronisierung noch nicht initialisiert wurde oder als problematisch gemeldet wird, warten Sie bitte 30 Minuten und überprüfen Sie die Seite erneut.
+2. Auf der Seite werden möglicherweise zunächst Fehler angezeigt, wenn bereits Inventarsynchronisierungen versucht wurden. Warten Sie einige Minuten, während das System initialisiert wird.
 
-3. Wenn die Seite 30 Minuten nach dem Einrichten des Plugins Probleme mit der Inventarsynchronisierung meldet, versuchen Sie, diese zu beheben, indem Sie[die Anweisungen für die Seite `Inventar`](settings_guide.md#die-seite-inventar) überprüfen und [die Plentymarkets Logs](troubleshooting.md#plentymarkets-logs) anzeigen und mithilfe von [der Anleitung zur Fehlerbehebung](troubleshooting.md).
+3. Überprüfen Sie die auf der Seite angezeigten Informationen.
+
+4. Wenn die Seite nach dem Probleme mit der Inventarsynchronisierung aller Produkte meldet, versuchen Sie, diese zu beheben, indem Sie[die Anweisungen für die Seite `Inventar`](settings_guide.md#die-seite-inventar) überprüfen und [die Plentymarkets Logs](troubleshooting.md#plentymarkets-logs) anzeigen und mithilfe von [der Anleitung zur Fehlerbehebung](troubleshooting.md).
 
 
 ### Version 1.1.3 und niedriger
 
-Frühere Versionen **(vor 1.1.4)** des Wayfair Plugin können die erste Inventarsynchronisierung nicht automatisch durchführen und erfordern manuelle Eingriffe:
+Frühere Versionen **(vor 1.1.5)** des Wayfair Plugin können die erste Inventarsynchronisierung nicht automatisch durchführen und erfordern manuelle Eingriffe:
 
-1. Suchen Sie die Seite `Voll Inventar` in den [Einstellungen für Wayfair Markt](settings_guide.md). **- Wenn die Seite `Vollständiges Inventar` nicht vorhanden ist, fahren Sie nicht fort - zeigen Sie [die Informationen für moderne Versionen des Plugins](#version-1.1.4-und-höher) an.**
+1. Suchen Sie die Seite `Voll Inventar` in den [Einstellungen für Wayfair Markt](settings_guide.md). **- Wenn die Seite `Vollständiges Inventar` nicht vorhanden ist, fahren Sie nicht fort - zeigen Sie [die Informationen für moderne Versionen des Plugins](#version-1.1.5-und-höher) an.**
 
 2. Klicken Sie auf die Schaltfläche `Jetzt synchronisieren`.
 
