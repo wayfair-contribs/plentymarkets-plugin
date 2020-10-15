@@ -189,7 +189,7 @@ Sobald alles eingerichtet ist, ist es Zeit für das Wayfair Plugin, Artikel zum 
 
 Ab Version 1.1.5, ist der Inventarsynchronisierungsprozess des Wayfair-Plugins vollständig automatisiert und kann vom Plentymarkets-Benutzer nicht gestartet werden. Nachdem Sie alle früheren Schritte in diesem Handbuch ausgeführt haben, müssen Sie sicherstellen, dass das Wayfair-Plugin aktiv Inventarsynchronisierungen durchführt:
 
-1. Suchen Sie [die Seite `Inventar`](settings_guide.md#die-seite-inventar) in den [Einstellungen für Wayfair Markt](settings_guide.md) **- Wenn die Seite `Vollständiges Inventar` nicht vorhanden ist, fahren Sie nicht fort - Sie müssen [die beschriebenen Schritte für frühere Versionen des Plugins](#version-1.1.3-und-niedriger)**.
+1. Suchen Sie [die Seite `Inventar`](settings_guide.md#die-seite-inventar) in den [Einstellungen für Wayfair Markt](settings_guide.md) **- Wenn die Seite `Vollständiges Inventar` nicht vorhanden ist, fahren Sie nicht fort - Sie müssen [die beschriebenen Schritte für frühere Versionen des Plugins](#version-113-und-niedriger)**.
 
 2. Auf der Seite werden möglicherweise zunächst Fehler angezeigt, wenn bereits Inventarsynchronisierungen versucht wurden. Warten Sie einige Minuten, während das System initialisiert wird.
 
@@ -202,7 +202,7 @@ Ab Version 1.1.5, ist der Inventarsynchronisierungsprozess des Wayfair-Plugins v
 
 Frühere Versionen **(vor 1.1.5)** des Wayfair Plugin können die erste Inventarsynchronisierung nicht automatisch durchführen und erfordern manuelle Eingriffe:
 
-1. Suchen Sie die Seite `Voll Inventar` in den [Einstellungen für Wayfair Markt](settings_guide.md). **- Wenn die Seite `Vollständiges Inventar` nicht vorhanden ist, fahren Sie nicht fort - zeigen Sie [die Informationen für moderne Versionen des Plugins](#version-1.1.5-und-höher) an.**
+1. Suchen Sie die Seite `Voll Inventar` in den [Einstellungen für Wayfair Markt](settings_guide.md). **- Wenn die Seite `Vollständiges Inventar` nicht vorhanden ist, fahren Sie nicht fort - zeigen Sie [die Informationen für moderne Versionen des Plugins](#version-115-und-höher) an.**
 
 2. Klicken Sie auf die Schaltfläche `Jetzt synchronisieren`.
 
