@@ -6,23 +6,21 @@
 
 namespace Wayfair\Cron;
 
+use Exception;
 use Plenty\Modules\Cron\Contracts\CronHandler as Cron;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Helpers\TranslationHelper;
-use Wayfair\Services\InventoryStatusService;
 use Wayfair\Services\InventoryUpdateService;
 
 class InventorySyncCron extends Cron
 {
-  // amount of time between full syncs.
-  // slightly less than one day.
-  const MAX_SEC_BETWEEN_FULL_SYNCS = 86000;
+  const LOG_KEY_INVENTORY_ERRORS = 'inventoryErrors';
+
+  /** @var bool */
+  private $fullInventory;
 
   /** @var InventoryUpdateService */
   private $inventoryUpdateService;
-
-  /** @var InventoryStatusService */
-  private $inventoryStatusService;
 
   /** @var LoggerContract */
   private $loggerContract;
@@ -32,12 +30,12 @@ class InventorySyncCron extends Cron
    *
    */
   public function __construct(
+    bool $fullInventory = false,
     InventoryUpdateservice $inventoryUpdateService,
-    InventoryStatusService $inventoryStatusService,
     LoggerContract $loggerContract
   ) {
+    $this->fullInventory = $fullInventory;
     $this->inventoryUpdateService = $inventoryUpdateService;
-    $this->inventoryStatusService = $inventoryStatusService;
     $this->loggerContract = $loggerContract;
   }
 
@@ -49,17 +47,25 @@ class InventorySyncCron extends Cron
   public function handle()
   {
     $this->loggerContract->debug(TranslationHelper::getLoggerKey('cronStartedMessage'), [
+      'additionalInfo' => [
+        'full' => $this->fullInventory
+      ],
       'method' => __METHOD__
     ]);
-    $syncResult = [];
-    $fullInventory = false;
+
+    $syncResult = null;
     try {
-      $fullInventory = $this->isFullDue();
-      $syncResult = $this->inventoryUpdateService->sync($fullInventory);
+      $syncResult = $this->inventoryUpdateService->sync($this->fullInventory);
+    } catch (Exception $e) {
+      // log at a high level because this is unexpected
+      $this->loggerContract->error(TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_ERRORS), [
+        'additionalInfo' => self::getInfoMapForException($e, $this->fullInventory),
+        'method' => __METHOD__
+      ]);
     } finally {
       $this->loggerContract->debug(TranslationHelper::getLoggerKey('cronFinishedMessage'), [
         'additionalInfo' => [
-          'full' => $fullInventory,
+          'full' => $this->fullInventory,
           'result' => $syncResult
         ],
         'method' => __METHOD__
@@ -67,21 +73,13 @@ class InventorySyncCron extends Cron
     }
   }
 
-  /**
-   * Check if the inventory sync should happen for all inventory, or just recent inventory changes.
-   *
-   * @return bool
-   */
-  private function isFullDue(): bool
+  private static function getInfoMapForException(\Exception $e, $fullInventory)
   {
-    $lastFullInventorySuccessStart = $this->inventoryStatusService->getLastCompletionStart(true);
-
-    if (!isset($lastFullInventorySuccessStart) || empty($lastFullInventorySuccessStart)) {
-      return true;
-    }
-
-    $numericStartTime = strtotime($lastFullInventorySuccessStart);
-
-    return ($numericStartTime <= 0 || time() >= $numericStartTime + self::MAX_SEC_BETWEEN_FULL_SYNCS);
+    return [
+      'full' => (string) $fullInventory,
+      'exceptionType' => get_class($e),
+      'errorMessage' => $e->getMessage(),
+      'stackTrace' => $e->getTraceAsString()
+    ];
   }
 }

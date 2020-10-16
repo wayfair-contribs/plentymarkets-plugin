@@ -8,12 +8,12 @@ function getL10nConfig(): L10nConfig {
 
   // Plentymarkets defaults to German
   let defaultLang: string = langDE;
-  let knownLangs: string[] = [langDE, langEN];
+  let knownLangs: Array<string> = [langDE, langEN];
 
   let langInLocalStorage: string = localStorage.getItem("plentymarkets_lang_");
   let resolvedLang: string = langInLocalStorage;
 
-  if (resolvedLang == null) {
+  if (resolvedLang === null) {
     // ask browser for perferred language
     resolvedLang = navigator.language.slice(0, 2).toLocaleLowerCase();
 

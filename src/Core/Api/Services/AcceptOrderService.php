@@ -7,41 +7,11 @@
 namespace Wayfair\Core\Api\Services;
 
 use Wayfair\Core\Api\APIService;
-use Wayfair\Core\Contracts\AuthContract;
-use Wayfair\Core\Contracts\ClientInterfaceContract;
-use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Exceptions\GraphQLQueryException;
-use Wayfair\Helpers\ConfigHelper;
 use Wayfair\Helpers\TranslationHelper;
-use Wayfair\Repositories\PendingOrdersRepository;
 
 class AcceptOrderService extends APIService
 {
-
-  /**
-   * @var PendingOrdersRepository
-   */
-  private $pendingOrdersRepository;
-
-  /**
-   * FetchOrderService constructor.
-   *
-   * @param ClientInterfaceContract $clientInterfaceContract
-   * @param AuthContract $authContract
-   * @param ConfigHelper $configHelper
-   * @param PendingOrdersRepository $pendingOrdersRepository
-   * @param LoggerContract $loggerContract
-   */
-  public function __construct(
-    ClientInterfaceContract $clientInterfaceContract,
-    AuthContract $authContract,
-    ConfigHelper $configHelper,
-    PendingOrdersRepository $pendingOrdersRepository,
-    LoggerContract $loggerContract
-  ) {
-    parent::__construct($clientInterfaceContract, $authContract, $configHelper, $loggerContract);
-    $this->pendingOrdersRepository = $pendingOrdersRepository;
-  }
 
   /**
    * @param string $poNumber

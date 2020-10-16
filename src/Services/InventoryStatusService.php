@@ -19,6 +19,10 @@ class InventoryStatusService
   const OVERDUE_TIME_FULL = 90000;
   const OVERDUE_TIME_PARTIAL = 1800;
 
+  // TODO: make these user-configurable in a future update
+  const MAX_INVENTORY_RUN_TIME_FULL = 21600;
+  const MAX_INVENTORY_RUN_TIME_PARTIAL = 3600;
+
   const LOG_KEY_STATE_CHANGE = 'inventoryStateChange';
   const LOG_KEY_STATE_CHECK = 'inventoryStateCheck';
   const LOG_KEY_STATE_CLEAR = 'inventoryStateClear';
@@ -97,9 +101,7 @@ class InventoryStatusService
    * Set the global status for full or partial inventory syncing,
 
    * returning the old state.
-   * @param bool $full
    * @param string $statusValue
-   * @param string $timestamp
    * @return string
    */
   private function setServiceStatusValue($statusValue): string
@@ -157,7 +159,7 @@ class InventoryStatusService
    *
    * @return string
    */
-  private function getServiceStatusValue(): string
+  public function getServiceStatusValue(): string
   {
     $state = $this->keyValueRepository->get(self::DB_KEY_INVENTORY_STATUS);
 
@@ -169,23 +171,13 @@ class InventoryStatusService
   }
 
   /**
-   * Check if an Inventory sync is running
-   *
-   * @return boolean
-   */
-  public function isInventoryRunning(): bool
-  {
-    return self::STATE_IDLE !== $this->getServiceStatusValue();
-  }
-
-  /**
    * Get the timestamp for last successful sync
    *
    * @param bool $full
    *
    * @return string
    */
-  public function getLastCompletionEnd(bool $full): string
+  public function getLastCompletionEnd(bool $full = false): string
   {
     $key = $full ? self::DB_KEY_INVENTORY_LAST_COMPLETION_END_FULL : self::DB_KEY_INVENTORY_LAST_COMPLETION_END_PARTIAL;
 
@@ -242,7 +234,7 @@ class InventoryStatusService
    * Set the global timestamp for an attempt to sync,
    * and return it.
    *
-   * @param $full
+   * @param bool $full
    *
    * @return string
    */
@@ -261,10 +253,9 @@ class InventoryStatusService
 
   /**
    * Set the status back to idle state
-   * @param bool $full
    * @return void
    */
-  public function markInventoryIdle(): void
+  public function markInventoryIdle()
   {
     $this->setServiceStatusValue(self::STATE_IDLE);
   }
@@ -276,7 +267,7 @@ class InventoryStatusService
    * @param string $startTime
    * @return void
    */
-  public function markInventoryComplete(bool $full, string $startTime, int $amount): void
+  public function markInventoryComplete(bool $full, string $startTime, int $amount)
   {
 
     $keyCompletionStart = $full ? self::DB_KEY_INVENTORY_LAST_COMPLETION_START_FULL : self::DB_KEY_INVENTORY_LAST_COMPLETION_START_PARTIAL;
@@ -307,7 +298,7 @@ class InventoryStatusService
    * @param boolean $manual
    * @return void
    */
-  public function clearState(bool $manual = false): void
+  public function clearState(bool $manual = false)
   {
     foreach (self::DB_KEYS as $key) {
       // using 'putOrReplace' with null is a safe delete operation.
@@ -323,12 +314,18 @@ class InventoryStatusService
   /**
    * Get the timestamp of the sync that was started most recently
    *
-   * @return string
+   * @return string|null
    */
-  public function getStartOfMostRecentAttempt(): string
+  public function getStartOfMostRecentAttempt(bool $fullOnly = false)
   {
-    $mostRecentPartial = $this->keyValueRepository->get(self::DB_KEY_INVENTORY_LAST_ATTEMPT_PARTIAL);
+
     $mostRecentFull = $this->keyValueRepository->get(self::DB_KEY_INVENTORY_LAST_ATTEMPT_FULL);
+
+    if ($fullOnly) {
+      return $mostRecentFull;
+    }
+
+    $mostRecentPartial = $this->keyValueRepository->get(self::DB_KEY_INVENTORY_LAST_ATTEMPT_PARTIAL);
 
     if (!isset($mostRecentPartial) || empty($mostRecentPartial)) {
       return $mostRecentFull;
@@ -403,10 +400,9 @@ class InventoryStatusService
       return $timeSinceLastGoodFullStart < 0 || $timeSinceLastGoodFullStart > self::OVERDUE_TIME_FULL;
     }
 
-    if ($timeSinceLastGoodFullStart < self::OVERDUE_TIME_PARTIAL)
-    {
-      // partial sync doesn't need to happen if a full sync did not happen yet,
-      // or if a full sync happened recently.
+    if ($timeSinceLastGoodFullStart < self::OVERDUE_TIME_PARTIAL) {
+      // partial sync should not happen if a full sync did not happen yet,
+      // or if a full sync just happened.
       return false;
     }
 
@@ -444,5 +440,21 @@ class InventoryStatusService
     }
 
     return false;
+  }
+
+  public function hasGoneOverTimeLimit(): bool
+  {
+    $curStatus = $this->getServiceStatusValue();
+
+    if (!isset($curStatus) || empty($curStatus) || self::STATE_IDLE == $curStatus)
+    {
+      return false;
+    }
+
+    $maxTime = self::FULL == $curStatus ? self::MAX_INVENTORY_RUN_TIME_FULL : self::MAX_INVENTORY_RUN_TIME_PARTIAL;
+    $startTime = $this->getStartOfMostRecentAttempt();
+    $elapsedTime = time() - $startTime;
+
+    return $elapsedTime >= $maxTime;
   }
 }

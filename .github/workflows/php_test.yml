@@ -34,5 +34,7 @@ jobs:
 
       - name: Run test suite
         run: |
-          sudo chmod +x ./run_tests
-          ./run_tests test
+          sudo chmod -R 755 .
+          ./run_tests test > test_results.txt
+          cat ./test_results.txt
+          if ! grep -q OK "test_results.txt"; then exit 1; fi

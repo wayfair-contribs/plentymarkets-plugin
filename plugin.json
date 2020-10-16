@@ -16,7 +16,7 @@
             "de": "Wayfair plugin fur Plentymarkets Kunden"
       },
       "serviceProvider": "Wayfair\\Providers\\WayfairServiceProvider",
-      "isClosedSource": true,
+      "isClosedSource": false,
       "dependencies": {
             "guzzlehttp/guzzle": "6.3.*",
             "psr/http-message": "1.0.*"

@@ -23,6 +23,7 @@ use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Contracts\RegisterPurchaseOrderContract;
 use Wayfair\Core\Contracts\StorageInterfaceContract;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
+use Wayfair\Cron\FullInventorySyncCron;
 use Wayfair\Cron\InventorySyncCron;
 use Wayfair\Cron\OrderAcceptCron;
 use Wayfair\Helpers\ConfigHelper;
@@ -75,6 +76,7 @@ class WayfairServiceProvider extends ServiceProvider
     EventProceduresService $eventProceduresService
   ) {
     // register crons
+    $cronContainer->add(CronContainer::DAILY, FullInventorySyncCron::class);
     $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, InventorySyncCron::class);
     $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, OrderImportCron::class);
     $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, OrderAcceptCron::class);
