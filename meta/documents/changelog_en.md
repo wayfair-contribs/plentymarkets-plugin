@@ -1,6 +1,6 @@
 ﻿# Release notes for Wayfair
 
-## v1.1.5 (2020-10)
+## v1.1.5 (2020-10-20)
 - see https://github.com/wayfair-contribs/plentymarkets-plugin/releases/tag/v1.1.5
 
 ## v1.1.3 (2020-08-04)
