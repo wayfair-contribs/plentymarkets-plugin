@@ -187,11 +187,13 @@ Sobald alles eingerichtet ist, ist es Zeit für das Wayfair Plugin, Artikel zum 
 
 ### Version 1.1.5 und höher
 
-Ab Version 1.1.5, ist der Inventarsynchronisierungsprozess des Wayfair-Plugins vollständig automatisiert und kann vom Plentymarkets-Benutzer nicht gestartet werden. Nachdem Sie alle früheren Schritte in diesem Handbuch ausgeführt haben, müssen Sie sicherstellen, dass das Wayfair-Plugin aktiv Inventarsynchronisierungen durchführt:
-
 1. Suchen Sie [die Seite `Inventar`](settings_guide.md#die-seite-inventar) in den [Einstellungen für Wayfair Markt](settings_guide.md) **- Wenn die Seite `Vollständiges Inventar` nicht vorhanden ist, fahren Sie nicht fort - Sie müssen [die beschriebenen Schritte für frühere Versionen des Plugins](#version-113-und-niedriger)**.
 
-2. Auf der Seite werden möglicherweise zunächst Fehler angezeigt, wenn bereits Inventarsynchronisierungen versucht wurden. Warten Sie einige Minuten, während das System initialisiert wird.
+    * Auf der Seite werden möglicherweise zunächst Fehler angezeigt, wenn bereits Inventarsynchronisierungen versucht wurden.
+
+    * Der Besuch der Seite kann dazu führen, dass eine neue Synchronisierung gestartet wird.
+
+2. Warten Sie eins Minuten, während das System aktualisiert wird.
 
 3. Überprüfen Sie die auf der Seite angezeigten Informationen.
 
@@ -199,8 +201,6 @@ Ab Version 1.1.5, ist der Inventarsynchronisierungsprozess des Wayfair-Plugins v
 
 
 ### Version 1.1.3 und niedriger
-
-Frühere Versionen **(vor 1.1.5)** des Wayfair Plugin können die erste Inventarsynchronisierung nicht automatisch durchführen und erfordern manuelle Eingriffe:
 
 1. Suchen Sie die Seite `Voll Inventar` in den [Einstellungen für Wayfair Markt](settings_guide.md). **- Wenn die Seite `Vollständiges Inventar` nicht vorhanden ist, fahren Sie nicht fort - zeigen Sie [die Informationen für moderne Versionen des Plugins](#version-115-und-höher) an.**
 
