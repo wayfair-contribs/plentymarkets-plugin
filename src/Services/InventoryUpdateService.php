@@ -439,8 +439,8 @@ class InventoryUpdateService
     $info = [
       'full' => (string) $fullInventory,
       'exceptionType' => get_class($exception),
-      'errorMessage' => $e->getMessage(),
-      'stackTrace' => $e->getTraceAsString()
+      'errorMessage' => $exception->getMessage(),
+      'stackTrace' => $exception->getTraceAsString()
     ];
 
     $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_FAILED), [
