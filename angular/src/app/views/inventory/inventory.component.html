@@ -1,56 +1,28 @@
 <div class="center-block">
   <div class="{{ mainState.style }} text-center" name="mainStateData">
     <div class="form-group-row" name="mainStateIcon">
-      <svg
-        width="6vw"
-        height="6vw"
-        viewBox="0 0 16 16"
-        attr.class="{{ mainState.icon.iconClass }}"
-        fill="currentColor"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          *ngFor="let drawing of mainState.icon.iconDrawings"
-          fill-rule="evenodd"
-          attr.d="{{ drawing }}"
-        ></path>
+      <svg width="6vw" height="6vw" viewBox="0 0 16 16" attr.class="{{ mainState.icon.iconClass }}" fill="currentColor"
+        xmlns="http://www.w3.org/2000/svg">
+        <path *ngFor="let drawing of mainState.icon.iconDrawings" fill-rule="evenodd" attr.d="{{ drawing }}"></path>
       </svg>
     </div>
     <div class="form-group-row" name="mainStateMessage">
-      <p style="font-size: 2vw; white-space: pre-line">
-        {{ mainState.message }}
-      </p>
+      <p style="font-size: 2vw; white-space: pre-line">{{ mainState.message }}</p>
     </div>
   </div>
 
   <div *ngIf="table" name="resultTable">
     <div class="form-group row" *ngFor="let row of table">
-      <p
-        class="{{ row.style }} text-center"
-        style="white-space: pre-line"
-        name="rowData"
-      >
-        <svg
-          width="2vw"
-          height="2vw"
-          viewBox="0 0 16 16"
-          attr.class="{{ row.icon.iconClass }}"
-          fill="currentColor"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            *ngFor="let drawing of row.icon.iconDrawings"
-            fill-rule="evenodd"
-            attr.d="{{ drawing }}"
-          ></path>
+      <p class="{{ row.style }} text-center" style="white-space: pre-line" name="rowData">
+        <svg width="2vw" height="2vw" viewBox="0 0 16 16" attr.class="{{ row.icon.iconClass }}" fill="currentColor"
+          xmlns="http://www.w3.org/2000/svg">
+          <path *ngFor="let drawing of row.icon.iconDrawings" fill-rule="evenodd" attr.d="{{ drawing }}"></path>
         </svg>&nbsp;&nbsp;&nbsp;{{ row.message }}
       </p>
     </div>
   </div>
   <div class="form-group-row" name="fetchTime">
-    <p class="text-info text-center">
-      {{ "page_loaded" | translate: lang }} {{ "at" | translate: lang }}
-      {{ fetchTime }}
+    <p class="text-info text-center">{{ "page_loaded" | translate: lang }} {{ "at" | translate: lang }}{{ fetchTime }}
     </p>
   </div>
 </div>
