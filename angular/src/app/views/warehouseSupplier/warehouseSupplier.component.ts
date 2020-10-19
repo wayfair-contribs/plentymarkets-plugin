@@ -30,18 +30,18 @@ export class WarehouseSupplierComponent implements OnInit {
     this.loadFromBackend();
   }
 
-  public changeToFetchErrorStatus(): void {
+  public showFetchError(): void {
     this.status.type = "text-danger";
     this.status.value = this.translation.translate("error_fetch");
   }
 
-  public clearStatus(): void {
+  public clearMessage(): void {
     this.status.type = "";
     this.status.value = "";
   }
 
   public loadFromBackend(): void {
-    this.clearStatus();
+    this.clearMessage();
     this.warehouseService.fetch().subscribe(
       (data) => {
         this.warehouses = data;
@@ -49,7 +49,7 @@ export class WarehouseSupplierComponent implements OnInit {
       (err) => {
         this.status.type = "text-danger";
         this.status.value = this.translation.translate("error_fetch");
-        this.changeToFetchErrorStatus();
+        this.showFetchError();
       }
     );
 
@@ -58,13 +58,13 @@ export class WarehouseSupplierComponent implements OnInit {
         this.warehouseSuppliers = data;
       },
       (err) => {
-        this.changeToFetchErrorStatus();
+        this.showFetchError();
       }
     );
   }
 
   public saveMappings(): void {
-    this.clearStatus();
+    this.clearMessage();
     this.warehouseSuppliers.forEach((item) => {
       // Check if any value is empty.
       if (Object.values(item).some((itemValue) => !itemValue)) {
@@ -98,7 +98,7 @@ export class WarehouseSupplierComponent implements OnInit {
   }
 
   public addMapping(): void {
-    this.clearStatus();
+    this.clearMessage();
     this.warehouseSuppliers.push({
       supplierId: null,
       warehouseId: null,
@@ -106,7 +106,7 @@ export class WarehouseSupplierComponent implements OnInit {
   }
 
   public removeMapping(warehouseSupplier): void {
-    this.clearStatus();
+    this.clearMessage();
     let foundIndex = this.warehouseSuppliers.findIndex((elem, idx) => {
       return (
         elem.supplierId == warehouseSupplier.supplierId &&
