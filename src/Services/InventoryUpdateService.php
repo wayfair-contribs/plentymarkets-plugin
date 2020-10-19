@@ -12,6 +12,7 @@ use Wayfair\Core\Api\Services\InventoryService;
 use Wayfair\Core\Api\Services\LogSenderService;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\Inventory\RequestDTO;
+use Wayfair\Core\Exceptions\AuthException;
 use Wayfair\Core\Exceptions\InventoryException;
 use Wayfair\Core\Exceptions\InventorySyncInProgressException;
 use Wayfair\Core\Exceptions\InventorySyncInterruptedException;
@@ -93,6 +94,7 @@ class InventoryUpdateService
    *
    * @return InventoryUpdateResult
    * @throws InventoryException
+   * @throws AuthException
    */
   public function sync(bool $fullInventory): InventoryUpdateResult
   {
@@ -144,6 +146,9 @@ class InventoryUpdateService
         // check window now before changing service state to "started"
         $windowStart = $this->getStartOfDeltaSyncWindow();
       }
+    } catch (AuthException $ae) {
+      // re-throw Auth Exception so it can be dealt with
+      throw $ae;
     } catch (InventoryException $ie) {
       // re-throw exceptions that were purposely thrown
       throw $ie;
@@ -368,28 +373,27 @@ class InventoryUpdateService
 
       // re-throw so that caller can decide what to do about it
       throw $e;
-    } catch (\Exception $e) {
-
+    } catch (AuthException $e) {
       $this->statusService->markInventoryIdle();
-
-      $externalLogs->addInventoryLog('Inventory exception: ' . $e->getMessage(), 'inventoryFailed' . ($fullInventory ? 'Full' : ''), 1, 0, false, $e->getTraceAsString());
 
       // bulk update failed, so everything we were going to save should be considered failing.
       // (we want the failure amount to be more than zero in order for client to know this failed.)
       $totalDtosFailed += $amtOfDtosForPage;
 
-      $info = [
-        'full' => (string) $fullInventory,
-        'exceptionType' => get_class($e),
-        'errorMessage' => $e->getMessage(),
-        'stackTrace' => $e->getTraceAsString()
-      ];
+      $this->logFatalException($e, $fullInventory, $externalLogs);
 
-      $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_FAILED), [
-        'additionalInfo' => $info,
-        'method' => __METHOD__
-      ]);
+      // let caller report auth issue
+      throw $e;
+    } catch (\Exception $e) {
+      $this->statusService->markInventoryIdle();
 
+      // bulk update failed, so everything we were going to save should be considered failing.
+      // (we want the failure amount to be more than zero in order for client to know this failed.)
+      $totalDtosFailed += $amtOfDtosForPage;
+
+      $this->logFatalException($e, $fullInventory, $externalLogs);
+
+      // wrap in InventoryException so that it can be handled as such
       throw new InventoryException($e->getMessage() . ' at ' . $e->getTraceAsString());
     } finally {
 
@@ -424,6 +428,25 @@ class InventoryUpdateService
     }
 
     return $resultObject;
+  }
+
+  private function logFatalException(\Exception $exception, bool $fullInventory, ExternalLogs $externalLogs)
+  {
+    $this->statusService->markInventoryIdle();
+
+    $externalLogs->addInventoryLog('Inventory exception: ' . $exception->getMessage(), 'inventoryFailed' . ($fullInventory ? 'Full' : ''), 1, 0, false, $exception->getTraceAsString());
+
+    $info = [
+      'full' => (string) $fullInventory,
+      'exceptionType' => get_class($exception),
+      'errorMessage' => $e->getMessage(),
+      'stackTrace' => $e->getTraceAsString()
+    ];
+
+    $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_FAILED), [
+      'additionalInfo' => $info,
+      'method' => __METHOD__
+    ]);
   }
 
   /**
