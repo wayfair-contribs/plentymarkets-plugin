@@ -155,14 +155,12 @@ export class WarehouseSupplierComponent implements OnInit {
 
     let buffer = "";
     if (emptyFields) {
-      // FIXME: add this translation!
       buffer += this.translation.translate("empty_fields");
     }
     if (duplicateKeys) {
       if (buffer.length > 0) {
         buffer += " ";
       }
-      // FIXME: add this translation!
       buffer += this.translation.translate("duplicate_warehouses");
     }
 
