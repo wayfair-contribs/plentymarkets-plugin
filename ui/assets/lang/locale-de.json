@@ -65,5 +65,7 @@
   "helpMenuLabel": "Hilfe",
   "userGuideLabel": "Benutzerhandbuch",
   "userGuideUrl": "https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide_de.md",
-  "clickTheHelpButton": "Klicken Sie auf Hilfe, um weitere Informationen zu erhalten"
+  "clickTheHelpButton": "Klicken Sie auf Hilfe, um weitere Informationen zu erhalten",
+  "empty_fields": "Leere Felder sind NICHT erlaubt.",
+  "duplicate_warehouses": "Ein Plentymarkets Lager sollte höchstens einer Wayfair Lieferanten ID zugeordnet werden"
 }
