@@ -2,8 +2,8 @@ import { Component, OnInit } from "@angular/core";
 import { Language, TranslationService } from "angular-l10n";
 import { WarehouseSupplierInterface } from "../..//core/services/warehouseSupplier/data/warehouseSupplier.interface";
 import { WarehouseSupplierService } from "../../core/services/warehouseSupplier/warehouseSupplier.service";
+import { WarehouseInterface } from "../../core/services/warehouse/data/warehouse.interface";
 import { WarehouseService } from "../../core/services/warehouse/warehouse.service";
-import { fail } from "assert";
 
 @Component({
   selector: "warehouse-supplier",
@@ -18,7 +18,7 @@ export class WarehouseSupplierComponent implements OnInit {
 
   public removedWarehouseSuppliers: Array<WarehouseSupplierInterface> = [];
 
-  public warehouses = [];
+  public warehouses: Array<WarehouseInterface> = [];
 
   public status = { type: null, value: null };
 
@@ -155,12 +155,14 @@ export class WarehouseSupplierComponent implements OnInit {
 
     let buffer = "";
     if (emptyFields) {
+      // FIXME: add this translation!
       buffer += this.translation.translate("empty_fields");
     }
     if (duplicateKeys) {
       if (buffer.length > 0) {
         buffer += " ";
       }
+      // FIXME: add this translation!
       buffer += this.translation.translate("duplicate_warehouses");
     }
 
