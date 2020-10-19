@@ -10,6 +10,7 @@ use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Wayfair\Core\Contracts\LoggerContract;
+use Wayfair\Core\Exceptions\AuthException;
 use Wayfair\Services\InventoryStatusService;
 use Wayfair\Services\InventoryUpdateService;
 use Wayfair\Helpers\TranslationHelper;
@@ -107,9 +108,10 @@ class InventoryController extends Controller
       ]);
 
       return $response->json($payloadOut);
+    } catch (AuthException $ae) {
+      return $response->json(['error' => $ae->getMessage()], Response::HTTP_UNAUTHORIZED);
     } catch (\Exception $e) {
-
-      return $response->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
+      return $response->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
   }
 }
