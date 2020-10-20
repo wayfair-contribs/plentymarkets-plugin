@@ -36,7 +36,7 @@ export class WarehouseSupplierComponent implements OnInit {
   public ngOnInit(): void {
     this.loadEverythingFromBackend();
 
-    // repeatedly pull state from the DB on the prescribed interval
+    // repeatedly pull Warehouses list from Plenty on the prescribed interval
     setInterval(
       () => this.loadWarehousesFromBackend(),
       WarehouseSupplierComponent.REFRESH_WAREHOUSES_INTERVAL
