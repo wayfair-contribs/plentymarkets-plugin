@@ -37,7 +37,7 @@ export class WarehouseSupplierComponent implements OnInit {
     this.loadEverythingFromBackend(() => this.validateAndAlert());
 
     // repeatedly pull Warehouses list from Plenty on the prescribed interval.
-    // avoid
+    // avoid pulling the mappings, as it could add/remove rows while user is working
     setInterval(
       () => this.loadWarehousesFromBackend(() => this.validateAndAlert()),
       WarehouseSupplierComponent.REFRESH_WAREHOUSES_INTERVAL
