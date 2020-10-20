@@ -34,20 +34,22 @@ export class WarehouseSupplierComponent implements OnInit {
   ) {}
 
   public ngOnInit(): void {
-    this.loadEverythingFromBackend();
+    this.loadEverythingFromBackend(() => this.validateAndAlert);
 
-    // repeatedly pull Warehouses list from Plenty on the prescribed interval
+    // repeatedly pull Warehouses list from Plenty on the prescribed interval.
+    // avoid
     setInterval(
-      () =>
-        this.loadWarehousesFromBackend(() =>
-          this.validateMappings(null, (issues) => {
-            // notify user that changes in backend have invalidated the mappings
-            this.status.type = "text-danger";
-            this.status.value = issues;
-          })
-        ),
+      () => this.loadWarehousesFromBackend(() => this.validateAndAlert),
       WarehouseSupplierComponent.REFRESH_WAREHOUSES_INTERVAL
     );
+  }
+
+  private validateAndAlert(): void {
+    this.validateMappings(null, (issues) => {
+      // notify user that changes in backend have invalidated the mappings
+      this.status.type = "text-danger";
+      this.status.value = issues;
+    });
   }
 
   /**
@@ -260,7 +262,8 @@ export class WarehouseSupplierComponent implements OnInit {
       (issues) => {
         // display save failure with reason(s)
         this.status.type = "text-danger";
-        this.status.value = this.translation.translate("error_save") + ": " + issues;
+        this.status.value =
+          this.translation.translate("error_save") + ": " + issues;
       }
     );
   }
