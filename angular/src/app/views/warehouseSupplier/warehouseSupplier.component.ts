@@ -11,6 +11,9 @@ import { WarehouseService } from "../../core/services/warehouse/warehouse.servic
   styles: [require("./warehouseSupplier.component.scss")],
 })
 export class WarehouseSupplierComponent implements OnInit {
+
+  private static readonly TRANSLATION_KEY_WAREHOUSE_MISSING = "warehouse_missing";
+
   /**
    * The interval on which the UI will automatically refresh Warehouses
    */
@@ -38,7 +41,18 @@ export class WarehouseSupplierComponent implements OnInit {
 
     // repeatedly pull Warehouses list from Plenty on the prescribed interval
     setInterval(
-      () => this.loadWarehousesFromBackend(),
+      () =>
+        this.loadWarehousesFromBackend(() => {
+          let foundIndex = this.warehouseSuppliers.findIndex((elem) => {
+            return !this.isWarehouseIdValid(elem.warehouseId);
+          });
+          if (foundIndex >= 0)
+          {
+            // a mapping is now invalid - let the user know why it went blank
+            this.status.type = "text-danger";
+            this.status.value = this.translation.translate(WarehouseSupplierComponent.TRANSLATION_KEY_WAREHOUSE_MISSING);
+          }
+        }),
       WarehouseSupplierComponent.REFRESH_WAREHOUSES_INTERVAL
     );
   }
@@ -199,7 +213,7 @@ export class WarehouseSupplierComponent implements OnInit {
         if (buffer.length > 0) {
           buffer += ". ";
         }
-        buffer += this.translation.translate("warehouse_missing");
+        buffer += this.translation.translate(WarehouseSupplierComponent.TRANSLATION_KEY_WAREHOUSE_MISSING);
       }
 
       if (buffer) {
