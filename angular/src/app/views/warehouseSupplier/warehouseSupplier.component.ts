@@ -173,13 +173,14 @@ export class WarehouseSupplierComponent implements OnInit {
         emptyFields = emptyFields || !(item.warehouseId && item.supplierId);
 
         if (item.warehouseId) {
-          invalidWarehouse =
-            invalidWarehouse || !this.isWarehouseIdValid(item.warehouseId);
-
-          if (warehouseIdsSeen.includes(item.warehouseId)) {
-            duplicateKeys = true;
+          if (this.isWarehouseIdValid(item.warehouseId)) {
+            if (warehouseIdsSeen.includes(item.warehouseId)) {
+              duplicateKeys = true;
+            } else {
+              warehouseIdsSeen.push(item.warehouseId);
+            }
           } else {
-            warehouseIdsSeen.push(item.warehouseId);
+            invalidWarehouse = true;
           }
         }
       });

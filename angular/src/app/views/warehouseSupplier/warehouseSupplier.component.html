@@ -14,6 +14,7 @@
     <div class="form-row" *ngFor="let warehouseSupplier of warehouseSuppliers">
         <div class="form-group col-md-5 col-md-offset-1">
             <select class="form-control" (change)="clearMessage()" [(ngModel)]="warehouseSupplier.warehouseId">
+                <option value=""></option>
                 <option *ngFor="let warehouse of warehouses" [value]="warehouse.id">{{warehouse.name}}</option>
             </select>
         </div>
