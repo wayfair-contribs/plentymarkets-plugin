@@ -108,7 +108,7 @@ export class InventoryComponent {
     // pull state from the DB on load
     this.refreshState();
     // repeatedly pull state from the DB on the prescribed interval
-    setInterval(() => this.refreshState(), InventoryComponent.REFRESH_INTERVAL);
+    setInterval(this.refreshState, InventoryComponent.REFRESH_INTERVAL);
   }
 
   /**

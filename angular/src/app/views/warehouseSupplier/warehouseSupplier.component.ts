@@ -11,6 +11,11 @@ import { WarehouseService } from "../../core/services/warehouse/warehouse.servic
   styles: [require("./warehouseSupplier.component.scss")],
 })
 export class WarehouseSupplierComponent implements OnInit {
+  /**
+   * The interval on which the UI will automatically refresh Warehouses
+   */
+  private static readonly REFRESH_WAREHOUSES_INTERVAL: number = 300000;
+
   @Language()
   public lang: string;
 
@@ -30,6 +35,12 @@ export class WarehouseSupplierComponent implements OnInit {
 
   public ngOnInit(): void {
     this.loadEverythingFromBackend();
+
+    // repeatedly pull state from the DB on the prescribed interval
+    setInterval(
+      this.loadWarehousesFromBackend,
+      WarehouseSupplierComponent.REFRESH_WAREHOUSES_INTERVAL
+    );
   }
 
   /**
