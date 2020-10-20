@@ -76,6 +76,7 @@ export class WarehouseSupplierComponent implements OnInit {
     successCallback?: () => void,
     failureCallBack?: () => void
   ): void {
+    this.clearMessage();
     this.loadWarehousesFromBackend(() => {
       this.loadMappingsFromBackend(successCallback, failureCallBack),
         failureCallBack;
@@ -117,8 +118,6 @@ export class WarehouseSupplierComponent implements OnInit {
     successCallback?: () => void,
     failureCallBack?: () => void
   ): void {
-    this.clearMessage();
-
     this.warehouseService.fetch().subscribe(
       (data) => {
         this.warehouses = data;
