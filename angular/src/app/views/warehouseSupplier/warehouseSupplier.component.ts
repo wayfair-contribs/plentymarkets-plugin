@@ -248,6 +248,7 @@ export class WarehouseSupplierComponent implements OnInit {
               this.loadEverythingFromBackend(() => {
                 this.status.type = "text-info";
                 this.status.value = this.translation.translate("saved");
+                this.validateAndAlert();
               }, this.showSaveError);
             },
             (err) => {
@@ -256,7 +257,7 @@ export class WarehouseSupplierComponent implements OnInit {
           );
         } else {
           // nothing to save, but warehouses and mappings may have changed in the backend
-          this.loadEverythingFromBackend();
+          this.loadEverythingFromBackend(() => this.validateAndAlert());
         }
       },
       (issues) => {
