@@ -38,7 +38,7 @@ export class WarehouseSupplierComponent implements OnInit {
 
     // repeatedly pull state from the DB on the prescribed interval
     setInterval(
-      () => this.loadWarehousesFromBackend,
+      () => this.loadWarehousesFromBackend(),
       WarehouseSupplierComponent.REFRESH_WAREHOUSES_INTERVAL
     );
   }
