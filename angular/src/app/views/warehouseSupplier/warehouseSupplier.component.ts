@@ -41,14 +41,6 @@ export class WarehouseSupplierComponent implements OnInit {
   }
 
   /**
-   * update the status to show that the save passed
-   */
-  public showSaved(): void {
-    this.status.type = "text-info";
-    this.status.value = this.translation.translate("saved");
-  }
-
-  /**
    * update the status to show tha the save failed
    */
   public showSaveError(): void {
@@ -227,6 +219,10 @@ export class WarehouseSupplierComponent implements OnInit {
    */
   public removeMapping(warehouseSupplier: WarehouseSupplierInterface): void {
     this.clearMessage();
+    if (!warehouseSupplier) {
+      return;
+    }
+
     let foundIndex = this.warehouseSuppliers.findIndex((elem, idx) => {
       return (
         elem.supplierId == warehouseSupplier.supplierId &&
@@ -234,11 +230,16 @@ export class WarehouseSupplierComponent implements OnInit {
       );
     });
 
-    if (foundIndex >= 0) {
-      let targetWarehouseSupplier = this.warehouseSuppliers[foundIndex];
-      targetWarehouseSupplier.removed = true;
-      this.removedWarehouseSuppliers.push(targetWarehouseSupplier);
-      this.warehouseSuppliers.splice(foundIndex, 1);
+    if (foundIndex < 0) {
+      return;
     }
+
+    let targetWarehouseSupplier = this.warehouseSuppliers[foundIndex];
+    // mark for removal from the database by the backend
+    targetWarehouseSupplier.removed = true;
+    // keep record of this for the next save operation
+    this.removedWarehouseSuppliers.push(targetWarehouseSupplier);
+    // update the view to no longer contain the row
+    this.warehouseSuppliers.splice(foundIndex, 1);
   }
 }
