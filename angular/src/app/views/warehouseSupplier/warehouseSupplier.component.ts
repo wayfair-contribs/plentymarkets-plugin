@@ -225,7 +225,7 @@ export class WarehouseSupplierComponent implements OnInit {
    * Mark a mapping for removal from the database, and hide it from view
    * @param warehouseSupplier a mapping
    */
-  public removeMapping(warehouseSupplier): void {
+  public removeMapping(warehouseSupplier: WarehouseSupplierInterface): void {
     this.clearMessage();
     let foundIndex = this.warehouseSuppliers.findIndex((elem, idx) => {
       return (
@@ -233,14 +233,12 @@ export class WarehouseSupplierComponent implements OnInit {
         elem.warehouseId == warehouseSupplier.warehouseId
       );
     });
-    let targetWarehouseSupplier = this.warehouseSuppliers[foundIndex];
-    if (
-      targetWarehouseSupplier.supplierId &&
-      targetWarehouseSupplier.warehouseId
-    ) {
+
+    if (foundIndex >= 0) {
+      let targetWarehouseSupplier = this.warehouseSuppliers[foundIndex];
       targetWarehouseSupplier.removed = true;
       this.removedWarehouseSuppliers.push(targetWarehouseSupplier);
+      this.warehouseSuppliers.splice(foundIndex, 1);
     }
-    this.warehouseSuppliers.splice(foundIndex, 1);
   }
 }
