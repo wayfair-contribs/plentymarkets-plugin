@@ -34,12 +34,12 @@ export class WarehouseSupplierComponent implements OnInit {
   ) {}
 
   public ngOnInit(): void {
-    this.loadEverythingFromBackend(() => this.validateAndAlert);
+    this.loadEverythingFromBackend(() => this.validateAndAlert());
 
     // repeatedly pull Warehouses list from Plenty on the prescribed interval.
     // avoid
     setInterval(
-      () => this.loadWarehousesFromBackend(() => this.validateAndAlert),
+      () => this.loadWarehousesFromBackend(() => this.validateAndAlert()),
       WarehouseSupplierComponent.REFRESH_WAREHOUSES_INTERVAL
     );
   }
