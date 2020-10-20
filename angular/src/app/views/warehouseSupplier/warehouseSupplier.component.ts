@@ -11,9 +11,6 @@ import { WarehouseService } from "../../core/services/warehouse/warehouse.servic
   styles: [require("./warehouseSupplier.component.scss")],
 })
 export class WarehouseSupplierComponent implements OnInit {
-
-  private static readonly TRANSLATION_KEY_WAREHOUSE_MISSING = "warehouse_missing";
-
   /**
    * The interval on which the UI will automatically refresh Warehouses
    */
@@ -42,17 +39,13 @@ export class WarehouseSupplierComponent implements OnInit {
     // repeatedly pull Warehouses list from Plenty on the prescribed interval
     setInterval(
       () =>
-        this.loadWarehousesFromBackend(() => {
-          let foundIndex = this.warehouseSuppliers.findIndex((elem) => {
-            return !this.isWarehouseIdValid(elem.warehouseId);
-          });
-          if (foundIndex >= 0)
-          {
-            // a mapping is now invalid - let the user know why it went blank
+        this.loadWarehousesFromBackend(() =>
+          this.validateMappings(null, (issues) => {
+            // notify user that changes in backend have invalidated the mappings
             this.status.type = "text-danger";
-            this.status.value = this.translation.translate(WarehouseSupplierComponent.TRANSLATION_KEY_WAREHOUSE_MISSING);
-          }
-        }),
+            this.status.value = issues;
+          })
+        ),
       WarehouseSupplierComponent.REFRESH_WAREHOUSES_INTERVAL
     );
   }
@@ -213,7 +206,7 @@ export class WarehouseSupplierComponent implements OnInit {
         if (buffer.length > 0) {
           buffer += ". ";
         }
-        buffer += this.translation.translate(WarehouseSupplierComponent.TRANSLATION_KEY_WAREHOUSE_MISSING);
+        buffer += this.translation.translate("warehouse_missing");
       }
 
       if (buffer) {
@@ -265,8 +258,9 @@ export class WarehouseSupplierComponent implements OnInit {
         }
       },
       (issues) => {
+        // display save failure with reason(s)
         this.status.type = "text-danger";
-        this.status.value = issues;
+        this.status.value = this.translation.translate("error_save") + ": " + issues;
       }
     );
   }
