@@ -134,39 +134,82 @@ export class WarehouseSupplierComponent implements OnInit {
     );
   }
 
+  private isWarehouseIdValid(warehouseId: string): boolean {
+    if (!warehouseId) {
+      return false;
+    }
+
+    let idAsNumber = parseInt(warehouseId);
+    if (isNaN(idAsNumber) || idAsNumber < 1) {
+      // all warehouse IDs are at least 1
+      return false;
+    }
+
+    let indexInWarehouses = this.warehouses.findIndex((elem) => {
+      return elem.id == idAsNumber;
+    });
+
+    return indexInWarehouses >= 0;
+  }
+
   /**
    * Check the current mappings for issues
    * Return the translated issues, or empty string if none
+   * @param successCallback action to take if ALL loading passes
+   * @param failureCallBack action to take if ANY loading fails
    * @returns string
    */
-  public validateMappings(): string {
-    let emptyFields = false;
-    let duplicateKeys = false;
-    let warehouseIds = [];
-    this.warehouseSuppliers.forEach((item) => {
-      emptyFields = emptyFields || !(item.warehouseId && item.supplierId);
+  public validateMappings(
+    successCallback?: () => void,
+    failureCallBack?: (issues?: string) => void
+  ): void {
+    // need the latest warehouses
+    this.loadWarehousesFromBackend(() => {
+      let emptyFields = false;
+      let duplicateKeys = false;
+      let invalidWarehouse = false;
+      let warehouseIdsSeen = [];
+      this.warehouseSuppliers.forEach((item) => {
+        emptyFields = emptyFields || !(item.warehouseId && item.supplierId);
 
-      if (item.warehouseId) {
-        if (warehouseIds.includes(item.warehouseId)) {
-          duplicateKeys = true;
-        } else {
-          warehouseIds.push(item.warehouseId);
+        if (item.warehouseId) {
+          invalidWarehouse =
+            invalidWarehouse || !this.isWarehouseIdValid(item.warehouseId);
+
+          if (warehouseIdsSeen.includes(item.warehouseId)) {
+            duplicateKeys = true;
+          } else {
+            warehouseIdsSeen.push(item.warehouseId);
+          }
         }
-      }
-    });
+      });
 
-    let buffer = "";
-    if (emptyFields) {
-      buffer += this.translation.translate("empty_fields");
-    }
-    if (duplicateKeys) {
-      if (buffer.length > 0) {
-        buffer += " ";
+      let buffer = "";
+      if (emptyFields) {
+        buffer += this.translation.translate("empty_fields");
       }
-      buffer += this.translation.translate("duplicate_warehouses");
-    }
+      if (duplicateKeys) {
+        if (buffer.length > 0) {
+          buffer += ". ";
+        }
+        buffer += this.translation.translate("duplicate_warehouses");
+      }
+      if (invalidWarehouse) {
+        if (buffer.length > 0) {
+          buffer += ". ";
+        }
+        buffer += this.translation.translate("warehouse_missing");
+      }
 
-    return buffer;
+      if (buffer) {
+        buffer += ".";
+        if (failureCallBack) {
+          failureCallBack(buffer);
+        }
+      } else if (successCallback) {
+        successCallback();
+      }
+    }, failureCallBack);
   }
 
   /**
@@ -175,41 +218,42 @@ export class WarehouseSupplierComponent implements OnInit {
   public saveMappings(): void {
     this.clearMessage();
 
-    let validationResult = this.validateMappings();
-    if (validationResult && validationResult.length > 0) {
-      this.status.type = "text-danger";
-      this.status.value = validationResult;
-      return;
-    }
-
-    if (
-      this.warehouseSuppliers.length > 0 ||
-      this.removedWarehouseSuppliers.length > 0
-    ) {
-      this.status.type = "text-info";
-      this.status.value = this.translation.translate("saving_status");
-      let postData = this.removedWarehouseSuppliers.concat(
-        this.warehouseSuppliers
-      );
-      this.warehouseSupplierService.postMappings(postData).subscribe(
-        (data) => {
-          // now that mappings were removed, clear out the "to remove" list
-          this.removedWarehouseSuppliers = [];
-          // warehouses and mappings may have been impacted by this save or by other actions,
-          // including the actions made by other users
-          this.loadEverythingFromBackend(() => {
-            this.status.type = "text-info";
-            this.status.value = this.translation.translate("saved");
-          }, this.showSaveError);
-        },
-        (err) => {
-          this.showSaveError;
+    this.validateMappings(
+      () => {
+        if (
+          this.warehouseSuppliers.length > 0 ||
+          this.removedWarehouseSuppliers.length > 0
+        ) {
+          this.status.type = "text-info";
+          this.status.value = this.translation.translate("saving_status");
+          let postData = this.removedWarehouseSuppliers.concat(
+            this.warehouseSuppliers
+          );
+          this.warehouseSupplierService.postMappings(postData).subscribe(
+            (data) => {
+              // now that mappings were removed, clear out the "to remove" list
+              this.removedWarehouseSuppliers = [];
+              // warehouses and mappings may have been impacted by this save or by other actions,
+              // including the actions made by other users
+              this.loadEverythingFromBackend(() => {
+                this.status.type = "text-info";
+                this.status.value = this.translation.translate("saved");
+              }, this.showSaveError);
+            },
+            (err) => {
+              this.showSaveError;
+            }
+          );
+        } else {
+          // nothing to save, but warehouses and mappings may have changed in the backend
+          this.loadEverythingFromBackend();
         }
-      );
-    } else {
-      // nothing to save, but warehouses and mappings may have changed in the backend
-      this.loadEverythingFromBackend();
-    }
+      },
+      (issues) => {
+        this.status.type = "text-danger";
+        this.status.value = issues;
+      }
+    );
   }
 
   /**
@@ -233,7 +277,7 @@ export class WarehouseSupplierComponent implements OnInit {
       return;
     }
 
-    let foundIndex = this.warehouseSuppliers.findIndex((elem, idx) => {
+    let foundIndex = this.warehouseSuppliers.findIndex((elem) => {
       return (
         elem.supplierId == warehouseSupplier.supplierId &&
         elem.warehouseId == warehouseSupplier.warehouseId

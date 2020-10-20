@@ -67,5 +67,6 @@
   "userGuideUrl": "https://github.com/wayfair-contribs/plentymarkets-plugin/blob/main/meta/documents/user_guide_de.md",
   "clickTheHelpButton": "Klicken Sie auf Hilfe, um weitere Informationen zu erhalten",
   "empty_fields": "Leere Felder sind NICHT erlaubt.",
-  "duplicate_warehouses": "Ein Plentymarkets Lager sollte höchstens einer Wayfair Lieferanten ID zugeordnet werden"
+  "duplicate_warehouses": "Ein Plentymarkets Lager sollte höchstens einer Wayfair Lieferanten ID zugeordnet werden",
+  "warehouse_missing": "Ein oder mehrere Plentymarkets Lager konnten nicht gefunden werden - Wählen Sie eine  aus der aktuellen Liste"
 }
