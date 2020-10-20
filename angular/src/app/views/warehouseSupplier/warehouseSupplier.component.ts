@@ -245,11 +245,17 @@ export class WarehouseSupplierComponent implements OnInit {
     }
 
     let targetWarehouseSupplier = this.warehouseSuppliers[foundIndex];
-    // mark for removal from the database by the backend
-    targetWarehouseSupplier.removed = true;
-    // keep record of this for the next save operation
-    this.removedWarehouseSuppliers.push(targetWarehouseSupplier);
     // update the view to no longer contain the row
     this.warehouseSuppliers.splice(foundIndex, 1);
+
+    if (
+      targetWarehouseSupplier.warehouseId ||
+      targetWarehouseSupplier.supplierId
+    ) {
+      // mark for removal from the database by the backend
+      targetWarehouseSupplier.removed = true;
+      // keep record of this for the next save operation
+      this.removedWarehouseSuppliers.push(targetWarehouseSupplier);
+    }
   }
 }
