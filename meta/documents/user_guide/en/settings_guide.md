@@ -214,7 +214,7 @@ During Wayfair plugin onboarding, Wayfair will instruct on which option is appro
 
   - Your orders' shipments are arranged by Wayfair, to be shipped by a carrier chosen by Wayfair
   - Your Plentymarkets system needs to Wayfair when the order is ready for shipment
-  - You Plentymarkets system needs to get tracking information back from Wayfair
+  - Your Plentymarkets system needs to get tracking information back from Wayfair
 
 - `Own account shipping`
   - You ship your own orders via your own carriers
