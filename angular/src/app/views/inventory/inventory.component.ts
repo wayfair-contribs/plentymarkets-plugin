@@ -280,6 +280,7 @@ export class InventoryComponent {
         } else if (InventoryService.syncsAttempted(this.statusObject, key)) {
           if (InventoryService.overdue(this.statusObject, key)) {
             nextRow.style = DisplayedState.TEXT_CLASS_DANGER;
+            nextRow.icon = InventoryComponent.ICON_CLOUD_SLASH;
             nextRow.message +=
               " " +
               this.translation.translate(
