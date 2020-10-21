@@ -1,95 +1,318 @@
-import {
-    Component,
-    Input,
-    OnInit
-} from '@angular/core';
-import { Language, TranslationService } from 'angular-l10n';
-import { WarehouseSupplierService } from '../../core/services/warehouseSupplier/warehouseSupplier.service';
-import { WarehouseService } from '../../core/services/warehouse/warehouse.service';
+import { Component, OnInit } from "@angular/core";
+import { Language, TranslationService } from "angular-l10n";
+import { WarehouseSupplierInterface } from "../..//core/services/warehouseSupplier/data/warehouseSupplier.interface";
+import { WarehouseSupplierService } from "../../core/services/warehouseSupplier/warehouseSupplier.service";
+import { WarehouseInterface } from "../../core/services/warehouse/data/warehouse.interface";
+import { WarehouseService } from "../../core/services/warehouse/warehouse.service";
 
 @Component({
-    selector: 'warehouse-supplier',
-    template: require('./warehouseSupplier.component.html'),
-    styles: [require('./warehouseSupplier.component.scss')],
+  selector: "warehouse-supplier",
+  template: require("./warehouseSupplier.component.html"),
+  styles: [require("./warehouseSupplier.component.scss")],
 })
 export class WarehouseSupplierComponent implements OnInit {
-    @Language()
-    public lang: string;
+  /**
+   * The interval on which the UI will automatically refresh Warehouses
+   */
+  private static readonly REFRESH_WAREHOUSES_INTERVAL: number = 300000;
 
-    public warehouseSuppliers = [];
+  @Language()
+  public lang: string;
 
-    public removedWarehouseSuppliers = [];
+  public warehouseSuppliers: Array<WarehouseSupplierInterface> = [];
 
-    public warehouses = [];
+  public removedWarehouseSuppliers: Array<WarehouseSupplierInterface> = [];
 
-    public status = { type: null, value: null };
+  public warehouses: Array<WarehouseInterface> = [];
 
-    constructor(private warehouseService: WarehouseService, private warehouseSupplierService: WarehouseSupplierService, private translation:TranslationService) {
+  public status = { type: null, value: null };
+
+  constructor(
+    private warehouseService: WarehouseService,
+    private warehouseSupplierService: WarehouseSupplierService,
+    private translation: TranslationService
+  ) {}
+
+  public ngOnInit(): void {
+    this.loadEverythingFromBackend(() => this.validateAndAlert());
+
+    // repeatedly pull Warehouses list from Plenty on the prescribed interval.
+    // avoid pulling the mappings, as it could add/remove rows while user is working
+    setInterval(
+      () => this.loadWarehousesFromBackend(() => this.validateAndAlert()),
+      WarehouseSupplierComponent.REFRESH_WAREHOUSES_INTERVAL
+    );
+  }
+
+  private validateAndAlert(): void {
+    this.validateMappings(null, (issues) => {
+      // notify user that changes in backend have invalidated the mappings
+      this.status.type = "text-danger";
+      this.status.value = issues;
+    });
+  }
+
+  /**
+   * update the status to show an error during fetch
+   */
+  private showFetchError(): void {
+    this.status.type = "text-danger";
+    this.status.value = this.translation.translate("error_fetch");
+  }
+
+  /**
+   * update the status to show tha the save failed
+   */
+  public showSaveError(): void {
+    this.status.type = "text-danger";
+    this.status.value = this.translation.translate("error_save");
+  }
+
+  /**
+   * Clear the current status
+   */
+  public clearMessage(): void {
+    this.status.type = "";
+    this.status.value = "";
+  }
+
+  /**
+   * Load all warehouses and mappings from backend
+   * @param successCallback action to take if ALL loading passes
+   * @param failureCallBack action to take if ANY loading fails
+   */
+  private loadEverythingFromBackend(
+    successCallback?: () => void,
+    failureCallBack?: () => void
+  ): void {
+    this.clearMessage();
+    this.loadWarehousesFromBackend(() => {
+      this.loadMappingsFromBackend(successCallback, failureCallBack),
+        failureCallBack;
+    });
+  }
+
+  /**
+   * Load the Mappings data from the plugin backend
+   * @param successCallback action to take if ALL loading passes
+   * @param failureCallBack action to take if ANY loading fails
+   */
+  private loadMappingsFromBackend(
+    successCallback?: () => void,
+    failureCallBack?: () => void
+  ): void {
+    this.clearMessage();
+    this.warehouseSupplierService.fetchMappings().subscribe(
+      (data) => {
+        this.warehouseSuppliers = data;
+        if (successCallback) {
+          successCallback();
+        }
+      },
+      (err) => {
+        this.showFetchError();
+        if (failureCallBack) {
+          failureCallBack();
+        }
+      }
+    );
+  }
+
+  /**
+   * Load information on the Plentymarkets system's warehouses
+   * @param successCallback action to take if ALL loading passes
+   * @param failureCallBack action to take if ANY loading fails
+   */
+  public loadWarehousesFromBackend(
+    successCallback?: () => void,
+    failureCallBack?: () => void
+  ): void {
+    this.warehouseService.fetch().subscribe(
+      (data) => {
+        this.warehouses = data;
+        if (successCallback) {
+          successCallback();
+        }
+      },
+      (err) => {
+        this.showFetchError();
+        if (failureCallBack) {
+          failureCallBack();
+        }
+      }
+    );
+  }
+
+  private isWarehouseIdValid(warehouseId: string): boolean {
+    if (!warehouseId) {
+      return false;
     }
 
-    public ngOnInit(): void {
-        this.warehouseService.fetch()
-            .subscribe(data => {
-                this.warehouses = data
-            }, err => {
-                this.status.type = 'text-danger'
-                this.status.value = this.translation.translate('error_fetch')
-            })
-
-        this.warehouseSupplierService.fetchMappings()
-            .subscribe(data => {
-                this.warehouseSuppliers = data
-            }, err => {
-                this.status.type = 'text-danger'
-                this.status.value = this.translation.translate('error_fetch')
-            })
+    let idAsNumber = parseInt(warehouseId);
+    if (isNaN(idAsNumber) || idAsNumber < 1) {
+      // all warehouse IDs are at least 1
+      return false;
     }
 
-    public saveMappings(): void {
-        let self = this
-        let validated = true
-        this.warehouseSuppliers.forEach((item) => {
-            // Check if any value is empty.
-            if (Object.values(item).some(itemValue => !itemValue)) {
-                self.status.type = 'text-danger'
-                self.status.value = this.translation.translate('empty_values_mapping')
-                validated = false
+    let indexInWarehouses = this.warehouses.findIndex((elem) => {
+      return elem.id == idAsNumber;
+    });
+
+    return indexInWarehouses >= 0;
+  }
+
+  /**
+   * Check the current mappings for issues
+   * Return the translated issues, or empty string if none
+   * @param successCallback action to take if ALL loading passes
+   * @param failureCallBack action to take if ANY loading fails
+   * @returns string
+   */
+  public validateMappings(
+    successCallback?: () => void,
+    failureCallBack?: (issues?: string) => void
+  ): void {
+    // need the latest warehouses
+    this.loadWarehousesFromBackend(() => {
+      let emptyFields = false;
+      let duplicateKeys = false;
+      let invalidWarehouse = false;
+      let warehouseIdsSeen = [];
+      this.warehouseSuppliers.forEach((item) => {
+        emptyFields = emptyFields || !(item.warehouseId && item.supplierId);
+
+        if (item.warehouseId) {
+          if (this.isWarehouseIdValid(item.warehouseId)) {
+            if (warehouseIdsSeen.includes(item.warehouseId)) {
+              duplicateKeys = true;
+            } else {
+              warehouseIdsSeen.push(item.warehouseId);
             }
-        })
-        if(!validated) return;
-        if (this.warehouseSuppliers.length > 0 || this.removedWarehouseSuppliers.length > 0) {
-            this.status.type = 'text-info'
-            this.status.value = this.translation.translate('saving_status')
-            let data = this.removedWarehouseSuppliers.concat(this.warehouseSuppliers);
-            this.warehouseSupplierService.postMappings(data).subscribe(data => {
-                this.status.type = 'text-info'
-                this.status.value = this.translation.translate('saved')
-            }, err => {
-                this.status.type = 'text-danger'
-                this.status.value = this.translation.translate('error_save')
-            });
+          } else {
+            invalidWarehouse = true;
+          }
+        }
+      });
+
+      let buffer = "";
+      if (emptyFields) {
+        buffer += this.translation.translate("empty_fields");
+      }
+      if (duplicateKeys) {
+        if (buffer.length > 0) {
+          buffer += ". ";
+        }
+        buffer += this.translation.translate("duplicate_warehouses");
+      }
+      if (invalidWarehouse) {
+        if (buffer.length > 0) {
+          buffer += ". ";
+        }
+        buffer += this.translation.translate("warehouse_missing");
+      }
+
+      if (buffer) {
+        buffer += ".";
+        if (failureCallBack) {
+          failureCallBack(buffer);
+        }
+      } else if (successCallback) {
+        successCallback();
+      }
+    }, failureCallBack);
+  }
+
+  /**
+   * Push the current state of the mappings to the plugin backend
+   */
+  public saveMappings(): void {
+    this.clearMessage();
+
+    this.validateMappings(
+      () => {
+        if (
+          this.warehouseSuppliers.length > 0 ||
+          this.removedWarehouseSuppliers.length > 0
+        ) {
+          this.status.type = "text-info";
+          this.status.value = this.translation.translate("saving_status");
+          let postData = this.removedWarehouseSuppliers.concat(
+            this.warehouseSuppliers
+          );
+          this.warehouseSupplierService.postMappings(postData).subscribe(
+            (data) => {
+              // now that mappings were removed, clear out the "to remove" list
+              this.removedWarehouseSuppliers = [];
+              // warehouses and mappings may have been impacted by this save or by other actions,
+              // including the actions made by other users
+              this.loadEverythingFromBackend(() => {
+                this.status.type = "text-info";
+                this.status.value = this.translation.translate("saved");
+                this.validateAndAlert();
+              }, this.showSaveError);
+            },
+            (err) => {
+              this.showSaveError;
+            }
+          );
         } else {
-            this.status.type = 'text-info'
-            this.status.value = this.translation.translate('nothing_to_save')
+          // nothing to save, but warehouses and mappings may have changed in the backend
+          this.loadEverythingFromBackend(() => this.validateAndAlert());
         }
+      },
+      (issues) => {
+        // display save failure with reason(s)
+        this.status.type = "text-danger";
+        this.status.value =
+          this.translation.translate("error_save") + ": " + issues;
+      }
+    );
+  }
+
+  /**
+   * Add a new empty mapping row
+   */
+  public addMapping(): void {
+    this.clearMessage();
+    this.warehouseSuppliers.push({
+      supplierId: null,
+      warehouseId: null,
+    });
+  }
+
+  /**
+   * Mark a mapping for removal from the database, and hide it from view
+   * @param warehouseSupplier a mapping
+   */
+  public removeMapping(warehouseSupplier: WarehouseSupplierInterface): void {
+    this.clearMessage();
+    if (!warehouseSupplier) {
+      return;
     }
 
-    public addMapping(): void {
-        this.warehouseSuppliers.push({
-            supplierId: null,
-            warehouseId: null
-        })
+    let foundIndex = this.warehouseSuppliers.findIndex((elem) => {
+      return (
+        elem.supplierId == warehouseSupplier.supplierId &&
+        elem.warehouseId == warehouseSupplier.warehouseId
+      );
+    });
+
+    if (foundIndex < 0) {
+      return;
     }
 
-    public removeMapping(warehouseSupplier): void {
-        let foundIndex = this.warehouseSuppliers.findIndex((elem, idx) => {
-            return elem.supplierId == warehouseSupplier.supplierId && elem.warehouseId == warehouseSupplier.warehouseId;
-        })
-        let targetWarehouseSupplier = this.warehouseSuppliers[foundIndex]
-        if(targetWarehouseSupplier.supplierId && targetWarehouseSupplier.warehouseId){
-            targetWarehouseSupplier.removed = true
-            this.removedWarehouseSuppliers.push(targetWarehouseSupplier)
-        }
-        this.warehouseSuppliers.splice(foundIndex, 1);
+    let targetWarehouseSupplier = this.warehouseSuppliers[foundIndex];
+    // update the view to no longer contain the row
+    this.warehouseSuppliers.splice(foundIndex, 1);
+
+    if (
+      targetWarehouseSupplier.warehouseId ||
+      targetWarehouseSupplier.supplierId
+    ) {
+      // mark for removal from the database by the backend
+      targetWarehouseSupplier.removed = true;
+      // keep record of this for the next save operation
+      this.removedWarehouseSuppliers.push(targetWarehouseSupplier);
     }
+  }
 }

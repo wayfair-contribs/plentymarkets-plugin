@@ -13,25 +13,27 @@
     </div>
     <div class="form-row" *ngFor="let warehouseSupplier of warehouseSuppliers">
         <div class="form-group col-md-5 col-md-offset-1">
-            <select class="form-control" [(ngModel)]="warehouseSupplier.warehouseId">
-                <option></option>
+            <select class="form-control" (change)="clearMessage()" [(ngModel)]="warehouseSupplier.warehouseId">
+                <option value=""></option>
                 <option *ngFor="let warehouse of warehouses" [value]="warehouse.id">{{warehouse.name}}</option>
-                <!-- [selected]="opt.selected == true">{{opt.selected+opt.value}} -->
             </select>
         </div>
         <div class="form-group col-md-5">
-            <input class="form-control" type="text" [(ngModel)]="warehouseSupplier.supplierId" />
+            <input class="form-control" type="text" (change)="clearMessage()"
+                [(ngModel)]="warehouseSupplier.supplierId" />
         </div>
         <div class="form-group col-md-1">
             <button class="btn btn-icon" (click)="removeMapping(warehouseSupplier)"><i class="fa fa-trash"></i></button>
         </div>
     </div>
-    <br/>
+    <br />
     <p *ngIf="status.value" class="{{status.type + ' col-md-12'}}">{{status.value}}</p>
 
-    <br/>
+    <br />
     <div>
-        <button class="btn btn-primary" id="addMappingBtn" (click)="addMapping()">{{ 'add_mapping' | translate:lang }}</button>
-        <button class="btn btn-success" id="saveMappingBtn" (click)="saveMappings()"> {{ 'save' | translate:lang }} </button>
+        <button class="btn btn-primary" id="addMappingBtn"
+            (click)="addMapping()">{{ 'add_mapping' | translate:lang }}</button>
+        <button class="btn btn-success" id="saveMappingBtn" (click)="saveMappings()"> {{ 'save' | translate:lang }}
+        </button>
     </div>
 </div>
