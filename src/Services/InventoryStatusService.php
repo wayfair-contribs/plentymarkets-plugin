@@ -16,7 +16,8 @@ use Wayfair\Repositories\KeyValueRepository;
  */
 class InventoryStatusService
 {
-  const OVERDUE_TIME_FULL = 90000;
+  // Plenty says the overdue window for daily cron should be 30 hours
+  const OVERDUE_TIME_FULL = 108000;
   const OVERDUE_TIME_PARTIAL = 1800;
 
   // TODO: make these user-configurable in a future update
