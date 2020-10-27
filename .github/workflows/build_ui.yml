@@ -31,7 +31,7 @@ jobs:
         run: echo "::set-output name=GIT_STATUS::$(git status -s)"
 
       - name: fail-out-if-protected-branch-needs-UI-generation
-        if: steps.check_for_changed_files.outputs.GIT_STATUS != '' && (endsWith(github.ref, '/master') || endsWith(github.ref, '/main') || contains(github.ref, 'release-'))
+        if: steps.check_for_changed_files.outputs.GIT_STATUS != '' && (endsWith(github.ref, '/master') || endsWith(github.ref, '/main') || contains(github.ref, 'release-') || contains(github.ref, 'tags/'))
         run: |
           echo "branch is protected - differences between Angular and UI must be resolved before pushing to a protected branch!"
           exit 1
