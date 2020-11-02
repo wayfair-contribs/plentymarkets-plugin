@@ -99,7 +99,9 @@ class InventoryMapper
       return -1;
     }
 
-    return $netStock;
+    // wayfair stock should be rounded DOWN to nearest integer.
+    // plenty allows for floats in net stock.
+    return floor($netStock);
   }
 
   /**
@@ -184,6 +186,7 @@ class InventoryMapper
       }
     }
 
+
     $stockRepository= pluginApp(StockRepositoryContract::class);
     $stockRepository->setFilters($filters);
 
@@ -231,7 +234,7 @@ class InventoryMapper
           continue;
         }
 
-        // Avl Immediately. ADJUSTED Net Stock (see Stock Buffer setting in Wayfair plugin).
+        // Avl Immediately.
         $originalStockNet = $stock[InventoryMapper::STOCK_COL_STOCK_NET];
         $onHand = self::normalizeQuantityOnHand($originalStockNet);
 
