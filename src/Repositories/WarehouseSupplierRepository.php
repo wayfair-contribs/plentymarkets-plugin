@@ -52,14 +52,14 @@ class WarehouseSupplierRepository extends Repository
   public function updateMapping($data = [])
   {
 
-    $mappingData = [];
+    $results = [];
 
     try {
       /**
        * @var DataBase $database
        */
       $database                  = pluginApp(DataBase::class);
-      $mappingData               = $database->query(WarehouseSupplier::class)->where('id', '=', $data['id'])->get();
+      $results               = $database->query(WarehouseSupplier::class)->where('id', '=', $data['id'])->get();
     } catch (\Exception $e) {
       $this->loggerContract
         ->error(
@@ -77,8 +77,8 @@ class WarehouseSupplierRepository extends Repository
         );
     }
 
-    if (isset($mappingData) && !empty($mappingData) && isset($mappingData[0])) {
-      $mappingDatum              = $mappingData[0];
+    if (isset($results) && !empty($results) && isset($results[0])) {
+      $mappingDatum              = $results[0];
       $mappingDatum->supplierId  = $data['supplierId'];
       $mappingDatum->warehouseId = $data['warehouseId'];
       $mappingDatum->createdAt   = time();
@@ -95,14 +95,14 @@ class WarehouseSupplierRepository extends Repository
   public function findByWarehouseId($warehouseId)
   {
 
-    $mappingData = [];
+    $results = [];
 
     try {
       /**
        * @var DataBase $database
        */
       $database    = pluginApp(DataBase::class);
-      $mappingData = $database->query(WarehouseSupplier::class)->where('warehouseId', '=', $warehouseId)->get();
+      $results = $database->query(WarehouseSupplier::class)->where('warehouseId', '=', $warehouseId)->get();
     } catch (\Exception $e) {
       $this->loggerContract
         ->error(
@@ -120,8 +120,8 @@ class WarehouseSupplierRepository extends Repository
         );
     }
 
-    if (isset($mappingData) && !empty($mappingData) && isset($mappingData[0])) {
-      $mappingDatum = $mappingData[0];
+    if (isset($results) && !empty($results) && isset($results[0])) {
+      $mappingDatum = $results[0];
 
       return $mappingDatum;
     }
@@ -138,14 +138,14 @@ class WarehouseSupplierRepository extends Repository
   {
 
     if (isset($data['id'])) {
-      $mappingData = [];
+      $results = [];
 
       try {
         /**
          * @var DataBase $database
          */
         $database                  = pluginApp(DataBase::class);
-        $mappingData               = $database->query(WarehouseSupplier::class)->where('id', '=', $data['id'])->get();
+        $results               = $database->query(WarehouseSupplier::class)->where('id', '=', $data['id'])->get();
       } catch (\Exception $e) {
         $this->loggerContract
           ->error(
@@ -163,8 +163,8 @@ class WarehouseSupplierRepository extends Repository
           );
       }
 
-      if (isset($mappingData) && !empty($mappingData) && isset($mappingData[0])) {
-        $database->delete($mappingData[0]);
+      if (isset($results) && !empty($results) && isset($results[0])) {
+        $database->delete($results[0]);
       }
     }
   }
@@ -302,8 +302,8 @@ class WarehouseSupplierRepository extends Repository
       $warehouseIdentifiers[] = $warehouseId;
     }
 
-    if (isset($mappingData) && !empty($mappingData) && isset($mappingData[0])) {
-      return $mappingData[0]->warehouseId;
+    if (isset($warehouseIdentifiers) && !empty($warehouseIdentifiers) && isset($mappwarehouseIdentifiersingData[0])) {
+      return $warehouseIdentifiers[0]->warehouseId;
     }
 
     return '';
