@@ -81,7 +81,7 @@ class InventoryMapper
 
   /**
    * Determine the "Quantity On Hand" to report to Wayfair
-   * @param int $netStock
+   * @param float $netStock
    *
    * @return int|mixed
    */
