@@ -1,11 +1,13 @@
 <?php
+
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Repositories;
 
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
+use Plenty\Modules\StockManagement\Warehouse\Contracts\WarehouseRepositoryContract;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Models\WarehouseSupplier;
 
@@ -16,16 +18,19 @@ use Wayfair\Models\WarehouseSupplier;
  *
  * @package Wayfair\Repositories
  */
-class WarehouseSupplierRepository extends Repository {
+class WarehouseSupplierRepository extends Repository
+{
 
   const LOG_KEY_QUERY_FAILED = 'warehouseSupplierQueryFailed';
+  const LOG_KEY_WAREHOUSE_ID_INVALID = 'warehouseIdInvalid';
 
   /**
    * @param array $data
    *
    * @return WarehouseSupplier
    */
-  public function createMapping($data = []) {
+  public function createMapping($data = [])
+  {
     /**
      * @var DataBase $database
      */
@@ -44,19 +49,18 @@ class WarehouseSupplierRepository extends Repository {
    *
    * @return mixed
    */
-  public function updateMapping($data = []) {
-    
+  public function updateMapping($data = [])
+  {
+
     $mappingData = [];
 
-    try
-    {
+    try {
       /**
        * @var DataBase $database
        */
       $database                  = pluginApp(DataBase::class);
       $mappingData               = $database->query(WarehouseSupplier::class)->where('id', '=', $data['id'])->get();
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
       $this->loggerContract
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
@@ -72,7 +76,7 @@ class WarehouseSupplierRepository extends Repository {
           ]
         );
     }
-    
+
     if (isset($mappingData) && !empty($mappingData) && isset($mappingData[0])) {
       $mappingDatum              = $mappingData[0];
       $mappingDatum->supplierId  = $data['supplierId'];
@@ -88,19 +92,18 @@ class WarehouseSupplierRepository extends Repository {
    *
    * @return mixed|null
    */
-  public function findByWarehouseId($warehouseId) {
-    
+  public function findByWarehouseId($warehouseId)
+  {
+
     $mappingData = [];
 
-    try
-    {
+    try {
       /**
        * @var DataBase $database
        */
       $database    = pluginApp(DataBase::class);
       $mappingData = $database->query(WarehouseSupplier::class)->where('warehouseId', '=', $warehouseId)->get();
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
       $this->loggerContract
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
@@ -122,7 +125,7 @@ class WarehouseSupplierRepository extends Repository {
 
       return $mappingDatum;
     }
-  
+
     return null;
   }
 
@@ -131,20 +134,19 @@ class WarehouseSupplierRepository extends Repository {
    *
    * @return void
    */
-  public function deleteMapping($data = []) {
+  public function deleteMapping($data = [])
+  {
 
     if (isset($data['id'])) {
       $mappingData = [];
 
-      try
-      {
+      try {
         /**
          * @var DataBase $database
          */
         $database                  = pluginApp(DataBase::class);
         $mappingData               = $database->query(WarehouseSupplier::class)->where('id', '=', $data['id'])->get();
-      }
-      catch (\Exception $e) {
+      } catch (\Exception $e) {
         $this->loggerContract
           ->error(
             TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
@@ -160,7 +162,7 @@ class WarehouseSupplierRepository extends Repository {
             ]
           );
       }
-      
+
       if (isset($mappingData) && !empty($mappingData) && isset($mappingData[0])) {
         $database->delete($mappingData[0]);
       }
@@ -172,16 +174,19 @@ class WarehouseSupplierRepository extends Repository {
    *
    * @return array
    */
-  public function saveMappings($data = []) {
+  public function saveMappings($data = [])
+  {
     $removedData = array_filter(
-        $data, function ($datum) {
-          return isset($datum['removed']);
-        }
+      $data,
+      function ($datum) {
+        return isset($datum['removed']);
+      }
     );
     $createdData = array_filter(
-        $data, function ($datum) {
-          return !isset($datum['removed']);
-        }
+      $data,
+      function ($datum) {
+        return !isset($datum['removed']);
+      }
     );
     $data = array_merge($removedData, $createdData);
     foreach ($data as $datum) {
@@ -202,17 +207,16 @@ class WarehouseSupplierRepository extends Repository {
   /**
    * @return mixed
    */
-  public function getAllMappings() {
-    
-    try
-    {
+  public function getAllMappings()
+  {
+
+    try {
       /**
        * @var DataBase $database
        */
       $database = pluginApp(DataBase::class);
       return $database->query(WarehouseSupplier::class)->get();
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
       $this->loggerContract
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
@@ -231,23 +235,27 @@ class WarehouseSupplierRepository extends Repository {
   }
 
   /**
+   * Get the Plentymarkets instance IDs for all Warehouses matching the inputs
+   *
+   * TODO: add more parameters in order to choose the best warehouse.
+   *  - Warehouse should have a positive stock amount for the item on order
+   *  - see https://github.com/wayfair-contribs/plentymarkets-plugin/issues/92
+   *
    * @param string $supplierId
    *
-   * @return string
+   * @return array
    */
-  public function findBySupplierId(string $supplierId) {
+  public function findWarehouseIds(string $supplierId)
+  {
+    $results = [];
 
-    $mappingData = [];
-
-    try
-    {
+    try {
       /**
        * @var DataBase $database
        */
       $database    = pluginApp(DataBase::class);
-      $mappingData = $database->query(WarehouseSupplier::class)->where('supplierId', '=', $supplierId)->get();
-    }
-    catch (\Exception $e) {
+      $results = $database->query(WarehouseSupplier::class)->where('supplierId', '=', $supplierId)->get();
+    } catch (\Exception $e) {
       $this->loggerContract
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
@@ -264,11 +272,57 @@ class WarehouseSupplierRepository extends Repository {
         );
     }
 
-    if (isset($mappingData) && !empty($mappingData) && isset($mappingData[0]))
-    {
+    if (!isset($results) || empty($results)) {
+      return [];
+    }
+
+    $warehouseIdentifiers = [];
+
+    /** @var WarehouseSupplier $mapping */
+    foreach ($results as $key => $mapping) {
+      $warehouseId = $mapping->warehouseId;
+
+      if (!($warehouseId && $warehouseId > 0 && $this->warehouseExists($warehouseId))) {
+        $this->loggerContract
+          ->error(
+            TranslationHelper::getLoggerKey(self::LOG_KEY_WAREHOUSE_ID_INVALID),
+            [
+              'additionalInfo' => [
+                'warehouseId' => $warehouseId
+              ],
+              'referenceType' => 'warehouseId',
+              'referenceValue' => $warehouseId,
+              'method' => __METHOD__
+            ]
+          );
+
+        continue;
+      }
+
+      $warehouseIdentifiers[] = $warehouseId;
+    }
+
+    if (isset($mappingData) && !empty($mappingData) && isset($mappingData[0])) {
       return $mappingData[0]->warehouseId;
     }
 
-   return '';
+    return '';
+  }
+
+  /**
+   * check if the warehouse ID is valid
+   *
+   * @param int $warehouseId
+   * @return boolean
+   */
+  function warehouseExists(int $warehouseId): bool
+  {
+    /** @var WarehouseRepositoryContract */
+    $warehouseRepository = pluginApp(WarehouseRepositoryContract::class);
+
+    $warehouse = $warehouseRepository->findById($warehouseId);
+
+    // use presence of warehouse name to mean it really exists
+    return isset($warehouse) && isset($warehouse->name) && !empty($warehouse->name);
   }
 }

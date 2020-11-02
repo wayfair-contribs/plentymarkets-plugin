@@ -281,10 +281,16 @@ class CreateOrderService
         throw new \Exception("PO " . $poNumber . " contains Warehouse information that is missing an ID.");
       }
 
-      $plentyWarehouseId = $this->warehouseSupplierRepository->findBySupplierId($supplierID);
-      if (!isset($plentyWarehouseId) || empty($plentyWarehouseId)) {
+      $plentyWarehouseId = null;
+
+      // TODO: filter warehouses based on criteria such as stock amounts?
+      $potentialIds = $this->warehouseSupplierRepository->findWarehouseIds($supplierID);
+
+      if (!isset($potentialIds) || empty($potentialIds)) {
         throw new \Exception("Could not find Warehouse ID for PO " . $poNumber . " for supplier " . $supplierID);
       }
+
+      $plentyWarehouseId = $potentialIds[0];
 
       $orderData = $this->purchaseOrderMapper->map(
         $dto,
