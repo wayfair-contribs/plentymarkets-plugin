@@ -364,7 +364,7 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
                 $expectedFilters[self::STOCK_FILTER_UPDATED_AT_TO] = $timeWindowEndW3c;
             }
 
-            if (sizeof($expectedFilters) > 0) {
+            if (count($expectedFilters) > 0) {
                 $expectedFilters[self::STOCK_COL_VARIATION_ID] = $variationId;
                 // only expect a search if one or more time filter is set, not just the variable ID parameter
                 $expectedSearches = 1;
