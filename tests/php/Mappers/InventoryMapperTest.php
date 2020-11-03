@@ -429,6 +429,17 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
             ["zero stock should make zero quantityOnHand", 0, 0],
             ["one stock should make 1 quantityOnHand", 1, 1],
             ["five stock should make five quantityOnHand", 5, 5],
+            ["floating point stock less than negative one should make negative 1 quantityOnHand v1", -1, -1.5],
+            ["floating point stock less than negative one should make negative 1 quantityOnHand v2", -1, -5.3],
+            ["floating point stock between zero and negative one should make negative 1 quantityOnHand v1", -1, -0.5],
+            ["floating point stock between zero and negative one should make negative 1 quantityOnHand v2", -1, -0.2],
+            ["floating point stock between zero and negative one should make negative 1 quantityOnHand v3", -1, -0.8],
+            ["floating point stock between zero and positive one should make zero quantityOnHand v1", 0, 0.2],
+            ["floating point stock between zero and positive one should make zero quantityOnHand v2", 0, 0.5],
+            ["floating point stock between zero and positive one should make zero quantityOnHand v3", 0, 0.8],
+            ["floating point stock that is positive should be rounded down v1", 1, 1.2],
+            ["floating point stock that is positive should be rounded down v2", 5, 5.5],
+            ["floating point stock that is positive should be rounded down v3", 8, 8.8],
         ];
     }
 

@@ -83,7 +83,7 @@ class InventoryMapper
 
   /**
    * Determine the "Quantity On Hand" to report to Wayfair
-   * @param int $netStock
+   * @param float $netStock
    *
    * @return int|mixed
    */
@@ -101,7 +101,9 @@ class InventoryMapper
       return -1;
     }
 
-    return $netStock;
+    // wayfair stock should be rounded DOWN to nearest integer.
+    // plenty allows for floats in net stock.
+    return floor($netStock);
   }
 
   /**
@@ -237,7 +239,7 @@ class InventoryMapper
           continue;
         }
 
-        // Avl Immediately. ADJUSTED Net Stock (see Stock Buffer setting in Wayfair plugin).
+        // Avl Immediately.
         $originalStockNet = $stock[InventoryMapper::STOCK_COL_STOCK_NET];
         $onHand = self::normalizeQuantityOnHand($originalStockNet);
 
