@@ -65,8 +65,8 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
     const VARIATION_COL_ID = 'id';
     const VARIATION_COL_NUMBER = 'number';
 
-    const ID_WITH_STOCK = '1111';
-    const ID_NO_STOCK = '2222';
+    const ID_WITH_STOCK = 1111;
+    const ID_NO_STOCK = 2222;
     const ARBITRARY_VAR_NUM = 'varFoo';
 
     const PART_NUM = 'part_123';
@@ -75,6 +75,7 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
     const STOCK_COL_VARIATION_ID = 'variationId';
     const STOCK_COL_WAREHOUSE_ID = 'warehouseId';
     const STOCK_COL_RESERVED_STOCK = 'reservedStock';
+    const STOCK_COL_UPDATED_AT = 'updatedAt';
 
     const STOCK_FILTER_UPDATED_AT_FROM = 'updatedAtFrom';
     const STOCK_FILTER_UPDATED_AT_TO = 'updatedAtTo';
@@ -84,13 +85,10 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
     const VARIATION_WITHOUT_ANY_STOCK = [self::VARIATION_COL_ID => self::ID_NO_STOCK, self::VARIATION_COL_NUMBER => self::ARBITRARY_VAR_NUM];
     const VARIATION_WITH_STOCK = [self::VARIATION_COL_ID => self::ID_WITH_STOCK, self::VARIATION_COL_NUMBER => self::ARBITRARY_VAR_NUM];
 
+    const WAREHOUSE_ID_WITH_STOCK = 99999;
+
     /**
-     * Undocumented function
-     *
-     * @param array $variationData
-     * @param string $itemMappingMethod
-     * @param integer $stockBuffer
-     * @param boolean $filtered
+     * Test for various cases of createInventoryDTOsFromVariation
      * @return void
      *
      * @dataProvider dataProviderForCreateInventoryDtosFromVariation
@@ -102,13 +100,16 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
         array $variationData = null,
         int $stockBuffer = null,
         $filterStart = null,
-        $filterEnd = null
+        $filterEnd = null,
+        $hasInventoryChanged = false
     ) {
 
         $stockDataArraysForPages = [];
 
+        $expectStockBuffer = (isset($stockBuffer) && $stockBuffer > 0) && isset($expectedResult) && count($expectedResult);
+
         /** @var InventoryMapper&\PHPUnit\Framework\MockObject\MockObject */
-        $inventoryMapper = $this->createInventoryMapper($expectedResult, $variationData, $stockDataArraysForPages, (isset($stockBuffer) && $stockBuffer > 0), $filterStart, $filterEnd);
+        $inventoryMapper = $this->createInventoryMapper($variationData, $stockDataArraysForPages, $expectStockBuffer, $filterStart, $filterEnd, $hasInventoryChanged, ['getSupplierPartNumberFromVariation', 'getAvailableDate']);
 
         $inventoryMapper->method('getSupplierPartNumberFromVariation')->willReturn(self::PART_NUM);
 
@@ -137,7 +138,9 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
 
         $cases[] = ['variation without stock should return an empty array', [], null, self::VARIATION_WITHOUT_ANY_STOCK];
 
-        $cases[] = ['timestamps should be passed to Stock Repository', [], null, self::VARIATION_WITHOUT_ANY_STOCK, null, self::TIMESTAMP_START, self::TIMESTAMP_END];
+        $cases[] = ['timestamp usage with no matches', [], null, self::VARIATION_WITHOUT_ANY_STOCK, null, self::TIMESTAMP_START, self::TIMESTAMP_END];
+
+        $cases[] = ['timestamp usage with positive matches', [], null, self::VARIATION_WITHOUT_ANY_STOCK, null, self::TIMESTAMP_START, self::TIMESTAMP_END, true];
 
         $cases[] = ['stockBuffer should not be used when no stock is returned: -5', [], null, self::VARIATION_WITHOUT_ANY_STOCK, -5];
 
@@ -156,17 +159,31 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
         return $cases;
     }
 
+    /**
+     * Create an InventoryMapper to use for testing
+     *
+     * @param mixed $variationData array representing a Variation
+     * @param array $stockDataArraysForPages array of arrays for pages returned from mock StockRepository
+     * @param boolean $expectStockBuffer is the stock buffer expected to be applied
+     * @param mixed $filterStart optional time filter start
+     * @param mixed $filterEnd optional time filter end
+     * @param boolean $hasInventoryChanged return value for the 'hasInventoryChanged' method
+     * @param array $methodsMockedLater names of methods that will be mocked out before this is used
+     * @return InventoryMapper
+     */
     public function createInventoryMapper(
-        $expectedResult = null,
         $variationData = null,
         $stockDataArraysForPages = [],
-        bool $stockBufferSet = false,
+        bool $expectStockBuffer = false,
         $filterStart = null,
-        $filterEnd = null
+        $filterEnd = null,
+        bool $hasInventoryChanged = false,
+        $methodsMockedLater = []
     ): InventoryMapper {
 
-        $expectedFilters = null;
         $expectedSearches = 0;
+        // null means no calls expected versus an empty meaning calling something with empty filters
+        $expectedFilters = null;
 
         $validVariation = isset($variationData)
             && array_key_exists(self::VARIATION_COL_ID, $variationData)
@@ -174,25 +191,16 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
             && array_key_exists(self::VARIATION_COL_NUMBER, $variationData)
             && !empty($variationData[self::VARIATION_COL_NUMBER]);
 
-        if ($validVariation) {
+        $timeExitWillHappen = ((isset($filterStart) && !empty($filterStart)) || (isset($filterEnd) && !empty($filterEnd))) && !$hasInventoryChanged;
+
+        if ($validVariation && !$timeExitWillHappen) {
             $expectedFilters = [self::STOCK_COL_VARIATION_ID => $variationData[self::VARIATION_COL_ID]];
-
-            if (isset($filterStart) && !empty($filterStart)) {
-                $expectedFilters[self::STOCK_FILTER_UPDATED_AT_FROM] = $filterStart;
-            }
-            if (isset($filterEnd) && !empty($filterEnd)) {
-                $expectedFilters[self::STOCK_FILTER_UPDATED_AT_TO] = $filterEnd;
-            }
-
             $expectedSearches = count($stockDataArraysForPages);
             if ($expectedSearches < 1) {
                 // even if we are not supplying data we're expecting to search once and get an empty page
                 $expectedSearches = 1;
             }
         }
-
-        /** @var LoggerContract&\PHPUnit\Framework\MockObject\MockObject */
-        $logger = $this->createMock(LoggerContract::class);
 
         global $mockPluginApp;
         $mockPluginApp = new MockPluginApp($this);
@@ -206,13 +214,21 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
 
         $mockPluginApp->willReturn(StockRepositoryContract::class, [], $stockRepository);
 
-        /** @var InventoryMapper&\PHPUnit\Framework\MockObject\MockObject */
-        $inventoryMapper = $this->createTestProxy(InventoryMapper::class, [
-            $logger,
-        ]);
+        $mockedOutMethodsForMapper = ['hasInventoryChanged'];
+        if (isset($methodsMockedLater) && !empty($methodsMockedLater)) {
+            // caller is going to mock out more things after creation
+            array_push($mockedOutMethodsForMapper, ...$methodsMockedLater);
+        }
 
-        if ($stockBufferSet && isset($expectedResult) && count($expectedResult)) {
+        /** @var InventoryMapper&\PHPUnit\Framework\MockObject\MockObject */
+        $inventoryMapper = $this->createPartialMock(InventoryMapper::class, $mockedOutMethodsForMapper);
+
+        if ($expectStockBuffer) {
             $inventoryMapper->expects($this->atLeastOnce())->method('applyStockBuffer');
+        }
+
+        if ($validVariation && ((isset($filterStart) && !empty($filterStart)) || (isset($filterEnd) && !empty($filterEnd)))) {
+            $inventoryMapper->expects($this->once())->method('hasInventoryChanged')->with($variationData[self::VARIATION_COL_ID], $filterStart, $filterEnd)->willReturn($hasInventoryChanged);
         }
 
         return $inventoryMapper;
@@ -285,7 +301,7 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
     /**
      * Test various cases for getting part numbers from variations
      *
-     * @param mixed $msg
+     * @param string $msg
      * @param mixed $variation
      * @param mixed $mappingMode
      * @param mixed $referrerId
@@ -320,6 +336,60 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
         if (isset($mappingMode) && isset($expected)) {
             $this->assertEquals($expected, $result, $msg);
         }
+    }
+
+    /**
+     * Test various cases for checking if inventory changed
+     *
+     * @param string $msg
+     * @param bool $expected
+     * @param mixed $variationId
+     * @param mixed $timeWindowStartW3c
+     * @param mixed $timeWindowEndW3c
+     * @param array $stockDataArraysForPages
+     * @return void
+     *
+     * @dataProvider dataProviderForHasInventoryChanged
+     */
+    public function testHasInventoryChanged($msg, bool $expected, $variationId, $timeWindowStartW3c, $timeWindowEndW3c, $stockDataArraysForPages)
+    {
+        $expectedSearches = 0;
+        /** @var array */
+        $expectedFilters = null;
+
+        if (isset($variationId) && !empty($variationId)) {
+            if (isset($timeWindowStartW3c) && !empty($timeWindowStartW3c)) {
+                $expectedFilters[self::STOCK_FILTER_UPDATED_AT_FROM] = $timeWindowStartW3c;
+            }
+            if (isset($timeWindowEndW3c) && !empty($timeWindowEndW3c)) {
+                $expectedFilters[self::STOCK_FILTER_UPDATED_AT_TO] = $timeWindowEndW3c;
+            }
+
+            if (isset($expectedFilters) && count($expectedFilters) > 0) {
+                $expectedFilters[self::STOCK_COL_VARIATION_ID] = $variationId;
+                // only expect a search if one or more time filter is set, not just the variable ID parameter
+                $expectedSearches = 1;
+            }
+        }
+
+        global $mockPluginApp;
+        $mockPluginApp = new MockPluginApp($this);
+
+        $stockRepository = (new MockStockRepositoryFactory($this))->create($stockDataArraysForPages, $expectedFilters, $expectedSearches);
+
+        $mockPluginApp->willReturn(StockRepositoryContract::class, [], $stockRepository);
+
+        /** @var LoggerContract&\PHPUnit\Framework\MockObject\MockObject */
+        $logger = $this->createMock(LoggerContract::class);
+
+        /** @var InventoryMapper&\PHPUnit\Framework\MockObject\MockObject */
+        $inventoryMapper = $this->createTestProxy(InventoryMapper::class, [
+            $logger,
+        ]);
+
+        $result = $inventoryMapper->hasInventoryChanged($variationId, $timeWindowStartW3c, $timeWindowEndW3c);
+
+        $this->assertEquals($expected, $result, $msg);
     }
 
     public function dataProviderForInventoryQuantityMerge()
@@ -494,6 +564,45 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
                 }
             }
         }
+        return $cases;
+    }
+
+    public function dataProviderForHasInventoryChanged()
+    {
+        $onePageWithOneStock = [[[self::STOCK_COL_WAREHOUSE_ID => self::WAREHOUSE_ID_WITH_STOCK, self::STOCK_COL_VARIATION_ID => self::ID_WITH_STOCK, self::STOCK_COL_UPDATED_AT => self::TIMESTAMP_START]]];
+        $noPages = [];
+        $oneEmptyPage = [[]];
+        $cases = [];
+
+        // cases with null variation
+        $cases[] = ["All null inputs means no changes V1", false, null, null, null, $noPages];
+        $cases[] = ["All null inputs means no changes V2", false, null, null, null, $oneEmptyPage];
+        $cases[] = ["All null inputs means no changes V3", false, null, null, null, $onePageWithOneStock];
+
+        $cases[] = ["Null supplier ID means no changes V1", false, null, self::TIMESTAMP_START, null, $noPages];
+        $cases[] = ["Null supplier ID means no changes V2", false, null, self::TIMESTAMP_START, null, $oneEmptyPage];
+        $cases[] = ["Null supplier ID means no changes V3", false, null, self::TIMESTAMP_START, null, $onePageWithOneStock];
+
+        $cases[] = ["Null supplier ID means no changes V4", false, null, null, self::TIMESTAMP_END, $noPages];
+        $cases[] = ["Null supplier ID means no changes V5", false, null, self::TIMESTAMP_START, null, $oneEmptyPage];
+        $cases[] = ["Null supplier ID means no changes V6", false, null, self::TIMESTAMP_START, null, $onePageWithOneStock];
+
+        $cases[] = ["Null timestamps means no changes V1", false, self::ID_WITH_STOCK, null, null, $noPages];
+        $cases[] = ["Null timestamps means no changes V2", false, self::ID_WITH_STOCK, null, null, $oneEmptyPage];
+        $cases[] = ["Null timestamps means no changes V3", false, self::ID_WITH_STOCK, null, null, $onePageWithOneStock];
+
+        $cases[] = ["Only start timestamp with no pages means no changes", false, self::ID_WITH_STOCK, self::TIMESTAMP_START, null, $noPages];
+        $cases[] = ["Only start timestamp with a blank page means no changes", false, self::ID_WITH_STOCK, self::TIMESTAMP_START, null, $oneEmptyPage];
+        $cases[] = ["Only start timestamp with a search result means a change happened", true, self::ID_WITH_STOCK, self::TIMESTAMP_START, null, $onePageWithOneStock];
+
+        $cases[] = ["Only end timestamp with no pages means no changes", false, self::ID_WITH_STOCK, null, self::TIMESTAMP_END, $noPages];
+        $cases[] = ["Only end timestamp with a blank page means no changes", false, self::ID_WITH_STOCK, null, self::TIMESTAMP_END, $oneEmptyPage];
+        $cases[] = ["Only end timestamp with a search result means a change happened", true, self::ID_WITH_STOCK, null, self::TIMESTAMP_END, $onePageWithOneStock];
+
+        $cases[] = ["Both timestamps with no pages means no changes", false, self::ID_WITH_STOCK, self::TIMESTAMP_START, self::TIMESTAMP_END, $noPages];
+        $cases[] = ["Both timestamps with a blank page means no changes", false, self::ID_WITH_STOCK, self::TIMESTAMP_START, self::TIMESTAMP_END, $oneEmptyPage];
+        $cases[] = ["Both timestamps with a search result means a change happened", true, self::ID_WITH_STOCK, self::TIMESTAMP_START, self::TIMESTAMP_END, $onePageWithOneStock];
+
         return $cases;
     }
 }
