@@ -302,7 +302,7 @@ class WarehouseSupplierRepository extends Repository
       $warehouseIdentifiers[] = $warehouseId;
     }
 
-    if (isset($warehouseIdentifiers) && !empty($warehouseIdentifiers) && isset($mappwarehouseIdentifiersingData[0])) {
+    if (isset($warehouseIdentifiers) && !empty($warehouseIdentifiers) && isset($warehouseIdentifiers[0])) {
       return $warehouseIdentifiers[0]->warehouseId;
     }
 
