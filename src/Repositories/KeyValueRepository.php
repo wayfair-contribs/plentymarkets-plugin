@@ -74,7 +74,7 @@ class KeyValueRepository extends Repository
         $firstModelForKey = $modelsForKey[0];
       }
     } catch (\Exception $e) {
-      $this->loggerContract
+      $this->getLogger()
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
           [
@@ -122,7 +122,7 @@ class KeyValueRepository extends Repository
       $database      = pluginApp(DataBase::class);
       $modelsForKey = $database->query(KeyValue::class)->where('key', '=', $key)->get();
     } catch (\Exception $e) {
-      $this->loggerContract
+      $this->getLogger()
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
           [
@@ -162,7 +162,7 @@ class KeyValueRepository extends Repository
       $database  = pluginApp(DataBase::class);
       $allModels = $database->query(KeyValue::class)->get();
     } catch (\Exception $e) {
-      $this->loggerContract
+      $this->getLogger()
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
           [

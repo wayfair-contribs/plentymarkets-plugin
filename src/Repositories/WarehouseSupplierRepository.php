@@ -61,7 +61,7 @@ class WarehouseSupplierRepository extends Repository
       $database                  = pluginApp(DataBase::class);
       $results               = $database->query(WarehouseSupplier::class)->where('id', '=', $data['id'])->get();
     } catch (\Exception $e) {
-      $this->loggerContract
+      $this->getLogger()
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
           [
@@ -104,7 +104,7 @@ class WarehouseSupplierRepository extends Repository
       $database    = pluginApp(DataBase::class);
       $results = $database->query(WarehouseSupplier::class)->where('warehouseId', '=', $warehouseId)->get();
     } catch (\Exception $e) {
-      $this->loggerContract
+      $this->getLogger()
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
           [
@@ -147,7 +147,7 @@ class WarehouseSupplierRepository extends Repository
         $database                  = pluginApp(DataBase::class);
         $results               = $database->query(WarehouseSupplier::class)->where('id', '=', $data['id'])->get();
       } catch (\Exception $e) {
-        $this->loggerContract
+        $this->getLogger()
           ->error(
             TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
             [
@@ -217,7 +217,7 @@ class WarehouseSupplierRepository extends Repository
       $database = pluginApp(DataBase::class);
       return $database->query(WarehouseSupplier::class)->get();
     } catch (\Exception $e) {
-      $this->loggerContract
+      $this->getLogger()
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
           [
@@ -247,6 +247,11 @@ class WarehouseSupplierRepository extends Repository
    */
   public function findWarehouseIds(string $supplierId)
   {
+    if (!isset($supplierId) || empty($supplierId))
+    {
+      return [];
+    }
+
     $results = [];
 
     try {
@@ -256,7 +261,7 @@ class WarehouseSupplierRepository extends Repository
       $database    = pluginApp(DataBase::class);
       $results = $database->query(WarehouseSupplier::class)->where('supplierId', '=', $supplierId)->get();
     } catch (\Exception $e) {
-      $this->loggerContract
+      $this->getLogger()
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
           [
@@ -283,7 +288,7 @@ class WarehouseSupplierRepository extends Repository
       $warehouseId = $mapping->warehouseId;
 
       if (!($warehouseId && $warehouseId > 0 && $this->warehouseExists($warehouseId))) {
-        $this->loggerContract
+        $this->getLogger()
           ->error(
             TranslationHelper::getLoggerKey(self::LOG_KEY_WAREHOUSE_ID_INVALID),
             [
@@ -318,7 +323,10 @@ class WarehouseSupplierRepository extends Repository
 
     $warehouse = $warehouseRepository->findById($warehouseId);
 
+    // ID is required for use in order creation.
     // use presence of warehouse name to mean it really exists
-    return isset($warehouse) && isset($warehouse->name) && !empty($warehouse->name);
+    return isset($warehouse) &&
+      isset($warehouse->id) && $warehouse->id > 0 &&
+      isset($warehouse->name) && !empty($warehouse->name);
   }
 }

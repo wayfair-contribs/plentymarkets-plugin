@@ -47,7 +47,7 @@ class PendingOrdersRepository extends Repository {
           ->get();
     }
     catch (\Exception $e) {
-      $this->loggerContract
+      $this->getLogger()
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
           [
@@ -85,7 +85,7 @@ class PendingOrdersRepository extends Repository {
    * @return array|null
    */
   public function get(string $poNum) {
-    
+
     try
     {
       $database = pluginApp(DataBase::class);
@@ -99,7 +99,7 @@ class PendingOrdersRepository extends Repository {
       }
     }
     catch (\Exception $e) {
-      $this->loggerContract
+      $this->getLogger()
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
           [
@@ -132,7 +132,7 @@ class PendingOrdersRepository extends Repository {
           ->get();
     }
     catch (\Exception $e) {
-      $this->loggerContract
+      $this->getLogger()
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
           [
@@ -161,7 +161,7 @@ class PendingOrdersRepository extends Repository {
       return $database->query(PendingOrders::class)->whereIn('poNum', $poNums)->delete();
     }
     catch (\Exception $e) {
-      $this->loggerContract
+      $this->getLogger()
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
           [
@@ -189,7 +189,7 @@ class PendingOrdersRepository extends Repository {
       return $database->query(PendingOrders::class)->delete();
     }
     catch (\Exception $e) {
-      $this->loggerContract
+      $this->getLogger()
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
           [

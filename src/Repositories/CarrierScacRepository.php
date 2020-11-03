@@ -68,7 +68,7 @@ class CarrierScacRepository extends Repository
     try {
       return $this->database->query(CarrierScac::class)->get();
     } catch (\Exception $e) {
-      $this->loggerContract
+      $this->getLogger()
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
           [
@@ -100,7 +100,7 @@ class CarrierScacRepository extends Repository
         return $model[0];
       }
     } catch (\Exception $e) {
-      $this->loggerContract
+      $this->getLogger()
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
           [
@@ -135,7 +135,7 @@ class CarrierScacRepository extends Repository
         return $model[0]->scac;
       }
     } catch (\Exception $e) {
-      $this->loggerContract
+      $this->getLogger()
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
           [

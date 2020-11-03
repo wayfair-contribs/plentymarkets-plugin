@@ -7,7 +7,7 @@ namespace Wayfair\Repositories;
 
 use Plenty\Modules\Frontend\Services\AccountService;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
-use Wayfair\Core\Contracts\LoggerContract;
+use Wayfair\Core\Contracts\getLogger();
 use Wayfair\Core\Dto\Constants;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Models\OrderASN;
@@ -52,7 +52,7 @@ class OrderASNRepository extends Repository {
           ->get();
     }
     catch (\Exception $e) {
-      $this->loggerContract
+      $this->getLogger()
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
           [
@@ -80,10 +80,10 @@ class OrderASNRepository extends Repository {
    */
   public function createOrUpdate($data) {
     /**
-     * @var LoggerContract $loggerContract
+     * @var getLogger() $getLogger()
      */
-    $loggerContract = pluginApp(LoggerContract::class);
-    $loggerContract
+    $getLogger() = pluginApp(getLogger()::class);
+    $getLogger()
         ->info(
             TranslationHelper::getLoggerKey('addOrderToSentASNList'), [
             'additionalInfo' => ['order' => $data],

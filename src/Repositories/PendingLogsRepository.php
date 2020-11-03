@@ -26,7 +26,7 @@ class PendingLogsRepository extends Repository {
           ->get();
     }
     catch (\Exception $e) {
-      $this->loggerContract
+      $this->getLogger()
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
           [
@@ -55,7 +55,7 @@ class PendingLogsRepository extends Repository {
       return $database->query(PendingLogs::class)->whereIn('id', $ids)->delete();
     }
     catch (\Exception $e) {
-      $this->loggerContract
+      $this->getLogger()
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
           [
@@ -83,7 +83,7 @@ class PendingLogsRepository extends Repository {
       return $database->query(PendingLogs::class)->delete();
     }
     catch (\Exception $e) {
-      $this->loggerContract
+      $this->getLogger()
         ->error(
           TranslationHelper::getLoggerKey(self::LOG_KEY_QUERY_FAILED),
           [
