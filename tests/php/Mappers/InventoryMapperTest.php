@@ -354,6 +354,7 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
     public function testHasInventoryChanged($msg, bool $expected, $variationId, $timeWindowStartW3c, $timeWindowEndW3c, $stockDataArraysForPages)
     {
         $expectedSearches = 0;
+        /** @var array */
         $expectedFilters = null;
 
         if (isset($variationId) && !empty($variationId)) {
@@ -364,7 +365,7 @@ final class InventoryMapperTest extends \PHPUnit\Framework\TestCase
                 $expectedFilters[self::STOCK_FILTER_UPDATED_AT_TO] = $timeWindowEndW3c;
             }
 
-            if (count($expectedFilters) > 0) {
+            if (isset($expectedFilters) && count($expectedFilters) > 0) {
                 $expectedFilters[self::STOCK_COL_VARIATION_ID] = $variationId;
                 // only expect a search if one or more time filter is set, not just the variable ID parameter
                 $expectedSearches = 1;
