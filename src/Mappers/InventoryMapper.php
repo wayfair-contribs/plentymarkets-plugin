@@ -34,6 +34,7 @@ class InventoryMapper
   const STOCK_COL_VARIATION_ID = 'variationId';
   const STOCK_COL_WAREHOUSE_ID = 'warehouseId';
   const STOCK_COL_RESERVED_STOCK = 'reservedStock';
+  const STOCK_COL_UPDATED_AT = 'updatedAt';
 
   const SKU_COL_MARKET_ID = 'marketId';
   const SKU_COL_SKU = 'sku';
@@ -45,7 +46,8 @@ class InventoryMapper
     self::STOCK_COL_WAREHOUSE_ID,
     self::STOCK_COL_VARIATION_ID,
     self::STOCK_COL_STOCK_NET,
-    self::STOCK_COL_RESERVED_STOCK
+    self::STOCK_COL_RESERVED_STOCK,
+    self::STOCK_COL_UPDATED_AT
   ];
 
   /** @var LoggerContract */
@@ -111,8 +113,8 @@ class InventoryMapper
    * @param string $itemMappingMethod the item mapping method setting
    * @param float|null $referrerId (optional) the referrer ID for Wayfair, for use with SKU mapping method
    * @param int|null $stockBuffer (optional) amount of stock (per product) to withold from Wayfair
-   * @param string|null $timeWindowStartW3c (optional) start of time-based filter in W3C format
-   * @param string|null $timeWindowEndW3c (optional) end of time-based filter in W3C format
+   * @param string|null $timeWindowStartW3c (optional) start of 'some stock has changed' filter in W3C format
+   * @param string|null $timeWindowEndW3c (optional) end of 'some stock has changed' filter in W3C format
    *
    * @return RequestDTO[]
    */
@@ -123,7 +125,7 @@ class InventoryMapper
     $stockBuffer = null,
     $timeWindowStartW3c = null,
     $timeWindowEndW3c = null
-  ) {
+  ): array {
     if (!isset($variationData) || empty($variationData)) {
       throw new InvalidArgumentException("No Variation data provided");
     }
@@ -172,19 +174,23 @@ class InventoryMapper
       return [];
     }
 
-    $nextAvailableDate = $this->getAvailableDate($variationId); // Pending. Need Item
-
-    $filters = [self::STOCK_COL_VARIATION_ID => $variationId];
-
-    if (isset($timeWindowStartW3c) && !empty($timeWindowStartW3c)) {
-      $filters[self::STOCK_FILTER_UPDATED_AT_FROM] = $timeWindowStartW3c;
-
-      if (isset($timeWindowEndW3c) && !empty($timeWindowEndW3c)) {
-        $filters[self::STOCK_FILTER_UPDATED_AT_TO] = $timeWindowEndW3c;
-      }
+    if (((isset($timeWindowStartW3c) && !empty($timeWindowStartW3c))
+        || (isset($timeWindowEndW3c) && !empty($timeWindowEndW3c)))
+      && !$this->hasInventoryChanged($variationId, $timeWindowStartW3c, $timeWindowEndW3c)
+    ) {
+      // no inventory changes were found for the time period. No stock update should be sent!
+      return [];
     }
 
-    $stockRepository= pluginApp(StockRepositoryContract::class);
+    // for items that are pending sale as stock becomes available
+    $nextAvailableDate = $this->getAvailableDate($variationId);
+
+    /** @var StockRepositoryContract */
+    $stockRepository = pluginApp(StockRepositoryContract::class);
+
+    // want always want to send TOTAL stock per variation, for ALL warehouses.
+    // hasInventoryChanged is used before this, to filter out variations based on the optional params.
+    $filters = [self::STOCK_COL_VARIATION_ID => $variationId];
     $stockRepository->setFilters($filters);
 
     /** @var array<string,RequestDTO> $requestDtosBySuID */
@@ -470,5 +476,54 @@ class InventoryMapper
     }
 
     return $left + $right;
+  }
+
+  /**
+   * Check for inventory changes for a Variation,
+   * based on the given timestamps.
+   *
+   * If no timestamps are set, returns false.
+   * Otherwise, it
+   *
+   * @param int $variationId
+   * @param string $timeWindowStartW3c
+   * @param string $timeWindowEndW3c
+   * @return boolean
+   */
+  function hasInventoryChanged($variationId, $timeWindowStartW3c, $timeWindowEndW3c)
+  {
+    if ($variationId == null) {
+      return false;
+    }
+
+    $filters = [];
+
+    if (isset($timeWindowStartW3c) && !empty($timeWindowStartW3c)) {
+      $filters[self::STOCK_FILTER_UPDATED_AT_FROM] = $timeWindowStartW3c;
+    }
+
+    if (isset($timeWindowEndW3c) && !empty($timeWindowEndW3c)) {
+      $filters[self::STOCK_FILTER_UPDATED_AT_TO] = $timeWindowEndW3c;
+    }
+
+    if (empty($filters)) {
+      return false;
+    }
+
+    /** @var StockRepositoryContract */
+    $stockRepository = pluginApp(StockRepositoryContract::class);
+
+    $filters[self::STOCK_COL_VARIATION_ID] = $variationId;
+
+    // fetch a maximum of one row
+    $stockRepository->setFilters($filters);
+    $stockSearchResponsePage = $stockRepository->listStock([self::STOCK_COL_WAREHOUSE_ID, self::STOCK_COL_UPDATED_AT], 1, 1);
+    $results = $stockSearchResponsePage->getResult();
+
+    // stock has changed if the row exists and is populated.
+    return isset($results)
+      && !empty($results)
+      && isset($results[0])
+      && $results[0][self::STOCK_COL_WAREHOUSE_ID] > 0;
   }
 }
