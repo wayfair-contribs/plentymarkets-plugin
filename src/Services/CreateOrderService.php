@@ -24,6 +24,7 @@ use Wayfair\Mappers\AddressMapper;
 use Wayfair\Mappers\PendingPurchaseOrderMapper;
 use Wayfair\Mappers\PurchaseOrderMapper;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
+use Wayfair\Core\Dto\General\BillingInfoDTO;
 use Wayfair\Models\ExternalLogs;
 use Wayfair\Repositories\KeyValueRepository;
 use Wayfair\Repositories\PendingOrdersRepository;
@@ -164,6 +165,9 @@ class CreateOrderService
     $this->pendingOrdersRepository = $pendingOrdersRepository;
     $this->savePackingSlipService = $savePackingSlipService;
     $this->addressService = $addressService;
+    $this->configHelper = $configHelper;
+    $this->logger = $logger;
+    $this->logSenderService = $logSenderService;
   }
 
   /**
@@ -211,16 +215,16 @@ class CreateOrderService
         throw new \Exception("Cannot create order - no PO number provided");
       }
 
-      // Check if order already exists
-      $this->orderRepositoryContract->setFilters(['externalOrderId' => $poNumber]);
-      // not expecting more than one page, so not setting page filter
-      $orderList = $this->orderRepositoryContract->searchOrders();
+      $idsOfExistingOrders = $this->getIdsOfExistingOrders($poNumber);
+      $numberOfOrdersForPO = sizeof($idsOfExistingOrders);
 
-      $numberOfOrdersForPO = $orderList->getTotalCount();
-      if ($numberOfOrdersForPO > 0) {
+      if ($numberOfOrdersForPO) {
         // orders exist for the Wayfair PO. Do not create another one.
         $this->logger->warning(TranslationHelper::getLoggerKey(self::LOG_KEY_ORDERS_ALREADY_EXIST), [
-          'additionalInfo' => ['poNumber' => $poNumber, 'orders' => $orderList->getResult()],
+          'additionalInfo' => [
+            'poNumber' => $poNumber,
+            'order_ids' => json_encode($idsOfExistingOrders)
+          ],
           'method' => __METHOD__
         ]);
 
@@ -244,30 +248,17 @@ class CreateOrderService
       // Create billing address and delivery address
       $addressDTO = AddressDTO::createFromArray(BillingAddress::BillingAddressAsArray);
 
-      $billing = null;
       $billingInfoFromDTO = $dto->getBillingInfo();
-      $encodedBillingContactFromRepository = $this->keyValueRepository->get(AbstractConfigHelper::BILLING_CONTACT);
-      if (isset($encodedBillingContactFromRepository) && !empty($encodedBillingContactFromRepository)) {
-        try {
-          $billing = \json_decode($encodedBillingContactFromRepository, true);
-        } catch (\Exception $e) {
-          $externalLogs->addWarningLog("Could not decode billing information in KeyValueRepository - "
-            . get_class($e) . ": " . $e->getMessage(), $e->getTraceAsString());
-        }
-      }
-
-      // TODO: verify that supplier's billing info should take precedence over billing info from PO here
-      if (!isset($billing) or empty($billing)) {
-        if (!isset($billingInfoFromDTO) || empty($billingInfoFromDTO)) {
-          throw new \Exception("No billing info provided in argument, nor any billing info in repository");
-        }
-
-        $billing = $this->addressService->createContactAndAddress($addressDTO, $billingInfoFromDTO, $referrerId, ContactType::TYPE_PARTNER, AddressRelationType::BILLING_ADDRESS);
-        $this->keyValueRepository->put(AbstractConfigHelper::BILLING_CONTACT, \json_encode($billing));
-      }
 
       if (!isset($billingInfoFromDTO) || empty($billingInfoFromDTO)) {
         throw new \Exception("Purchase order information is missing billing details. PO: " . $poNumber);
+      }
+
+      $billing = $this->getOrCreateBillingInfoForWayfair($addressDTO, $billingInfoFromDTO, $referrerId, $externalLogs);
+
+      if (!isset($billing) || empty($billing))
+      {
+        throw new \Exception("Could not determine information on how to bill Wayfair for PO: " . $poNumber);
       }
 
       $shipTo = $dto->getShipTo();
@@ -321,7 +312,7 @@ class CreateOrderService
       }
 
       $order = $this->orderRepositoryContract->createOrder($orderData);
-      if (!isset($order) or !$order->id) {
+      if (!isset($order) || !isset($order->id) || $order->id < 1) {
         throw new \Exception("Unable to create new order using order data: " . \json_encode($orderData));
       }
 
@@ -421,5 +412,67 @@ class CreateOrderService
     ];
 
     return $this->paymentRepositoryContract->createPayment($data);
+  }
+
+  private function getIdsOfExistingOrders(string $poNumber): array
+  {
+    if (!isset($poNumber) || empty($poNumber)) {
+      return [];
+    }
+
+    $oldFilters = $this->orderRepositoryContract->getFilters();
+    try {
+      $this->orderRepositoryContract->setFilters(['externalOrderId' => $poNumber]);
+      // not expecting more than one page, so not setting page filter
+      $orderList = $this->orderRepositoryContract->searchOrders();
+    } finally {
+      $this->orderRepositoryContract->setFilters($oldFilters);
+    }
+
+    $ids = [];
+
+    foreach ($orderList->getResult() as $key => $order) {
+      $ids[] = $order['id'];
+    }
+
+    return $ids;
+  }
+
+  /**
+   * Cache billing info for Wayfair, if it does not already exist
+   *
+   * @param AddressDTO $addressDTO
+   * @param BillingInfoDTO $billingInfoFromDTO
+   * @param float $referrerId
+   * @param ExternalLogs $externalLogs
+   * @return array
+   */
+  private function getOrCreateBillingInfoForWayfair($addressDTO, $billingInfoFromDTO, $referrerId, $externalLogs = null): array
+  {
+    $billing = [];
+
+    $encodedBillingContactFromRepository = $this->keyValueRepository->get(AbstractConfigHelper::BILLING_CONTACT);
+    if (isset($encodedBillingContactFromRepository) && !empty($encodedBillingContactFromRepository)) {
+      try {
+        $billing = \json_decode($encodedBillingContactFromRepository, true);
+      } catch (\Exception $e) {
+        if (isset($externalLogs)) {
+          $externalLogs->addWarningLog("Could not decode billing information in KeyValueRepository - "
+            . get_class($e) . ": " . $e->getMessage(), $e->getTraceAsString());
+        }
+      }
+    }
+
+    if (!isset($billing) or empty($billing)) {
+      // no billing info cached for Wayfair yet
+      if (!isset($billingInfoFromDTO) || empty($billingInfoFromDTO)) {
+        return [];
+      }
+
+      $billing = $this->addressService->createContactAndAddress($addressDTO, $billingInfoFromDTO, $referrerId, ContactType::TYPE_PARTNER, AddressRelationType::BILLING_ADDRESS);
+      $this->keyValueRepository->put(AbstractConfigHelper::BILLING_CONTACT, \json_encode($billing));
+    }
+
+    return $billing;
   }
 }
