@@ -6,6 +6,7 @@
 
 namespace Wayfair\PlentyMockets\Factories;
 
+use PHPUnit\Framework\TestCase;
 use Plenty\Repositories\Models\PaginatedResult;
 use Wayfair\PlentyMockets\AbstractMockFactory;
 
@@ -13,8 +14,23 @@ class MockPaginatedResultFactory extends AbstractMockFactory
 {
     private $pageNumber = 1;
 
+    private $totalCount;
+
+    private $createdLastPage = false;
+
+    public function __construct(TestCase $testCase, int $totalCount)
+    {
+        parent::__construct($testCase);
+        $this->totalCount = $totalCount;
+    }
+
     public function createNext(array $searchResults, bool $isLastPage): PaginatedResult
     {
+        if ($this->createdLastPage)
+        {
+            throw new \Exception("Already created last page");
+        }
+
         /** @var PaginatedResult&\PHPUnit\Framework\MockObject\MockObject */
         $paginatedResult  = $this->createMock(PaginatedResult::class);
 
@@ -26,11 +42,11 @@ class MockPaginatedResultFactory extends AbstractMockFactory
 
         $paginatedResult->method('getCurrentPage')->willReturn($curPageNumber);
 
+        $paginatedResult->method('getTotalCount')->willReturn($this->totalCount);
+
         $paginatedResult->method('isLastPage')->willReturn($isLastPage);
-        if ($isLastPage)
-        {
-            $this->pageNumber = 1;
-        }
+
+        $this->createdLastPage = $this->createdLastPage || $isLastPage;
 
         return $paginatedResult;
     }

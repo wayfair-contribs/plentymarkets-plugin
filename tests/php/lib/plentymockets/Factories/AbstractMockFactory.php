@@ -48,9 +48,13 @@ abstract class AbstractMockFactory
         $pages = [];
         $dataForLastPage = [];
 
-        $pageFactory = new MockPaginatedResultFactory($this->getTestCase());
+        $totalCount = $this->countObjectsInPages($dataPages);
+
+        $pageFactory = new MockPaginatedResultFactory($this->getTestCase(), $totalCount);
 
         $amtPages = count($dataPages);
+
+        $amountResults = 0;
 
         for ($page = 0; $page < $amtPages - 1; $page++) {
             $pages[] = $pageFactory->createNext($dataPages[$page], false);
@@ -64,8 +68,7 @@ abstract class AbstractMockFactory
         // the last page MUST report that it is the last page, or there will be infinite looping!
         $pages[] = $pageFactory->createNext($dataForLastPage, true);
 
-        if (!isset($searchesExpected))
-        {
+        if (!isset($searchesExpected)) {
             $searchesExpected = $amtPages;
         }
 
@@ -75,5 +78,20 @@ abstract class AbstractMockFactory
         if (isset($expectedFilters)) {
             $mockObject->expects($this->getTestCase()->once())->method('setFilters')->with($this->getTestCase()->equalTo($expectedFilters));
         }
+    }
+
+    protected function countObjectsInPages($dataPages): int
+    {
+        if (!isset($dataPages) || empty($dataPages)) {
+            return 0;
+        }
+
+        $totalCount = 0;
+
+        foreach ($dataPages as $idx => $page) {
+            $totalCount += sizeof($page);
+        }
+
+        return $totalCount;
     }
 }

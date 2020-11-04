@@ -16,7 +16,6 @@ require_once(dirname(__DIR__) . DIRECTORY_SEPARATOR
     . 'plentymockets' . DIRECTORY_SEPARATOR
     . 'Overrides' . DIRECTORY_SEPARATOR . 'ReplacePluginApp.php');
 
-use Plenty\Modules\Frontend\Services\AccountService;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 use Plenty\Modules\Plugin\DataBase\Contracts\Query;
 use Plenty\Modules\StockManagement\Warehouse\Contracts\WarehouseRepositoryContract;

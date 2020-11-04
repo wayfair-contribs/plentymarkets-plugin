@@ -102,6 +102,21 @@ class CreateOrderService
   private $addressService;
 
   /**
+   * @var AbstractConfigHelper
+   */
+  private $configHelper;
+
+  /**
+   * @var LoggerContract
+   */
+  private $logger;
+
+  /**
+   * @var LogSenderService
+   */
+  private $logSenderService;
+
+  /**
    * CreateOrderService constructor.
    *
    * @param PurchaseOrderMapper $purchaseOrderMapper
@@ -116,6 +131,9 @@ class CreateOrderService
    * @param PendingOrdersRepository $pendingOrdersRepository
    * @param SavePackingSlipService $savePackingSlipService
    * @param AddressService $addressService
+   * @param AbstractConfigHelper $configHelper
+   * @param LoggerContract $logger
+   * @param LogSenderService $logSenderService
    */
   public function __construct(
     PurchaseOrderMapper $purchaseOrderMapper,
@@ -129,7 +147,10 @@ class CreateOrderService
     PendingPurchaseOrderMapper $pendingPurchaseOrderMapper,
     PendingOrdersRepository $pendingOrdersRepository,
     SavePackingSlipService $savePackingSlipService,
-    AddressService $addressService
+    AddressService $addressService,
+    AbstractConfigHelper $configHelper,
+    LoggerContract $logger,
+    LogSenderService $logSenderService
   ) {
     $this->purchaseOrderMapper = $purchaseOrderMapper;
     $this->addressMapper = $addressMapper;
@@ -165,13 +186,6 @@ class CreateOrderService
    */
   public function create(ResponseDTO $dto): int
   {
-    /**
-     * @var AbstractConfigHelper $configHelper
-     */
-    $configHelper = pluginApp(AbstractConfigHelper::class);
-
-    /** @var LoggerContract $loggerContract */
-    $loggerContract = pluginApp(LoggerContract::class);
     /** @var ExternalLogs $externalLogs */
     $externalLogs = pluginApp(ExternalLogs::class);
 
@@ -186,7 +200,7 @@ class CreateOrderService
       }
 
       // Get referrer ID
-      $referrerId = $configHelper->getOrderReferrerValue();
+      $referrerId = $this->configHelper->getOrderReferrerValue();
 
       if (!isset($referrerId) || $referrerId <= 0) {
         throw new \Exception("Cannot create order - no referrer value");
@@ -205,7 +219,7 @@ class CreateOrderService
       $numberOfOrdersForPO = $orderList->getTotalCount();
       if ($numberOfOrdersForPO > 0) {
         // orders exist for the Wayfair PO. Do not create another one.
-        $loggerContract->warning(TranslationHelper::getLoggerKey(self::LOG_KEY_ORDERS_ALREADY_EXIST), [
+        $this->logger->warning(TranslationHelper::getLoggerKey(self::LOG_KEY_ORDERS_ALREADY_EXIST), [
           'additionalInfo' => ['poNumber' => $poNumber, 'orders' => $orderList->getResult()],
           'method' => __METHOD__
         ]);
@@ -219,7 +233,7 @@ class CreateOrderService
         return -1;
       }
 
-      $loggerContract->info(TranslationHelper::getLoggerKey(self::LOG_KEY_CREATING_ORDER), [
+      $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_CREATING_ORDER), [
         'additionalInfo' => [
           'poNumber' => $poNumber
         ],
@@ -348,9 +362,7 @@ class CreateOrderService
       return $orderId;
     } finally {
       if (count($externalLogs->getLogs())) {
-        /** @var LogSenderService $logSenderService */
-        $logSenderService = pluginApp(LogSenderService::class);
-        $logSenderService->execute($externalLogs->getLogs());
+        $this->logSenderService->execute($externalLogs->getLogs());
       }
     }
   }
@@ -369,10 +381,8 @@ class CreateOrderService
     try {
       $pendingOrder = $this->pendingOrdersRepository->get($poNumber);
     } catch (\Exception $e) {
-      /** @var LoggerContract $loggerContract */
-      $loggerContract = pluginApp(LoggerContract::class);
 
-      $loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_PENDING_ORDER_MAY_EXIST), [
+      $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_PENDING_ORDER_MAY_EXIST), [
         'exception' => $e,
         'exceptionType' => get_class($e),
         'exceptionMessage' => $e->getMessage(),
