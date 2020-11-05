@@ -29,9 +29,12 @@ use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
+use Plenty\Modules\Payment\Models\Payment;
+use Plenty\Modules\Payment\Models\PaymentOrderRelation;
 use Wayfair\Core\Api\Services\LogSenderService;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\PurchaseOrder\ResponseDTO;
+use Wayfair\Core\Exceptions\CreateOrderException;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Helpers\PaymentHelper;
 use Wayfair\Mappers\AddressMapper;
@@ -52,72 +55,187 @@ class CreateOrderServiceTest extends \PHPUnit\Framework\TestCase
     const DELIVERY_ADDRESS_ID = 3;
     const PAYMENT_ID = 4;
 
+
+    /**
+     * @before
+     */
+    public function setUp()
+    {
+        // set up the pluginApp, which returns empty mocks by default
+        global $mockPluginApp;
+        $mockPluginApp = new MockPluginApp($this);
+    }
+
     /**
      * Test harness for create method
+     *
+     * FIXME: param hints in this docblock
      *
      * @param string $msg
      * @param integer $expected
      * @param ResponseDTO $purchaseOrderResponseDTO
-     * @param array $pagesOfExistingOrders
+     * @param array $existingOrderIDs
      * @return void
      *
      * @dataProvider dataProviderForCreate
      */
-    public function testCreate(string $msg, int $expected, ResponseDTO $purchaseOrderResponseDTO, array $pagesOfExistingOrders, array $warehouseIDs, array $orderData, Order $plentyOrder, bool $pendingOrderCreationSuccessful)
-    {
-        global $mockPluginApp;
-        $mockPluginApp = new MockPluginApp($this);
+    public function testCreate(
+        string $msg,
+        ResponseDTO $purchaseOrderResponseDTO,
+        float $orderReferrerId,
+        array $idsOfExistingOrders,
+        array $warehouseIDs,
+        array $orderDataReturnedFromMapper,
+        Order $plentyOrder,
+        bool $pendingOrderCreationSuccessful,
+        array $wayfairBillingInfo,
+        array $deliveryInfoCreated,
+        Payment $createdPayment,
+        PaymentOrderRelation $createdPaymentOrderRelation
+    ) {
+        $expectedResult = null;
 
-        $orderRepositoryFactory = new MockOrderRepositoryFactory($this);
+        $poNumber = null;
+        $plentyWarehouseIdFromRepo = null;
 
-        $orderRepositorySearchesExpected = 0;
-
-        $poNumber = '';
+        $dtoPoNumberGetsExpected = 0;
+        $orderReferralValueChecksExpected = 0;
+        $existingOrderChecksExpected = 0;
+        $pendingOrderCreationsExpected = 0;
+        $orderRepositoryCreationsExpected = 0;
+        $dtoBillingGetsExpected = 0;
+        $billingInfoLookupsExpected = 0;
+        $dtoShipToGetsExpected = 0;
+        $contactAndAddressCreationsExpected = 0;
+        $dtoWarehouseGetsExpected = 0;
+        $dtoWarehouseIdGetsExpected = 0;
+        $warehouseIdLookupsExpected = 0;
+        $purchaseOrderMappingsExpected = 0;
+        $orderCreationsExpected = 0;
+        $paymentCreationsExpected = 0;
+        $paymentOrderRelationCreationsExpected = 0;
+        $packingSlipFetchesExpected = 1;
 
         if (isset($purchaseOrderResponseDTO)) {
+            $dtoPoNumberGetsExpected = 1;
             $poNumber = $purchaseOrderResponseDTO->getPoNumber();
 
             if (isset($poNumber) && !empty($poNumber)) {
-                $orderRepositorySearchesExpected = 1;
+                $orderReferralValueChecksExpected = 1;
+
+                if (isset($orderReferrerId) && $orderReferrerId >= 1) {
+                    $existingOrderChecksExpected = 1;
+
+                    if (isset($idsOfExistingOrders) && !empty($idsOfExistingOrders)) {
+                        $pendingOrderCreationsExpected = 1;
+                        $expectedResult = CreateOrderService::RETURN_VALUE_EXISTING_ORDERS;
+                    } else {
+                        $dtoBillingGetsExpected = 1;
+                        $billingInfoFromDTO = $purchaseOrderResponseDTO->getBillingInfo();
+
+                        if (isset($billingInfoFromDTO) && !empty($billingInfoFromDTO)) {
+                            $billingInfoLookupsExpected = 1;
+
+                            if (isset($wayfairBillingInfo) && !empty($wayfairBillingInfo)) {
+                                $wayfairBillingAddressId = $wayfairBillingInfo['addressId'];
+                                $wayfairBillingContactId = $billingInformationForWayfair['contactId'];
+
+                                if (isset($wayfairBillingAddressId) && $wayfairBillingAddressId >= 1 && isset($wayfairBillingContactId) && $wayfairBillingContactId >= 1) {
+
+                                    $dtoShipToGetsExpected = 1;
+
+                                    if (null !== $purchaseOrderResponseDTO->getShipTo()) {
+                                        $contactAndAddressCreationsExpected = 1;
+
+                                        if (isset($deliveryInfoCreated) && !empty($deliveryInfoCreated)) {
+
+                                            $deliveryAddressId = $deliveryInfoCreated['addressId'];
+
+                                            if (isset($deliveryAddressId) && $deliveryAddressId >= 1) {
+
+                                                $dtoWarehouseGetsExpected = 1;
+
+                                                $warehouseInDto = $purchaseOrderResponseDTO->getWarehouse();
+
+                                                if (isset($warehouse) && null !== $warehouse->getId() && !empty($warehouse->getId())) {
+                                                    $dtoWarehouseIdGetsExpected = 1;
+
+                                                    $supplierIdInDto = $warehouseInDto->getId();
+
+                                                    if (isset($supplierIdInDto) && !empty($supplierIdInDto)) {
+                                                        $warehouseIdLookupsExpected = 1;
+
+                                                        if (isset($warehouseIDs) && !empty($warehouseIDs) && !empty($warehouseIDs[0])) {
+                                                            $plentyWarehouseIdFromRepo = $warehouseIDs[0];
+                                                            $purchaseOrderMappingsExpected = 1;
+
+                                                            if (isset($orderDataReturnedFromMapper) && !empty($orderDataReturnedFromMapper)) {
+                                                                $orderCreationsExpected = 1;
+
+                                                                if (isset($plentyOrder) && isset($plentyOrder->id) && $plentyOrder->id >= 1) {
+                                                                    $pendingOrderCreationsExpected = 1;
+
+                                                                    if ($pendingOrderCreationSuccessful)
+                                                                    {
+                                                                        $paymentCreationsExpected = 1;
+
+                                                                        if (isset($createdPayment) && isset($createdPayment->id) && $createdPayment->id >= 1)
+                                                                        {
+                                                                            $paymentOrderRelationCreationsExpected = 1;
+
+                                                                            if (isset($createdPaymentOrderRelation) && isset($createdPaymentOrderRelation->id) && $createdPaymentOrderRelation->id >= 1)
+                                                                            {
+                                                                                $expectedResult = $plentyOrder->id;
+
+                                                                                $packingSlipFetchesExpected = 1;
+                                                                            }
+
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
-        $poMappingsExpected = 0;
+        /** @var AbstractConfigHelper&\PHPUnit\Framework\MockObject\MockObject */
+        $configHelper = $this->createMock(AbstractConfigHelper::class);
 
-        if (isset($warehouseIDs) && in_array(self::WAREHOUSE_ID, $warehouseIDs)) {
-            $poMappingsExpected = 1;
-        } else {
-            $this->expectException(Exception::class);
-        }
+        $configHelper->expects($this->exactly($orderReferralValueChecksExpected))->method('getOrderReferrerValue')->willReturn($orderReferrerId);
 
         /** @var PurchaseOrderMapper&\PHPUnit\Framework\MockObject\MockObject */
         $purchaseOrderMapper = $this->createMock(PurchaseOrderMapper::class);
 
-        $purchaseOrderMapper->expects($this->exactly($poMappingsExpected))->method('map')->with(
+        $purchaseOrderMapper->expects($this->exactly($purchaseOrderMappingsExpected))->method('map')->with(
             $purchaseOrderResponseDTO,
             self::BILLING_ADDRESS_ID,
             self::BILLING_CONTACT_ID,
             self::ORDER_REFERRER_ID,
             self::WAREHOUSE_ID,
             (string) AbstractConfigHelper::PAYMENT_METHOD_INVOICE
-        )->willReturn($orderData);
+        )->willReturn($orderDataReturnedFromMapper);
 
-        $orderRepositoryCreationsExpected = 0;
-
-        if (isset($orderData) && !empty($orderData)) {
-            $orderRepositoryCreationsExpected = 1;
-        } else {
-            $this->expectException(Exception::class);
-        }
-
+        // lookups are happening in a different function, so the OrderRepositoryContract does NOT need to support fetching here.
         /** @var OrderRepositoryContract&\PHPUnit\Framework\MockObject\MockObject */
-        $orderRepositoryContract = $orderRepositoryFactory->create($pagesOfExistingOrders, ['externalOrderId' => $poNumber], $orderRepositorySearchesExpected);
-        $orderRepositoryContract->expects($this->exactly($orderRepositoryCreationsExpected))->method('createOrder')->with($orderData)->willReturn($plentyOrder);
+        $orderRepositoryContract = $this->createMock(OrderRepositoryContract::class);
+
+        $orderRepositoryContract->expects($this->exactly($orderRepositoryCreationsExpected))->method('createOrder')->with($orderDataReturnedFromMapper)->willReturn($plentyOrder);
+
+        /** @var PendingOrdersRepository&\PHPUnit\Framework\MockObject\MockObject */
+        $pendingOrdersRepository = $this->createMock(PendingOrdersRepository::class);
 
         /** @var AddressMapper&\PHPUnit\Framework\MockObject\MockObject */
         $addressMapper = $this->createMock(AddressMapper::class);
-
-
 
         /** @var KeyValueRepository&\PHPUnit\Framework\MockObject\MockObject */
         $keyValueRepository = $this->createMock(KeyValueRepository::class);
@@ -146,11 +264,6 @@ class CreateOrderServiceTest extends \PHPUnit\Framework\TestCase
         /** @var AddressService&\PHPUnit\Framework\MockObject\MockObject */
         $addressService = $this->createMock(AddressService::class);
 
-        /** @var AbstractConfigHelper&\PHPUnit\Framework\MockObject\MockObject */
-        $configHelper = $this->createMock(AbstractConfigHelper::class);
-
-        $configHelper->expects($this->once())->method('getOrderReferrerValue')->willReturn(self::ORDER_REFERRER_ID);
-
         /** @var LoggerContract&\PHPUnit\Framework\MockObject\MockObject */
         $logger = $this->createMock(LoggerContract::class);
 
@@ -176,25 +289,25 @@ class CreateOrderServiceTest extends \PHPUnit\Framework\TestCase
             $logSenderService
         ]);
 
+        // mock out the subroutines - these should be tested in their own respective harnesses
+
         /** @var Payment&\PHPUnit\Framework\MockObject\MockObject */
         $payment = $this->createMock(Payment::class);
         $payment->id = self::PAYMENT_ID;
 
         $createOrderService->method('createPayment')->willReturn($payment);
 
-        $pendingOrderCreationsExpected = 0;
-
-        if (isset($order) && isset($order->id) && $order->id > 0) {
-            $pendingOrderCreationsExpected = 1;
-        } else {
-            $this->expectException(Exception::class);
-        }
-
         $createOrderService->expects($this->exactly($pendingOrderCreationsExpected))->method('createPendingOrder')->willReturn($pendingOrderCreationSuccessful);
+
+        $createOrderService->expects($this->exactly($existingOrderChecksExpected))->method('getIdsOfExistingOrders')->with($poNumber)->willReturn($idsOfExistingOrders);
+
+        if (!isset($expectedResult)) {
+            $this->expectException(CreateOrderException::class);
+        }
 
         $actual = $createOrderService->create($purchaseOrderResponseDTO);
 
-        $this->assertEquals($expected, $actual, $msg);
+        $this->assertEquals($expectedResult, $actual, $msg);
     }
 
     public function dataProviderForCreate()

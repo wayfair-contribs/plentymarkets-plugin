@@ -16,6 +16,7 @@ use Wayfair\Core\Api\Services\LogSenderService;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\General\AddressDTO;
 use Wayfair\Core\Dto\PurchaseOrder\ResponseDTO;
+use Wayfair\Core\Exceptions\CreateOrderException;
 use Wayfair\Core\Helpers\AbstractConfigHelper;
 use Wayfair\Core\Helpers\BillingAddress;
 use Wayfair\Helpers\PaymentHelper;
@@ -42,132 +43,134 @@ class CreateOrderService
   const LOG_KEY_CREATING_ORDER = 'creatingNewOrder';
   const LOG_KEY_PENDING_ORDER_MAY_EXIST = 'pendingOrderMayExist';
 
+  const RETURN_VALUE_EXISTING_ORDERS = -1;
+
   /**
    * @var PurchaseOrderMapper
    */
-  public $purchaseOrderMapper;
+  public $wfPurchaseOrderMapper;
 
   /**
    * @var AddressMapper
    */
-  public $addressMapper;
+  public $wfAddressMapper;
 
   /**
    * @var OrderRepositoryContract
    */
-  public $orderRepositoryContract;
+  public $plentyOrderRepositoryContract;
 
   /**
    * @var KeyValueRepository
    */
-  public $keyValueRepository;
+  public $wfKeyValueRepository;
 
   /**
    * @var WarehouseSupplierRepository
    */
-  public $warehouseSupplierRepository;
+  public $wfWarehouseSupplierRepository;
 
   /**
    * @var PaymentRepositoryContract
    */
-  public $paymentRepositoryContract;
+  public $plentyPaymentRepositoryContract;
 
   /**
    * @var PaymentHelper
    */
-  public $paymentHelper;
+  public $wfPaymentHelper;
 
   /**
    * @var PaymentOrderRelationRepositoryContract
    */
-  public $paymentOrderRelationRepositoryContract;
+  public $plentyPaymentOrderRelationRepositoryContract;
 
   /**
    * @var PendingPurchaseOrderMapper
    */
-  public $pendingPurchaseOrderMapper;
+  public $wfPendingPurchaseOrderMapper;
 
   /**
    * @var PendingOrdersRepository
    */
-  public $pendingOrdersRepository;
+  public $wfPendingOrdersRepository;
 
   /**
    * @var SavePackingSlipService
    */
-  private $savePackingSlipService;
+  private $wfSavePackingSlipService;
 
   /**
    * @var AddressService
    */
-  private $addressService;
+  private $wfAddressService;
 
   /**
    * @var AbstractConfigHelper
    */
-  private $configHelper;
+  private $wfConfigHelper;
 
   /**
    * @var LoggerContract
    */
-  private $logger;
+  private $wfLogger;
 
   /**
    * @var LogSenderService
    */
-  private $logSenderService;
+  private $wfLogSenderService;
 
   /**
    * CreateOrderService constructor.
    *
-   * @param PurchaseOrderMapper $purchaseOrderMapper
-   * @param AddressMapper $addressMapper
-   * @param OrderRepositoryContract $orderRepositoryContract
-   * @param KeyValueRepository $keyValueRepository
-   * @param WarehouseSupplierRepository $warehouseSupplierRepository
-   * @param PaymentRepositoryContract $paymentRepositoryContract
-   * @param PaymentHelper $paymentHelper
-   * @param PaymentOrderRelationRepositoryContract $paymentOrderRelationRepositoryContract
-   * @param PendingPurchaseOrderMapper $pendingPurchaseOrderMapper
-   * @param PendingOrdersRepository $pendingOrdersRepository
-   * @param SavePackingSlipService $savePackingSlipService
-   * @param AddressService $addressService
-   * @param AbstractConfigHelper $configHelper
-   * @param LoggerContract $logger
-   * @param LogSenderService $logSenderService
+   * @param PurchaseOrderMapper $wfPurchaseOrderMapper
+   * @param AddressMapper $wfAddressMapper
+   * @param OrderRepositoryContract $plentyOrderRepositoryContract
+   * @param KeyValueRepository $wfKeyValueRepository
+   * @param WarehouseSupplierRepository $wfWarehouseSupplierRepository
+   * @param PaymentRepositoryContract $plentyPaymentRepositoryContract
+   * @param PaymentHelper $wfPaymentHelper
+   * @param PaymentOrderRelationRepositoryContract $plentyPaymentOrderRelationRepositoryContract
+   * @param PendingPurchaseOrderMapper $wfPendingPurchaseOrderMapper
+   * @param PendingOrdersRepository $wfPendingOrdersRepository
+   * @param SavePackingSlipService $wfSavePackingSlipService
+   * @param AddressService $wfAddressService
+   * @param AbstractConfigHelper $wfConfigHelper
+   * @param LoggerContract $wfLogger
+   * @param LogSenderService $wfLogSenderService
    */
   public function __construct(
-    PurchaseOrderMapper $purchaseOrderMapper,
-    AddressMapper $addressMapper,
-    OrderRepositoryContract $orderRepositoryContract,
-    KeyValueRepository $keyValueRepository,
-    WarehouseSupplierRepository $warehouseSupplierRepository,
-    PaymentRepositoryContract $paymentRepositoryContract,
-    PaymentHelper $paymentHelper,
-    PaymentOrderRelationRepositoryContract $paymentOrderRelationRepositoryContract,
-    PendingPurchaseOrderMapper $pendingPurchaseOrderMapper,
-    PendingOrdersRepository $pendingOrdersRepository,
-    SavePackingSlipService $savePackingSlipService,
-    AddressService $addressService,
-    AbstractConfigHelper $configHelper,
-    LoggerContract $logger,
-    LogSenderService $logSenderService
+    PurchaseOrderMapper $wfPurchaseOrderMapper,
+    AddressMapper $wfAddressMapper,
+    OrderRepositoryContract $plentyOrderRepositoryContract,
+    KeyValueRepository $wfKeyValueRepository,
+    WarehouseSupplierRepository $wfWarehouseSupplierRepository,
+    PaymentRepositoryContract $plentyPaymentRepositoryContract,
+    PaymentHelper $wfPaymentHelper,
+    PaymentOrderRelationRepositoryContract $plentyPaymentOrderRelationRepositoryContract,
+    PendingPurchaseOrderMapper $wfPendingPurchaseOrderMapper,
+    PendingOrdersRepository $wfPendingOrdersRepository,
+    SavePackingSlipService $wfSavePackingSlipService,
+    AddressService $wfAddressService,
+    AbstractConfigHelper $wfConfigHelper,
+    LoggerContract $wfLogger,
+    LogSenderService $wfLogSenderService
   ) {
-    $this->purchaseOrderMapper = $purchaseOrderMapper;
-    $this->addressMapper = $addressMapper;
-    $this->orderRepositoryContract = $orderRepositoryContract;
-    $this->keyValueRepository = $keyValueRepository;
-    $this->warehouseSupplierRepository = $warehouseSupplierRepository;
-    $this->paymentRepositoryContract = $paymentRepositoryContract;
-    $this->paymentHelper = $paymentHelper;
-    $this->paymentOrderRelationRepositoryContract = $paymentOrderRelationRepositoryContract;
-    $this->pendingPurchaseOrderMapper = $pendingPurchaseOrderMapper;
-    $this->pendingOrdersRepository = $pendingOrdersRepository;
-    $this->savePackingSlipService = $savePackingSlipService;
-    $this->addressService = $addressService;
-    $this->configHelper = $configHelper;
-    $this->logger = $logger;
-    $this->logSenderService = $logSenderService;
+    $this->wfPurchaseOrderMapper = $wfPurchaseOrderMapper;
+    $this->wfAddressMapper = $wfAddressMapper;
+    $this->plentyOrderRepositoryContract = $plentyOrderRepositoryContract;
+    $this->wfKeyValueRepository = $wfKeyValueRepository;
+    $this->wfWarehouseSupplierRepository = $wfWarehouseSupplierRepository;
+    $this->plentyPaymentRepositoryContract = $plentyPaymentRepositoryContract;
+    $this->wfPaymentHelper = $wfPaymentHelper;
+    $this->plentyPaymentOrderRelationRepositoryContract = $plentyPaymentOrderRelationRepositoryContract;
+    $this->wfPendingPurchaseOrderMapper = $wfPendingPurchaseOrderMapper;
+    $this->wfPendingOrdersRepository = $wfPendingOrdersRepository;
+    $this->wfSavePackingSlipService = $wfSavePackingSlipService;
+    $this->wfAddressService = $wfAddressService;
+    $this->wfConfigHelper = $wfConfigHelper;
+    $this->wfLogger = $wfLogger;
+    $this->wfLogSenderService = $wfLogSenderService;
   }
 
   /**
@@ -183,177 +186,195 @@ class CreateOrderService
    *
    * If the order cannot be created for any reason, throws an Exception.
    *
-   * @param ResponseDTO $dto
+   * @param ResponseDTO $wfPurchaseOrderResponseDTO
    *
    * @return int
-   * @throws \Exception
+   * @throws CreateOrderException
    */
-  public function create(ResponseDTO $dto): int
+  public function create(ResponseDTO $wfPurchaseOrderResponseDTO): int
   {
     /** @var ExternalLogs $externalLogs */
     $externalLogs = pluginApp(ExternalLogs::class);
 
-    /** @var int $orderId */
-    $orderId = 0;
-    /** @var string $poNumber */
-    $poNumber = '';
+    /** @var int $plentyOrderId */
+    $plentyOrderId = 0;
+    /** @var string $wfPurchaseOrderNumber */
+    $wfPurchaseOrderNumber = '';
 
     try {
-      if (!isset($dto)) {
-        throw new \Exception("Cannot create order - no PO information provided");
+      if (!isset($wfPurchaseOrderResponseDTO)) {
+        throw new CreateOrderException("Cannot create order - no PO information provided");
+      }
+
+      $wfPurchaseOrderNumber = $wfPurchaseOrderResponseDTO->getPoNumber();
+      if (!isset($wfPurchaseOrderNumber) || empty($wfPurchaseOrderNumber)) {
+        throw new CreateOrderException("Cannot create order - no PO number provided");
       }
 
       // Get referrer ID
-      $referrerId = $this->configHelper->getOrderReferrerValue();
+      $referrerIdForWayfair  = $this->wfConfigHelper->getOrderReferrerValue();
 
-      if (!isset($referrerId) || $referrerId <= 0) {
-        throw new \Exception("Cannot create order - no referrer value");
+      if (!isset($referrerIdForWayfair) || $referrerIdForWayfair  <= 0) {
+        throw new CreateOrderException("Cannot create order - no referrer value");
       }
 
-      $poNumber = $dto->getPoNumber();
-      if (!isset($poNumber) || empty($poNumber)) {
-        throw new \Exception("Cannot create order - no PO number provided");
-      }
+      $idsOfExistingPlentyOrders = $this->getIdsOfExistingPlentyOrders($wfPurchaseOrderNumber);
+      $numberOfPlentyOrdersForWfPurchaseOrder = sizeof($idsOfExistingPlentyOrders);
 
-      $idsOfExistingOrders = $this->getIdsOfExistingOrders($poNumber);
-      $numberOfOrdersForPO = sizeof($idsOfExistingOrders);
-
-      if ($numberOfOrdersForPO) {
+      if ($numberOfPlentyOrdersForWfPurchaseOrder > 0) {
         // orders exist for the Wayfair PO. Do not create another one.
-        $this->logger->warning(TranslationHelper::getLoggerKey(self::LOG_KEY_ORDERS_ALREADY_EXIST), [
+        $this->wfLogger->warning(TranslationHelper::getLoggerKey(self::LOG_KEY_ORDERS_ALREADY_EXIST), [
           'additionalInfo' => [
-            'poNumber' => $poNumber,
-            'order_ids' => json_encode($idsOfExistingOrders)
+            'poNumber' => $wfPurchaseOrderNumber,
+            'order_ids' => json_encode($idsOfExistingPlentyOrders)
           ],
           'method' => __METHOD__
         ]);
 
-        $externalLogs->addInfoLog("Order creation skipped - found " . $numberOfOrdersForPO . " already created for PO " . $poNumber);
+        $externalLogs->addInfoLog("Order creation skipped - found " . $numberOfPlentyOrdersForWfPurchaseOrder . " already created for PO " . $wfPurchaseOrderNumber);
 
         // make sure that we (re)accept this order,
         // as the presence of the Plentymarkets Order means it should no longer be "open."
-        $this->createPendingOrder($dto);
+        $this->createPendingOrder($wfPurchaseOrderResponseDTO);
 
-        return -1;
+        return self::RETURN_VALUE_EXISTING_ORDERS;
       }
 
-      $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_CREATING_ORDER), [
+      $this->wfLogger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_CREATING_ORDER), [
         'additionalInfo' => [
-          'poNumber' => $poNumber
+          'poNumber' => $wfPurchaseOrderNumber
         ],
         'method' => __METHOD__
       ]);
 
       // Get payment method id
       // Create billing address and delivery address
-      $addressDTO = AddressDTO::createFromArray(BillingAddress::BillingAddressAsArray);
+      $wfAddressDto = AddressDTO::createFromArray(BillingAddress::BillingAddressAsArray);
 
-      $billingInfoFromDTO = $dto->getBillingInfo();
+      $billingInfoFromWayfairDto = $wfPurchaseOrderResponseDTO->getBillingInfo();
 
-      if (!isset($billingInfoFromDTO) || empty($billingInfoFromDTO)) {
-        throw new \Exception("Purchase order information is missing billing details. PO: " . $poNumber);
+      if (!isset($billingInfoFromWayfairDto) || empty($billingInfoFromWayfairDto)) {
+        throw new CreateOrderException("Purchase order information is missing billing details. PO: " . $wfPurchaseOrderNumber);
       }
 
-      $billing = $this->getOrCreateBillingInfoForWayfair($addressDTO, $billingInfoFromDTO, $referrerId, $externalLogs);
+      $billingInformationForWayfair = $this->getOrCreateBillingInfoForWayfair($wfAddressDto, $billingInfoFromWayfairDto, $referrerIdForWayfair, $externalLogs);
 
-      if (!isset($billing) || empty($billing))
-      {
-        throw new \Exception("Could not determine information on how to bill Wayfair for PO: " . $poNumber);
+      if (!isset($billingInformationForWayfair) || empty($billingInformationForWayfair)) {
+        throw new CreateOrderException("Could not determine information on how to bill Wayfair for PO: " . $wfPurchaseOrderNumber);
       }
 
-      $shipTo = $dto->getShipTo();
+      /** @var int */
+      $wayfairBillingAddressId = $billingInformationForWayfair['addressId'];
 
-      if (!isset($shipTo)) {
-        throw new \Exception("Purchase order information is missing destination shipping information. PO: "
-          . $poNumber);
+      if (!isset($wayfairBillingAddressId) || $wayfairBillingAddressId < 1) {
+        throw new CreateOrderException("Could not determine Wayfair Billing Address ID for PO: " . $wfPurchaseOrderNumber);
+      }
+
+      /** @var int */
+      $wayfairBillingContactId = $billingInformationForWayfair['contactId'];
+
+      if (!isset($wayfairBillingContactId) || $wayfairBillingContactId < 1) {
+        throw new CreateOrderException("Could not determine Wayfair Contact Information ID for PO: " . $wfPurchaseOrderNumber);
+      }
+
+      $shipToInWayfairDto = $wfPurchaseOrderResponseDTO->getShipTo();
+
+      if (!isset($shipToInWayfairDto)) {
+        throw new CreateOrderException("Purchase order information is missing destination shipping information. PO: "
+          . $wfPurchaseOrderNumber);
       }
 
       // delivery always uses billing info from PO instead of the information stored in the system
-      $delivery = $this->addressService->createContactAndAddress($shipTo, $billingInfoFromDTO, $referrerId, ContactType::TYPE_CUSTOMER, AddressRelationType::DELIVERY_ADDRESS);
+      $deliveryInformation = $this->wfAddressService->createContactAndAddress($shipToInWayfairDto, $billingInfoFromWayfairDto, $referrerIdForWayfair, ContactType::TYPE_CUSTOMER, AddressRelationType::DELIVERY_ADDRESS);
 
-      if (!isset($delivery) || empty($delivery)) {
-        throw new \Exception("Unable to create delivery information for purchase order: " . $poNumber);
+      if (!isset($deliveryInformation) || empty($deliveryInformation)) {
+        throw new CreateOrderException("Unable to create delivery information for purchase order: " . $wfPurchaseOrderNumber);
       }
 
-      $warehouse = $dto->getWarehouse();
-      if (!isset($warehouse)) {
-        throw new \Exception("No warehouse information for PO " . $poNumber);
+      /** @var int */
+      $deliveryAddressId = $deliveryInformation['addressId'];
+
+      if (!isset($deliveryAddressId) || $deliveryAddressId < 1) {
+        throw new CreateOrderException("Could not determine Delivery Address ID for PO: " . $wfPurchaseOrderNumber);
       }
 
-      $supplierID = $warehouse->getId();
-
-      if (!isset($supplierID)) {
-        throw new \Exception("PO " . $poNumber . " contains Warehouse information that is missing an ID.");
+      $warehouseInDto = $wfPurchaseOrderResponseDTO->getWarehouse();
+      if (!isset($warehouseInDto)) {
+        throw new CreateOrderException("No warehouse information for PO " . $wfPurchaseOrderNumber);
       }
 
-      $plentyWarehouseId = null;
+      $supplierIdInDto = $warehouseInDto->getId();
+
+      if (!isset($supplierIdInDto)  || $supplierIdInDto) {
+        throw new CreateOrderException("PO " . $wfPurchaseOrderNumber . " contains Warehouse information that is missing an ID.");
+      }
 
       // TODO: filter warehouses based on criteria such as stock amounts?
-      $potentialIds = $this->warehouseSupplierRepository->findWarehouseIds($supplierID);
+      $potentialIds = $this->wfWarehouseSupplierRepository->findWarehouseIds($supplierIdInDto);
 
-      if (!isset($potentialIds) || empty($potentialIds)) {
-        throw new \Exception("Could not find Warehouse ID for PO " . $poNumber . " for supplier " . $supplierID);
+      if (!isset($potentialIds) || empty($potentialIds) || empty($potentialIds[0])) {
+        throw new CreateOrderException("Could not find Warehouse ID for PO " . $wfPurchaseOrderNumber . " for supplier " . $supplierIdInDto);
       }
 
-      $plentyWarehouseId = $potentialIds[0];
+      $plentyWarehouseIdFromRepo = $potentialIds[0];
 
-      $orderData = $this->purchaseOrderMapper->map(
-        $dto,
-        $billing['addressId'],
-        $billing['contactId'],
-        $delivery['addressId'],
-        $referrerId,
-        $plentyWarehouseId,
+      $orderData = $this->wfPurchaseOrderMapper->map(
+        $wfPurchaseOrderResponseDTO,
+        $wayfairBillingAddressId,
+        $wayfairBillingContactId,
+        $deliveryAddressId,
+        $referrerIdForWayfair,
+        $plentyWarehouseIdFromRepo,
         (string) AbstractConfigHelper::PAYMENT_METHOD_INVOICE
       );
 
       if (!isset($orderData) || empty($orderData)) {
-        throw new \Exception("Unable to map order data for PO " . $poNumber);
+        throw new CreateOrderException("Unable to map order data for PO " . $wfPurchaseOrderNumber);
       }
 
-      $order = $this->orderRepositoryContract->createOrder($orderData);
-      if (!isset($order) || !isset($order->id) || $order->id < 1) {
-        throw new \Exception("Unable to create new order using order data: " . \json_encode($orderData));
+      $plentyOrder = $this->plentyOrderRepositoryContract->createOrder($orderData);
+      if (!isset($plentyOrder) || null == $plentyOrder->id || $plentyOrder->id < 1) {
+        throw new CreateOrderException("Unable to create new order using order data: " . \json_encode($orderData));
       }
 
-      $orderId = $order->id;
+      $plentyOrderId = $plentyOrder->id;
 
       /*
        * The search at the beginning of this function will find the order that was just created,
        *  and block creation of another order for this Wayfair PO.
        */
 
-      if (!$this->createPendingOrder($dto)) {
-        throw new \Exception("Unable to create pending order entry for order " . $order . " PO: " . $poNumber);
+      if (!$this->createPendingOrder($wfPurchaseOrderResponseDTO)) {
+        throw new CreateOrderException("Unable to create pending order entry for order " . $plentyOrderId . " PO: " . $wfPurchaseOrderNumber);
       }
 
       // Create payment
       // NOTICE: there is no way to undo the payment actions
-      $payment = $this->createPayment($poNumber);
-      if (!isset($payment) || !$payment->id) {
-        throw new \Exception("Unable to create payment information for order " . $order . " PO: " . $poNumber);
+      $plentyPayment = $this->createPayment($wfPurchaseOrderNumber);
+      if (!isset($payment) || null == $payment->id || $plentyPayment->id < 1) {
+        throw new CreateOrderException("Unable to create payment information for order " . $plentyOrderId . " PO: " . $wfPurchaseOrderNumber);
       }
 
-      $paymentID = $payment->id;
+      $plentyPaymentId = $plentyPayment->id;
 
       // Create order payment relation
-      $paymentRelation = $this->paymentOrderRelationRepositoryContract->createOrderRelation($payment, $order);
-      if (!isset($paymentRelation) || !$paymentRelation->id) {
-        throw new \Exception("Unable to relate payment " . $paymentID . " with order " . $orderId);
+      $plentyPaymentRelation = $this->plentyPaymentOrderRelationRepositoryContract->createOrderRelation($plentyPayment, $plentyOrder);
+      if (!isset($plentyPaymentRelation) || null == $plentyPaymentRelation->id || $plentyPaymentRelation->id < 1) {
+        throw new CreateOrderException("Unable to relate payment " . $plentyPaymentId . " with order " . $plentyOrderId);
       }
 
       // packing slips are an optional feature and may be phased out.
       // do not fail the order for lack of packing slip.
       try {
-        $this->savePackingSlipService->save($orderId, $poNumber);
+        $this->wfSavePackingSlipService->save($plentyOrderId, $wfPurchaseOrderNumber);
       } catch (\Exception $exception) {
         $externalLogs->addErrorLog("Unexpected " . get_class($exception) . " while working with packing slips: " . $exception->getMessage(), $exception->getTraceAsString());
       }
 
-      return $orderId;
+      return $plentyOrderId;
     } finally {
       if (count($externalLogs->getLogs())) {
-        $this->logSenderService->execute($externalLogs->getLogs());
+        $this->wfLogSenderService->execute($externalLogs->getLogs());
       }
     }
   }
@@ -361,23 +382,23 @@ class CreateOrderService
   /**
    * Create a Pending Order record for a Purchase Order,
    * if not already existing.
-   * @param ResponseDTO $dto
+   * @param ResponseDTO $wfPurchaseOrderResponseDTO
    *
    * @return void
    */
-  private function createPendingOrder(ResponseDTO $dto): bool
+  private function createPendingOrder(ResponseDTO $wfPurchaseOrderResponseDTO): bool
   {
-    $poNumber = $dto->getPoNumber();
+    $wfPurchaseOrderNumber = $wfPurchaseOrderResponseDTO->getPoNumber();
     $pendingOrder = null;
     try {
-      $pendingOrder = $this->pendingOrdersRepository->get($poNumber);
+      $pendingOrder = $this->wfPendingOrdersRepository->get($wfPurchaseOrderNumber);
     } catch (\Exception $e) {
 
-      $this->logger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_PENDING_ORDER_MAY_EXIST), [
+      $this->wfLogger->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_PENDING_ORDER_MAY_EXIST), [
         'exception' => $e,
         'exceptionType' => get_class($e),
         'exceptionMessage' => $e->getMessage(),
-        'additionalInfo' => ['poNumber' => $poNumber],
+        'additionalInfo' => ['poNumber' => $wfPurchaseOrderNumber],
         'method' => __METHOD__
       ]);
     }
@@ -387,16 +408,16 @@ class CreateOrderService
       return true;
     }
 
-    $pendingOrder = $this->pendingPurchaseOrderMapper->map($dto);
-    return $this->pendingOrdersRepository->insert($pendingOrder);
+    $pendingOrder = $this->wfPendingPurchaseOrderMapper->map($wfPurchaseOrderResponseDTO);
+    return $this->wfPendingOrdersRepository->insert($pendingOrder);
   }
 
   /**
-   * @param string $poNumber
+   * @param string $wfPurchaseOrderNumber
    *
    * @return Payment
    */
-  private function createPayment(string $poNumber): Payment
+  private function createPayment(string $wfPurchaseOrderNumber): Payment
   {
     $data = [
       'amount' => 0,
@@ -406,27 +427,27 @@ class CreateOrderService
       'properties' => [
         [
           'typeId' => PaymentProperty::TYPE_TRANSACTION_ID,
-          'value' => $poNumber . '_' . time() . '_' . AbstractConfigHelper::PAYMENT_KEY
+          'value' => $wfPurchaseOrderNumber . '_' . time() . '_' . AbstractConfigHelper::PAYMENT_KEY
         ]
       ]
     ];
 
-    return $this->paymentRepositoryContract->createPayment($data);
+    return $this->plentyPaymentRepositoryContract->createPayment($data);
   }
 
-  private function getIdsOfExistingOrders(string $poNumber): array
+  private function getIdsOfExistingPlentyOrders(string $wfPurchaseOrderNumber): array
   {
-    if (!isset($poNumber) || empty($poNumber)) {
+    if (!isset($wfPurchaseOrderNumber) || empty($wfPurchaseOrderNumber)) {
       return [];
     }
 
-    $oldFilters = $this->orderRepositoryContract->getFilters();
+    $oldFilters = $this->plentyOrderRepositoryContract->getFilters();
     try {
-      $this->orderRepositoryContract->setFilters(['externalOrderId' => $poNumber]);
+      $this->plentyOrderRepositoryContract->setFilters(['externalOrderId' => $wfPurchaseOrderNumber]);
       // not expecting more than one page, so not setting page filter
-      $orderList = $this->orderRepositoryContract->searchOrders();
+      $orderList = $this->plentyOrderRepositoryContract->searchOrders();
     } finally {
-      $this->orderRepositoryContract->setFilters($oldFilters);
+      $this->plentyOrderRepositoryContract->setFilters($oldFilters);
     }
 
     $ids = [];
@@ -442,19 +463,19 @@ class CreateOrderService
    * Cache billing info for Wayfair, if it does not already exist
    *
    * @param AddressDTO $addressDTO
-   * @param BillingInfoDTO $billingInfoFromDTO
-   * @param float $referrerId
+   * @param BillingInfoDTO $billingInfoFromWayfairPurchaseOrderDto
+   * @param float $referrerIdForWayfair
    * @param ExternalLogs $externalLogs
    * @return array
    */
-  private function getOrCreateBillingInfoForWayfair($addressDTO, $billingInfoFromDTO, $referrerId, $externalLogs = null): array
+  private function getOrCreateBillingInfoForWayfair($addressDTO, $billingInfoFromWayfairPurchaseOrderDto, $referrerIdForWayfair, $externalLogs = null): array
   {
-    $billing = [];
+    $wfBilling = [];
 
-    $encodedBillingContactFromRepository = $this->keyValueRepository->get(AbstractConfigHelper::BILLING_CONTACT);
+    $encodedBillingContactFromRepository = $this->wfKeyValueRepository->get(AbstractConfigHelper::BILLING_CONTACT);
     if (isset($encodedBillingContactFromRepository) && !empty($encodedBillingContactFromRepository)) {
       try {
-        $billing = \json_decode($encodedBillingContactFromRepository, true);
+        $wfBilling = \json_decode($encodedBillingContactFromRepository, true);
       } catch (\Exception $e) {
         if (isset($externalLogs)) {
           $externalLogs->addWarningLog("Could not decode billing information in KeyValueRepository - "
@@ -463,16 +484,16 @@ class CreateOrderService
       }
     }
 
-    if (!isset($billing) or empty($billing)) {
+    if (!isset($wfBilling) or empty($wfBilling)) {
       // no billing info cached for Wayfair yet
-      if (!isset($billingInfoFromDTO) || empty($billingInfoFromDTO)) {
+      if (!isset($billingInfoFromWayfairPurchaseOrderDto) || empty($billingInfoFromWayfairPurchaseOrderDto)) {
         return [];
       }
 
-      $billing = $this->addressService->createContactAndAddress($addressDTO, $billingInfoFromDTO, $referrerId, ContactType::TYPE_PARTNER, AddressRelationType::BILLING_ADDRESS);
-      $this->keyValueRepository->put(AbstractConfigHelper::BILLING_CONTACT, \json_encode($billing));
+      $wfBilling = $this->wfAddressService->createContactAndAddress($addressDTO, $billingInfoFromWayfairPurchaseOrderDto, $referrerIdForWayfair, ContactType::TYPE_PARTNER, AddressRelationType::BILLING_ADDRESS);
+      $this->wfKeyValueRepository->put(AbstractConfigHelper::BILLING_CONTACT, \json_encode($wfBilling));
     }
 
-    return $billing;
+    return $wfBilling;
   }
 }
