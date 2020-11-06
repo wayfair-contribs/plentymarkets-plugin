@@ -48,52 +48,52 @@ class CreateOrderService
   /**
    * @var PurchaseOrderMapper
    */
-  public $wfPurchaseOrderMapper;
+  private $wfPurchaseOrderMapper;
 
   /**
    * @var AddressMapper
    */
-  public $wfAddressMapper;
+  private $wfAddressMapper;
 
   /**
    * @var OrderRepositoryContract
    */
-  public $plentyOrderRepositoryContract;
+  private $plentyOrderRepositoryContract;
 
   /**
    * @var KeyValueRepository
    */
-  public $wfKeyValueRepository;
+  private $wfKeyValueRepository;
 
   /**
    * @var WarehouseSupplierRepository
    */
-  public $wfWarehouseSupplierRepository;
+  private $wfWarehouseSupplierRepository;
 
   /**
    * @var PaymentRepositoryContract
    */
-  public $plentyPaymentRepositoryContract;
+  private $plentyPaymentRepositoryContract;
 
   /**
    * @var PaymentHelper
    */
-  public $wfPaymentHelper;
+  private $wfPaymentHelper;
 
   /**
    * @var PaymentOrderRelationRepositoryContract
    */
-  public $plentyPaymentOrderRelationRepositoryContract;
+  private $plentyPaymentOrderRelationRepositoryContract;
 
   /**
    * @var PendingPurchaseOrderMapper
    */
-  public $wfPendingPurchaseOrderMapper;
+  private $wfPendingPurchaseOrderMapper;
 
   /**
    * @var PendingOrdersRepository
    */
-  public $wfPendingOrdersRepository;
+  private $wfPendingOrdersRepository;
 
   /**
    * @var SavePackingSlipService
@@ -442,9 +442,9 @@ class CreateOrderService
     return $this->plentyPaymentRepositoryContract->createPayment($data);
   }
 
-  function getIdsOfExistingPlentyOrders(string $wfPurchaseOrderNumber): array
+  function getIdsOfExistingPlentyOrders($wfPurchaseOrderNumber): array
   {
-    if (!isset($wfPurchaseOrderNumber) || empty($wfPurchaseOrderNumber)) {
+    if (!isset($wfPurchaseOrderNumber) || empty(trim($wfPurchaseOrderNumber))) {
       return [];
     }
 
@@ -464,7 +464,9 @@ class CreateOrderService
     $ids = [];
 
     foreach ($orderList->getResult() as $key => $order) {
-      $ids[] = $order['id'];
+      if (key_exists('id', $order)) {
+        $ids[] = $order['id'];
+      }
     }
 
     return $ids;

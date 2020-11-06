@@ -47,6 +47,7 @@ use Wayfair\Mappers\AddressMapper;
 use Wayfair\Mappers\PendingPurchaseOrderMapper;
 use Wayfair\Mappers\PurchaseOrderMapper;
 use Wayfair\Models\ExternalLogs;
+use Wayfair\PlentyMockets\Factories\MockOrderRepositoryFactory;
 use Wayfair\PlentyMockets\Helpers\MockPluginApp;
 use Wayfair\Repositories\KeyValueRepository;
 use Wayfair\Repositories\PendingOrdersRepository;
@@ -76,6 +77,16 @@ class CreateOrderServiceTest extends \PHPUnit\Framework\TestCase
         // make a shared ExternalLogs instance so arguments may be included in expectations
         $this->externalLogs = $this->createMock(ExternalLogs::class);
         $mockPluginApp->willReturn(ExternalLogs::class, [], $this->externalLogs);
+    }
+
+    /**
+     * @after
+     */
+    public function tearDown()
+    {
+        // clear out the global pluginApp
+        global $mockPluginApp;
+        $mockPluginApp = new MockPluginApp($this);
     }
 
     /**
@@ -446,9 +457,6 @@ class CreateOrderServiceTest extends \PHPUnit\Framework\TestCase
      * - testCreate has default values for all parameters except for the test case message.
      * - the default params are all null/false
      *
-     * - first param is mandatory case label
-     * - second param is mandatory expected result
-     *
      * @return array
      */
     public function dataProviderForCreate()
@@ -502,7 +510,82 @@ class CreateOrderServiceTest extends \PHPUnit\Framework\TestCase
         return $cases;
     }
 
-    // TODO: test harness for getIdsOfExistingPlentyOrders
+    /**
+     * Test harness for getIdsOfExistingPlentyOrders
+     *
+     * @param string $label the label for the test case
+     * @param array $expectedResult the expected array of ids
+     * @param string|null $poNumber the po number passed in
+     * @param array|null $pagesOfOrders pages of arrays returned from the OrderRepositoryContract
+     * @return void
+     *
+     * @dataProvider dataProviderForGetIdsOfExistingPlentyOrders
+     */
+    public function testGetIdsOfExistingPlentyOrders(string $label, array $expectedResult, $poNumber, $pagesOfOrders)
+    {
+        // FIXME: set this correctly
+        $searchesExpected = (isset($poNumber) && !empty(trim($poNumber))) ? 1 : 0;
+
+        // nullifying expectedFilters means "we don't expect to call setFilters"
+        $expectedFilters = null;
+
+        if ($searchesExpected > 0) {
+            $expectedFilters = ['externalOrderId' => $poNumber];
+        }
+
+        $orderRepositoryFactory = new MockOrderRepositoryFactory($this);
+        $orderRepositoryContract = $orderRepositoryFactory->create($pagesOfOrders, $expectedFilters, $searchesExpected);
+
+        // the method under test only uses the OrderRepositoryContract
+        // but we need to mock out the rest of the constructor args in order to call it (due to type restrictions)
+
+        /** @var CreateOrderService&\PHPUnit\Framework\MockObject\MockObject */
+        $createOrderService = $this->createTestProxy(CreateOrderService::class, [
+            $this->createMock(PurchaseOrderMapper::class),
+            $this->createMock(AddressMapper::class),
+            $orderRepositoryContract,
+            $this->createMock(KeyValueRepository::class),
+            $this->createMock(WarehouseSupplierRepository::class),
+            $this->createMock(PaymentRepositoryContract::class),
+            $this->createMock(PaymentHelper::class),
+            $this->createMock(PaymentOrderRelationRepositoryContract::class),
+            $this->createMock(PendingPurchaseOrderMapper::class),
+            $this->createMock(PendingOrdersRepository::class),
+            $this->createMock(SavePackingSlipService::class),
+            $this->createMock(AddressService::class),
+            $this->createMock(AbstractConfigHelper::class),
+            $this->createMock(LoggerContract::class),
+            $this->createMock(LogSenderService::class),
+        ]);
+
+        $actualResult = $createOrderService->getIdsOfExistingPlentyOrders($poNumber);
+
+        $this->assertEquals($expectedResult, $actualResult, $label);
+    }
+
+    /**
+     * Cases for testGetIdsOfExistingPlentyOrders
+     *
+     *
+     * @return void
+     */
+    public function dataProviderForGetIdsOfExistingPlentyOrders()
+    {
+        $cases = [];
+
+        $cases[] = ['null poNumber means no results', [], null, [[['id' => '123']]]];
+        $cases[] = ['empty poNumber means no results', [], '', [[['id' => '123']]]];
+        $cases[] = ['whitespace poNumber means no results', [], '   ', [[['id' => '123']]]];
+        $cases[] = ['valid poNumber without pages means no results', [], 'SomePO', []];
+        $cases[] = ['valid poNumber with one empty page means no results', [], 'SomePO', [[]]];
+        $cases[] = ['valid poNumber with one empty Order array means no results', [], 'SomePO', [[[]]]];
+        $cases[] = ['valid poNumber with one Order', ['123'], 'SomePO', [[['id' => '123']]]];
+        $cases[] = ['valid poNumber with multiple Orders', ['123', '456', '789'], 'SomePO', [[['id' => '123'], ['id' => '456'], ['id' => '789']]]];
+        $cases[] = ['valid poNumber with a bad order at the beginning', ['456', '789'], 'SomePO', [[['id' => '456'], ['id' => '789']]]];
+        $cases[] = ['valid poNumber with a bad order in the middle', ['123', '789'], 'SomePO', [[['id' => '123'], ['id' => '789']]]];
+        $cases[] = ['valid poNumber with a bad order at the end', ['123', '456'], 'SomePO', [[['id' => '123'], ['id' => '456']]]];
+        return $cases;
+    }
 
     // TODO: test harness for getOrCreateBillingInfoForWayfair
 
