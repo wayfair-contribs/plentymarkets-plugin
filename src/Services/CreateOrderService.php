@@ -391,11 +391,21 @@ class CreateOrderService
    * if not already existing.
    * @param ResponseDTO $wfPurchaseOrderResponseDTO
    *
-   * @return void
+   * @return bool
    */
   function createPendingOrder(ResponseDTO $wfPurchaseOrderResponseDTO): bool
   {
+    if (!isset($wfPurchaseOrderResponseDTO) || empty($wfPurchaseOrderResponseDTO))
+    {
+      return false;
+    }
+
     $wfPurchaseOrderNumber = $wfPurchaseOrderResponseDTO->getPoNumber();
+
+    if (!isset($wfPurchaseOrderNumber) || empty(trim($wfPurchaseOrderNumber))) {
+      return false;
+    }
+
     $pendingOrder = null;
     try {
       $pendingOrder = $this->wfPendingOrdersRepository->get($wfPurchaseOrderNumber);
@@ -410,12 +420,18 @@ class CreateOrderService
       ]);
     }
 
-    if (isset($pendingOrder)) {
+
+    if (isset($pendingOrder) && !empty($pendingOrder)) {
       // PO already queued for acceptance
       return true;
     }
 
     $pendingOrder = $this->wfPendingPurchaseOrderMapper->map($wfPurchaseOrderResponseDTO);
+    if (!isset($pendingOrder) || empty($pendingOrder))
+    {
+      return false;
+    }
+
     return $this->wfPendingOrdersRepository->insert($pendingOrder);
   }
 

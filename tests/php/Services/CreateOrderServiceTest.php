@@ -566,8 +566,7 @@ class CreateOrderServiceTest extends \PHPUnit\Framework\TestCase
     /**
      * Cases for testGetIdsOfExistingPlentyOrders
      *
-     *
-     * @return void
+     * @return array
      */
     public function dataProviderForGetIdsOfExistingPlentyOrders()
     {
@@ -667,6 +666,11 @@ class CreateOrderServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $actualResult, $label);
     }
 
+    /**
+     * Cases for testGetOrCreateBillingInfoForWayfair
+     *
+     * @return array
+     */
     public function dataProviderForGetOrCreateBillingInfoForWayfair()
     {
         $cases = [];
@@ -685,5 +689,89 @@ class CreateOrderServiceTest extends \PHPUnit\Framework\TestCase
         return $cases;
     }
 
-    // TODO: test harness for createPendingOrder
+    /**
+     * Test harness for createPendingOrder
+     *
+     * @param string $label the test case's label
+     * @param boolean $expectedResult the expected outcome of the creation call
+     * @param string|null $poNumber the PO number in the PO Response DTO
+     * @param array|null $existingPendingOrder the pending order that already exists for the PO
+     * @param array|null $mappingResults the results of mapping to a new pending order
+     * @param bool $insertionResults the result of trying to insert the new pending order
+     * @return void
+     *
+     * @dataProvider dataProviderForCreatePendingOrder
+     */
+    public function testCreatePendingOrder(string $label, bool $expectedResult, $poNumber = null, $existingPendingOrder = null, $mappingResults = null, $insertionResults = false)
+    {
+        $expectedPendingOrderFetches = 0;
+        $expectedPendingOrderMappings = 0;
+        $expectedPendingOrderPuts = 0;
+
+        if (isset($poNumber) && !empty(trim($poNumber))) {
+            $expectedPendingOrderFetches = 1;
+
+            if (!isset($existingPendingOrder) || empty($existingPendingOrder)) {
+                $expectedPendingOrderMappings = 1;
+
+                if (isset($mappingResults) && !empty($mappingResults)) {
+                    $expectedPendingOrderPuts = 1;
+                }
+            }
+        }
+
+        /** @var ResponseDTO&\PHPUnit\Framework\MockObject\MockObject */
+        $wfPurchaseOrderResponseDTO = $this->createMock(ResponseDTO::class);
+        $wfPurchaseOrderResponseDTO->expects($this->once())->method('getPoNumber')->willReturn($poNumber);
+
+        /** @var PendingOrdersRepository&\PHPUnit\Framework\MockObject\MockObject */
+        $wfPendingOrdersRepository = $this->createMock(PendingOrdersRepository::class);
+        $wfPendingOrdersRepository->expects($this->exactly($expectedPendingOrderFetches))->method('get')->with($poNumber)->willReturn($existingPendingOrder);
+        $wfPendingOrdersRepository->expects($this->exactly($expectedPendingOrderPuts))->method('insert')->with($mappingResults)->willReturn($insertionResults);
+
+        /** @var PendingPurchaseOrderMapper&\PHPUnit\Framework\MockObject\MockObject */
+        $wfPendingPurchaseOrderMapper = $this->createMock(PendingPurchaseOrderMapper::class);
+        $wfPendingPurchaseOrderMapper->expects($this->exactly($expectedPendingOrderMappings))->method('map')->with($wfPurchaseOrderResponseDTO)->willReturn($mappingResults);
+
+        /** @var CreateOrderService&\PHPUnit\Framework\MockObject\MockObject */
+        $createOrderService = $this->createTestProxy(CreateOrderService::class, [
+            $this->createMock(PurchaseOrderMapper::class),
+            $this->createMock(AddressMapper::class),
+            $this->createMock(OrderRepositoryContract::class),
+            $this->createMock(KeyValueRepository::class),
+            $this->createMock(WarehouseSupplierRepository::class),
+            $this->createMock(PaymentRepositoryContract::class),
+            $this->createMock(PaymentHelper::class),
+            $this->createMock(PaymentOrderRelationRepositoryContract::class),
+            $wfPendingPurchaseOrderMapper,
+            $wfPendingOrdersRepository,
+            $this->createMock(SavePackingSlipService::class),
+            $this->createMock(AddressService::class),
+            $this->createMock(AbstractConfigHelper::class),
+            $this->createMock(LoggerContract::class),
+            $this->createMock(LogSenderService::class),
+        ]);
+
+
+        $actualResult = $createOrderService->createPendingOrder($wfPurchaseOrderResponseDTO);
+
+        $this->assertEquals($expectedResult, $actualResult, $label);
+    }
+
+    /**
+     * UCases for testCreatePendingOrder
+     *
+     * @return array
+     */
+    public function dataProviderForCreatePendingOrder()
+    {
+        $cases = [];
+
+        $cases[] = ['null PO number error', false, null];
+        $cases[] = ['existing pending order early exit', true, 'myPO', ['existing', 'pending', 'order', 'data']];
+        $cases[] = ['mapping failure - empty', false, 'myPO', [], []];
+        $cases[] = ['successful mapping but failed insertion', false, 'myPO', [], [], false];
+        $cases[] = ['successful mapping and successful insertion', true, 'myPO', [], ['created', 'pending', 'order', 'data'], true];
+        return $cases;
+    }
 }
