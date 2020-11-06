@@ -78,19 +78,39 @@ class CreateOrderServiceTest extends \PHPUnit\Framework\TestCase
         $mockPluginApp->willReturn(ExternalLogs::class, [], $this->externalLogs);
     }
 
-    /**
-     * Test harness for create method
-     *
-     * TODO: param hints in this docblock
-     *
-     *
-     * @dataProvider dataProviderForCreate
-     */
+   /**
+    * Undocumented function
+    *
+    * @param string $label the label for the test case
+    * @param int|null $expectedResult the expected result of calling create - null if it should not finish
+    * @param mixed $poNumber the PO Number in the PO DTO that gets passed into create
+    * @param float|null $orderReferrerId the order referrer ID that Wayfair has cached
+    * @param array|null $idsOfExistingOrders the array of IDs for orders that already exist for the PO
+    * @param boolean $pendingOrderCreationSuccessful does the Pending Order creation fail or pass?
+    * @param boolean $dtoHasBilling does the PO DTO have a billing element?
+    * @param array $fetchedWayfairBillingInfo the data created/pulled for Wayfair's billing address, etc.
+    * @param boolean $dtoHasShipTo does the PO DTO have a shipTo element?
+    * @param array|null $createdDeliveryInfo the array created when processing delivery info
+    * @param boolean $dtoHasWarehouse does the PO DTO have a Warehouse element?
+    * @param string|null $supplierIdInWarehouseInDto the id element of the Warehouse in the PO DTO
+    * @param array|null $warehouseIDs the IDs returned from the Warehouse-Supplier search.
+    * @param array|null $orderDataReturnedFromMapper the result of order mapping
+    * @param boolean $plentyOrderIsCreated is the plenty order created?
+    * @param int|null $plentyOrderId the ID of the plenty order that gets created
+    * @param boolean $paymentIsCreated is the plenty payment created?
+    * @param int|null $idOfCreatedPayment the ID of the payment that gets created
+    * @param boolean $paymentOrderRelationIsCreated is the paymentOrderRelation created?
+    * @param int|null $idOfCreatedPaymentOrderRelation the ID of the paymentOrderRelation created
+    * @param boolean $packingSlipCreationThrowsException does the packing slip functionality work correctly?
+    * @return void
+    *
+    * @dataProvider dataProviderForCreate
+    */
     public function testCreate(
-        string $msg,
+        string $label,
         $expectedResult,
         $poNumber = null,
-        float $orderReferrerId = null,
+        $orderReferrerId = null,
         $idsOfExistingOrders = null,
         bool $pendingOrderCreationSuccessful = false,
         bool $dtoHasBilling = false,
@@ -418,7 +438,7 @@ class CreateOrderServiceTest extends \PHPUnit\Framework\TestCase
 
         $actual = $createOrderService->create($purchaseOrderResponseDTO);
 
-        $this->assertEquals($expectedResult, $actual, $msg);
+        $this->assertEquals($expectedResult, $actual, $label);
     }
 
     /**
@@ -478,6 +498,7 @@ class CreateOrderServiceTest extends \PHPUnit\Framework\TestCase
         $cases[] = ['paymentOrderRelation id negative', null, 'poFoo', self::ORDER_REFERRER_ID, [], true, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, ['addressId' => self::DELIVERY_ADDRESS_ID], true, 'coolCouches', [self::WAREHOUSE_ID], ['order', 'data'], true, self::PLENTY_ORDER_ID, true, 222, true, -4];
         $cases[] = ['paymentOrderRelation id zero', null, 'poFoo', self::ORDER_REFERRER_ID, [], true, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, ['addressId' => self::DELIVERY_ADDRESS_ID], true, 'coolCouches', [self::WAREHOUSE_ID], ['order', 'data'], true, self::PLENTY_ORDER_ID, true, 222, true, 0];
         $cases[] = ['successful creation', self::PLENTY_ORDER_ID, 'poFoo', self::ORDER_REFERRER_ID, [], true, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, ['addressId' => self::DELIVERY_ADDRESS_ID], true, 'coolCouches', [self::WAREHOUSE_ID], ['order', 'data'], true, self::PLENTY_ORDER_ID, true, 222, true, 333];
+        $cases[] = ['successful creation, with multiple warehouse results', self::PLENTY_ORDER_ID, 'poFoo', self::ORDER_REFERRER_ID, [], true, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, ['addressId' => self::DELIVERY_ADDRESS_ID], true, 'coolCouches', [self::WAREHOUSE_ID, '999', '8989'], ['order', 'data'], true, self::PLENTY_ORDER_ID, true, 222, true, 333];
         $cases[] = ['successful creation, packing slip allowed to fail', self::PLENTY_ORDER_ID, 'poFoo', self::ORDER_REFERRER_ID, [], true, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, ['addressId' => self::DELIVERY_ADDRESS_ID], true, 'coolCouches', [self::WAREHOUSE_ID], ['order', 'data'], true, self::PLENTY_ORDER_ID, true, 222, true, 333, true];
 
         return $cases;
