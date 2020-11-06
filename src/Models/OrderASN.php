@@ -1,18 +1,18 @@
 <?php
+
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Models;
-
-use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 
 /**
  * Class OrderASN
  *
  * @package Wayfair\Models
  */
-class OrderASN extends Model {
+class OrderASN extends AbstractWayfairModel
+{
   /**
    * @var      int
    * @property int
@@ -40,7 +40,8 @@ class OrderASN extends Model {
   /**
    * @return string
    */
-  public function getTableName(): string {
+  public function getTableName(): string
+  {
     return 'Wayfair::OrderASN';
   }
 }

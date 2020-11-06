@@ -1,13 +1,13 @@
 <?php
+
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Models;
 
-use Plenty\Modules\Plugin\DataBase\Contracts\Model;
-
-class PendingLogs extends Model {
+class PendingLogs extends AbstractWayfairModel
+{
 
   /**
    * @var      int
@@ -40,7 +40,8 @@ class PendingLogs extends Model {
   /**
    * @return string
    */
-  public function getTableName(): string {
+  public function getTableName(): string
+  {
     return 'Wayfair::PendingLogs';
   }
 

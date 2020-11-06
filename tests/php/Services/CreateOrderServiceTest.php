@@ -78,34 +78,34 @@ class CreateOrderServiceTest extends \PHPUnit\Framework\TestCase
         $mockPluginApp->willReturn(ExternalLogs::class, [], $this->externalLogs);
     }
 
-   /**
-    * Undocumented function
-    *
-    * @param string $label the label for the test case
-    * @param int|null $expectedResult the expected result of calling create - null if it should not finish
-    * @param mixed $poNumber the PO Number in the PO DTO that gets passed into create
-    * @param float|null $orderReferrerId the order referrer ID that Wayfair has cached
-    * @param array|null $idsOfExistingOrders the array of IDs for orders that already exist for the PO
-    * @param boolean $pendingOrderCreationSuccessful does the Pending Order creation fail or pass?
-    * @param boolean $dtoHasBilling does the PO DTO have a billing element?
-    * @param array $fetchedWayfairBillingInfo the data created/pulled for Wayfair's billing address, etc.
-    * @param boolean $dtoHasShipTo does the PO DTO have a shipTo element?
-    * @param array|null $createdDeliveryInfo the array created when processing delivery info
-    * @param boolean $dtoHasWarehouse does the PO DTO have a Warehouse element?
-    * @param string|null $supplierIdInWarehouseInDto the id element of the Warehouse in the PO DTO
-    * @param array|null $warehouseIDs the IDs returned from the Warehouse-Supplier search.
-    * @param array|null $orderDataReturnedFromMapper the result of order mapping
-    * @param boolean $plentyOrderIsCreated is the plenty order created?
-    * @param int|null $plentyOrderId the ID of the plenty order that gets created
-    * @param boolean $paymentIsCreated is the plenty payment created?
-    * @param int|null $idOfCreatedPayment the ID of the payment that gets created
-    * @param boolean $paymentOrderRelationIsCreated is the paymentOrderRelation created?
-    * @param int|null $idOfCreatedPaymentOrderRelation the ID of the paymentOrderRelation created
-    * @param boolean $packingSlipCreationThrowsException does the packing slip functionality work correctly?
-    * @return void
-    *
-    * @dataProvider dataProviderForCreate
-    */
+    /**
+     * Undocumented function
+     *
+     * @param string $label the label for the test case
+     * @param int|null $expectedResult the expected result of calling create - null if it should not finish
+     * @param mixed $poNumber the PO Number in the PO DTO that gets passed into create
+     * @param float|null $orderReferrerId the order referrer ID that Wayfair has cached
+     * @param array|null $idsOfExistingOrders the array of IDs for orders that already exist for the PO
+     * @param boolean $pendingOrderCreationSuccessful does the Pending Order creation fail or pass?
+     * @param boolean $dtoHasBilling does the PO DTO have a billing element?
+     * @param array $fetchedWayfairBillingInfo the data created/pulled for Wayfair's billing address, etc.
+     * @param boolean $dtoHasShipTo does the PO DTO have a shipTo element?
+     * @param array|null $createdDeliveryInfo the array created when processing delivery info
+     * @param boolean $dtoHasWarehouse does the PO DTO have a Warehouse element?
+     * @param string|null $supplierIdInWarehouseInDto the id element of the Warehouse in the PO DTO
+     * @param array|null $warehouseIDs the IDs returned from the Warehouse-Supplier search.
+     * @param array|null $orderDataReturnedFromMapper the result of order mapping
+     * @param boolean $plentyOrderIsCreated is the plenty order created?
+     * @param int|null $plentyOrderId the ID of the plenty order that gets created
+     * @param boolean $paymentIsCreated is the plenty payment created?
+     * @param int|null $idOfCreatedPayment the ID of the payment that gets created
+     * @param boolean $paymentOrderRelationIsCreated is the paymentOrderRelation created?
+     * @param int|null $idOfCreatedPaymentOrderRelation the ID of the paymentOrderRelation created
+     * @param boolean $packingSlipCreationThrowsException does the packing slip functionality work correctly?
+     * @return void
+     *
+     * @dataProvider dataProviderForCreate
+     */
     public function testCreate(
         string $label,
         $expectedResult,
@@ -370,8 +370,6 @@ class CreateOrderServiceTest extends \PHPUnit\Framework\TestCase
         } else {
             $savePackingSlipService->expects($this->exactly($packingSlipFetchesExpected))->method('save')->with($plentyOrderId, $poNumber);
         }
-
-
 
         /** @var AddressService&\PHPUnit\Framework\MockObject\MockObject */
         $addressService = $this->createMock(AddressService::class);
