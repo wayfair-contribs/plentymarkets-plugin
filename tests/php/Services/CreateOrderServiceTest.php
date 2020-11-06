@@ -36,6 +36,7 @@ use Plenty\Modules\Payment\Models\PaymentOrderRelation;
 use Wayfair\Core\Api\Services\LogSenderService;
 use Wayfair\Core\Contracts\LoggerContract;
 use Wayfair\Core\Dto\General\AddressDTO;
+use Wayfair\Core\Dto\General\BillingInfoDTO;
 use Wayfair\Core\Dto\General\WarehouseDTO;
 use Wayfair\Core\Dto\PurchaseOrder\ResponseDTO;
 use Wayfair\Core\Exceptions\CreateOrderException;
@@ -53,8 +54,9 @@ use Wayfair\Repositories\WarehouseSupplierRepository;
 
 class CreateOrderServiceTest extends \PHPUnit\Framework\TestCase
 {
+    const PLENTY_ORDER_ID = 123;
     const ORDER_REFERRER_ID = 2.3;
-    const WAREHOUSE_ID = '123';
+    const WAREHOUSE_ID = '555';
     const BILLING_ADDRESS_ID = 1;
     const BILLING_CONTACT_ID = 2;
     const DELIVERY_ADDRESS_ID = 3;
@@ -86,29 +88,27 @@ class CreateOrderServiceTest extends \PHPUnit\Framework\TestCase
      */
     public function testCreate(
         string $msg,
+        $expectedResult,
         $poNumber = null,
-        $billingInfoFromDto = null,
-        bool $dtoIsMissingShipTo = false,
-        bool $dtoIsMissingWarehouse = false,
-        $supplierIdInWarehouseInDto = null,
         float $orderReferrerId = null,
         $idsOfExistingOrders = null,
+        bool $pendingOrderCreationSuccessful = false,
+        bool $dtoHasBilling = false,
+        $fetchedWayfairBillingInfo = [],
+        bool $dtoHasShipTo = false,
+        $createdDeliveryInfo = null,
+        bool $dtoHasWarehouse = false,
+        $supplierIdInWarehouseInDto = null,
         $warehouseIDs = null,
         $orderDataReturnedFromMapper = null,
         bool $plentyOrderIsCreated = false,
         $plentyOrderId = null,
-        $pendingOrderCreationSuccessful = null,
-        $fetchedWayfairBillingInfo = null,
-        $createdDeliveryInfo = null,
         bool $paymentIsCreated = false,
         $idOfCreatedPayment = null,
         bool $paymentOrderRelationIsCreated = false,
         $idOfCreatedPaymentOrderRelation = null,
         bool $packingSlipCreationThrowsException = false
     ) {
-
-        $expectedResult = null;
-
         $orderReferralValueChecksExpected = 0;
         $existingOrderChecksExpected = 0;
         $pendingOrderCreationsExpected = 0;
@@ -137,18 +137,25 @@ class CreateOrderServiceTest extends \PHPUnit\Framework\TestCase
                 } else {
                     $dtoBillingGetCallsExpected = 1;
 
-                    if (isset($billingInfoFromDto) && !empty($billingInfoFromDto)) {
+                    if ($dtoHasBilling) {
                         $billingInfoLookupsExpected = 1;
 
                         if (isset($fetchedWayfairBillingInfo) && !empty($fetchedWayfairBillingInfo)) {
-                            $wayfairBillingAddressId = $fetchedWayfairBillingInfo['addressId'];
-                            $wayfairBillingContactId = $fetchedWayfairBillingInfo['contactId'];
+                            $wayfairBillingAddressId = null;
+                            if (key_exists('addressId', $fetchedWayfairBillingInfo)) {
+                                $wayfairBillingAddressId = $fetchedWayfairBillingInfo['addressId'];
+                            }
+                            $wayfairBillingContactId = null;
+
+                            if (key_exists('contactId', $fetchedWayfairBillingInfo)) {
+                                $wayfairBillingContactId = $fetchedWayfairBillingInfo['contactId'];
+                            }
 
                             if (isset($wayfairBillingAddressId) && $wayfairBillingAddressId >= 1 && isset($wayfairBillingContactId) && $wayfairBillingContactId >= 1) {
 
                                 $dtoGetShipToCallsExpected = 1;
 
-                                if (!$dtoIsMissingShipTo) {
+                                if ($dtoHasShipTo) {
                                     $contactAndAddressCreationsExpected = 1;
 
                                     if (isset($createdDeliveryInfo) && !empty($createdDeliveryInfo)) {
@@ -158,10 +165,10 @@ class CreateOrderServiceTest extends \PHPUnit\Framework\TestCase
                                         if (isset($deliveryAddressId) && $deliveryAddressId >= 1) {
                                             $dtoGetWarehouseCallsExpected = 1;
 
-                                            if (!$dtoIsMissingWarehouse) {
+                                            if ($dtoHasWarehouse) {
                                                 $dtoWarehouseGetIdCallsExpected = 1;
 
-                                                if (isset($supplierIdInWarehouseInDto) && !empty($supplierIdInWarehouseInDto)) {
+                                                if (isset($supplierIdInWarehouseInDto) && !empty(trim($supplierIdInWarehouseInDto))) {
                                                     $warehouseIdLookupsExpected = 1;
 
                                                     if (isset($warehouseIDs) && !empty($warehouseIDs) && !empty($warehouseIDs[0])) {
@@ -213,12 +220,20 @@ class CreateOrderServiceTest extends \PHPUnit\Framework\TestCase
         /** @var AddressDTO */
         $shipToInWayfairDto = null;
 
+        /** @var BillingInfoDTO */
+        $billingInfoFromDto = null;
+
+        if ($dtoHasBilling) {
+            /** @var BillingInfoDTO&\PHPUnit\Framework\MockObject\MockObject */
+            $billingInfoFromDto = $this->createMock(BillingInfoDTO::class);
+        }
+
         /** @var ResponseDTO&\PHPUnit\Framework\MockObject\MockObject  */
         $purchaseOrderResponseDTO = $this->createMock(ResponseDTO::class);
         $purchaseOrderResponseDTO->expects($this->once())->method('getPoNumber')->willReturn($poNumber);
         $purchaseOrderResponseDTO->expects($this->exactly($dtoBillingGetCallsExpected))->method('getBillingInfo')->willReturn($billingInfoFromDto);
 
-        if (!$dtoIsMissingShipTo) {
+        if ($dtoHasShipTo) {
             /** @var AddressDTO&\PHPUnit\Framework\MockObject\MockObject */
             $shipToInWayfairDto = $this->createMock(AddressDTO::class);
         }
@@ -228,7 +243,7 @@ class CreateOrderServiceTest extends \PHPUnit\Framework\TestCase
         /** @var WarehouseDTO */
         $warehouseInDto = null;
 
-        if (!$dtoIsMissingWarehouse) {
+        if ($dtoHasWarehouse) {
             /** @var WarehouseDTO&\PHPUnit\Framework\MockObject\MockObject */
             $warehouseInDto = $this->createMock(WarehouseDTO::class);
             $warehouseInDto->expects($this->exactly($dtoWarehouseGetIdCallsExpected))->method('getId')->willReturn($supplierIdInWarehouseInDto);
@@ -248,6 +263,7 @@ class CreateOrderServiceTest extends \PHPUnit\Framework\TestCase
             $purchaseOrderResponseDTO,
             self::BILLING_ADDRESS_ID,
             self::BILLING_CONTACT_ID,
+            self::DELIVERY_ADDRESS_ID,
             self::ORDER_REFERRER_ID,
             self::WAREHOUSE_ID,
             (string) AbstractConfigHelper::PAYMENT_METHOD_INVOICE
@@ -335,6 +351,8 @@ class CreateOrderServiceTest extends \PHPUnit\Framework\TestCase
             $savePackingSlipService->expects($this->exactly($packingSlipFetchesExpected))->method('save')->with($plentyOrderId, $poNumber);
         }
 
+
+
         /** @var AddressService&\PHPUnit\Framework\MockObject\MockObject */
         $addressService = $this->createMock(AddressService::class);
 
@@ -353,7 +371,13 @@ class CreateOrderServiceTest extends \PHPUnit\Framework\TestCase
         $logSenderService = $this->createMock(LogSenderService::class);
 
         /** @var CreateOrderService&\PHPUnit\Framework\MockObject\MockObject */
-        $createOrderService = $this->createTestProxy(CreateOrderService::class, [
+        $createOrderService = $this->createPartialMock(CreateOrderService::class, [
+            'createPayment',
+            'createPendingOrder',
+            'getIdsOfExistingPlentyOrders',
+            'getOrCreateBillingInfoForWayfair',
+        ]);
+        $createOrderService->__construct(
             $purchaseOrderMapper,
             $addressMapper,
             $orderRepositoryContract,
@@ -369,15 +393,9 @@ class CreateOrderServiceTest extends \PHPUnit\Framework\TestCase
             $configHelper,
             $logger,
             $logSenderService
-        ]);
-
+        );
         // mock out the subroutines - these should be tested in their own respective harnesses
 
-        /** @var Payment&\PHPUnit\Framework\MockObject\MockObject */
-        $payment = $this->createMock(Payment::class);
-        $payment->id = self::PAYMENT_ID;
-
-        $createOrderService->method('createPayment')->willReturn($payment);
 
         $createOrderService->expects($this->exactly($pendingOrderCreationsExpected))->method('createPendingOrder')->with($purchaseOrderResponseDTO)->willReturn($pendingOrderCreationSuccessful);
 
@@ -403,15 +421,64 @@ class CreateOrderServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $actual, $msg);
     }
 
+    /**
+     * Inputs for testCreate.
+     *
+     * - testCreate determines the expected result based on the inputs.
+     * - testCreate has default values for all parameters except for the test case message.
+     * - the default params are all null/false
+     *
+     * - first param is mandatory case label
+     * - second param is mandatory expected result
+     *
+     * @return array
+     */
     public function dataProviderForCreate()
     {
         $cases = [];
 
-        $cases[] = ['null poNumber should cause exception and no other calculations'];
-        $cases[] = ['empty poNumber value should cause exception and no other calculations', ''];
-        $cases[] = ['whitespace poNumber value should cause exception and no other calculations', '      '];
-        $cases[] = ['lack of order referrer should cause exception and no further calculations', 'poFoo'];
-        // TODO: fill out cases
+        $cases[] = ['null poNumber', null, null];
+        $cases[] = ['empty poNumber value', null, ''];
+        $cases[] = ['whitespace poNumber value', null, '      '];
+        $cases[] = ['lack of order referrer', null, 'poFoo', null];
+        $cases[] = ['negative order referrer', null, 'poFoo', -self::ORDER_REFERRER_ID, []];
+        $cases[] = ['order referrer 0', null, 'poFoo', 0, []];
+        $cases[] = ['order referrer 0.0', null, 'poFoo', 0.0, []];
+        $cases[] = ['one existing order, existing pending order(s)', CreateOrderService::RETURN_VALUE_EXISTING_ORDERS, 'poFoo', self::ORDER_REFERRER_ID, ['1'], false];
+        $cases[] = ['multiple existing orders, existing pending order(s)', CreateOrderService::RETURN_VALUE_EXISTING_ORDERS, 'poFoo', self::ORDER_REFERRER_ID, ['1', '2', '3'], false];
+        $cases[] = ['one existing order, no pending orders', CreateOrderService::RETURN_VALUE_EXISTING_ORDERS, 'poFoo', self::ORDER_REFERRER_ID, ['1'], true];
+        $cases[] = ['multiple existing orders, no pending orders', CreateOrderService::RETURN_VALUE_EXISTING_ORDERS, 'poFoo', self::ORDER_REFERRER_ID, ['1', '2', '3'], true];
+        $cases[] = ['lack of billing info in PO DTO', null, 'poFoo', self::ORDER_REFERRER_ID, [], false, false];
+        $cases[] = ['empty billing info for Wayfair', null, 'poFoo', self::ORDER_REFERRER_ID, [], false, true, []];
+        $cases[] = ['billing info for Wayfair missing addressId', null, 'poFoo', self::ORDER_REFERRER_ID, [], false, true, ['contactId' => self::BILLING_CONTACT_ID]];
+        $cases[] = ['billing info for Wayfair missing contactId', null, 'poFoo', self::ORDER_REFERRER_ID, [], false, true, ['addressId' => self::BILLING_ADDRESS_ID]];
+        $cases[] = ['shipto info missing from PO DTO', null, 'poFoo', self::ORDER_REFERRER_ID, [], false, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], false];
+        $cases[] = ['empty delivery info got returned', null, 'poFoo', self::ORDER_REFERRER_ID, [], false, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, []];
+        $cases[] = ['warehouse missing from PO DTO', null, 'poFoo', self::ORDER_REFERRER_ID, [], false, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, ['addressId' => self::DELIVERY_ADDRESS_ID], false];
+        $cases[] = ['null supplier ID', null, 'poFoo', self::ORDER_REFERRER_ID, [], false, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, ['addressId' => self::DELIVERY_ADDRESS_ID], true, null];
+        $cases[] = ['empty supplier ID', null, 'poFoo', self::ORDER_REFERRER_ID, [], false, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, ['addressId' => self::DELIVERY_ADDRESS_ID], true, ''];
+        $cases[] = ['whitespace supplier ID', null, 'poFoo', self::ORDER_REFERRER_ID, [], false, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, ['addressId' => self::DELIVERY_ADDRESS_ID], true, '     ', [self::WAREHOUSE_ID]];
+        $cases[] = ['no warehouse IDs found - null', null, 'poFoo', self::ORDER_REFERRER_ID, [], false, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, ['addressId' => self::DELIVERY_ADDRESS_ID], true, 'coolCouches', null];
+        $cases[] = ['no warehouse IDs found - empty', null, 'poFoo', self::ORDER_REFERRER_ID, [], false, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, ['addressId' => self::DELIVERY_ADDRESS_ID], true, 'coolCouches', []];
+        $cases[] = ['no data returned from order mapper', null, 'poFoo', self::ORDER_REFERRER_ID, [], false, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, ['addressId' => self::DELIVERY_ADDRESS_ID], true, 'coolCouches', [self::WAREHOUSE_ID], []];
+        // contract of OrderRepositoryContract does not let us return null order
+        // $cases[] = ['plenty order repo failed to create', null, 'poFoo', self::ORDER_REFERRER_ID, [], false, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, ['addressId' => self::DELIVERY_ADDRESS_ID], true, 'coolCouches', [self::WAREHOUSE_ID], ['order', 'data'], false];
+        $cases[] = ['plenty order id missing', null, 'poFoo', self::ORDER_REFERRER_ID, [], false, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, ['addressId' => self::DELIVERY_ADDRESS_ID], true, 'coolCouches', [self::WAREHOUSE_ID], ['order', 'data'], true, null];
+        $cases[] = ['plenty order id negative', null, 'poFoo', self::ORDER_REFERRER_ID, [], false, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, ['addressId' => self::DELIVERY_ADDRESS_ID], true, 'coolCouches', [self::WAREHOUSE_ID], ['order', 'data'], true, -2];
+        $cases[] = ['plenty order id zero', null, 'poFoo', self::ORDER_REFERRER_ID, [], false, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, ['addressId' => self::DELIVERY_ADDRESS_ID], true, 'coolCouches', [self::WAREHOUSE_ID], ['order', 'data'], true, 0];
+        $cases[] = ['failure to create pending order', null, 'poFoo', self::ORDER_REFERRER_ID, [], true, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, ['addressId' => self::DELIVERY_ADDRESS_ID], true, 'coolCouches', [self::WAREHOUSE_ID], ['order', 'data'], true, self::PLENTY_ORDER_ID, true];
+        // contract of PaymentRepositoryContract does not let us return null Payment
+        // $cases[] = ['payment not created', null, 'poFoo', self::ORDER_REFERRER_ID, [], true, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, ['addressId' => self::DELIVERY_ADDRESS_ID], true, 'coolCouches', [self::WAREHOUSE_ID], ['order', 'data'], true, self::PLENTY_ORDER_ID, false];
+        $cases[] = ['payment id missing', null, 'poFoo', self::ORDER_REFERRER_ID, [], true, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, ['addressId' => self::DELIVERY_ADDRESS_ID], true, 'coolCouches', [self::WAREHOUSE_ID], ['order', 'data'], true, self::PLENTY_ORDER_ID, true, null];
+        $cases[] = ['payment id negative', null, 'poFoo', self::ORDER_REFERRER_ID, [], true, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, ['addressId' => self::DELIVERY_ADDRESS_ID], true, 'coolCouches', [self::WAREHOUSE_ID], ['order', 'data'], true, self::PLENTY_ORDER_ID, true, -3];
+        $cases[] = ['payment id zero', null, 'poFoo', self::ORDER_REFERRER_ID, [], true, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, ['addressId' => self::DELIVERY_ADDRESS_ID], true, 'coolCouches', [self::WAREHOUSE_ID], ['order', 'data'], true, self::PLENTY_ORDER_ID, true, 0];
+        // contract of PaymentOrderRelationRepositoryContract does not let su return null relation
+        // $cases[] = ['paymentOrderRelation not created', null, 'poFoo', self::ORDER_REFERRER_ID, [], true, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, ['addressId' => self::DELIVERY_ADDRESS_ID], true, 'coolCouches', [self::WAREHOUSE_ID], ['order', 'data'], true, self::PLENTY_ORDER_ID, true, 222, false];
+        $cases[] = ['paymentOrderRelation id missing', null, 'poFoo', self::ORDER_REFERRER_ID, [], true, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, ['addressId' => self::DELIVERY_ADDRESS_ID], true, 'coolCouches', [self::WAREHOUSE_ID], ['order', 'data'], true, self::PLENTY_ORDER_ID, true, 222, true, null];
+        $cases[] = ['paymentOrderRelation id negative', null, 'poFoo', self::ORDER_REFERRER_ID, [], true, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, ['addressId' => self::DELIVERY_ADDRESS_ID], true, 'coolCouches', [self::WAREHOUSE_ID], ['order', 'data'], true, self::PLENTY_ORDER_ID, true, 222, true, -4];
+        $cases[] = ['paymentOrderRelation id zero', null, 'poFoo', self::ORDER_REFERRER_ID, [], true, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, ['addressId' => self::DELIVERY_ADDRESS_ID], true, 'coolCouches', [self::WAREHOUSE_ID], ['order', 'data'], true, self::PLENTY_ORDER_ID, true, 222, true, 0];
+        $cases[] = ['successful creation', self::PLENTY_ORDER_ID, 'poFoo', self::ORDER_REFERRER_ID, [], true, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, ['addressId' => self::DELIVERY_ADDRESS_ID], true, 'coolCouches', [self::WAREHOUSE_ID], ['order', 'data'], true, self::PLENTY_ORDER_ID, true, 222, true, 333];
+        $cases[] = ['successful creation, packing slip allowed to fail', self::PLENTY_ORDER_ID, 'poFoo', self::ORDER_REFERRER_ID, [], true, true, ['contactId' => self::BILLING_CONTACT_ID, 'addressId' => self::BILLING_ADDRESS_ID], true, ['addressId' => self::DELIVERY_ADDRESS_ID], true, 'coolCouches', [self::WAREHOUSE_ID], ['order', 'data'], true, self::PLENTY_ORDER_ID, true, 222, true, 333, true];
 
         return $cases;
     }

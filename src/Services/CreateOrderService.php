@@ -263,14 +263,21 @@ class CreateOrderService
       }
 
       /** @var int */
-      $wayfairBillingAddressId = $billingInformationForWayfair['addressId'];
+      $wayfairBillingAddressId = null;
+
+      if (key_exists('addressId', $billingInformationForWayfair)) {
+        $wayfairBillingAddressId = $billingInformationForWayfair['addressId'];
+      }
 
       if (!isset($wayfairBillingAddressId) || $wayfairBillingAddressId < 1) {
         throw new CreateOrderException("Could not determine Wayfair Billing Address ID for PO: " . $wfPurchaseOrderNumber);
       }
 
       /** @var int */
-      $wayfairBillingContactId = $billingInformationForWayfair['contactId'];
+      $wayfairBillingContactId = null;
+      if (key_exists('contactId', $billingInformationForWayfair)) {
+        $wayfairBillingContactId = $billingInformationForWayfair['contactId'];
+      }
 
       if (!isset($wayfairBillingContactId) || $wayfairBillingContactId < 1) {
         throw new CreateOrderException("Could not determine Wayfair Contact Information ID for PO: " . $wfPurchaseOrderNumber);
@@ -304,14 +311,14 @@ class CreateOrderService
 
       $supplierIdInDto = $warehouseInDto->getId();
 
-      if (!isset($supplierIdInDto)  || $supplierIdInDto) {
+      if (!isset($supplierIdInDto) || empty(trim($supplierIdInDto))) {
         throw new CreateOrderException("PO " . $wfPurchaseOrderNumber . " contains Warehouse information that is missing an ID.");
       }
 
       // TODO: filter warehouses based on criteria such as stock amounts?
       $potentialIds = $this->wfWarehouseSupplierRepository->findWarehouseIds($supplierIdInDto);
 
-      if (!isset($potentialIds) || empty($potentialIds) || empty($potentialIds[0])) {
+      if (!isset($potentialIds) || empty($potentialIds) || empty(trim($potentialIds[0]))) {
         throw new CreateOrderException("Could not find Warehouse ID for PO " . $wfPurchaseOrderNumber . " for supplier " . $supplierIdInDto);
       }
 
@@ -350,7 +357,7 @@ class CreateOrderService
       // Create payment
       // NOTICE: there is no way to undo the payment actions
       $plentyPayment = $this->createPayment($wfPurchaseOrderNumber);
-      if (!isset($payment) || null == $payment->id || $plentyPayment->id < 1) {
+      if (!isset($plentyPayment) || null == $plentyPayment->id || $plentyPayment->id < 1) {
         throw new CreateOrderException("Unable to create payment information for order " . $plentyOrderId . " PO: " . $wfPurchaseOrderNumber);
       }
 
@@ -447,7 +454,11 @@ class CreateOrderService
       // not expecting more than one page, so not setting page filter
       $orderList = $this->plentyOrderRepositoryContract->searchOrders();
     } finally {
-      $this->plentyOrderRepositoryContract->setFilters($oldFilters);
+      if (isset($oldFilters)) {
+        $this->plentyOrderRepositoryContract->setFilters($oldFilters);
+      } else {
+        $this->plentyOrderRepositoryContract->clearFilters();
+      }
     }
 
     $ids = [];
