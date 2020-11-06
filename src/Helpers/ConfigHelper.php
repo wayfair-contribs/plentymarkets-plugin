@@ -65,9 +65,9 @@ class ConfigHelper extends AbstractConfigHelper
   }
 
   /**
-   * @return float
+   * @return float|null
    */
-  public function getOrderReferrerValue(): float
+  public function getOrderReferrerValue()
   {
     /**
      * @var KeyValueRepository $keyValueRepository

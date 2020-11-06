@@ -207,7 +207,7 @@ class CreateOrderService
       }
 
       $wfPurchaseOrderNumber = $wfPurchaseOrderResponseDTO->getPoNumber();
-      if (!isset($wfPurchaseOrderNumber) || empty($wfPurchaseOrderNumber)) {
+      if (!isset($wfPurchaseOrderNumber) || empty(trim($wfPurchaseOrderNumber))) {
         throw new CreateOrderException("Cannot create order - no PO number provided");
       }
 
@@ -247,17 +247,16 @@ class CreateOrderService
         'method' => __METHOD__
       ]);
 
-      // Get payment method id
       // Create billing address and delivery address
       $wfAddressDto = AddressDTO::createFromArray(BillingAddress::BillingAddressAsArray);
 
-      $billingInfoFromWayfairDto = $wfPurchaseOrderResponseDTO->getBillingInfo();
+      $billingInfoFromDto = $wfPurchaseOrderResponseDTO->getBillingInfo();
 
-      if (!isset($billingInfoFromWayfairDto) || empty($billingInfoFromWayfairDto)) {
+      if (!isset($billingInfoFromDto) || empty($billingInfoFromDto)) {
         throw new CreateOrderException("Purchase order information is missing billing details. PO: " . $wfPurchaseOrderNumber);
       }
 
-      $billingInformationForWayfair = $this->getOrCreateBillingInfoForWayfair($wfAddressDto, $billingInfoFromWayfairDto, $referrerIdForWayfair, $externalLogs);
+      $billingInformationForWayfair = $this->getOrCreateBillingInfoForWayfair($wfAddressDto, $billingInfoFromDto, $referrerIdForWayfair, $externalLogs);
 
       if (!isset($billingInformationForWayfair) || empty($billingInformationForWayfair)) {
         throw new CreateOrderException("Could not determine information on how to bill Wayfair for PO: " . $wfPurchaseOrderNumber);
@@ -285,7 +284,7 @@ class CreateOrderService
       }
 
       // delivery always uses billing info from PO instead of the information stored in the system
-      $deliveryInformation = $this->wfAddressService->createContactAndAddress($shipToInWayfairDto, $billingInfoFromWayfairDto, $referrerIdForWayfair, ContactType::TYPE_CUSTOMER, AddressRelationType::DELIVERY_ADDRESS);
+      $deliveryInformation = $this->wfAddressService->createContactAndAddress($shipToInWayfairDto, $billingInfoFromDto, $referrerIdForWayfair, ContactType::TYPE_CUSTOMER, AddressRelationType::DELIVERY_ADDRESS);
 
       if (!isset($deliveryInformation) || empty($deliveryInformation)) {
         throw new CreateOrderException("Unable to create delivery information for purchase order: " . $wfPurchaseOrderNumber);
@@ -364,9 +363,10 @@ class CreateOrderService
       }
 
       // packing slips are an optional feature and may be phased out.
-      // do not fail the order for lack of packing slip.
+      // do NOT fail the order for lack of packing slip!
       try {
         $this->wfSavePackingSlipService->save($plentyOrderId, $wfPurchaseOrderNumber);
+        // ignore a null/empty result here, as it is not worth the traffic to notify anyone about this.
       } catch (\Exception $exception) {
         $externalLogs->addErrorLog("Unexpected " . get_class($exception) . " while working with packing slips: " . $exception->getMessage(), $exception->getTraceAsString());
       }
@@ -386,7 +386,7 @@ class CreateOrderService
    *
    * @return void
    */
-  private function createPendingOrder(ResponseDTO $wfPurchaseOrderResponseDTO): bool
+  function createPendingOrder(ResponseDTO $wfPurchaseOrderResponseDTO): bool
   {
     $wfPurchaseOrderNumber = $wfPurchaseOrderResponseDTO->getPoNumber();
     $pendingOrder = null;
@@ -417,7 +417,7 @@ class CreateOrderService
    *
    * @return Payment
    */
-  private function createPayment(string $wfPurchaseOrderNumber): Payment
+  function createPayment(string $wfPurchaseOrderNumber): Payment
   {
     $data = [
       'amount' => 0,
@@ -435,7 +435,7 @@ class CreateOrderService
     return $this->plentyPaymentRepositoryContract->createPayment($data);
   }
 
-  private function getIdsOfExistingPlentyOrders(string $wfPurchaseOrderNumber): array
+  function getIdsOfExistingPlentyOrders(string $wfPurchaseOrderNumber): array
   {
     if (!isset($wfPurchaseOrderNumber) || empty($wfPurchaseOrderNumber)) {
       return [];
@@ -468,7 +468,7 @@ class CreateOrderService
    * @param ExternalLogs $externalLogs
    * @return array
    */
-  private function getOrCreateBillingInfoForWayfair($addressDTO, $billingInfoFromWayfairPurchaseOrderDto, $referrerIdForWayfair, $externalLogs = null): array
+  function getOrCreateBillingInfoForWayfair($addressDTO, $billingInfoFromWayfairPurchaseOrderDto, $referrerIdForWayfair, $externalLogs = null): array
   {
     $wfBilling = [];
 
