@@ -481,14 +481,14 @@ class CreateOrderService
    * @param ExternalLogs $externalLogs
    * @return array
    */
-  function getOrCreateBillingInfoForWayfair($addressDTO, $billingInfoFromWayfairPurchaseOrderDto, $referrerIdForWayfair, $externalLogs = null): array
+  function getOrCreateBillingInfoForWayfair(AddressDTO $addressDTO, BillingInfoDTO $billingInfoFromWayfairPurchaseOrderDto, float $referrerIdForWayfair, ExternalLogs $externalLogs = null): array
   {
     $wfBilling = [];
 
-    $encodedBillingContactFromRepository = $this->wfKeyValueRepository->get(AbstractConfigHelper::BILLING_CONTACT);
-    if (isset($encodedBillingContactFromRepository) && !empty($encodedBillingContactFromRepository)) {
+    $encodedBillingContactInRepository = $this->wfKeyValueRepository->get(AbstractConfigHelper::BILLING_CONTACT);
+    if (isset($encodedBillingContactInRepository) && !empty(trim($encodedBillingContactInRepository))) {
       try {
-        $wfBilling = \json_decode($encodedBillingContactFromRepository, true);
+        $wfBilling = \json_decode($encodedBillingContactInRepository, true);
       } catch (\Exception $e) {
         if (isset($externalLogs)) {
           $externalLogs->addWarningLog("Could not decode billing information in KeyValueRepository - "
@@ -504,7 +504,10 @@ class CreateOrderService
       }
 
       $wfBilling = $this->wfAddressService->createContactAndAddress($addressDTO, $billingInfoFromWayfairPurchaseOrderDto, $referrerIdForWayfair, ContactType::TYPE_PARTNER, AddressRelationType::BILLING_ADDRESS);
-      $this->wfKeyValueRepository->put(AbstractConfigHelper::BILLING_CONTACT, \json_encode($wfBilling));
+      if (isset($wfBilling) && !empty($wfBilling))
+      {
+        $this->wfKeyValueRepository->put(AbstractConfigHelper::BILLING_CONTACT, \json_encode($wfBilling));
+      }
     }
 
     return $wfBilling;

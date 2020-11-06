@@ -587,7 +587,103 @@ class CreateOrderServiceTest extends \PHPUnit\Framework\TestCase
         return $cases;
     }
 
-    // TODO: test harness for getOrCreateBillingInfoForWayfair
+    /**
+     * Test harness for getOrCreateBillingInfoForWayfair
+     *
+     * @param string $label the test case label
+     * @param array $expectedResult the expected output of getOrCreateBillingInfoForWayfair
+     * @param string|null $encodedBillingContactInRepository the data found in the repo
+     * @param array|null $createdBillingInfo the billing info array returned from AddressService
+     * @return void
+     *
+     * @dataProvider dataProviderForGetOrCreateBillingInfoForWayfair
+     */
+    public function testGetOrCreateBillingInfoForWayfair(string $label, array $expectedResult, $encodedBillingContactInRepository, $createdBillingInfo)
+    {
+        /** @var KeyValueRepository&\PHPUnit\Framework\MockObject\MockObject  */
+        $keyValueRepository = $this->createMock(KeyValueRepository::class);
+
+        $keyValueRepository->expects($this->once())->method('get')->willReturn($encodedBillingContactInRepository);
+
+        $expectedCreations = 0;
+
+        if (!isset($encodedBillingContactInRepository) || empty(trim($encodedBillingContactInRepository))) {
+            $expectedCreations = 1;
+        } else {
+            try {
+                $decoded = json_decode($encodedBillingContactInRepository);
+                if (!isset($decoded) || empty($decoded)) {
+                    $expectedCreations = 1;
+                }
+            } catch (Exception $e) {
+                $expectedCreations = 1;
+            }
+        }
+
+        $expectedPuts = ($expectedCreations > 0 && isset($createdBillingInfo) && !empty($createdBillingInfo)) ? 1 : 0;
+
+        $keyValueRepository->expects($this->exactly($expectedPuts))->method('put');
+
+        /** @var AddressService&\PHPUnit\Framework\MockObject\MockObject */
+        $addressService = $this->createMock(AddressService::class);
+
+        /** @var AddressDTO&\PHPUnit\Framework\MockObject\MockObject */
+        $addressDTO = $this->createMock(AddressDTO::class);
+
+        /** @var BillingInfoDTO&\PHPUnit\Framework\MockObject\MockObject */
+        $billingInfoFromWayfairPurchaseOrderDto = $this->createMock(BillingInfoDTO::class);
+
+        $addressService->expects($this->exactly($expectedCreations))->method('createContactAndAddress')->with(
+            $addressDTO,
+            $billingInfoFromWayfairPurchaseOrderDto,
+            self::ORDER_REFERRER_ID,
+            ContactType::TYPE_PARTNER,
+            AddressRelationType::BILLING_ADDRESS
+        )->willReturn($createdBillingInfo);
+
+        /** @var CreateOrderService&\PHPUnit\Framework\MockObject\MockObject */
+        $createOrderService = $this->createTestProxy(CreateOrderService::class, [
+            $this->createMock(PurchaseOrderMapper::class),
+            $this->createMock(AddressMapper::class),
+            $this->createMock(OrderRepositoryContract::class),
+            $keyValueRepository,
+            $this->createMock(WarehouseSupplierRepository::class),
+            $this->createMock(PaymentRepositoryContract::class),
+            $this->createMock(PaymentHelper::class),
+            $this->createMock(PaymentOrderRelationRepositoryContract::class),
+            $this->createMock(PendingPurchaseOrderMapper::class),
+            $this->createMock(PendingOrdersRepository::class),
+            $this->createMock(SavePackingSlipService::class),
+            $addressService,
+            $this->createMock(AbstractConfigHelper::class),
+            $this->createMock(LoggerContract::class),
+            $this->createMock(LogSenderService::class),
+        ]);
+
+        // due to argument type declarations, can't pass nulls under test
+        // referrer is checked in 'create' before 'getOrCreateBillingInfoForWayfair' is called
+        $actualResult = $createOrderService->getOrCreateBillingInfoForWayfair($addressDTO, $billingInfoFromWayfairPurchaseOrderDto, self::ORDER_REFERRER_ID, $this->externalLogs);
+
+        $this->assertEquals($expectedResult, $actualResult, $label);
+    }
+
+    public function dataProviderForGetOrCreateBillingInfoForWayfair()
+    {
+        $cases = [];
+
+        $cases[] = ['nothing in repo, and AddressService returns nothing', [], null, []];
+        $cases[] = ['empty string in repo, and AddressService returns nothing', [], '', []];
+        $cases[] = ['whitespace string in repo, and AddressService returns nothing', [], '    ', []];
+        $cases[] = ['invalid json in repo, and AddressService returns nothing', [], '{foo', []];
+        $cases[] = ['nothing in repo, use AddressService result', ['faz' => 'baz'], null, ['faz' => 'baz']];
+        $cases[] = ['empty string in repo, use AddressService result', ['faz' => 'baz'], '', ['faz' => 'baz']];
+        $cases[] = ['whitespace string in repo, use AddressService result', ['faz' => 'baz'], '    ', ['faz' => 'baz']];
+        $cases[] = ['invalid json in repo, use AddressService result', ['faz' => 'baz'], '{foo', ['faz' => 'baz']];
+        $cases[] = ['valid json string in repo, use repo result V1', ['foo' => 'bar'], '{"foo": "bar"}', []];
+        $cases[] = ['valid json string in repo, use repo result V2', ['foo' => 'bar'], '{"foo": "bar"}', ['faz' => 'baz']];
+
+        return $cases;
+    }
 
     // TODO: test harness for createPendingOrder
 }
