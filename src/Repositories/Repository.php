@@ -36,4 +36,9 @@ class Repository {
     return $this->accountService->getAccountContactId();
   }
 
+  function getLogger()
+  {
+    return $this->loggerContract;
+  }
+
 }

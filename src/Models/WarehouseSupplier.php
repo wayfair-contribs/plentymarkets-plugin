@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright 2019 Wayfair LLC - All rights reserved
  */
@@ -7,7 +8,8 @@ namespace Wayfair\Models;
 
 use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 
-class WarehouseSupplier extends Model {
+class WarehouseSupplier extends AbstractWayfairModel
+{
 
   /**
    * @var      int
@@ -36,7 +38,8 @@ class WarehouseSupplier extends Model {
   /**
    * @return string
    */
-  public function getTableName(): string {
+  public function getTableName(): string
+  {
     return 'Wayfair::WarehouseSupplier';
   }
 }

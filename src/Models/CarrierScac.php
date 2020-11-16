@@ -1,18 +1,18 @@
 <?php
+
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Models;
-
-use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 
 /**
  * Class CarrierScac
  *
  * @package Wayfair\Models
  */
-class CarrierScac extends Model {
+class CarrierScac extends AbstractWayfairModel
+{
   /**
    * @var      int
    * @property int
@@ -40,7 +40,8 @@ class CarrierScac extends Model {
   /**
    * @return string
    */
-  public function getTableName(): string {
+  public function getTableName(): string
+  {
     return 'Wayfair::CarrierScac';
   }
 }

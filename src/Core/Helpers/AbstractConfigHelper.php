@@ -44,9 +44,9 @@ abstract class AbstractConfigHelper {
   /**
    * Returns the PlentyMarkets identifier for Wayfair's Order Referrer value
    *
-   * @return float
+   * @return float|null
    */
-  abstract public function getOrderReferrerValue(): float;
+  abstract public function getOrderReferrerValue();
 
   /**
    * Get the value of the user-configured Stock Buffer setting
