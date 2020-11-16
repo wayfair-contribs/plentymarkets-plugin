@@ -3,12 +3,12 @@
  * @copyright 2019 Wayfair LLC - All rights reserved
  */
 
-namespace Wayfair\Core\Dto\ShippingLabel;
+namespace Wayfair\Core\Dto\General;
 
-class ResponseDTO {
+class DocumentDTO {
 
   /**
-   * ResponseDTO constructor.
+   * DocumentDTO constructor.
    *
    * @param array $data
    */
