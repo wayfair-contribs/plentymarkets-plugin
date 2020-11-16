@@ -1,11 +1,13 @@
 <?php
+
 /**
  * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Core\Dto\General;
 
-class CustomsDocumentDTO {
+class CustomsDocumentDTO
+{
   /**
    * @var bool
    */
@@ -19,7 +21,8 @@ class CustomsDocumentDTO {
   /**
    * @return bool
    */
-  public function getRequired() {
+  public function getRequired()
+  {
     return $this->required;
   }
 
@@ -28,14 +31,16 @@ class CustomsDocumentDTO {
    *
    * @return void
    */
-  public function setRequired($required) {
-    $this->required = $required;
+  public function setRequired($required)
+  {
+    $this->required = isset($required) && $required;
   }
 
   /**
    * @return string
    */
-  public function getUrl() {
+  public function getUrl()
+  {
     return $this->url;
   }
 
@@ -44,7 +49,8 @@ class CustomsDocumentDTO {
    *
    * @return void
    */
-  public function setUrl($url) {
+  public function setUrl($url)
+  {
     $this->url = $url;
   }
 
@@ -55,7 +61,9 @@ class CustomsDocumentDTO {
    *
    * @return self
    */
-  public static function createFromArray(array $params): self {
+  public static function createFromArray(array $params): self
+  {
+    /** @var CustomsDocumentDTO */
     $dto = pluginApp(CustomsDocumentDTO::class);
     $dto->setRequired($params['required'] ?? null);
     $dto->setUrl($params['url'] ?? null);
