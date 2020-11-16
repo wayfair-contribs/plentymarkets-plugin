@@ -81,6 +81,11 @@ class ShipmentRegisterService
   private $orderPropertyService;
 
   /**
+   * @var SaveCustomsInvoiceService
+   */
+  private $saveCustomsInvoiceService;
+
+  /**
    * @var LoggerContract
    */
   private $loggerContract;
@@ -95,6 +100,7 @@ class ShipmentRegisterService
    * @param StorageRepositoryContract $storageRepositoryContract
    * @param FetchDocumentContract $fetchShippingLabelContract
    * @param OrderPropertyService $orderPropertyService
+   * @param SaveCustomsInvoiceService $saveCustomsInvoiceService
    * @param LoggerContract $loggerContract
    */
   public function __construct(
@@ -105,6 +111,7 @@ class ShipmentRegisterService
     StorageRepositoryContract $storageRepositoryContract,
     FetchDocumentContract $fetchShippingLabelContract,
     OrderPropertyService $orderPropertyService,
+    SaveCustomsInvoiceService $saveCustomsInvoiceService,
     LoggerContract $loggerContract
   ) {
     $this->saveOrderDocumentService = $saveOrderDocumentService;
@@ -114,6 +121,7 @@ class ShipmentRegisterService
     $this->storageRepositoryContract = $storageRepositoryContract;
     $this->fetchShippingLabelContract = $fetchShippingLabelContract;
     $this->orderPropertyService = $orderPropertyService;
+    $this->saveCustomsInvoiceService = $saveCustomsInvoiceService;
     $this->loggerContract = $loggerContract;
   }
 
@@ -512,6 +520,17 @@ class ShipmentRegisterService
                 'labelPath' => $storageObject->key
               ]
             );
+
+            $customsDocument = $registerResponse->getCustomsDocument();
+
+            if (isset($customsDocument) && $customsDocument->getRequired())
+            {
+              $url = $customsDocument->getUrl();
+              if (isset($url) && !empty(trim($url)))
+              {
+                $this->saveCustomsInvoiceService->save($orderId, $poNumber, $url);
+              }
+            }
 
             $objectUrl = $this->storageRepositoryContract->getObjectUrl(
               AbstractConfigHelper::PLUGIN_NAME,

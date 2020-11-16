@@ -56,8 +56,9 @@ class ResponseDTO
   private $purchaseOrder;
 
   /**
-   * @var
+   * @var CustomsDocumentDTO
    */
+  private $customsDocument;
 
   /**
    * @return string
@@ -230,6 +231,22 @@ class ResponseDTO
     }
   }
 
+  /**
+   * Get the Customs Document, if any
+   *
+   * @return CustomsDocumentDTO
+   */
+  public function getCustomsDocument(): CustomsDocumentDTO
+  {
+    return $this->customsDocument;
+  }
+
+  /**
+   * Set the customs document based on an array
+   *
+   * @param mixed $customsDocument
+   * @return void
+   */
   public function setCustomsDocument($customsDocument)
   {
     $this->customsDocument = null;
