@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright 2020 Wayfair LLC - All rights reserved
  */
@@ -61,8 +62,7 @@ class SaveCustomsInvoiceService
     FetchDocumentContract $fetchDocumentContract,
     LoggerContract $loggerContract,
     LogSenderService $logSenderService
-  )
-  {
+  ) {
     $this->documentRepositoryContract = $documentRepositoryContract;
     $this->fetchDocumentContract = $fetchDocumentContract;
     $this->loggerContract = $loggerContract;
@@ -113,13 +113,17 @@ class SaveCustomsInvoiceService
       ]
     );
 
-    try {
+    $contentBase64 = '';
 
+    try {
       $docDto = $this->fetchDocumentContract->fetch($documentURL);
 
-      $contentBase64 = $docDto->getBase64EncodedContent();
+      if (isset($docDto)) {
+        $contentBase64 = $docDto->getBase64EncodedContent();
+      }
     } catch (\Exception $exception) {
-      $this->loggerContract->error(
+      // not all orders have customs invoices
+      $this->loggerContract->warning(
         TranslationHelper::getLoggerKey(self::LOG_KEY_DOWNLOAD_ERROR),
         [
           'additionalInfo' => [
@@ -133,14 +137,13 @@ class SaveCustomsInvoiceService
         ]
       );
 
-      $externalLogs->addErrorLog("PO " . $wfPoNumber . " for order " . $plentyOrderId . ": unable to fetch customs invoice - " .
-        get_class($exception) . ": " . $exception->getMessage());
-
+      // avoiding external log as this could become noisy
       return [];
     }
 
     if (!isset($contentBase64) && empty($contentBase64)) {
-      $this->loggerContract->error(
+      // not all orders have customs invoices
+      $this->loggerContract->info(
         TranslationHelper::getLoggerKey(self::LOG_KEY_NO_CUSTOMS_INVOICE_DATA),
         [
           'additionalInfo' => [
@@ -151,8 +154,7 @@ class SaveCustomsInvoiceService
         ]
       );
 
-      $externalLogs->addErrorLog("Unable to fetch Customs Invoice. PO: " . $wfPoNumber . " ORDER: " . $plentyOrderId);
-
+      // avoiding external log as this could become noisy
       return [];
     }
 
@@ -202,7 +204,6 @@ class SaveCustomsInvoiceService
         . json_encode($upload_result));
 
       return $upload_result;
-
     } catch (\Exception $exception) {
       $this->loggerContract->error(
         TranslationHelper::getLoggerKey(self::LOG_KEY_SAVE_ERROR),
@@ -222,7 +223,6 @@ class SaveCustomsInvoiceService
         get_class($exception) . ": " . $exception->getMessage(), $exception->getTraceAsString());
 
       return [];
-
     } finally {
       if (isset($this->logSenderService) && count($externalLogs->getLogs())) {
         $this->logSenderService->execute($externalLogs->getLogs());
