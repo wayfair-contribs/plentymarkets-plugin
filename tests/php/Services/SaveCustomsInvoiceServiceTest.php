@@ -118,8 +118,6 @@ final class SaveCustomsInvoiceServiceTest extends \PHPUnit\Framework\TestCase
                     $uploadInvocation->willThrowException(new TestTimeException("Forced upload failure"));
                 }
             } else {
-                $documentRepositoryContract->expects(($this->never()))->method('uploadOrderDocuments');
-
                 if ($fetchResultType == self::RESULT_INSTRUCTION_FAIL)
                 {
                     $fetchInvocation->willReturn(null);
