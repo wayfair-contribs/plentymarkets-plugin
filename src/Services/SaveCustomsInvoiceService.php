@@ -70,23 +70,6 @@ class SaveCustomsInvoiceService
   }
 
   /**
-   * Build the plentymarkets document data array
-   * @param string $poNumberWithPrefix
-   * @param string $contentBase64
-   * @return array
-   */
-  private function buildDocumentData(string $contentBase64): array
-  {
-    return [
-      'documents' => [
-        [
-          'content' => $contentBase64,
-        ]
-      ]
-    ];
-  }
-
-  /**
    * Fetch a document from the Wayfair API URL in the parameter
    * Add the file as an "external invoice" document to the order with the ID in the parameter
    *
@@ -98,18 +81,15 @@ class SaveCustomsInvoiceService
    */
   public function save(int $plentyOrderId, string $wfPoNumber, string $documentURL): array
   {
-    if (!isset($plentyOrderId) || $plentyOrderId <= 0)
-    {
+    if (!isset($plentyOrderId) || $plentyOrderId <= 0) {
       throw new InvalidArgumentException("Plenty order ID MUST be a positive integer");
     }
 
-    if(!isset($wfPoNumber) || empty(trim(($wfPoNumber))))
-    {
+    if (!isset($wfPoNumber) || empty(trim(($wfPoNumber)))) {
       throw new InvalidArgumentException("Wayfair Purchase order number MUST be provided");
     }
 
-    if (!isset($documentURL) || empty(trim($documentURL)))
-    {
+    if (!isset($documentURL) || empty(trim($documentURL))) {
       throw new InvalidArgumentException("Document MUST must be provided");
     }
 
@@ -184,8 +164,15 @@ class SaveCustomsInvoiceService
       ]
     );
 
+    $documentData = [
+      'documents' => [
+        [
+          'content' => $contentBase64,
+        ]
+      ]
+    ];
+
     try {
-      $documentData = $this->buildDocumentData($contentBase64);
       // TODO: confirm doc type with PM, CM, etc, before merging
       $docType = Document::PRO_FORMA_INVOICE;
 
