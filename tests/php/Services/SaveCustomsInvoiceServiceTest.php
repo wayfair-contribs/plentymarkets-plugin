@@ -159,7 +159,12 @@ final class SaveCustomsInvoiceServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $actualResult, $name);
     }
 
-    public function dataProviderForSave()
+    /**
+     * Test cases for testSave
+     *
+     * @return array
+     */
+    public function dataProviderForSave(): array
     {
         $cases = [];
 
@@ -172,6 +177,10 @@ final class SaveCustomsInvoiceServiceTest extends \PHPUnit\Framework\TestCase
 
         $cases[] = ['failure at upload time should have empty result', [], null, self::ORDER_NUM, self::PO_NUM, self::DOC_URL, self::RESULT_INSTRUCTION_PASS, self::RESULT_INSTRUCTION_FAIL];
         $cases[] = ['exception at upload time should have empty result', [], null, self::ORDER_NUM, self::PO_NUM, self::DOC_URL, self::RESULT_INSTRUCTION_PASS, self::RESULT_INSTRUCTION_EXCEPTION];
+
+        $cases[] = ['all good inputs should mean good upload', self::UPLOAD_RESULT_GOOD, null, self::ORDER_NUM, self::PO_NUM, self::DOC_URL];
+
+        // TODO: add more cases
 
         return $cases;
     }
