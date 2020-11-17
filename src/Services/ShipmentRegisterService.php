@@ -523,13 +523,20 @@ class ShipmentRegisterService
 
             $customsDocument = $registerResponse->getCustomsDocument();
 
-            if (isset($customsDocument) && $customsDocument->getRequired())
-            {
+            if (isset($customsDocument) && $customsDocument->getRequired()) {
               $url = $customsDocument->getUrl();
-              if (isset($url) && !empty(trim($url)))
-              {
-                $this->saveCustomsInvoiceService->save($orderId, $poNumber, $url);
+              if (isset($url) && !empty(trim($url))) {
+                try {
+                  $this->saveCustomsInvoiceService->save($orderId, $poNumber, $url);
+                  // TODO: log the document upload result
+                } catch (\Exception $exception) {
+                  // FIXME: need to log an error for this Exception
+                }
+              } else {
+                // FIXME: need to log an error when required is true and url is blank
               }
+            } else {
+              // TODO: info log about no customs doc required
             }
 
             $objectUrl = $this->storageRepositoryContract->getObjectUrl(
