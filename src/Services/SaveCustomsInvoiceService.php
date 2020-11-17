@@ -156,7 +156,7 @@ class SaveCustomsInvoiceService
       return [];
     }
 
-    if (!isset($contentBase64) && empty($contentBase64)) {
+    if (!isset($contentBase64) || empty($contentBase64)) {
       // not all orders have customs invoices
       $this->loggerContract->info(
         TranslationHelper::getLoggerKey(self::LOG_KEY_NO_CUSTOMS_INVOICE_DATA),
