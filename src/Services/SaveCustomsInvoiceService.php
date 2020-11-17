@@ -169,6 +169,7 @@ class SaveCustomsInvoiceService
 
     try {
       $documentData = $this->buildDocumentData($contentBase64);
+      // TODO: confirm doc type with PM, CM, etc, before merging
       $docType = Document::PRO_FORMA_INVOICE;
 
       $this->loggerContract->debug(

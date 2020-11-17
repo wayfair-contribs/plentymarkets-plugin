@@ -67,6 +67,75 @@ class SaveOrderDocumentService
   }
 
   /**
+   * Save order file data to order
+   *
+   * @param ResponseDTO $responseDTO
+   * @param string $fileName
+   *
+   * @return StorageObject
+   * @throws \Wayfair\Core\Exceptions\TokenNotFoundException
+   * @throws \Exception
+   */
+  public function savePoShippingLabel(ResponseDTO $responseDTO, string $fileName): StorageObject
+  {
+
+    if (!isset($responseDTO)) {
+      throw new \Exception(self::CANNOT_GET_SHIPPING_LABEL .
+        ": No PO registration response  DTO was provided");
+    }
+
+    $purchase_order_info = $responseDTO->getPurchaseOrder();
+    if (!isset($purchase_order_info)) {
+      throw new \Exception(self::CANNOT_GET_SHIPPING_LABEL .
+        ": No PO information in DTO");
+    }
+
+    $poNumberWithPrefix = $purchase_order_info->getStorePrefix() . $purchase_order_info->getPoNumber();
+
+    $pm_order_id = $this->getCheckedOrderId($poNumberWithPrefix);
+    // order validation happens inside getCheckedOrderId
+
+    $shipping_label_info = $responseDTO->getConsolidatedShippingLabel();
+    if (!isset($shipping_label_info)) {
+      throw new \Exception(self::CANNOT_GET_SHIPPING_LABEL .
+        " for PO " . $poNumberWithPrefix . ": No Shipping Label information in DTO." . " Order: " . $pm_order_id);
+    }
+
+    $label_url = $shipping_label_info->getUrl();
+    if (empty($label_url)) {
+      $this->loggerContract
+        ->error(
+          TranslationHelper::getLoggerKey('emptyLabelUrl'), [
+            'additionalInfo' => [
+              'responseDto' => $responseDTO,
+              'PO' => $poNumberWithPrefix,
+              'order' => $pm_order_id
+            ],
+            'method' => __METHOD__
+          ]
+        );
+
+      throw new \Exception(self::CANNOT_GET_SHIPPING_LABEL . " for PO " .
+        $poNumberWithPrefix . ": Shipping label URL is empty." . " Order: " . $pm_order_id);
+    }
+
+    try
+    {
+      $labelFile = $this->fetchShippingLabelContract->fetch($label_url);
+    }
+    catch(\Exception $e)
+    {
+      throw new \Exception("Shipping label fetch failed : " . $e);
+    }
+
+    if (empty($labelFile->getFileContent())) {
+      throw new \Exception("Label file content empty, cannot save to PM. Label URL: "  . $label_url);
+    }
+
+    return $this->save($fileName, $labelFile->getFileContent());
+  }
+
+  /**
    * Save a document with array of data for order.
    *
    * @param string $fileName
