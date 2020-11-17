@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Core\Dto\General;
@@ -58,7 +58,8 @@ class DocumentDTO {
    * @return self
    */
   public static function createFromArray(array $params): self {
-    $dto = pluginApp(ResponseDTO::class);
+    /** @var DocumentDTO */
+    $dto = pluginApp(DocumentDTO::class);
     $dto->setFileContent($params['fileContent'] ?? null);
     return $dto;
   }

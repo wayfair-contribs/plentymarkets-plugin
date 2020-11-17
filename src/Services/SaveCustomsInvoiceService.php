@@ -6,7 +6,7 @@
 
 namespace Wayfair\Services;
 
-
+use InvalidArgumentException;
 use Plenty\Modules\Document\Contracts\DocumentRepositoryContract;
 use Plenty\Modules\Document\Models\Document;
 use Wayfair\Core\Api\Services\LogSenderService;
@@ -98,6 +98,21 @@ class SaveCustomsInvoiceService
    */
   public function save(int $plentyOrderId, string $wfPoNumber, string $documentURL): array
   {
+    if (!isset($plentyOrderId) || $plentyOrderId <= 0)
+    {
+      throw new InvalidArgumentException("Plenty order ID MUST be a positive integer");
+    }
+
+    if(!isset($wfPoNumber) || empty(trim(($wfPoNumber))))
+    {
+      throw new InvalidArgumentException("Wayfair Purchase order number MUST be provided");
+    }
+
+    if (!isset($documentURL) || empty(trim($documentURL)))
+    {
+      throw new InvalidArgumentException("Document MUST must be provided");
+    }
+
     /** @var ExternalLogs $externalLogs */
     $externalLogs = pluginApp(ExternalLogs::class);
 
