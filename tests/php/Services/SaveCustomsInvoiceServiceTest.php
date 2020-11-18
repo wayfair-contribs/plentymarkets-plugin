@@ -146,7 +146,7 @@ final class SaveCustomsInvoiceServiceTest extends \PHPUnit\Framework\TestCase
         $constructorArgs = [$documentRepositoryContract, $fetchDocumentContract, $loggerContract, $logSenderService];
 
         /** @var SaveCustomsInvoiceService */
-        $saveCustomsInvoiceServiceTest = $this->createTestProxy(SaveCustomsInvoiceService::class, $constructorArgs);
+        $saveCustomsInvoiceService = $this->createTestProxy(SaveCustomsInvoiceService::class, $constructorArgs);
 
         $actualResult = [];
 
@@ -154,7 +154,7 @@ final class SaveCustomsInvoiceServiceTest extends \PHPUnit\Framework\TestCase
             $this->expectException($expectedException);
         }
 
-        $actualResult = $saveCustomsInvoiceServiceTest->save($plentyOrderId, $wfPoNumber, $documentURL);
+        $actualResult = $saveCustomsInvoiceService->save($plentyOrderId, $wfPoNumber, $documentURL);
 
         $this->assertEquals($expectedResult, $actualResult, $name);
     }
