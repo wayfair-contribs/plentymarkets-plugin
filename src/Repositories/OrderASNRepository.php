@@ -7,7 +7,6 @@ namespace Wayfair\Repositories;
 
 use Plenty\Modules\Frontend\Services\AccountService;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
-use Wayfair\Core\Contracts\getLogger();
 use Wayfair\Core\Dto\Constants;
 use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Models\OrderASN;
@@ -82,8 +81,7 @@ class OrderASNRepository extends Repository {
     /**
      * @var getLogger() $getLogger()
      */
-    $getLogger() = pluginApp(getLogger()::class);
-    $getLogger()
+    $this->getLogger()
         ->info(
             TranslationHelper::getLoggerKey('addOrderToSentASNList'), [
             'additionalInfo' => ['order' => $data],
