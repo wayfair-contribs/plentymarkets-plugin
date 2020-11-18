@@ -159,6 +159,7 @@ class SaveCustomsInvoiceService
         'additionalInfo' => [
           'plentyOrderId' => $plentyOrderId,
           'wfPoNumber' => $wfPoNumber,
+          'contentLength' => strlen($contentBase64)
         ],
         'method' => __METHOD__
       ]
