@@ -46,6 +46,7 @@ class ShipmentRegisterService
   const LOG_KEY_CUSTOMS_INVOICE_MISSING_URL = 'noURLForRequiredCustomsInvoice';
   const LOG_KEY_CUSTOMS_INVOICE_SAVED = 'customsInvoiceSaved';
   const LOG_KEY_CUSTOMS_INVOICE_SAVE_FAILED = 'customsInvoiceSaveFailed';
+  const LOG_KEY_CUSTOMS_INVOICE_REQUIRED = 'customsInvoiceRequired'
 
   const SHIPPING_REGISTERED_STATUS = 'registered';
   const SHIPPING_WAYFAIR_COST = 0.00;
@@ -579,6 +580,17 @@ class ShipmentRegisterService
           $customsDocument = $registerResponse->getCustomsDocument();
 
           if (isset($customsDocument) && $customsDocument->getRequired()) {
+            $this->loggerContract
+                  ->info(
+                    TranslationHelper::getLoggerKey(self::LOG_KEY_CUSTOMS_INVOICE_REQUIRED),
+                    [
+                      'additionalInfo' => [
+                        'orderId' => $orderId,
+                        'poNumber' => $poNumber,
+                      ],
+                      'method' => __METHOD__,
+                    ]
+                  );
             $url = $customsDocument->getUrl();
             if (isset($url) && !empty(trim($url))) {
               try {
