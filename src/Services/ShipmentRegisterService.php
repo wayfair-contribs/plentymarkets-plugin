@@ -46,7 +46,7 @@ class ShipmentRegisterService
   const LOG_KEY_CUSTOMS_INVOICE_MISSING_URL = 'noURLForRequiredCustomsInvoice';
   const LOG_KEY_CUSTOMS_INVOICE_SAVED = 'customsInvoiceSaved';
   const LOG_KEY_CUSTOMS_INVOICE_SAVE_FAILED = 'customsInvoiceSaveFailed';
-  const LOG_KEY_CUSTOMS_INVOICE_REQUIRED = 'customsInvoiceRequired'
+  const LOG_KEY_CUSTOMS_INVOICE_REQUIRED = 'customsInvoiceRequired';
 
   const SHIPPING_REGISTERED_STATUS = 'registered';
   const SHIPPING_WAYFAIR_COST = 0.00;
