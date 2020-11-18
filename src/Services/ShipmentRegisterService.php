@@ -608,13 +608,22 @@ class ShipmentRegisterService
                     ]
                   );
               } catch (\Exception $exception) {
+
+                $message = $exception->getMessage();
+
+                $cause = $exception->getPrevious();
+                if (isset($cause))
+                {
+                  $message = $message . ' ' . $cause->getMessage();
+                }
+
                 $this->loggerContract
                   ->error(
                     TranslationHelper::getLoggerKey(self::LOG_KEY_CUSTOMS_INVOICE_SAVE_FAILED),
                     [
                       'additionalInfo' => [
                         'exceptionType' => get_class($exception),
-                        'exceptionMessage' => $exception->getMessage(),
+                        'exceptionMessage' => $message,
                         'orderId' => $orderId,
                         'poNumber' => $poNumber,
                       ],
