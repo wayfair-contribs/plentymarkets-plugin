@@ -244,14 +244,14 @@ class ResponseDTO
   /**
    * Set the customs document based on an array
    *
-   * @param mixed $customsDocument
+   * @param mixed $customsDocumentData
    * @return void
    */
-  public function setCustomsDocument($customsDocument)
+  public function setCustomsDocument($customsDocumentData)
   {
     $this->customsDocument = null;
-    if (isset($customsDocument)) {
-      $this->customsDocument = CustomsDocumentDTO::createFromArray($customsDocument);
+    if (isset($customsDocumentData)) {
+      $this->customsDocument = CustomsDocumentDTO::createFromArray($customsDocumentData);
     }
   }
 

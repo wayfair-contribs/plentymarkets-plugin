@@ -172,13 +172,21 @@ final class SaveCustomsInvoiceServiceTest extends \PHPUnit\Framework\TestCase
 
         $cases[] = ['zero order ID should cause InvalidArgumentException', [], InvalidArgumentException::class, 0, self::PO_NUM, self::DOC_URL];
 
+        $cases[] = ['empty PO number should cause InvalidArgumentException', [], InvalidArgumentException::class, self::ORDER_NUM, '', self::DOC_URL];
+        $cases[] = ['whitespace PO number should cause InvalidArgumentException', [], InvalidArgumentException::class, self::ORDER_NUM, '      ', self::DOC_URL];
+
+        $cases[] = ['empty URL should cause InvalidArgumentException', [], InvalidArgumentException::class, self::ORDER_NUM, self::PO_NUM, ''];
+        $cases[] = ['whitespace URL should cause InvalidArgumentException', [], InvalidArgumentException::class, self::ORDER_NUM, self::PO_NUM, '     '];
+
         $cases[] = ['failure at fetch time should result in lack of upload', [], null, self::ORDER_NUM, self::PO_NUM, self::DOC_URL, self::RESULT_INSTRUCTION_FAIL];
         $cases[] = ['exception at fetch time should result in lack of upload', [], null, self::ORDER_NUM, self::PO_NUM, self::DOC_URL, self::RESULT_INSTRUCTION_EXCEPTION];
+
+        // Expectations are in place to make sure we aren't attempting to upload after a failed fetch, so there is no need for those cases.
 
         $cases[] = ['failure at upload time should have empty result', [], null, self::ORDER_NUM, self::PO_NUM, self::DOC_URL, self::RESULT_INSTRUCTION_PASS, self::RESULT_INSTRUCTION_FAIL];
         $cases[] = ['exception at upload time should have empty result', [], null, self::ORDER_NUM, self::PO_NUM, self::DOC_URL, self::RESULT_INSTRUCTION_PASS, self::RESULT_INSTRUCTION_EXCEPTION];
 
-        $cases[] = ['all good inputs should mean good upload', self::UPLOAD_RESULT_GOOD, null, self::ORDER_NUM, self::PO_NUM, self::DOC_URL];
+        $cases[] = ['perfect inputs and good responses from other modules should lead to an upload', self::UPLOAD_RESULT_GOOD, null, self::ORDER_NUM, self::PO_NUM, self::DOC_URL];
 
         // TODO: add more cases
 
