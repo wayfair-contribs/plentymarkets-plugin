@@ -1,18 +1,24 @@
 <?php
+
 /**
  * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Core\Dto\General;
 
-class DocumentDTO {
+/**
+ * DTO for Documents in Wayfair's API
+ */
+class DocumentDTO
+{
 
   /**
    * DocumentDTO constructor.
    *
    * @param array $data
    */
-  public function __construct($data = []) {
+  public function __construct($data = [])
+  {
     $this->setFileContent($data['fileContent'] ?? '');
   }
 
@@ -21,7 +27,8 @@ class DocumentDTO {
    *
    * @return string
    */
-  public function getBase64EncodedContent() {
+  public function getBase64EncodedContent()
+  {
     if (!empty($this->fileContent)) {
       return base64_encode($this->fileContent);
     }
@@ -37,7 +44,8 @@ class DocumentDTO {
   /**
    * @return string
    */
-  public function getFileContent() {
+  public function getFileContent()
+  {
     return $this->fileContent;
   }
 
@@ -46,7 +54,8 @@ class DocumentDTO {
    *
    * @return void
    */
-  public function setFileContent($fileContent) {
+  public function setFileContent($fileContent)
+  {
     $this->fileContent = $fileContent;
   }
 
@@ -57,7 +66,8 @@ class DocumentDTO {
    *
    * @return self
    */
-  public static function createFromArray(array $params): self {
+  public static function createFromArray(array $params): self
+  {
     /** @var DocumentDTO */
     $dto = pluginApp(DocumentDTO::class);
     $dto->setFileContent($params['fileContent'] ?? null);
