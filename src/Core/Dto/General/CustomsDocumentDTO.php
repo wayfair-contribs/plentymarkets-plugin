@@ -6,6 +6,9 @@
 
 namespace Wayfair\Core\Dto\General;
 
+/**
+ * DTO for the "customsDocument" element in the Wayfair shipment registration schema
+ */
 class CustomsDocumentDTO
 {
   /**
