@@ -122,7 +122,7 @@ class SaveCustomsInvoiceService
         TranslationHelper::getLoggerKey(self::LOG_KEY_DOWNLOAD_ERROR),
         [
           'additionalInfo' => [
-            'exception' => $exception,
+            'exceptionType' => get_class($exception),
             'message' => $exception->getMessage(),
             'stackTrace' => $exception->getTrace(),
             'plentyOrderId' => $plentyOrderId,
