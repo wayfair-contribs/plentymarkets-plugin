@@ -42,6 +42,10 @@ class ShipmentRegisterService
   const LOG_KEY_SHIPPING_LABEL_RETRIEVAL_FAILED = 'shippingLabelRetrievalFailed';
   const LOG_KEY_NO_SHIPPING_INFO_FOR_UNREGISTER = 'noShippingInformationForUnregister';
   const LOG_KEY_WAREHOUSE_MISSING_FOR_ORDER = 'warehouseMissingForOrder';
+  const LOG_KEY_CUSTOMS_INVOICE_NOT_REQUIRED = 'customsInvoiceNotRequired';
+  const LOG_KEY_CUSTOMS_INVOICE_MISSING_URL = 'noURLForRequiredCustomsInvoice';
+  const LOG_KEY_CUSTOMS_INVOICE_SAVED = 'customsInvoiceSaved';
+  const LOG_KEY_CUSTOMS_INVOICE_SAVE_FAILED = 'customsInvoiceSaveFailed';
 
   const SHIPPING_REGISTERED_STATUS = 'registered';
   const SHIPPING_WAYFAIR_COST = 0.00;
@@ -506,10 +510,21 @@ class ShipmentRegisterService
 
             $trackingNumber = $this->getTrackingNumberForPackage($trackingNumbers, $index, $poNumber, $externalLogs);
             if (!isset($trackingNumber) || empty($trackingNumber)) {
+
+              $this->loggerContract->error(TranslationHelper::getLoggerKey(self::LOG_KEY_UNABLE_TO_GET_TRACKING_NUMBER), [
+                'additionalInfo' => [
+                  'packageIndex' => $index,
+                  'orderId' => $orderId,
+                  'po' => $poNumber,
+                ],
+                'method' => __METHOD__
+              ]);
+
               $externalLogs->addErrorLog('Failed to get tracking number. PO:' . $poNumber . " Package ID: " . $packageId);
             }
 
-            $externalLogs->addDebugLog('Using tracking number ' . $trackingNumber . ' for package ' .
+            // TODO: internal info log for this tracking number
+            $externalLogs->addInfoLog('Using tracking number ' . $trackingNumber . ' for package ' .
               $index . ' from PO ' . $poNumber);
 
             $this->orderShippingPackageRepositoryContract->updateOrderShippingPackage(
@@ -520,24 +535,6 @@ class ShipmentRegisterService
                 'labelPath' => $storageObject->key
               ]
             );
-
-            $customsDocument = $registerResponse->getCustomsDocument();
-
-            if (isset($customsDocument) && $customsDocument->getRequired()) {
-              $url = $customsDocument->getUrl();
-              if (isset($url) && !empty(trim($url))) {
-                try {
-                  $this->saveCustomsInvoiceService->save($orderId, $poNumber, $url);
-                  // TODO: log the document upload result
-                } catch (\Exception $exception) {
-                  // FIXME: need to log an error for this Exception
-                }
-              } else {
-                // FIXME: need to log an error when required is true and url is blank
-              }
-            } else {
-              // TODO: info log about no customs doc required
-            }
 
             $objectUrl = $this->storageRepositoryContract->getObjectUrl(
               AbstractConfigHelper::PLUGIN_NAME,
@@ -577,6 +574,69 @@ class ShipmentRegisterService
               false,
               $shipmentItems
             );
+          }
+
+          $customsDocument = $registerResponse->getCustomsDocument();
+
+          if (isset($customsDocument) && $customsDocument->getRequired()) {
+            $url = $customsDocument->getUrl();
+            if (isset($url) && !empty(trim($url))) {
+              try {
+                $customsDocumentSaveResult = $this->saveCustomsInvoiceService->save($orderId, $poNumber, $url);
+                $this->loggerContract
+                  ->info(
+                    TranslationHelper::getLoggerKey(self::LOG_KEY_CUSTOMS_INVOICE_SAVED),
+                    [
+                      'additionalInfo' => [
+                        'orderId' => $orderId,
+                        'poNumber' => $poNumber,
+                        'customsDocumentSaveResult' => $customsDocumentSaveResult
+                      ],
+                      'method' => __METHOD__,
+                    ]
+                  );
+              } catch (\Exception $exception) {
+                $this->loggerContract
+                  ->error(
+                    TranslationHelper::getLoggerKey(self::LOG_KEY_CUSTOMS_INVOICE_SAVE_FAILED),
+                    [
+                      'additionalInfo' => [
+                        'exceptionType' => get_class($exception),
+                        'exceptionMessage' => $exception->getMessage(),
+                        'orderId' => $orderId,
+                        'poNumber' => $poNumber,
+                      ],
+                      'method' => __METHOD__,
+                    ]
+                  );
+
+                $externalLogs->addErrorLog('Customs Invoice save failed for Order: ' .$orderId . ' PO:' . $poNumber . ' - '
+                  . get_class($exception) . ': '
+                  . $exception->getMessage(), $exception->getTraceAsString());
+              }
+            } else {
+              $this->loggerContract
+                ->error(
+                  TranslationHelper::getLoggerKey(self::LOG_KEY_CUSTOMS_INVOICE_MISSING_URL),
+                  [
+                    'additionalInfo' => [
+                      'orderId' => $orderId,
+                      'poNumber' => $poNumber,
+                    ],
+                    'method' => __METHOD__,
+                  ]
+                );
+
+                $externalLogs->addErrorLog('Customs Invoice URL is missing but required flag is true, Order: ' .$orderId . ' PO:' . $poNumber);
+            }
+          } else {
+            $this->loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_CUSTOMS_INVOICE_NOT_REQUIRED), [
+              'additionalInfo' => [
+                'orderId' => $orderId,
+                'po' => $poNumber,
+              ],
+              'method' => __METHOD__
+            ]);
           }
         } catch (\Exception $exception) {
           $externalLogs->addErrorLog('Registration process failed, PO:' . $poNumber . ' - '
