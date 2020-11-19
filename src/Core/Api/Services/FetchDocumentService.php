@@ -63,22 +63,37 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
       curl_setopt($ch, CURLOPT_TIMEOUT, 30);
       $output = curl_exec($ch);
 
-      $curlError = curl_errno($ch);
+      $curlErrorNumber = curl_errno($ch);
       $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-      if ($curlError != 0 || $statusCode < 200 || $statusCode >= 300) {
+      if ($curlErrorNumber != 0 || $statusCode < 200 || $statusCode >= 300) {
+
+        $curlErrorMessage = curl_error($ch);
         $this->loggerContract
-          ->error(
+          ->warning(
             TranslationHelper::getLoggerKey(self::LOG_KEY_DOCUMENT_FETCH_FAILURE),
             [
-              'additionalInfo' => ['url' => $url,
-              'accessToken' => StringHelper::mask($this->authService->generateAuthHeader()),
-              'statusCode' => $statusCode,
-              'curlError' => $curlError
-            ],
+              'additionalInfo' => [
+                'url' => $url,
+                'accessToken' => StringHelper::mask($this->authService->generateAuthHeader()),
+                'httpStatusCode' => $statusCode,
+                'curlErrorNumber' => $curlErrorNumber,
+                'curlErrorMessage' => $curlErrorMessage
+              ],
               'method' => __METHOD__
             ]
           );
-        throw new \Exception('Unable to fetch document: ' . curl_error($ch));
+
+        $reason = 'Unable to fetch document';
+
+        if (isset($statusCode) && $statusCode > 0) {
+          $reason .= ' (HTTP: ' . $statusCode . ')';
+        }
+
+        if (isset($curlErrorMessage) && !empty(trim($curlErrorMessage))) {
+          $reason .= ' (CURL: ' . $curlErrorMessage . ')';
+        }
+
+        throw new \Exception($reason);
       }
       return DocumentDTO::createFromArray(['fileContent' => $output]);
     } finally {
