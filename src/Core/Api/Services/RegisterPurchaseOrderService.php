@@ -77,6 +77,7 @@ class RegisterPurchaseOrderService extends APIService implements RegisterPurchas
           TranslationHelper::getLoggerKey(self::LOG_KEY_UNABLE_TO_REGISTER_ORDER),
           [
             'additionalInfo' => ['message' => $e->getMessage()],
+            'method' => __METHOD__,
             'referenceType' => 'poNumber',
             'referenceValue' => $requestDTO->getPoNumber()
           ]
