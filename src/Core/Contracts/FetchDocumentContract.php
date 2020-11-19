@@ -1,11 +1,11 @@
 <?php
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
 namespace Wayfair\Core\Contracts;
 
-use Wayfair\Core\Dto\ShippingLabel\ResponseDTO;
+use Wayfair\Core\Dto\General\DocumentDTO;
 use Wayfair\Core\Exceptions\TokenNotFoundException;
 
 /**
@@ -17,7 +17,7 @@ interface FetchDocumentContract {
   /**
    * @param string $url
    *
-   * @return ResponseDTO
+   * @return DocumentDTO
    * @throws TokenNotFoundException
    */
   public function fetch(string $url);

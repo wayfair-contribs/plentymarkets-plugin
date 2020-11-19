@@ -498,10 +498,20 @@ class ShipmentRegisterService
 
             $trackingNumber = $this->getTrackingNumberForPackage($trackingNumbers, $index, $poNumber, $externalLogs);
             if (!isset($trackingNumber) || empty($trackingNumber)) {
+              $this->loggerContract->error(TranslationHelper::getLoggerKey(self::LOG_KEY_UNABLE_TO_GET_TRACKING_NUMBER), [
+                'additionalInfo' => [
+                  'packageIndex' => $index,
+                  'orderId' => $orderId,
+                  'po' => $poNumber,
+                ],
+                'method' => __METHOD__
+              ]);
+
               $externalLogs->addErrorLog('Failed to get tracking number. PO:' . $poNumber . " Package ID: " . $packageId);
             }
 
-            $externalLogs->addDebugLog('Using tracking number ' . $trackingNumber . ' for package ' .
+            // TODO: internal info log for this tracking number
+            $externalLogs->addInfoLog('Using tracking number ' . $trackingNumber . ' for package ' .
               $index . ' from PO ' . $poNumber);
 
             $this->orderShippingPackageRepositoryContract->updateOrderShippingPackage(
