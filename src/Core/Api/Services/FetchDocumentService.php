@@ -61,12 +61,19 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
       curl_setopt($ch, CURLOPT_TIMEOUT, 30);
       $output = curl_exec($ch);
-      if (curl_errno($ch)) {
+
+      $curlError = curl_errno($ch);
+      $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+      if ($curlError != 0 || $statusCode < 200 || $statusCode >= 300) {
         $this->loggerContract
           ->error(
             TranslationHelper::getLoggerKey(self::LOG_KEY_FAILED_WAYFAIR_API_CALL),
             [
-              'additionalInfo' => ['url' => $url, 'accessToken' => StringHelper::mask($this->authService->generateAuthHeader())],
+              'additionalInfo' => ['url' => $url,
+              'accessToken' => StringHelper::mask($this->authService->generateAuthHeader()),
+              'statusCode' => $statusCode,
+              'curlError' => $curlError
+            ],
               'method' => __METHOD__
             ]
           );
