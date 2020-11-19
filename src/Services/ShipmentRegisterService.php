@@ -581,39 +581,53 @@ class ShipmentRegisterService
 
           if (isset($customsDocument) && $customsDocument->getRequired()) {
             $this->loggerContract
-                  ->info(
-                    TranslationHelper::getLoggerKey(self::LOG_KEY_CUSTOMS_INVOICE_REQUIRED),
-                    [
-                      'additionalInfo' => [
-                        'orderId' => $orderId,
-                        'poNumber' => $poNumber,
-                      ],
-                      'method' => __METHOD__,
-                    ]
-                  );
+              ->info(
+                TranslationHelper::getLoggerKey(self::LOG_KEY_CUSTOMS_INVOICE_REQUIRED),
+                [
+                  'additionalInfo' => [
+                    'orderId' => $orderId,
+                    'poNumber' => $poNumber,
+                  ],
+                  'method' => __METHOD__,
+                ]
+              );
             $url = $customsDocument->getUrl();
             if (isset($url) && !empty(trim($url))) {
               try {
                 $customsDocumentSaveResult = $this->saveCustomsInvoiceService->save($orderId, $poNumber, $url);
-                $this->loggerContract
-                  ->info(
-                    TranslationHelper::getLoggerKey(self::LOG_KEY_CUSTOMS_INVOICE_SAVED),
-                    [
-                      'additionalInfo' => [
-                        'orderId' => $orderId,
-                        'poNumber' => $poNumber,
-                        'customsDocumentSaveResult' => $customsDocumentSaveResult
-                      ],
-                      'method' => __METHOD__,
-                    ]
-                  );
+
+                if (isset($customsDocumentSaveResult) && !empty($customsDocumentSaveResult)) {
+                  $this->loggerContract
+                    ->info(
+                      TranslationHelper::getLoggerKey(self::LOG_KEY_CUSTOMS_INVOICE_SAVED),
+                      [
+                        'additionalInfo' => [
+                          'orderId' => $orderId,
+                          'poNumber' => $poNumber,
+                          'customsDocumentSaveResult' => $customsDocumentSaveResult
+                        ],
+                        'method' => __METHOD__,
+                      ]
+                    );
+                } else {
+                  $this->loggerContract
+                    ->error(
+                      TranslationHelper::getLoggerKey(self::LOG_KEY_CUSTOMS_INVOICE_SAVE_FAILED),
+                      [
+                        'additionalInfo' => [
+                          'orderId' => $orderId,
+                          'poNumber' => $poNumber,
+                        ],
+                        'method' => __METHOD__,
+                      ]
+                    );
+                }
               } catch (\Exception $exception) {
 
                 $message = $exception->getMessage();
 
                 $cause = $exception->getPrevious();
-                if (isset($cause))
-                {
+                if (isset($cause)) {
                   $message = $message . ' ' . $cause->getMessage();
                 }
 
@@ -631,7 +645,7 @@ class ShipmentRegisterService
                     ]
                   );
 
-                $externalLogs->addErrorLog('Customs Invoice save failed for Order: ' .$orderId . ' PO:' . $poNumber . ' - '
+                $externalLogs->addErrorLog('Customs Invoice save failed for Order: ' . $orderId . ' PO:' . $poNumber . ' - '
                   . get_class($exception) . ': '
                   . $exception->getMessage(), $exception->getTraceAsString());
               }
@@ -648,7 +662,7 @@ class ShipmentRegisterService
                   ]
                 );
 
-                $externalLogs->addErrorLog('Customs Invoice URL is missing but required flag is true, Order: ' .$orderId . ' PO:' . $poNumber);
+              $externalLogs->addErrorLog('Customs Invoice URL is missing but required flag is true, Order: ' . $orderId . ' PO:' . $poNumber);
             }
           } else {
             $this->loggerContract->debug(TranslationHelper::getLoggerKey(self::LOG_KEY_CUSTOMS_INVOICE_NOT_REQUIRED), [

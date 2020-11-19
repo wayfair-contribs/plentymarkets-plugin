@@ -222,7 +222,7 @@ class SaveCustomsInvoiceService
         ]
       );
 
-      $externalLogs->addErrorLog("PO " . $wfPoNumber . " for order " . $plentyOrderId . ": unable to save Customs Invoice - " .
+      $externalLogs->addErrorLog("PO " . $wfPoNumber . " for order " . $plentyOrderId . ": unable to upload Customs Invoice - " .
         get_class($exception) . ": " . $exception->getMessage(), $exception->getTraceAsString());
 
       return [];
