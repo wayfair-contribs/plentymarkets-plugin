@@ -24,8 +24,9 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
 {
   const LOG_KEY_OBTAINING_TRACKING_NUMBER = 'obtainingTrackingNumber';
   const LOG_KEY_TRACKING_RESPONSE = 'trackingNumberServiceResponse';
-  const LOG_KEY_FAILED_WAYFAIR_API_CALL = 'cannotCallWayfairAPI';
   const LOG_KEY_FETCHING_DOCUMENT = 'fetchingDocument';
+  const LOG_KEY_DOCUMENT_FETCH_FAILURE = 'documentFetchFailed';
+  const LOG_KEY_TRACKING_NUMBER_FETCH_FAILURE = 'unableToGetTrackingNumber';
 
   /**
    * Fetch shipping label file from WF server and put it in a ResponseDTO object.
@@ -67,7 +68,7 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
       if ($curlError != 0 || $statusCode < 200 || $statusCode >= 300) {
         $this->loggerContract
           ->error(
-            TranslationHelper::getLoggerKey(self::LOG_KEY_FAILED_WAYFAIR_API_CALL),
+            TranslationHelper::getLoggerKey(self::LOG_KEY_DOCUMENT_FETCH_FAILURE),
             [
               'additionalInfo' => ['url' => $url,
               'accessToken' => StringHelper::mask($this->authService->generateAuthHeader()),
@@ -155,7 +156,7 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
     } catch (\Exception $e) {
       $this->loggerContract
         ->error(
-          TranslationHelper::getLoggerKey('unableToGetTrackingNumber'),
+          TranslationHelper::getLoggerKey(self::LOG_KEY_TRACKING_NUMBER_FETCH_FAILURE),
           [
             'additionalInfo' => [
               'message' => $e->getMessage(),
