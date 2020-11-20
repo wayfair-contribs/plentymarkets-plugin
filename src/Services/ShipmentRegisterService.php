@@ -607,10 +607,10 @@ class ShipmentRegisterService
                   'method' => __METHOD__,
                 ]
               );
-            $url = $customsDocument->getUrl();
-            if (isset($url) && !empty(trim($url))) {
+            $customsDocUrl = $customsDocument->getUrl();
+            if (isset($customsDocUrl) && !empty(trim($customsDocUrl))) {
               try {
-                $customsDocumentSaveResult = $this->saveCustomsInvoiceService->save($orderId, $poNumber, $url);
+                $customsDocumentSaveResult = $this->saveCustomsInvoiceService->save($orderId, $poNumber, $customsDocUrl);
 
                 if (isset($customsDocumentSaveResult) && !empty($customsDocumentSaveResult)) {
                   $this->loggerContract
@@ -620,6 +620,7 @@ class ShipmentRegisterService
                         'additionalInfo' => [
                           'orderId' => $orderId,
                           'poNumber' => $poNumber,
+                          'customsDocUrl' => $customsDocUrl,
                           'customsDocumentSaveResult' => $customsDocumentSaveResult
                         ],
                         'method' => __METHOD__,
@@ -633,6 +634,7 @@ class ShipmentRegisterService
                         'additionalInfo' => [
                           'orderId' => $orderId,
                           'poNumber' => $poNumber,
+                          'customsDocUrl' => $customsDocUrl
                         ],
                         'method' => __METHOD__,
                       ]
