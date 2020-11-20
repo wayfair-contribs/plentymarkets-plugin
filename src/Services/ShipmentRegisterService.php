@@ -318,7 +318,7 @@ class ShipmentRegisterService
                   'additionalInfo' => [
                     'orderId' => $orderId,
                     'po' => $poNumber,
-                    'exception' => $e,
+                    'exceptionType' => get_class($e),
                     'message' => $e->getMessage(),
                     'stacktrace' => $e->getTrace()
 
@@ -385,7 +385,7 @@ class ShipmentRegisterService
                   'additionalInfo' => [
                     'orderId' => $orderId,
                     'po' => $poNumber,
-                    'exception' => $e,
+                    'exceptionType' => get_class($e),
                     'message' => $e->getMessage(),
                     'stacktrace' => $e->getTrace()
 
@@ -412,7 +412,7 @@ class ShipmentRegisterService
               'additionalInfo' => [
                 'orderId' => $orderId,
                 'po' => $poNumber,
-                'exception' => $exception,
+                'exceptionType' => get_class($exception),
                 'message' => $exception->getMessage(),
                 'stacktrace' => $exception->getTrace()
               ],
@@ -592,7 +592,7 @@ class ShipmentRegisterService
                 'additionalInfo' => [
                   'orderId' => $orderId,
                   'po' => $poNumber,
-                  'exception' => $exception,
+                  'exceptionType' => get_class($exception),
                   'message' => $exception->getMessage(),
                   'stacktrace' => $exception->getTrace()
                 ],
