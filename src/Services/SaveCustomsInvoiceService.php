@@ -118,7 +118,7 @@ class SaveCustomsInvoiceService
       }
     } catch (\Exception $exception) {
       // not all orders have customs invoices
-      $this->loggerContract->warning(
+      $this->loggerContract->debug(
         TranslationHelper::getLoggerKey(self::LOG_KEY_DOWNLOAD_ERROR),
         [
           'additionalInfo' => [
