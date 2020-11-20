@@ -10,6 +10,7 @@ use Wayfair\Core\Api\APIService;
 use Wayfair\Core\Contracts\RegisterPurchaseOrderContract;
 use Wayfair\Core\Dto\RegisterPurchaseOrder\RequestDTO;
 use Wayfair\Core\Dto\RegisterPurchaseOrder\ResponseDTO;
+use Wayfair\Core\Exceptions\DryRunNotSupportedException;
 use Wayfair\Core\Exceptions\GraphQLQueryException;
 use Wayfair\Helpers\TranslationHelper;
 
@@ -30,6 +31,14 @@ class RegisterPurchaseOrderService extends APIService implements RegisterPurchas
    */
   public function register(RequestDTO $requestDTO): ResponseDTO
   {
+
+    $dryRunVal = $this->configHelper->getDryRun();
+    if(filter_var($dryRunVal, FILTER_VALIDATE_BOOLEAN))
+    {
+      // dry run is NOT supported in the register mutation.
+      // TODO: if/when 'dryRun' mode uses the Wayfair API Sandbox, stop throwing the Exception
+      throw new DryRunNotSupportedException("Purchase Order Registration not allowed when in dryRun mode");
+    }
 
     $query = 'mutation purchaseOrders { '
       . 'purchaseOrders { '
@@ -77,6 +86,7 @@ class RegisterPurchaseOrderService extends APIService implements RegisterPurchas
           TranslationHelper::getLoggerKey(self::LOG_KEY_UNABLE_TO_REGISTER_ORDER),
           [
             'additionalInfo' => ['message' => $e->getMessage()],
+            'method' => __METHOD__,
             'referenceType' => 'poNumber',
             'referenceValue' => $requestDTO->getPoNumber()
           ]

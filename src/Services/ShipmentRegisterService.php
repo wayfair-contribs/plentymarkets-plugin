@@ -42,6 +42,7 @@ class ShipmentRegisterService
   const LOG_KEY_SHIPPING_LABEL_RETRIEVAL_FAILED = 'shippingLabelRetrievalFailed';
   const LOG_KEY_NO_SHIPPING_INFO_FOR_UNREGISTER = 'noShippingInformationForUnregister';
   const LOG_KEY_WAREHOUSE_MISSING_FOR_ORDER = 'warehouseMissingForOrder';
+  const LOG_KEY_TRACKING_NUMBER_OBTAINED = 'trackingNumberObtained';
 
   const SHIPPING_REGISTERED_STATUS = 'registered';
   const SHIPPING_WAYFAIR_COST = 0.00;
@@ -317,7 +318,7 @@ class ShipmentRegisterService
                   'additionalInfo' => [
                     'orderId' => $orderId,
                     'po' => $poNumber,
-                    'exception' => $e,
+                    'exceptionType' => get_class($e),
                     'message' => $e->getMessage(),
                     'stacktrace' => $e->getTrace()
 
@@ -384,7 +385,7 @@ class ShipmentRegisterService
                   'additionalInfo' => [
                     'orderId' => $orderId,
                     'po' => $poNumber,
-                    'exception' => $e,
+                    'exceptionType' => get_class($e),
                     'message' => $e->getMessage(),
                     'stacktrace' => $e->getTrace()
 
@@ -411,7 +412,7 @@ class ShipmentRegisterService
               'additionalInfo' => [
                 'orderId' => $orderId,
                 'po' => $poNumber,
-                'exception' => $exception,
+                'exceptionType' => get_class($exception),
                 'message' => $exception->getMessage(),
                 'stacktrace' => $exception->getTrace()
               ],
@@ -473,7 +474,7 @@ class ShipmentRegisterService
                 TimeHelper::getMilliseconds() - $msSaveStart
               );
               $externalLogs->addErrorLog('Shipping label retrieval failed. PO:' . $poNumber .
-                " " . get_class($e) . ": " . $e->getMessage());
+                " " . get_class($e) . ": " . $e->getMessage(), $e->getTraceAsString());
 
               $this->loggerContract
                 ->error(
@@ -482,10 +483,10 @@ class ShipmentRegisterService
                     'additionalInfo' => [
                       'orderId' => $orderId,
                       'po' => $poNumber,
-                      'exception' => $e,
+                      'packageId' => $packageId,
+                      'exceptionType' => get_class($e),
                       'message' => $e->getMessage(),
                       'stacktrace' => $e->getTrace()
-
                     ],
                     'method' => __METHOD__,
                     'referenceType' => 'packageId',
@@ -497,12 +498,38 @@ class ShipmentRegisterService
             }
 
             $trackingNumber = $this->getTrackingNumberForPackage($trackingNumbers, $index, $poNumber, $externalLogs);
-            if (!isset($trackingNumber) || empty($trackingNumber)) {
-              $externalLogs->addErrorLog('Failed to get tracking number. PO:' . $poNumber . " Package ID: " . $packageId);
-            }
+            if (!isset($trackingNumber) || empty(trim($trackingNumber))) {
+              $this->loggerContract->error(TranslationHelper::getLoggerKey(self::LOG_KEY_UNABLE_TO_GET_TRACKING_NUMBER), [
+                'additionalInfo' => [
+                  'packageIndex' => $index,
+                  'orderId' => $orderId,
+                  'po' => $poNumber,
+                ],
+                'method' => __METHOD__
+              ]);
 
-            $externalLogs->addDebugLog('Using tracking number ' . $trackingNumber . ' for package ' .
-              $index . ' from PO ' . $poNumber);
+              $externalLogs->addErrorLog('Failed to get tracking number. PO:' . $poNumber . " Package ID: " . $packageId);
+            } else {
+
+              $this->loggerContract
+                ->info(
+                  TranslationHelper::getLoggerKey(self::LOG_KEY_TRACKING_NUMBER_OBTAINED),
+                  [
+                    'additionalInfo' => [
+                      'orderId' => $orderId,
+                      'po' => $poNumber,
+                      'packageId' => $packageId,
+                      'packageIndex' => $index
+                    ],
+                    'method' => __METHOD__,
+                    'referenceType' => 'packageId',
+                    'referenceValue' => $packageId
+                  ]
+                );
+
+              $externalLogs->addInfoLog('Using tracking number ' . $trackingNumber . ' for package at index' .
+                $index . ' with package ID ' . $packageId . ' from PO ' . $poNumber . ' for Order' . $orderId);
+            }
 
             $this->orderShippingPackageRepositoryContract->updateOrderShippingPackage(
               $packageId,
@@ -565,7 +592,7 @@ class ShipmentRegisterService
                 'additionalInfo' => [
                   'orderId' => $orderId,
                   'po' => $poNumber,
-                  'exception' => $exception,
+                  'exceptionType' => get_class($exception),
                   'message' => $exception->getMessage(),
                   'stacktrace' => $exception->getTrace()
                 ],

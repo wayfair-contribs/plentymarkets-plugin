@@ -1,18 +1,24 @@
 <?php
+
 /**
- * @copyright 2019 Wayfair LLC - All rights reserved
+ * @copyright 2020 Wayfair LLC - All rights reserved
  */
 
-namespace Wayfair\Core\Dto\ShippingLabel;
+namespace Wayfair\Core\Dto\General;
 
-class ResponseDTO {
+/**
+ * DTO for Documents in Wayfair's API
+ */
+class DocumentDTO
+{
 
   /**
-   * ResponseDTO constructor.
+   * DocumentDTO constructor.
    *
    * @param array $data
    */
-  public function __construct($data = []) {
+  public function __construct($data = [])
+  {
     $this->setFileContent($data['fileContent'] ?? '');
   }
 
@@ -21,7 +27,8 @@ class ResponseDTO {
    *
    * @return string
    */
-  public function getBase64EncodedContent() {
+  public function getBase64EncodedContent()
+  {
     if (!empty($this->fileContent)) {
       return base64_encode($this->fileContent);
     }
@@ -37,7 +44,8 @@ class ResponseDTO {
   /**
    * @return string
    */
-  public function getFileContent() {
+  public function getFileContent()
+  {
     return $this->fileContent;
   }
 
@@ -46,7 +54,8 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setFileContent($fileContent) {
+  public function setFileContent($fileContent)
+  {
     $this->fileContent = $fileContent;
   }
 
@@ -57,8 +66,10 @@ class ResponseDTO {
    *
    * @return self
    */
-  public static function createFromArray(array $params): self {
-    $dto = pluginApp(ResponseDTO::class);
+  public static function createFromArray(array $params): self
+  {
+    /** @var DocumentDTO */
+    $dto = pluginApp(DocumentDTO::class);
     $dto->setFileContent($params['fileContent'] ?? null);
     return $dto;
   }

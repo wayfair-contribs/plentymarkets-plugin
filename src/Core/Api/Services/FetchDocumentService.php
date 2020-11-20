@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright 2020 Wayfair LLC - All rights reserved
  */
@@ -7,7 +8,7 @@ namespace Wayfair\Core\Api\Services;
 
 use Wayfair\Core\Api\APIService;
 use Wayfair\Core\Contracts\FetchDocumentContract;
-use Wayfair\Core\Dto\ShippingLabel\ResponseDTO;
+use Wayfair\Core\Dto\General\DocumentDTO;
 use Wayfair\Core\Exceptions\GraphQLQueryException;
 use Wayfair\Core\Helpers\URLHelper;
 use Wayfair\Helpers\ConfigHelper;
@@ -23,7 +24,9 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
 {
   const LOG_KEY_OBTAINING_TRACKING_NUMBER = 'obtainingTrackingNumber';
   const LOG_KEY_TRACKING_RESPONSE = 'trackingNumberServiceResponse';
-  const LOG_KEY_FAILED_WAYFAIR_API_CALL = 'cannotCallWayfairAPI';
+  const LOG_KEY_FETCHING_DOCUMENT = 'fetchingDocument';
+  const LOG_KEY_DOCUMENT_FETCH_FAILURE = 'documentFetchFailed';
+  const LOG_KEY_TRACKING_NUMBER_FETCH_FAILURE = 'unableToGetTrackingNumber';
 
   /**
    * Fetch shipping label file from WF server and put it in a ResponseDTO object.
@@ -33,16 +36,21 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
    * @return ResponseDTO
    * @throws \Exception
    */
-  public function fetch(string $url): ResponseDTO
+  public function fetch(string $url): DocumentDTO
   {
     // FIXME: this should be using a generic client via an interface, not cURL!
     $this->loggerContract
-      ->debug(TranslationHelper::getLoggerKey('fetchingShipmentForURL'), ['additionalInfo' => ['url' => $url], 'method' => __METHOD__]);
+      ->debug(
+        TranslationHelper::getLoggerKey(self::LOG_KEY_FETCHING_DOCUMENT),
+        ['additionalInfo' => ['url' => $url], 'method' => __METHOD__]
+      );
     $ch = curl_init();
     try {
       if (self::isWayfairAPI($url)) {
         curl_setopt(
-          $ch, CURLOPT_HTTPHEADER, [
+          $ch,
+          CURLOPT_HTTPHEADER,
+          [
             'Authorization: ' . $this->authService->generateAuthHeader(),
             ConfigHelper::WAYFAIR_INTEGRATION_HEADER . ': ' . $this->configHelper->getIntegrationAgentHeader()
           ]
@@ -54,17 +62,40 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
       curl_setopt($ch, CURLOPT_TIMEOUT, 30);
       $output = curl_exec($ch);
-      if (curl_errno($ch)) {
+
+      $curlErrorNumber = curl_errno($ch);
+      $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+      if ($curlErrorNumber != 0 || $statusCode < 200 || $statusCode >= 300) {
+
+        $curlErrorMessage = curl_error($ch);
         $this->loggerContract
-          ->error(
-            TranslationHelper::getLoggerKey(self::LOG_KEY_FAILED_WAYFAIR_API_CALL), [
-              'additionalInfo' => ['url' => $url, 'accessToken' => StringHelper::mask($this->authService->generateAuthHeader())],
+          ->warning(
+            TranslationHelper::getLoggerKey(self::LOG_KEY_DOCUMENT_FETCH_FAILURE),
+            [
+              'additionalInfo' => [
+                'url' => $url,
+                'accessToken' => StringHelper::mask($this->authService->generateAuthHeader()),
+                'httpStatusCode' => $statusCode,
+                'curlErrorNumber' => $curlErrorNumber,
+                'curlErrorMessage' => $curlErrorMessage
+              ],
               'method' => __METHOD__
             ]
           );
-        throw new \Exception('Unable to fetch document: ' . curl_error($ch));
+
+        $reason = 'Unable to fetch document';
+
+        if (isset($statusCode) && $statusCode > 0) {
+          $reason .= ' (HTTP: ' . $statusCode . ')';
+        }
+
+        if (isset($curlErrorMessage) && !empty(trim($curlErrorMessage))) {
+          $reason .= ' (CURL: ' . $curlErrorMessage . ')';
+        }
+
+        throw new \Exception($reason);
       }
-      return ResponseDTO::createFromArray(['fileContent' => $output]);
+      return DocumentDTO::createFromArray(['fileContent' => $output]);
     } finally {
       curl_close($ch);
     }
@@ -86,10 +117,12 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
 
     $this->loggerContract
       ->debug(
-        TranslationHelper::getLoggerKey(self::LOG_KEY_OBTAINING_TRACKING_NUMBER), [
+        TranslationHelper::getLoggerKey(self::LOG_KEY_OBTAINING_TRACKING_NUMBER),
+        [
           'additionalInfo' => [
             'poNumber' => $poNumber,
-            'query' => $query],
+            'query' => $query
+          ],
           'method' => __METHOD__
         ]
       );
@@ -98,8 +131,7 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
     try {
       $response = $this->query($query);
 
-      if (!isset($response))
-      {
+      if (!isset($response)) {
         throw new GraphQLQueryException("Did not get query response");
       }
 
@@ -107,28 +139,26 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
 
       $this->loggerContract
         ->info(
-          TranslationHelper::getLoggerKey(self::LOG_KEY_TRACKING_RESPONSE), [
+          TranslationHelper::getLoggerKey(self::LOG_KEY_TRACKING_RESPONSE),
+          [
             'additionalInfo' => ['responseBody' => $responseBody],
             'method' => __METHOD__
           ]
         );
 
-      if ($response->hasErrors())
-      {
+      if ($response->hasErrors()) {
         throw new \Exception("Errors received from tracking number service: "
           . json_encode($response->getError()));
       }
 
       $dataElement = $responseBody['data'];
-      if (!isset($dataElement) || empty($dataElement))
-      {
+      if (!isset($dataElement) || empty($dataElement)) {
         throw new \Exception("No data element in tracking number response from Wayfair");
       }
 
       $labelGenerationEvents = $dataElement['labelGenerationEvents'];
 
-      if (!isset($labelGenerationEvents) || empty($labelGenerationEvents))
-      {
+      if (!isset($labelGenerationEvents) || empty($labelGenerationEvents)) {
         throw new \Exception("No label generation events in tracking number response from Wayfair");
       }
 
@@ -141,7 +171,8 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
     } catch (\Exception $e) {
       $this->loggerContract
         ->error(
-          TranslationHelper::getLoggerKey('unableToGetTrackingNumber'), [
+          TranslationHelper::getLoggerKey(self::LOG_KEY_TRACKING_NUMBER_FETCH_FAILURE),
+          [
             'additionalInfo' => [
               'message' => $e->getMessage(),
               'responseBody' => $responseBody,
@@ -187,5 +218,4 @@ class FetchDocumentService extends APIService implements FetchDocumentContract
   {
     return stripos($url, URLHelper::BASE_URL) === 0;
   }
-
 }
