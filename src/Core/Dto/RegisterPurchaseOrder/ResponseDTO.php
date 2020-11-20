@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright 2019 Wayfair LLC - All rights reserved
  */
@@ -8,8 +9,11 @@ namespace Wayfair\Core\Dto\RegisterPurchaseOrder;
 use Wayfair\Core\Dto\General\BillOfLadingDTO;
 use Wayfair\Core\Dto\General\ShippingLabelDTO;
 use Wayfair\Core\Dto\General\GeneratedShippingLabelDTO;
+use Wayfair\Core\Dto\General\CustomsDocumentDTO;
+use Wayfair\Core\Dto\PurchaseOrder\ResponseDTO as PurchaseOrderResponseDTO;
 
-class ResponseDTO {
+class ResponseDTO
+{
 
   /**
    * @var string
@@ -47,14 +51,20 @@ class ResponseDTO {
   private $generatedShippingLabels;
 
   /**
-   * @var \Wayfair\Core\Dto\PurchaseOrder\ResponseDTO
+   * @var PurchaseOrderResponseDTO
    */
   private $purchaseOrder;
 
   /**
+   * @var CustomsDocumentDTO
+   */
+  private $customsDocument;
+
+  /**
    * @return string
    */
-  public function getId() {
+  public function getId()
+  {
     return $this->id;
   }
 
@@ -63,14 +73,19 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setId($id) {
-    $this->id = $id;
+  public function setId($id)
+  {
+    $this->id = null;
+    if (isset($id)) {
+      $this->id = $id;
+    }
   }
 
   /**
    * @return string
    */
-  public function getEventDate() {
+  public function getEventDate()
+  {
     return $this->eventDate;
   }
 
@@ -79,14 +94,19 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setEventDate($eventDate) {
-    $this->eventDate = $eventDate;
+  public function setEventDate($eventDate)
+  {
+    $this->eventDate = null;
+    if (isset($eventDate)) {
+      $this->eventDate = $eventDate;
+    }
   }
 
   /**
    * @return string
    */
-  public function getPickupDate() {
+  public function getPickupDate()
+  {
     return $this->pickupDate;
   }
 
@@ -95,14 +115,19 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setPickupDate($pickupDate) {
-    $this->pickupDate = $pickupDate;
+  public function setPickupDate($pickupDate)
+  {
+    $this->pickupDate = null;
+    if (isset($pickupDate)) {
+      $this->pickupDate = $pickupDate;
+    }
   }
 
   /**
    * @return int
    */
-  public function getPoNumber() {
+  public function getPoNumber()
+  {
     return $this->poNumber;
   }
 
@@ -111,14 +136,19 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setPoNumber($poNumber) {
-    $this->poNumber = $poNumber;
+  public function setPoNumber($poNumber)
+  {
+    $this->poNumber = null;
+    if (isset($poNumber)) {
+      $this->poNumber = $poNumber;
+    }
   }
 
   /**
    * @return BillOfLadingDTO
    */
-  public function getBillOfLading() {
+  public function getBillOfLading()
+  {
     return $this->billOfLading;
   }
 
@@ -127,14 +157,19 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setBillOfLading($billOfLading) {
-    $this->billOfLading = BillOfLadingDTO::createFromArray($billOfLading);
+  public function setBillOfLading($billOfLading)
+  {
+    $this->billOfLading = null;
+    if (isset($billOfLading)) {
+      $this->billOfLading = BillOfLadingDTO::createFromArray($billOfLading);
+    }
   }
 
   /**
    * @return ShippingLabelDTO
    */
-  public function getConsolidatedShippingLabel() {
+  public function getConsolidatedShippingLabel()
+  {
     return $this->consolidatedShippingLabel;
   }
 
@@ -143,14 +178,19 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setConsolidatedShippingLabel($consolidatedShippingLabel) {
-    $this->consolidatedShippingLabel = ShippingLabelDTO::createFromArray($consolidatedShippingLabel);;
+  public function setConsolidatedShippingLabel($consolidatedShippingLabel)
+  {
+    $this->consolidatedShippingLabel = null;
+    if (isset($consolidatedShippingLabel)) {
+      $this->consolidatedShippingLabel = ShippingLabelDTO::createFromArray($consolidatedShippingLabel);
+    }
   }
 
   /**
    * @return array
    */
-  public function getGeneratedShippingLabels() {
+  public function getGeneratedShippingLabels()
+  {
     return $this->generatedShippingLabels;
   }
 
@@ -159,17 +199,21 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setGeneratedShippingLabels($generatedShippingLabels) {
+  public function setGeneratedShippingLabels($generatedShippingLabels)
+  {
     $this->generatedShippingLabels = [];
-    foreach ($generatedShippingLabels as $generatedShippingLabel) {
-      $this->generatedShippingLabels[] = GeneratedShippingLabelDTO::createFromArray($generatedShippingLabel);
+    if (isset($generatedShippingLabels)) {
+      foreach ($generatedShippingLabels as $generatedShippingLabel) {
+        $this->generatedShippingLabels[] = GeneratedShippingLabelDTO::createFromArray($generatedShippingLabel);
+      }
     }
   }
 
   /**
-   * @return \Wayfair\Core\Dto\PurchaseOrder\ResponseDTO
+   * @return PurchaseOrderResponseDTO
    */
-  public function getPurchaseOrder(): \Wayfair\Core\Dto\PurchaseOrder\ResponseDTO {
+  public function getPurchaseOrder(): PurchaseOrderResponseDTO
+  {
     return $this->purchaseOrder;
   }
 
@@ -178,8 +222,37 @@ class ResponseDTO {
    *
    * @return void
    */
-  public function setPurchaseOrder($purchaseOrder) {
-    $this->purchaseOrder = \Wayfair\Core\Dto\PurchaseOrder\ResponseDTO::createFromArray($purchaseOrder);
+  public function setPurchaseOrder($purchaseOrder)
+  {
+    $this->purchaseOrder = null;
+
+    if (isset($purchaseOrder)) {
+      $this->purchaseOrder = PurchaseOrderResponseDTO::createFromArray($purchaseOrder);
+    }
+  }
+
+  /**
+   * Get the Customs Document, if any
+   *
+   * @return CustomsDocumentDTO
+   */
+  public function getCustomsDocument(): CustomsDocumentDTO
+  {
+    return $this->customsDocument;
+  }
+
+  /**
+   * Set the customs document based on an array
+   *
+   * @param mixed $customsDocumentData
+   * @return void
+   */
+  public function setCustomsDocument($customsDocumentData)
+  {
+    $this->customsDocument = null;
+    if (isset($customsDocumentData)) {
+      $this->customsDocument = CustomsDocumentDTO::createFromArray($customsDocumentData);
+    }
   }
 
   /**
@@ -189,7 +262,8 @@ class ResponseDTO {
    *
    * @return self
    */
-  public static function createFromArray(array $params): self {
+  public static function createFromArray(array $params): self
+  {
     /**
      * @var ResponseDTO $dto
      */
@@ -202,6 +276,7 @@ class ResponseDTO {
     $dto->setConsolidatedShippingLabel($params['consolidatedShippingLabel'] ?? null);
     $dto->setGeneratedShippingLabels($params['generatedShippingLabels'] ?? null);
     $dto->setPurchaseOrder($params['purchaseOrder'] ?? null);
+    $dto->setCustomsDocument($params['customsDocument'] ?? null);
     return $dto;
   }
 }
