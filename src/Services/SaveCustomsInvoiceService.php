@@ -168,14 +168,15 @@ class SaveCustomsInvoiceService
       ]
     );
 
-    // need a unique document number in case of multiple generations
-    $epochTimestamp = time();
+    $currentTime = date_create();
+     // need a unique document number in case of multiple generations
+    $docNumber = intval($currentTime->format('YmdHis'));
     $documentData = [
       'documents' => [
         [
           'content' => $contentBase64,
-          'numberWithPrefix' => self::DOC_NUMBER_PREFIX . $epochTimestamp,
-          'number' => $epochTimestamp
+          'numberWithPrefix' => self::DOC_NUMBER_PREFIX . $docNumber,
+          'number' => $docNumber
         ]
       ]
     ];
