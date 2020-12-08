@@ -142,8 +142,6 @@ final class SaveCustomsInvoiceServiceTest extends \PHPUnit\Framework\TestCase
         /** @var LogSenderService&\PHPUnit\Framework\MockObject\MockObject */
         $logSenderService = $this->createMock(LogSenderService::class);
 
-        $constructorArgs = [$documentRepositoryContract, $fetchDocumentContract, $loggerContract, $logSenderService];
-
         /** @var SaveCustomsInvoiceService&\PHPUnit\Framework\MockObject\MockObject */
         $saveCustomsInvoiceService = $this->createPartialMock(SaveCustomsInvoiceService::class, ['generateDocNumber']);
         $saveCustomsInvoiceService->__construct($documentRepositoryContract, $fetchDocumentContract, $loggerContract, $logSenderService);
