@@ -73,6 +73,18 @@ class SaveCustomsInvoiceService
   }
 
   /**
+   * Generate a unique document number
+   *
+   * @return int
+   */
+  function generateDocNumber()
+  {
+    $currentTime = date_create();
+    // need a unique document number in case of multiple generations
+    return intval($currentTime->format('YmdHis'));
+  }
+
+  /**
    * Fetch a document from the Wayfair API URL in the parameter
    * Add the file as an "external invoice" document to the order with the ID in the parameter
    *
@@ -168,9 +180,7 @@ class SaveCustomsInvoiceService
       ]
     );
 
-    $currentTime = date_create();
-     // need a unique document number in case of multiple generations
-    $docNumber = intval($currentTime->format('YmdHis'));
+    $docNumber = $this->generateDocNumber();
     $documentData = [
       'documents' => [
         [

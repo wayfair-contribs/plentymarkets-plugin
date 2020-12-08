@@ -47,13 +47,17 @@ final class SaveCustomsInvoiceServiceTest extends \PHPUnit\Framework\TestCase
     const DOC_DATA = 'b64DocData';
     const DOC_TYPE = Document::UPLOADED;
 
+    const DOC_NUMBER = '12345';
+
     const DOC_PAYLOAD =  [
         'documents' => [
-          [
-            'content' => self::DOC_DATA,
-          ]
+            [
+                'content' => self::DOC_DATA,
+                'numberWithPrefix' => 'customs' . self::DOC_NUMBER,
+                'number' => self::DOC_NUMBER
+            ]
         ]
-      ];
+    ];
 
     /**
      * @before
@@ -116,12 +120,9 @@ final class SaveCustomsInvoiceServiceTest extends \PHPUnit\Framework\TestCase
                     $uploadInvocation->willThrowException(new TestTimeException("Forced upload failure"));
                 }
             } else {
-                if ($fetchResultType == self::RESULT_INSTRUCTION_FAIL)
-                {
+                if ($fetchResultType == self::RESULT_INSTRUCTION_FAIL) {
                     $fetchInvocation->willReturn(null);
-                }
-                else
-                {
+                } else {
                     $fetchInvocation->willThrowException(new TestTimeException("Forced fetch failure"));
                 }
             }
@@ -143,8 +144,10 @@ final class SaveCustomsInvoiceServiceTest extends \PHPUnit\Framework\TestCase
 
         $constructorArgs = [$documentRepositoryContract, $fetchDocumentContract, $loggerContract, $logSenderService];
 
-        /** @var SaveCustomsInvoiceService */
-        $saveCustomsInvoiceService = $this->createTestProxy(SaveCustomsInvoiceService::class, $constructorArgs);
+        /** @var SaveCustomsInvoiceService&\PHPUnit\Framework\MockObject\MockObject */
+        $saveCustomsInvoiceService = $this->createPartialMock(SaveCustomsInvoiceService::class, ['generateDocNumber']);
+        $saveCustomsInvoiceService->__construct($documentRepositoryContract, $fetchDocumentContract, $loggerContract, $logSenderService);
+        $saveCustomsInvoiceService->method('generateDocNumber')->willReturn(self::DOC_NUMBER);
 
         $actualResult = [];
 
