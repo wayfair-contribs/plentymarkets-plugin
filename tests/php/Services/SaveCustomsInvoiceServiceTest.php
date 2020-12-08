@@ -45,9 +45,7 @@ final class SaveCustomsInvoiceServiceTest extends \PHPUnit\Framework\TestCase
     const UPLOAD_RESULT_GOOD = ['good', 'upload'];
 
     const DOC_DATA = 'b64DocData';
-
-    // TODO: update this if the type is changed in module under test
-    const DOC_TYPE = Document::PRO_FORMA_INVOICE;
+    const DOC_TYPE = Document::UPLOADED;
 
     const DOC_PAYLOAD =  [
         'documents' => [

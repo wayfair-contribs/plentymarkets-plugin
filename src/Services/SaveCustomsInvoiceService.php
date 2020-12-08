@@ -30,6 +30,9 @@ class SaveCustomsInvoiceService
   const LOG_KEY_SAVE_ERROR = 'saveCustomsInvoiceError';
   const LOG_KEY_NO_CUSTOMS_INVOICE_DATA = 'noCustomsInvoiceData';
 
+  // prefix for numberWithPrefix on uploads
+  const DOC_NUMBER_PREFIX = 'customs';
+
   /**
    * @var DocumentRepositoryContract
    */
@@ -165,17 +168,22 @@ class SaveCustomsInvoiceService
       ]
     );
 
+    // need a unique document number in case of multiple generations
+    $epochTimestamp = time();
     $documentData = [
       'documents' => [
         [
           'content' => $contentBase64,
+          'numberWithPrefix' => self::DOC_NUMBER_PREFIX . $epochTimestamp,
+          'number' => $epochTimestamp
         ]
       ]
     ];
 
     try {
-      // TODO: confirm doc type with PM, CM, etc, before merging
-      $docType = Document::PRO_FORMA_INVOICE;
+      // Plenty says to use this UPLOADED constant.
+      // see https://forum.plentymarkets.com/t/can-we-upload-a-pro-forma-invoice-document/618441
+      $docType = Document::UPLOADED;
 
       $this->loggerContract->debug(
         TranslationHelper::getLoggerKey(self::LOG_KEY_UPLOADING_ORDER_DOCUMENTS),
