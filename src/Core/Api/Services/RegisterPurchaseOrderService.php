@@ -47,7 +47,7 @@ class RegisterPurchaseOrderService extends APIService implements RegisterPurchas
       . 'poNumber: "' . $requestDTO->getPoNumber() . '" '
       . (empty($requestDTO->getWarehouseId()) ? ' ' : 'warehouseId: "' . $requestDTO->getWarehouseId() . '" ')
       . '}) '
-      . '{ id, eventDate ,pickupDate, poNumber, purchaseOrder { poNumber, storePrefix }, billOfLading { url }, consolidatedShippingLabel { url } } '
+      . '{ id, eventDate ,pickupDate, poNumber, purchaseOrder { poNumber, storePrefix }, billOfLading { url }, consolidatedShippingLabel { url }, customsDocument { required, url } } '
       . '} '
       . '}';
     $this->loggerContract
