@@ -7,6 +7,7 @@
 namespace Wayfair\Cron;
 
 use Wayfair\Core\Contracts\LoggerContract;
+use Wayfair\Helpers\TranslationHelper;
 use Wayfair\Services\InventoryUpdateService;
 
 class FullInventorySyncCron extends InventorySyncCron
@@ -23,12 +24,29 @@ class FullInventorySyncCron extends InventorySyncCron
   }
 
   /**
+   * Call parent's handler,
+   * but create log entries with this class name for filtering
    * @throws \Exception
    *
    * @return void
    */
   public function handle()
   {
-    parent::handle();
+    $this->loggerContract->debug(TranslationHelper::getLoggerKey('cronStartedMessage'), [
+      'additionalInfo' => [
+        'full' => $this->fullInventory
+      ],
+      'method' => __METHOD__
+    ]);
+
+    try {
+      parent::handle();
+    } finally {
+      $this->loggerContract->debug(TranslationHelper::getLoggerKey('cronFinishedMessage'), [
+        'additionalInfo' => [
+        ],
+        'method' => __METHOD__
+      ]);
+    }
   }
 }
