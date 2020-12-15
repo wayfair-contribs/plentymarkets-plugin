@@ -51,14 +51,14 @@ class OrderAcceptCron extends Cron
      * @var LoggerContract $loggerContract
      */
     $loggerContract = pluginApp(LoggerContract::class);
-    $loggerContract->debug(TranslationHelper::getLoggerKey('cronStartedMessage'), ['method' => __METHOD__]);
+    $loggerContract->info(TranslationHelper::getLoggerKey('cronStartedMessage'), ['method' => __METHOD__]);
     try {
       $this->orderService->accept($externalLogs, 1);
     } finally {
       if (count($externalLogs->getLogs())) {
         $this->logSenderService->execute($externalLogs->getLogs());
       }
-      $loggerContract->debug(TranslationHelper::getLoggerKey('cronFinishedMessage'), ['method' => __METHOD__]);
+      $loggerContract->info(TranslationHelper::getLoggerKey('cronFinishedMessage'), ['method' => __METHOD__]);
     }
   }
 }

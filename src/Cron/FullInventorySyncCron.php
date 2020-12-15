@@ -32,7 +32,7 @@ class FullInventorySyncCron extends InventorySyncCron
    */
   public function handle()
   {
-    $this->loggerContract->debug(TranslationHelper::getLoggerKey('cronStartedMessage'), [
+    $this->loggerContract->info(TranslationHelper::getLoggerKey('cronStartedMessage'), [
       'additionalInfo' => [
         'full' => $this->fullInventory
       ],
@@ -42,7 +42,7 @@ class FullInventorySyncCron extends InventorySyncCron
     try {
       parent::handle();
     } finally {
-      $this->loggerContract->debug(TranslationHelper::getLoggerKey('cronFinishedMessage'), [
+      $this->loggerContract->info(TranslationHelper::getLoggerKey('cronFinishedMessage'), [
         'additionalInfo' => [
         ],
         'method' => __METHOD__
