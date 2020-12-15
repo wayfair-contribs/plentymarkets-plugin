@@ -371,7 +371,6 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
         $configHelper->method('getOrderReferrerValue')->willReturn(self::REFERRER_ID);
         $configHelper->method('isAllItemsActive')->willReturn($allItemsActive);
 
-        /** @var LoggerContract&\PHPUnit\Framework\MockObject\MockObject */
         $logger = new TestTimeLogger();
 
         /** @var LogSenderService&\PHPUnit\Framework\MockObject\MockObject */
