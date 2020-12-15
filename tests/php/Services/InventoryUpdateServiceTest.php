@@ -27,6 +27,9 @@ require_once(dirname(__DIR__) . DIRECTORY_SEPARATOR
     . 'plentymockets' . DIRECTORY_SEPARATOR
     . 'Overrides' . DIRECTORY_SEPARATOR . 'ReplacePluginApp.php');
 
+require_once(dirname(__DIR__) . DIRECTORY_SEPARATOR
+    . 'lib' . DIRECTORY_SEPARATOR . 'TestTimeLogger.php');
+
 use Plenty\Modules\Item\Variation\Contracts\VariationSearchRepositoryContract;
 use Wayfair\Core\Api\Services\InventoryService;
 use Wayfair\Core\Api\Services\LogSenderService;
@@ -43,6 +46,7 @@ use Wayfair\PlentyMockets\Factories\VariationDataFactory;
 use Wayfair\PlentyMockets\Helpers\MockPluginApp;
 use Wayfair\Services\InventoryStatusService;
 use Wayfair\Services\InventoryUpdateService;
+use Wayfair\Test\TestTimeLogger;
 
 /**
  * Tests for InventoryUpdateService
@@ -55,7 +59,7 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
     const TIMESTAMP_RECENT = '2020-10-06 17:44:02.000000 +02:00';
     const TIMESTAMP_NOW = '2020-10-06 17:45:02.000000 +02:00';
     const TIMESTAMP_FUTURE = '2035-10-06 17:44:02.000000 +02:00';
-    const W3C_LATER = '2020-10-06T15:44:02+00:00';
+    const W3C_RECENT = '2020-10-06T15:44:02+00:00';
 
     const REFERRER_ID = 12345;
 
@@ -88,13 +92,13 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
 
         $cases[] = ['lack of full sync should cause exception', null, self::TIMESTAMP_RECENT, ''];
 
-        $cases[] = ['knowing only full sync should return full sync time', self::W3C_LATER, '', self::TIMESTAMP_RECENT];
+        $cases[] = ['knowing only full sync should return full sync time', self::W3C_RECENT, '', self::TIMESTAMP_RECENT];
 
-        $cases[] = ['partial sync happening more recently than full sync should return partial sync time', self::W3C_LATER, self::TIMESTAMP_RECENT, self::TIMESTAMP_OVERDUE];
+        $cases[] = ['partial sync happening more recently than full sync should return partial sync time', self::W3C_RECENT, self::TIMESTAMP_RECENT, self::TIMESTAMP_OVERDUE];
 
-        $cases[] = ['full sync happening more recently than partial sync should return full sync time', self::W3C_LATER, self::TIMESTAMP_OVERDUE, self::TIMESTAMP_RECENT];
+        $cases[] = ['full sync happening more recently than partial sync should return full sync time', self::W3C_RECENT, self::TIMESTAMP_OVERDUE, self::TIMESTAMP_RECENT];
 
-        $cases[] = ['both kinds of sync happening at the same time should return that duplicated time', self::W3C_LATER, self::TIMESTAMP_RECENT, self::TIMESTAMP_RECENT];
+        $cases[] = ['both kinds of sync happening at the same time should return that duplicated time', self::W3C_RECENT, self::TIMESTAMP_RECENT, self::TIMESTAMP_RECENT];
 
         return $cases;
     }
@@ -252,6 +256,8 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
 
         $cases[] = ["full sync with no request DTOs", $emptyResultFull, null, true, [[]], [], [$collectionOneVariation], self::TIMESTAMP_RECENT, self::TIMESTAMP_RECENT, InventoryStatusService::PARTIAL, false, self::TIMESTAMP_RECENT];
 
+        $cases[] = ["full syncs can start when the first full sync has been running for too long", $emptyResultFull, null, true, [], [], [], null, null, InventoryStatusService::FULL, false, self::TIMESTAMP_RECENT];
+
         // TODO: make sure sync method returns all DTOs that InventoryService returns to it
 
         // TODO: make sure sync method returns correct summation of failures
@@ -368,7 +374,7 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
         $configHelper->method('isAllItemsActive')->willReturn($allItemsActive);
 
         /** @var LoggerContract&\PHPUnit\Framework\MockObject\MockObject */
-        $logger = $this->createMock(LoggerContract::class);
+        $logger = new TestTimeLogger();
 
         /** @var LogSenderService&\PHPUnit\Framework\MockObject\MockObject */
         $logSenderService = $this->createMock(LogSenderService::class);
