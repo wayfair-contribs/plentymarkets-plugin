@@ -256,8 +256,6 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
 
         $cases[] = ["full sync with no request DTOs", $emptyResultFull, null, true, [[]], [], [$collectionOneVariation], self::TIMESTAMP_RECENT, self::TIMESTAMP_RECENT, InventoryStatusService::PARTIAL, false, self::TIMESTAMP_RECENT];
 
-        $cases[] = ["full syncs can start when the first full sync has been running for too long", $emptyResultFull, null, true, [], [], [], null, null, InventoryStatusService::FULL, false, self::TIMESTAMP_RECENT];
-
         // TODO: make sure sync method returns all DTOs that InventoryService returns to it
 
         // TODO: make sure sync method returns correct summation of failures
@@ -284,8 +282,8 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
 
         $inventoryStatusService->method('getStartOfMostRecentAttempt')->willReturn($mostRecentAttemptTime);
 
-        $overDue = $mostRecentAttemptTime == self::TIMESTAMP_OVERDUE;
-        $overLimit = $overDue && isset($currentInventoryStatus) && '' != $currentInventoryStatus &&  InventoryStatusService::STATE_IDLE != $currentInventoryStatus;
+        $overDue = strtotime($mostRecentAttemptTime) <= strtotime(self::TIMESTAMP_OVERDUE);
+        $overLimit = $overDue && isset($currentInventoryStatus) && '' != $currentInventoryStatus && InventoryStatusService::STATE_IDLE != $currentInventoryStatus;
         $inventoryStatusService->method('isOverdue')->willReturn($overDue);
         $inventoryStatusService->method('hasGoneOverTimeLimit')->willReturn($overLimit);
         $inventoryStatusService->method('markInventoryStarted')->willReturn(self::TIMESTAMP_NOW);
