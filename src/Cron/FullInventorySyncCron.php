@@ -22,7 +22,6 @@ class FullInventorySyncCron extends InventorySyncCron
     parent::__construct(true, $inventoryUpdateService, $loggerContract);
   }
 
-
   /**
    * @throws \Exception
    *
