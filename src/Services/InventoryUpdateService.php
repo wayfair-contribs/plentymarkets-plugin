@@ -110,6 +110,7 @@ class InventoryUpdateService
     $windowStart = null;
     $windowEnd = null;
 
+    /** @var ExternalLogs */
     $externalLogs = pluginApp(ExternalLogs::class);
 
     try {
@@ -139,7 +140,10 @@ class InventoryUpdateService
           'method' => __METHOD__
         ]);
 
-        $externalLogs->addErrorLog('Inventory ' . ($fullInventory ? 'Full' : '') . ' overriding a currently running inventory sync process.');
+        $externalLogs->addWarningLog('Inventory ' . ($fullInventory ? 'Full' : '') . ' overriding a currently running inventory sync process.');
+
+        // cancel the stale/stalled run now, in case a new one does not start for some reason.
+        $this->statusService->markInventoryIdle();
       }
 
       if (!$fullInventory) {
