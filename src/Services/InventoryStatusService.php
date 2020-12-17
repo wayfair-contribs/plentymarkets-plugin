@@ -447,14 +447,30 @@ class InventoryStatusService
   {
     $curStatus = $this->getServiceStatusValue();
 
-    if (!isset($curStatus) || empty($curStatus) || self::STATE_IDLE == $curStatus)
+    if (!isset($curStatus) || empty(trim($curStatus)) || self::STATE_IDLE == $curStatus)
     {
       return false;
     }
 
+    $startTimestamp = $this->getStartOfMostRecentAttempt();
+
+    if (!isset($startTimestamp) || empty(trim($startTimestamp)))
+    {
+      // no idea when things started so assume it's dead/done
+      return true;
+    }
+
+    $startTimeValue = strtotime($startTimestamp);
+
+    if (!$startTimestamp)
+    {
+      // start timestamp is invalid so assume it's dead/done
+      return true;
+    }
+
+    $elapsedTime = time() - $startTimeValue;
+
     $maxTime = self::FULL == $curStatus ? self::MAX_INVENTORY_RUN_TIME_FULL : self::MAX_INVENTORY_RUN_TIME_PARTIAL;
-    $startTime = $this->getStartOfMostRecentAttempt();
-    $elapsedTime = time() - $startTime;
 
     // TODO: account for an inventory sync that is stuck or has died by checking for a recent heartbeat
 
