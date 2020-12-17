@@ -7,6 +7,7 @@
 namespace Wayfair\Services;
 
 use DateTime;
+use InvalidArgumentException;
 use Plenty\Modules\Item\Variation\Contracts\VariationSearchRepositoryContract;
 use Wayfair\Core\Api\Services\InventoryService;
 use Wayfair\Core\Api\Services\LogSenderService;
@@ -98,14 +99,15 @@ class InventoryUpdateService
    */
   public function sync(bool $fullInventory): InventoryUpdateResult
   {
-    $startTimeStamp = null;
+    $syncStartTimeStamp = null;
 
     $totalDtosAttempted = 0;
     $totalDtosSaved = 0;
     $totalDtosFailed = 0;
     $totalTimeSpentGatheringData = 0;
     $totalTimeSpentSendingData = 0;
-    $totalVariationIdsInDTOsForAllPages = 0;
+    $totalVariationsAttempted = 0;
+    $completedLastPage = false;
 
     $windowStart = null;
     $windowEnd = null;
@@ -187,11 +189,8 @@ class InventoryUpdateService
       // stock buffer should be the same across all pages of inventory
       $stockBuffer = $this->getNormalizedStockBuffer();
 
-      $searchParameters = $this->getDefaultSearchParameters();
-
       // The Plentymarkets team instructed to start on page 1, not page 0.
       $pageNumber = 1;
-
 
       $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_START), [
         'additionalInfo' => [
@@ -200,148 +199,55 @@ class InventoryUpdateService
         'method' => __METHOD__
       ]);
 
-      $startTimeStamp = $this->statusService->markInventoryStarted($fullInventory);
+      $syncStartTimeStamp = $this->statusService->markInventoryStarted($fullInventory);
       if (!$fullInventory) {
         // end time of Inventory change filter is the moment the sync begins
         // this provides redundancy in case this sync fails!
-        $windowEnd = $this->getEndOfDeltaSyncWindow($startTimeStamp);
+        $windowEnd = $this->getEndOfDeltaSyncWindow($syncStartTimeStamp);
       }
 
       $externalLogs->addInfoLog("Starting " . ($fullInventory ? "Full " : "Partial ") . "inventory sync.");
 
       $variationSearchRepository->setFilters($this->getDefaultFilters());
 
+      $amtOfDtosForPage = 0;
       do {
-        $amtErrors = 0;
-        $amtOfDtosForPage = 0;
-        $startTimeInDatabase = $this->statusService->getStartOfMostRecentAttempt();
-
-        if (isset($startTimeInDatabase) && !empty($startTimeInDatabase) && strtotime($startTimeInDatabase) > strtotime($startTimeStamp)) {
-          throw new InventorySyncInterruptedException("Inventory sync started at " . $startTimeStamp .
-            " is quitting due to staleness. A new inventory sync started at " . $startTimeInDatabase);
-        }
-
-        $unixTimeAtPageStart = TimeHelper::getMilliseconds();
-
-        /** @var RequestDTO[] collection of DTOs to include in a bulk update*/
-        $requestDTOsForPage = [];
-        /** @var int[] collection of the IDs of Variations for which requestDTOs were created*/
-        $variationIdsForPage = [];
-        $searchParameters['page'] = (string) $pageNumber;
-        $variationSearchRepository->setSearchParams($searchParameters);
-        $this->logger
-          ->debug(
-            TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
-            [
-              'additionalInfo' => [
-                'full' => (string) $fullInventory,
-                'pageNum' => $pageNumber,
-                'info' => 'Searching Variation repo',
-                'searchFilters' => $variationSearchRepository->getFilters(),
-                'searchConditions' => $variationSearchRepository->getConditions(),
-                'windowStart' => json_encode($windowStart),
-                'windowEnd' => json_encode($windowEnd)
-              ],
-              'method' => __METHOD__
-            ]
-          );
-        $variationSearchResponse = $variationSearchRepository->search();
-
-        $searchResults = $variationSearchResponse->getResult();
-        if ($pageNumber == 1 && !isset($searchResults) || empty($searchResults)) {
-          // let the user know why syncs are not doing anything
-          $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_NO_VARIATIONS), [
-            'additionalInfo' => [
-              'full' => (string) $fullInventory
-            ],
-            'method' => __METHOD__
-          ]);
-
-          // let Wayfair know that no Inventory DTOs are expected due to lack of Wayfair Variations
-          $externalLogs->addErrorLog('Inventory : no Wayfair Variations');
-
-          // let this sync be marked as "successful" with zeroes for every piece of data
-          break;
-        }
-
-        /** @var array $variationData information about a single Variation */
-        foreach ($searchResults as $variationData) {
-          /** @var RequestDTO[] */
-          $requestDTOsForVariation = $this->inventoryMapper->createInventoryDTOsFromVariation($variationData, $itemMappingMethod, $referrerId, $stockBuffer, $windowStart, $windowEnd);
-
-          if (count($requestDTOsForVariation)) {
-            $requestDTOsForPage = array_merge($requestDTOsForPage, $requestDTOsForVariation);
-            $variationIdsForPage[] = $variationData['id'];
-          }
-        }
-
-        $amtOfDtosForPage = count($requestDTOsForPage);
-
-        if ($amtOfDtosForPage > 0) {
-          $amtOfVariationsForPage = count($variationIdsForPage);
-          $totalVariationIdsInDTOsForAllPages += $amtOfVariationsForPage;
-
-          $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': ' . (string) $amtOfDtosForPage . ' updates to send for page ' . $pageNumber);
-
-          $this->logger->debug(
-            TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
-            [
-              'additionalInfo' => [
-                'full' => (string) $fullInventory,
-                'page' => $pageNumber,
-                'amtOfDtosForPage' => $amtOfDtosForPage,
-                'amtOfVariationsForPage' => $amtOfVariationsForPage
-              ],
-              'method' => __METHOD__
-            ]
-          );
-
-          $totalTimeSpentGatheringData += TimeHelper::getMilliseconds() - $unixTimeAtPageStart;
-          $unixTimeBeforeSendingData = TimeHelper::getMilliseconds();
-
-          $totalDtosAttempted +=  $amtOfDtosForPage;
-
-          $responseDto = $this->inventoryService->updateBulk($requestDTOsForPage);
-
-          $totalTimeSpentSendingData += TimeHelper::getMilliseconds() - $unixTimeBeforeSendingData;
-
-          $errors = $responseDto->getErrors();
-
-          if (isset($errors) && !empty($errors)) {
-            $amtErrors = count($errors);
-
-            $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_ERRORS), [
-              'additionalInfo' => [
-                'full' => (string) $fullInventory,
-                'errors' => json_encode($errors)
-              ],
-              'method' => __METHOD__
-            ]);
-
-            $externalLogs->addErrorLog('Inventory ' . ($fullInventory ? 'Full' : '') . ' errors found for page ' . $pageNumber, json_encode($errors));
-          }
-
-          // TODO: verify that there is a 1:1 relationship between errors and DTOs
-          $totalDtosSaved += $amtOfDtosForPage - $amtErrors;
-          $totalDtosFailed += $amtErrors;
-        }
+        $pageResult = $this->syncNextPageOfVariations(
+          $pageNumber,
+          $fullInventory,
+          $itemMappingMethod,
+          $referrerId,
+          $stockBuffer,
+          $syncStartTimeStamp,
+          $variationSearchRepository,
+          $windowStart,
+          $windowEnd,
+          $externalLogs
+        );
 
         $this->logger->debug(
           TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
           [
             'additionalInfo' => [
-              'fullInventory' => (string) $fullInventory,
               'page_num' => (string) $pageNumber,
               'info' => 'page done',
-              'numSavedForPage' => $amtOfDtosForPage - $amtErrors,
-              'numErrorsForPage' => $amtErrors
+              'pageResult' => $pageResult
             ],
             'method' => __METHOD__
           ]
         );
 
-        $pageNumber++;
-      } while (isset($variationSearchResponse) && !$variationSearchResponse->isLastPage());
+        $totalDtosAttempted += $pageResult->getDtosAttempted();
+        $totalDtosSaved += $pageResult->getDtosSaved();
+        $totalDtosFailed += $pageResult->getDtosFailed();
+        $totalTimeSpentGatheringData += $pageResult->getDataGatherMs();
+        $totalTimeSpentSendingData += $pageResult->getDataSendMs();
+        $totalVariationsAttempted += $pageResult->getVariationsAttempted();
+        $completedLastPage = $pageResult->getLastPage();
+
+        // TODO: add a heartbeat so other requestors can track the status of this one
+
+      } while (!$completedLastPage);
       // TODO: consider introducing page limits to avoid letting the job run for too long?
 
       // make sure not to let this get called while another sync is running!
@@ -360,7 +266,7 @@ class InventoryUpdateService
           'method' => __METHOD__
         ]);
       } else {
-        $this->statusService->markInventoryComplete($fullInventory, $startTimeStamp, $totalDtosSaved);
+        $this->statusService->markInventoryComplete($fullInventory, $syncStartTimeStamp, $totalDtosSaved);
       }
     } catch (InventorySyncInterruptedException $e) {
       // DO NOT change inventory status as it will conflict with the sync that interrupted this one!
@@ -401,17 +307,19 @@ class InventoryUpdateService
       throw new InventoryException($e->getMessage() . ' at ' . $e->getTraceAsString());
     } finally {
 
-      $elapsedTime = time() - strtotime($startTimeStamp);
+      $elapsedTime = time() - strtotime($syncStartTimeStamp);
 
-      $resultObject = pluginApp(InventoryUpdateResult::class);
-
-      $resultObject->setFullInventory($fullInventory);
-      $resultObject->setDtosAttempted($totalDtosAttempted);
-      $resultObject->setDtosAttempted($totalDtosAttempted);
-      $resultObject->setDtosSaved($totalDtosSaved);
-      $resultObject->setDtosFailed($totalDtosFailed);
-      $resultObject->setElapsedTime($elapsedTime);
-      $resultObject->setVariationsAttempted($totalVariationIdsInDTOsForAllPages);
+      $resultObject = $this->constructResultObject(
+        $fullInventory,
+        $totalDtosAttempted,
+        $totalDtosSaved,
+        $totalDtosFailed,
+        $elapsedTime,
+        $totalVariationsAttempted,
+        $totalTimeSpentGatheringData,
+        $totalTimeSpentSendingData,
+        $completedLastPage
+      );
 
       $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_END), [
         'additionalInfo' => [
@@ -495,9 +403,7 @@ class InventoryUpdateService
    */
   private function getNormalizedStockBuffer()
   {
-    $stockBuffer = null;
     $stockBuffer = $this->configHelper->getStockBufferValue();
-
 
     if (isset($stockBuffer)) {
       if ($stockBuffer >= 0) {
@@ -580,5 +486,221 @@ class InventoryUpdateService
   function getEndOfDeltaSyncWindow($startTimeStamp): string
   {
     return (date_create($startTimeStamp))->format(DateTime::W3C);
+  }
+
+  /**
+   * Internal loop logic for inventory sync, operating on a single page of Variations.
+   *
+   * Returns true if this was the last page of Variations to work on.
+   *
+   * @param int $pageNumber
+   * @param bool $fullInventory
+   * @param string $itemMappingMethod
+   * @param float $referrerId
+   * @param mixed $stockBuffer
+   * @param string $startTimeStamp
+   * @param VariationSearchRepositoryContract $variationSearchRepository
+   * @param int $windowStart
+   * @param int $windowEnd
+   * @param ExternalLogs $externalLogs
+   * @param int $totalVariationsAttempted
+   * @param int $totalDtosAttempted
+   * @param int $totalTimeSpentGatheringData
+   * @param int $totalTimeSpentSendingData
+   * @param int $totalDtosSaved
+   * @param int $totalDtosFailed
+   * @param int $amtOfDtosForPage
+   *
+   * @return InventoryUpdateResult
+   */
+  function syncNextPageOfVariations(
+    $pageNumber,
+    $fullInventory,
+    $itemMappingMethod,
+    $referrerId,
+    $stockBuffer,
+    $syncStartTimeStamp,
+    $variationSearchRepository,
+    $windowStart,
+    $windowEnd,
+    $externalLogs
+  ): InventoryUpdateResult {
+
+    if ($pageNumber < 1)
+    {
+      throw new InvalidArgumentException("Page number must be at least 1");
+    }
+
+    $totalDtosAttempted = 0;
+    $totalDtosSaved = 0;
+    $totalDtosFailed = 0;
+    $dataGatherMs = 0;
+    $dataSendMs = 0;
+    $totalVariationsAttempted = 0;
+
+    $$statusInDatabase = $this->statusService->getServiceStatusValue();
+    if (!isset($statusInDatabase)) {
+      $statusInDatabase = '';
+    }
+    $startTimeInDatabase = $this->statusService->getStartOfMostRecentAttempt();
+
+    if (
+      !isset($statusInDatabase) || empty($statusInDatabase)
+      || ($fullInventory && $statusInDatabase != InventoryStatusService::FULL) || (!$fullInventory && $statusInDatabase != InventoryStatusService::PARTIAL) ||
+      !isset($startTimeInDatabase) || empty($startTimeInDatabase) ||
+      (strtotime($startTimeInDatabase) > strtotime($syncStartTimeStamp))
+    ) {
+      throw new InventorySyncInterruptedException(($fullInventory ? "Full " : "Partial ") . "Inventory sync started at [" . $syncStartTimeStamp .
+        "] is quitting before page [" . $pageNumber . "] of Variations due to staleness. Service run state is [" . $statusInDatabase . "] and newest start time is [" . $startTimeInDatabase . "]");
+    }
+
+    $unixTimeAtPageStart = TimeHelper::getMilliseconds();
+
+    /** @var RequestDTO[] collection of DTOs to include in a bulk update*/
+    $requestDTOsForPage = [];
+    /** @var int[] collection of the IDs of Variations for which requestDTOs were created*/
+    $variationIdsForPage = [];
+    $searchParameters = $this->getDefaultSearchParameters();
+    $searchParameters['page'] = (string) $pageNumber;
+    $variationSearchRepository->setSearchParams($searchParameters);
+    $this->logger
+      ->debug(
+        TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
+        [
+          'additionalInfo' => [
+            'full' => (string) $fullInventory,
+            'pageNum' => $pageNumber,
+            'info' => 'Searching Variation repo',
+            'searchFilters' => $variationSearchRepository->getFilters(),
+            'searchConditions' => $variationSearchRepository->getConditions(),
+            'windowStart' => json_encode($windowStart),
+            'windowEnd' => json_encode($windowEnd)
+          ],
+          'method' => __METHOD__
+        ]
+      );
+
+    $searchResults = [];
+    $lastPage = false;
+    $variationSearchResponse = $variationSearchRepository->search();
+    if (isset($variationSearchResponse)) {
+      $lastPage = $variationSearchResponse->isLastPage();
+      $searchResults = $variationSearchResponse->getResult();
+    }
+
+    if (!isset($searchResults) || empty($searchResults)) {
+      $lastPage = true;
+
+      if ($pageNumber <= 1) {
+        // let the user know why syncs are not doing anything
+        $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_NO_VARIATIONS), [
+          'additionalInfo' => [
+            'full' => (string) $fullInventory
+          ],
+          'method' => __METHOD__
+        ]);
+
+        // let Wayfair know that no Inventory DTOs are expected due to lack of Wayfair Variations
+        $externalLogs->addErrorLog('Inventory : no Wayfair Variations');
+      }
+    } else {
+
+      /** @var array $variationData information about a single Variation */
+      foreach ($searchResults as $variationData) {
+        /** @var RequestDTO[] */
+        $requestDTOsForVariation = $this->inventoryMapper->createInventoryDTOsFromVariation($variationData, $itemMappingMethod, $referrerId, $stockBuffer, $windowStart, $windowEnd);
+
+        if (count($requestDTOsForVariation)) {
+          $requestDTOsForPage = array_merge($requestDTOsForPage, $requestDTOsForVariation);
+          $variationIdsForPage[] = $variationData['id'];
+        }
+      }
+
+      $amtOfDtosForPage = count($requestDTOsForPage);
+
+      if ($amtOfDtosForPage < 1) {
+        // TODO: add a log about the lack of DTOs
+        return true;
+      }
+
+      $amtOfVariationsForPage = count($variationIdsForPage);
+      $totalVariationsAttempted += $amtOfVariationsForPage;
+
+      $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': ' . (string) $amtOfDtosForPage . ' updates to send for page ' . $pageNumber);
+
+      $this->logger->debug(
+        TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
+        [
+          'additionalInfo' => [
+            'full' => (string) $fullInventory,
+            'page' => $pageNumber,
+            'amtOfDtosForPage' => $amtOfDtosForPage,
+            'amtOfVariationsForPage' => $amtOfVariationsForPage
+          ],
+          'method' => __METHOD__
+        ]
+      );
+
+      $dataGatherMs = TimeHelper::getMilliseconds() - $unixTimeAtPageStart;
+      $unixTimeBeforeSendingData = TimeHelper::getMilliseconds();
+
+      $totalDtosAttempted +=  $amtOfDtosForPage;
+
+      $responseDto = $this->inventoryService->updateBulk($requestDTOsForPage);
+
+      $dataSendMs = TimeHelper::getMilliseconds() - $unixTimeBeforeSendingData;
+
+      $errors = $responseDto->getErrors();
+
+      if (isset($errors) && !empty($errors)) {
+        $amtErrors = count($errors);
+
+        $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_ERRORS), [
+          'additionalInfo' => [
+            'full' => (string) $fullInventory,
+            'errors' => json_encode($errors)
+          ],
+          'method' => __METHOD__
+        ]);
+
+        $externalLogs->addErrorLog('Inventory ' . ($fullInventory ? 'Full' : '') . ' errors found for page ' . $pageNumber, json_encode($errors));
+      }
+
+      // TODO: verify that there is a 1:1 relationship between errors and DTOs
+      $totalDtosSaved += $amtOfDtosForPage - $amtErrors;
+      $totalDtosFailed += $amtErrors;
+    }
+
+    // time in result objects is in seconds
+    $elapsedTime = (TimeHelper::getMilliseconds() - $unixTimeAtPageStart) * 0.001;
+
+    return $this->constructResultObject($fullInventory, $totalDtosAttempted, $totalDtosSaved, $totalDtosFailed, $elapsedTime, $totalVariationsAttempted, $dataGatherMs, $dataSendMs, $lastPage);
+  }
+
+  function constructResultObject(
+    bool $fullInventory,
+    int $totalDtosAttempted,
+    int $totalDtosSaved,
+    int $totalDtosFailed,
+    int $elapsedTime,
+    int $totalVariationsAttempted,
+    int $dataGatherMs,
+    int $dataSendMs,
+    bool $lastPage
+  ): InventoryUpdateResult {
+    /** @var InventoryUpdateResult */
+    $resultObject = pluginApp(InventoryUpdateResult::class);
+
+    $resultObject->setFullInventory($fullInventory);
+    $resultObject->setDtosAttempted($totalDtosAttempted);
+    $resultObject->setDtosSaved($totalDtosSaved);
+    $resultObject->setDtosFailed($totalDtosFailed);
+    $resultObject->setElapsedTime($elapsedTime);
+    $resultObject->setVariationsAttempted($totalVariationsAttempted);
+    $resultObject->setDataGatherMs($dataGatherMs);
+    $resultObject->setDataSendMs($dataSendMs);
+    $resultObject->setLastPage($lastPage);
+
+    return $resultObject;
   }
 }

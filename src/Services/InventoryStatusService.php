@@ -456,6 +456,8 @@ class InventoryStatusService
     $startTime = $this->getStartOfMostRecentAttempt();
     $elapsedTime = time() - $startTime;
 
+    // TODO: account for an inventory sync that is stuck or has died by checking for a recent heartbeat
+
     return $elapsedTime >= $maxTime;
   }
 }
