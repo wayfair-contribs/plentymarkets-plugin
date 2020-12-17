@@ -166,8 +166,7 @@ class InventoryUpdateService
         // stock buffer should be the same across all pages of inventory
         $stockBuffer = $this->getNormalizedStockBuffer();
 
-        // The Plentymarkets team instructed to start on page 1, not page 0.
-        $pageNumber = 1;
+
 
         $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_START), [
           'additionalInfo' => [
@@ -212,7 +211,10 @@ class InventoryUpdateService
       }
 
       // setup is complete. Begin loop over Variations.
-      do {
+
+      // The Plentymarkets team instructed to start on page 1, not page 0.
+       // TODO: consider introducing maximum page number?
+      for ($pageNumber = 1; !$completedLastPage; $pageNumber++) {
         $pageResult = $this->syncNextPageOfVariations(
           $pageNumber,
           $fullInventory,
@@ -234,9 +236,7 @@ class InventoryUpdateService
         $completedLastPage = $pageResult->getLastPage();
 
         // TODO: add a heartbeat so other requestors can track the status of this one
-
-        // TODO: consider introducing maximum page number?
-      } while (!$completedLastPage);
+      }
 
       $elapsedTime = $this->calculateTimeSinceSyncStart($syncStartTimeStamp);
 
