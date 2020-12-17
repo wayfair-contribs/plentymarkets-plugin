@@ -164,7 +164,7 @@ class InventoryStatusService
   {
     $state = $this->keyValueRepository->get(self::DB_KEY_INVENTORY_STATUS);
 
-    if (!isset($state)) {
+    if (!isset($state) || empty($state)) {
       $state = self::STATE_IDLE;
     }
 
