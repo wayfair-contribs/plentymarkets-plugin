@@ -145,9 +145,6 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
     /**
      * Test Inventory Sync
      *
-     * // FIXME: this should not call the real syncNextPageOfVariations.
-     * // TODO: create a separate set of test cases for syncNextPageOfVariations
-     *
      * @return void
      *
      * @dataProvider dataProviderForTestSync
