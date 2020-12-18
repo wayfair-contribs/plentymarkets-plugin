@@ -7,7 +7,7 @@
     ],
     "require": {
         "guzzlehttp/guzzle": "^6.3",
-        "plentymarkets/plugin-interface": "dev-beta7",
+        "plentymarkets/plugin-interface": "dev-stable7",
         "ext-json": "*",
         "php-di/phpdoc-reader": "^2.1"
     },
