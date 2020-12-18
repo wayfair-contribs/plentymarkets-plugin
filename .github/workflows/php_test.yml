@@ -16,20 +16,14 @@ jobs:
     runs-on: ubuntu-16.04
 
     steps:
+
       - name: checkout
         uses: actions/checkout@v2
 
-      - name: Cache Composer packages
-        id: composer-cache
-        uses: actions/cache@v2
-        with:
-          path: vendor
-          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-php-
+      - name: switch to php 7.0
+        run: sudo update-alternatives --set php /usr/bin/php7.0
 
       - name: Install dependencies
-        if: steps.composer-cache.outputs.cache-hit != 'true'
         run: composer install --prefer-dist --no-progress --no-suggest
 
       - name: Run test suite
