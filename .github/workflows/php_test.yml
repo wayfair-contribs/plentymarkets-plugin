@@ -10,7 +10,7 @@ on:
 
 jobs:
   build-and-test-php:
-    # ubuntu 16.04 has PHP 7.0 installed by default.
+    # ubuntu 16.04 has PHP 7.0 installed, but it is NOT selected anymore (December 2020).
     # Plenty plugin code must be PHP 7.0 only.
     # other OSes / ubuntu versions will not be compatible.
     runs-on: ubuntu-16.04
