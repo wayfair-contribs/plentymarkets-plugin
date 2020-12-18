@@ -7,6 +7,7 @@
 namespace Wayfair\Services;
 
 use DateTime;
+use Exception;
 use InvalidArgumentException;
 use Plenty\Modules\Item\Variation\Contracts\VariationSearchRepositoryContract;
 use Wayfair\Core\Api\Services\InventoryService;
@@ -135,7 +136,7 @@ class InventoryUpdateService
             throw new InventorySyncInProgressException("An Inventory Sync is in progress, preventing this one from starting.");
           }
 
-          // other inventory sync is stale or stalled, so a new one should start.
+          // other inventory sync is stale or stalled, so a new one should be allowed to start.
           $this->logger->warning(TranslationHelper::getLoggerKey(self::LOG_KEY_LONG_RUN), [
             'additionalInfo' => [
               'newerSyncIsFullInventory' => $fullInventory,
@@ -211,29 +212,36 @@ class InventoryUpdateService
       // setup is complete. Begin loop over Variations.
 
       // The Plentymarkets team instructed to start on page 1, not page 0.
-       // TODO: consider introducing maximum page number?
-      for ($pageNumber = 1; !$completedLastPage; $pageNumber++) {
-        $pageResult = $this->syncNextPageOfVariations(
-          $pageNumber,
-          $fullInventory,
-          $itemMappingMethod,
-          $referrerId,
-          $stockBuffer,
-          $syncStartTimeStamp,
-          $variationSearchRepository,
-          $windowStart,
-          $windowEnd
-        );
+      // TODO: consider introducing maximum page number?
+      try {
+        for ($pageNumber = 1; !$completedLastPage; $pageNumber++) {
 
-        $totalDtosAttempted += $pageResult->getDtosAttempted();
-        $totalDtosSaved += $pageResult->getDtosSaved();
-        $totalDtosFailed += $pageResult->getDtosFailed();
-        $totalTimeSpentGatheringData += $pageResult->getDataGatherMs();
-        $totalTimeSpentSendingData += $pageResult->getDataSendMs();
-        $totalVariationsAttempted += $pageResult->getVariationsAttempted();
-        $completedLastPage = $pageResult->getLastPage();
+          $pageResult = $this->syncNextPageOfVariations(
+            $pageNumber,
+            $fullInventory,
+            $itemMappingMethod,
+            $referrerId,
+            $stockBuffer,
+            $syncStartTimeStamp,
+            $variationSearchRepository,
+            $windowStart,
+            $windowEnd
+          );
 
-        // TODO: add a heartbeat so other requestors can track the status of this one
+          $totalDtosAttempted += $pageResult->getDtosAttempted();
+          $totalDtosSaved += $pageResult->getDtosSaved();
+          $totalDtosFailed += $pageResult->getDtosFailed();
+          $totalTimeSpentGatheringData += $pageResult->getDataGatherMs();
+          $totalTimeSpentSendingData += $pageResult->getDataSendMs();
+          $totalVariationsAttempted += $pageResult->getVariationsAttempted();
+          $completedLastPage = $pageResult->getLastPage();
+
+          // TODO: add a heartbeat so other requestors can track the status of this one
+        }
+      } catch (\Exception $e) {
+        // prevent this sync from blocking syncs that will replace it
+        $this->statusService->markInventoryIdle($syncStartTimeStamp);
+        throw $e;
       }
 
       $elapsedTime = $this->calculateTimeSinceSyncStart($syncStartTimeStamp);
@@ -252,7 +260,18 @@ class InventoryUpdateService
 
       $info = ['full' => (string) $fullInventory];
 
-      if ($fullInventory && $totalDtosAttempted < 1) {
+      if ($totalVariationsAttempted < 1) {
+        // let the user know why syncs are not doing anything
+        $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_NO_VARIATIONS), [
+          'additionalInfo' => [
+            'full' => (string) $fullInventory
+          ],
+          'method' => __METHOD__
+        ]);
+
+        // let Wayfair know that no Inventory DTOs are expected due to lack of Wayfair Variations
+        $externalLogs->addErrorLog('Inventory : no Wayfair Variations');
+      } elseif ($fullInventory && $totalDtosAttempted < 1) {
         $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_NO_STOCKS), [
           'additionalInfo' => $info,
           'method' => __METHOD__
@@ -275,11 +294,11 @@ class InventoryUpdateService
 
       $externalLogs->addInfoLog("Finished " . ($fullInventory ? "Full " : "Partial ") . "inventory sync.", json_encode($resultObject->toArray()));
 
+      // allow another sync to start now
+      $this->statusService->markInventoryIdle($syncStartTimeStamp);
+
       return $resultObject;
     } finally {
-
-       // allow another sync to start now
-       $this->statusService->markInventoryIdle($syncStartTimeStamp);
 
       if (isset($externalLogs) && isset($this->logSenderService)) {
         $externalLogs->addInventoryLog('Inventory syncs attempted', 'totalDtosAttempted' . ($fullInventory ? 'Full' : ''), $totalDtosAttempted, $totalTimeSpentGatheringData);
@@ -549,19 +568,6 @@ class InventoryUpdateService
 
       if (!isset($searchResults) || empty($searchResults)) {
         $lastPage = true;
-
-        if ($pageNumber <= 1) {
-          // let the user know why syncs are not doing anything
-          $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_NO_VARIATIONS), [
-            'additionalInfo' => [
-              'full' => (string) $fullInventory
-            ],
-            'method' => __METHOD__
-          ]);
-
-          // let Wayfair know that no Inventory DTOs are expected due to lack of Wayfair Variations
-          $externalLogs->addErrorLog('Inventory : no Wayfair Variations');
-        }
       } else {
 
         /** @var array $variationData information about a single Variation */
@@ -650,8 +656,6 @@ class InventoryUpdateService
 
       return $pageResult;
     } catch (AuthException $e) {
-      $this->statusService->markInventoryIdle($syncStartTimeStamp);
-
       // bulk update failed, so everything we were going to save should be considered failing.
       // (we want the failure amount to be more than zero in order for client to know this failed.)
       $totalDtosFailed += $amtOfDtosForPage;
@@ -661,8 +665,6 @@ class InventoryUpdateService
       // let caller report auth issue
       throw $e;
     } catch (\Exception $e) {
-      $this->statusService->markInventoryIdle($syncStartTimeStamp);
-
       // bulk update failed, so everything we were going to save should be considered failing.
       // (we want the failure amount to be more than zero in order for client to know this failed.)
       $totalDtosFailed += $amtOfDtosForPage;
