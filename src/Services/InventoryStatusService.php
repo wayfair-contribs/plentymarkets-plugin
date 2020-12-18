@@ -256,9 +256,20 @@ class InventoryStatusService
    * Set the status back to idle state
    * @return void
    */
-  public function markInventoryIdle()
+  public function markInventoryIdle($syncStartTimestamp = null)
   {
-    $this->setServiceStatusValue(self::STATE_IDLE);
+    $currentStatus = $this->getServiceStatusValue();
+    $mostRecentAttempt = $this->getStartOfMostRecentAttempt();
+
+    if (
+      !isset($currentStatus) || $currentStatus != self::STATE_IDLE
+      || !isset($syncStartTimestamp) || empty($syncStartTimestamp)
+      || !isset($mostRecentAttempt) || empty($mostRecentAttempt)
+      || (strtotime($syncStartTimestamp) >= strtotime($mostRecentAttempt))
+    ) {
+      // only make the change if the argument does not represent an older sync than the current one
+      $this->setServiceStatusValue(self::STATE_IDLE);
+    }
   }
 
   /**
@@ -279,8 +290,7 @@ class InventoryStatusService
     $this->keyValueRepository->putOrReplace($keyCompletionEnd, $ts);
     $this->keyValueRepository->putOrReplace($keyCompletionStart, $startTime);
     $this->keyValueRepository->putOrReplace($keyCompletionAmount, $amount);
-    // timestamp on state change should match timestamp of last completion
-    $this->setServiceStatusValue(self::STATE_IDLE);
+    $this->markInventoryIdle($startTime);
   }
 
   /**
@@ -447,23 +457,20 @@ class InventoryStatusService
   {
     $curStatus = $this->getServiceStatusValue();
 
-    if (!isset($curStatus) || empty(trim($curStatus)) || self::STATE_IDLE == $curStatus)
-    {
+    if (!isset($curStatus) || empty(trim($curStatus)) || self::STATE_IDLE == $curStatus) {
       return false;
     }
 
     $startTimestamp = $this->getStartOfMostRecentAttempt();
 
-    if (!isset($startTimestamp) || empty(trim($startTimestamp)))
-    {
+    if (!isset($startTimestamp) || empty(trim($startTimestamp))) {
       // no idea when things started so assume it's dead/done
       return true;
     }
 
     $startTimeValue = strtotime($startTimestamp);
 
-    if (!$startTimestamp)
-    {
+    if (!$startTimestamp) {
       // start timestamp is invalid so assume it's dead/done
       return true;
     }

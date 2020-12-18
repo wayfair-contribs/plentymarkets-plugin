@@ -144,9 +144,9 @@ class InventoryUpdateService
             'method' => __METHOD__
           ]);
 
-          $externalLogs->addWarningLog('Inventory ' . ($fullInventory ? 'Full' : '') . ' overriding a currently running inventory sync process.');
+          $externalLogs->addWarningLog('Inventory ' . ($fullInventory ? 'Full' : '') . ' cancelling another inventory sync process.');
 
-          // cancel the stale/stalled run now, in case a new one does not start for some reason.
+          // cancel the stale/stalled run now, to unblock syncs
           $this->statusService->markInventoryIdle();
         }
 
@@ -165,8 +165,6 @@ class InventoryUpdateService
 
         // stock buffer should be the same across all pages of inventory
         $stockBuffer = $this->getNormalizedStockBuffer();
-
-
 
         $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_START), [
           'additionalInfo' => [
@@ -277,11 +275,12 @@ class InventoryUpdateService
 
       $externalLogs->addInfoLog("Finished " . ($fullInventory ? "Full " : "Partial ") . "inventory sync.", json_encode($resultObject->toArray()));
 
-      // allow another sync to start now
-      $this->statusService->markInventoryIdle();
-
       return $resultObject;
     } finally {
+
+       // allow another sync to start now
+       $this->statusService->markInventoryIdle($syncStartTimeStamp);
+
       if (isset($externalLogs) && isset($this->logSenderService)) {
         $externalLogs->addInventoryLog('Inventory syncs attempted', 'totalDtosAttempted' . ($fullInventory ? 'Full' : ''), $totalDtosAttempted, $totalTimeSpentGatheringData);
         $externalLogs->addInventoryLog('Inventory syncs completed', 'totalDtosSaved' . ($fullInventory ? 'Full' : ''), $totalDtosSaved, $totalTimeSpentSendingData);
@@ -294,8 +293,6 @@ class InventoryUpdateService
 
   private function logFatalException(\Exception $exception, bool $fullInventory, ExternalLogs $externalLogs)
   {
-    $this->statusService->markInventoryIdle();
-
     $externalLogs->addInventoryLog('Inventory exception: ' . $exception->getMessage(), 'inventoryFailed' . ($fullInventory ? 'Full' : ''), 1, 0, false, $exception->getTraceAsString());
 
     $info = [
@@ -635,7 +632,6 @@ class InventoryUpdateService
       // time in result objects is in seconds
       $elapsedTime = (TimeHelper::getMilliseconds() - $unixTimeAtPageStart) * 0.001;
 
-
       $pageResult =  $this->constructResultObject($fullInventory, $totalDtosAttempted, $totalDtosSaved, $totalDtosFailed, $elapsedTime, $totalVariationsAttempted, $dataGatherMs, $dataSendMs, $lastPage);
 
       $this->logger->debug(
@@ -654,7 +650,7 @@ class InventoryUpdateService
 
       return $pageResult;
     } catch (AuthException $e) {
-      $this->statusService->markInventoryIdle();
+      $this->statusService->markInventoryIdle($syncStartTimeStamp);
 
       // bulk update failed, so everything we were going to save should be considered failing.
       // (we want the failure amount to be more than zero in order for client to know this failed.)
@@ -665,7 +661,7 @@ class InventoryUpdateService
       // let caller report auth issue
       throw $e;
     } catch (\Exception $e) {
-      $this->statusService->markInventoryIdle();
+      $this->statusService->markInventoryIdle($syncStartTimeStamp);
 
       // bulk update failed, so everything we were going to save should be considered failing.
       // (we want the failure amount to be more than zero in order for client to know this failed.)
