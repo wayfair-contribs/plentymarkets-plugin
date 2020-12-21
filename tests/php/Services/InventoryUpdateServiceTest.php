@@ -537,11 +537,6 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
             $collectionFiveVariations[] = $variationDataFactory->create(1, [12345]);
         }
 
-        $collectionFiveHundredVariations = [];
-        for ($i = 0; $i < 500; $i++) {
-            $collectionFiveHundredVariations[] = $variationDataFactory->create(1, [12345]);
-        }
-
         $cases = [];
 
         $cases[] = ["no variations - partial - not last", null, false, InventoryStatusService::PARTIAL, self::TIMESTAMP_NOW];
