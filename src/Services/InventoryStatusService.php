@@ -253,7 +253,13 @@ class InventoryStatusService
   }
 
   /**
-   * Set the status back to idle state
+   * Set the status back to idle.
+   *
+   * The behavior is as such:
+   *  - status is currently unknown =  change to idle
+   *  - status is not already IDLE = do nothing
+   *  - status is not IDLE and argument matches timestamp in DB = change to idle
+   *
    * @return void
    */
   public function markInventoryIdle($syncStartTimestamp = null)
@@ -262,12 +268,12 @@ class InventoryStatusService
     $mostRecentAttempt = $this->getStartOfMostRecentAttempt();
 
     if (
-      !isset($currentStatus) || $currentStatus != self::STATE_IDLE
-      || !isset($syncStartTimestamp) || empty($syncStartTimestamp)
-      || !isset($mostRecentAttempt) || empty($mostRecentAttempt)
-      || (strtotime($syncStartTimestamp) >= strtotime($mostRecentAttempt))
+      !isset($currentStatus) || empty(trim($currentStatus)) ||
+      ($currentStatus != self::STATE_IDLE &&
+        (!isset($syncStartTimestamp) || empty(trim($syncStartTimestamp)) ||
+          !isset($mostRecentAttempt) || empty(trim($mostRecentAttempt)) ||
+          (strtotime($syncStartTimestamp) >= strtotime($mostRecentAttempt))))
     ) {
-      // only make the change if the argument does not represent an older sync than the current one
       $this->setServiceStatusValue(self::STATE_IDLE);
     }
   }

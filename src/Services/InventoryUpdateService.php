@@ -493,40 +493,39 @@ class InventoryUpdateService
     /** @var ExternalLogs */
     $externalLogs = pluginApp(ExternalLogs::class);
 
+    $totalDtosAttempted = 0;
+    $totalDtosSaved = 0;
+    $totalDtosFailed = 0;
+    $dataGatherMs = 0;
+    $dataSendMs = 0;
+    $totalVariationsAttempted = 0;
+
     try {
       if ($pageNumber < 1) {
         throw new InvalidArgumentException("Page number must be at least 1");
       }
 
-      $totalDtosAttempted = 0;
-      $totalDtosSaved = 0;
-      $totalDtosFailed = 0;
-      $dataGatherMs = 0;
-      $dataSendMs = 0;
-      $totalVariationsAttempted = 0;
-
-      $$statusInDatabase = $this->statusService->getServiceStatusValue();
+      $statusInDatabase = $this->statusService->getServiceStatusValue();
       if (!isset($statusInDatabase)) {
         $statusInDatabase = '';
       }
       $startTimeInDatabase = $this->statusService->getStartOfMostRecentAttempt();
 
       if (
-        !isset($statusInDatabase) || empty($statusInDatabase)
+        !isset($statusInDatabase) || empty(trim($statusInDatabase))
         || ($fullInventory && $statusInDatabase != InventoryStatusService::FULL) || (!$fullInventory && $statusInDatabase != InventoryStatusService::PARTIAL) ||
-        !isset($startTimeInDatabase) || empty($startTimeInDatabase) ||
+        !isset($startTimeInDatabase) || empty(trim($startTimeInDatabase)) ||
         (strtotime($startTimeInDatabase) > strtotime($syncStartTimeStamp))
       ) {
 
         $this->logger->info(TranslationHelper::getLoggerKey(self::LOG_KEY_INTERRUPTED), [
           'additionalInfo' => [
-            'full' => (string) $fullInventory,
-            'message' => $e->getMessage()
+            'full' => (string) $fullInventory
           ],
           'method' => __METHOD__
         ]);
 
-        $externalLogs->addInventoryLog('Inventory interrupted: ' . $e->getMessage(), 'inventoryInterrupted' . ($fullInventory ? 'Full' : ''), 1, 0, false, $e->getTraceAsString());
+        $externalLogs->addInventoryLog('Inventory interrupted', 'inventoryInterrupted' . ($fullInventory ? 'Full' : ''), 1, 0, false);
 
         throw new InventorySyncInterruptedException(($fullInventory ? "Full " : "Partial ") . "Inventory sync started at [" . $syncStartTimeStamp .
           "] is quitting before page [" . $pageNumber . "] of Variations due to staleness. Service run state is [" . $statusInDatabase . "] and newest start time is [" . $startTimeInDatabase . "]");
@@ -581,14 +580,13 @@ class InventoryUpdateService
           }
         }
 
-        $amtOfDtosForPage = count($requestDTOsForPage);
+        $totalDtosAttempted = count($requestDTOsForPage);
 
-        if ($amtOfDtosForPage < 1) {
+        if ($totalDtosAttempted < 1) {
           // TODO: add a log about the lack of DTOs
         } else {
 
-          $amtOfVariationsForPage = count($variationIdsForPage);
-          $totalVariationsAttempted += $amtOfVariationsForPage;
+          $totalVariationsAttempted = count($variationIdsForPage);
 
           $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': ' . (string) $amtOfDtosForPage . ' updates to send for page ' . $pageNumber);
 
@@ -598,17 +596,15 @@ class InventoryUpdateService
               'additionalInfo' => [
                 'full' => (string) $fullInventory,
                 'page' => $pageNumber,
-                'amtOfDtosForPage' => $amtOfDtosForPage,
-                'amtOfVariationsForPage' => $amtOfVariationsForPage
+                'amtOfDtosForPage' => $totalDtosAttempted,
+                'amtOfVariationsForPage' => $totalVariationsAttempted
               ],
               'method' => __METHOD__
             ]
           );
 
-          $dataGatherMs = TimeHelper::getMilliseconds() - $unixTimeAtPageStart;
           $unixTimeBeforeSendingData = TimeHelper::getMilliseconds();
-
-          $totalDtosAttempted +=  $amtOfDtosForPage;
+          $dataGatherMs = $unixTimeBeforeSendingData - $unixTimeAtPageStart;
 
           $responseDto = $this->inventoryService->updateBulk($requestDTOsForPage);
 
@@ -617,7 +613,7 @@ class InventoryUpdateService
           $errors = $responseDto->getErrors();
 
           if (isset($errors) && !empty($errors)) {
-            $amtErrors = count($errors);
+            $totalDtosFailed = count($errors);
 
             $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_ERRORS), [
               'additionalInfo' => [
@@ -630,9 +626,7 @@ class InventoryUpdateService
             $externalLogs->addErrorLog('Inventory ' . ($fullInventory ? 'Full' : '') . ' errors found for page ' . $pageNumber, json_encode($errors));
           }
 
-          // TODO: verify that there is a 1:1 relationship between errors and DTOs
-          $totalDtosSaved += $amtOfDtosForPage - $amtErrors;
-          $totalDtosFailed += $amtErrors;
+          $totalDtosSaved = $totalDtosAttempted - $totalDtosFailed;
         }
       }
       // time in result objects is in seconds
@@ -658,16 +652,24 @@ class InventoryUpdateService
     } catch (AuthException $e) {
       // bulk update failed, so everything we were going to save should be considered failing.
       // (we want the failure amount to be more than zero in order for client to know this failed.)
-      $totalDtosFailed += $amtOfDtosForPage;
+      $totalDtosFailed = $totalDtosAttempted;
 
       $this->logFatalException($e, $fullInventory, $externalLogs);
 
       // let caller report auth issue
       throw $e;
+    } catch (InventoryException $e) {
+       // bulk update failed, so everything we were going to save should be considered failing.
+      // (we want the failure amount to be more than zero in order for client to know this failed.)
+      $totalDtosFailed = $totalDtosAttempted;
+
+      $this->logFatalException($e, $fullInventory, $externalLogs);
+
+      throw $e;
     } catch (\Exception $e) {
       // bulk update failed, so everything we were going to save should be considered failing.
       // (we want the failure amount to be more than zero in order for client to know this failed.)
-      $totalDtosFailed += $amtOfDtosForPage;
+      $totalDtosFailed = $totalDtosAttempted;
 
       $this->logFatalException($e, $fullInventory, $externalLogs);
 
