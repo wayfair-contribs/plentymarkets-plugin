@@ -570,6 +570,8 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
         $cases[] = ["exception thrown at data send - partial", null, false, InventoryStatusService::PARTIAL, self::TIMESTAMP_NOW, $collectionOneVariation, [[new RequestDTO()]], [], false, false, 1, null, new TestTimeException("DTO send failure")];
         $cases[] = ["exception thrown at data send - full", null, true, InventoryStatusService::FULL, self::TIMESTAMP_NOW, $collectionOneVariation, [[new RequestDTO()]], [], false, false, 1, null, new TestTimeException("DTO send failure")];
 
+        // TODO: errors after sending data
+
         // TODO: positive amounts of Variations combined with various results from InventoryMapper->createInventoryDTOsFromVariation
 
         // TODO: positive amounts of Variations, positive results from InventoryMapper->createInventoryDTOsFromVariation, various results from InventoryService->updateBulk
