@@ -684,9 +684,7 @@ class InventoryUpdateService
       // time in result objects is in seconds
       $elapsedTime = (TimeHelper::getMilliseconds() - $unixTimeAtPageStart) * 0.001;
 
-      print('setting total variation count to: ' . $totalVariationsAttempted);
       $pageResult = $this->constructResultObject($fullInventory, $totalDtosAttempted, $totalDtosSaved, $totalDtosFailed, $elapsedTime, $totalVariationsAttempted, $dataGatherMs, $dataSendMs, $lastPage);
-      print('result object is ' . json_encode($pageResult->toArray()));
 
       $this->logger->debug(
         TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
