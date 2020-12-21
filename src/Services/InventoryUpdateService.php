@@ -238,10 +238,29 @@ class InventoryUpdateService
 
           // TODO: add a heartbeat so other requestors can track the status of this one
         }
+      } catch (AuthException $e) {
+        // prevent this sync from blocking syncs that will replace it
+        $this->statusService->markInventoryIdle($syncStartTimeStamp);
+
+        $this->logFatalException($e, $fullInventory, $externalLogs);
+
+        // let caller handle auth issue
+        throw $e;
+      } catch (InventoryException $e) {
+        // prevent this sync from blocking syncs that will replace it
+        $this->statusService->markInventoryIdle($syncStartTimeStamp);
+
+        $this->logFatalException($e, $fullInventory, $externalLogs);
+
+        throw $e;
       } catch (\Exception $e) {
         // prevent this sync from blocking syncs that will replace it
         $this->statusService->markInventoryIdle($syncStartTimeStamp);
-        throw $e;
+
+        $this->logFatalException($e, $fullInventory, $externalLogs);
+
+        // wrap in InventoryException so that it can be handled as such
+        throw new InventoryException($e->getMessage() . ' at ' . $e->getTraceAsString());
       }
 
       $elapsedTime = $this->calculateTimeSinceSyncStart($syncStartTimeStamp);
@@ -536,7 +555,6 @@ class InventoryUpdateService
       /** @var RequestDTO[] collection of DTOs to include in a bulk update*/
       $requestDTOsForPage = [];
       /** @var int[] collection of the IDs of Variations for which requestDTOs were created*/
-      $variationIdsForPage = [];
       $searchParameters = $this->getDefaultSearchParameters();
       $searchParameters['page'] = (string) $pageNumber;
       $variationSearchRepository->setSearchParams($searchParameters);
@@ -571,24 +589,36 @@ class InventoryUpdateService
 
         /** @var array $variationData information about a single Variation */
         foreach ($searchResults as $variationData) {
+          print("seeing variation");
+          ++$totalVariationsAttempted;
+
           /** @var RequestDTO[] */
-          $requestDTOsForVariation = $this->inventoryMapper->createInventoryDTOsFromVariation($variationData, $itemMappingMethod, $referrerId, $stockBuffer, $windowStart, $windowEnd);
+          $requestDTOsForVariation = [];
+
+          try {
+            $requestDTOsForVariation = $this->inventoryMapper->createInventoryDTOsFromVariation($variationData, $itemMappingMethod, $referrerId, $stockBuffer, $windowStart, $windowEnd);
+          } catch (Exception $e) {
+            $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_ERRORS), [
+              'additionalInfo' => [
+                'full' => (string) $fullInventory,
+                'exceptionType' => get_class($e),
+                'errorMessage' => $e->getMessage(),
+                'stackTrace' => $e->getTraceAsString()
+              ],
+              'method' => __METHOD__
+            ]);
+          }
 
           if (count($requestDTOsForVariation)) {
             $requestDTOsForPage = array_merge($requestDTOsForPage, $requestDTOsForVariation);
-            $variationIdsForPage[] = $variationData['id'];
           }
         }
 
         $totalDtosAttempted = count($requestDTOsForPage);
 
-        if ($totalDtosAttempted < 1) {
-          // TODO: add a log about the lack of DTOs
-        } else {
+        if ($totalDtosAttempted > 0) {
 
-          $totalVariationsAttempted = count($variationIdsForPage);
-
-          $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': ' . (string) $amtOfDtosForPage . ' updates to send for page ' . $pageNumber);
+          $externalLogs->addInfoLog('Inventory ' . ($fullInventory ? 'Full' : '') . ': ' . (string) $totalDtosAttempted . ' updates to send for page ' . $pageNumber);
 
           $this->logger->debug(
             TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
@@ -606,11 +636,33 @@ class InventoryUpdateService
           $unixTimeBeforeSendingData = TimeHelper::getMilliseconds();
           $dataGatherMs = $unixTimeBeforeSendingData - $unixTimeAtPageStart;
 
-          $responseDto = $this->inventoryService->updateBulk($requestDTOsForPage);
+          $responseDto = null;
+          $errors = [];
+
+          try {
+            $responseDto = $this->inventoryService->updateBulk($requestDTOsForPage);
+          } catch (Exception $e) {
+
+            // bulk update failed, so everything we were going to save should be considered failing.
+            // (we want the failure amount to be more than zero in order for client to know this failed.)
+            $totalDtosFailed = $totalDtosAttempted;
+
+            $this->logger->error(TranslationHelper::getLoggerKey(self::LOG_KEY_INVENTORY_ERRORS), [
+              'additionalInfo' => [
+                'full' => (string) $fullInventory,
+                'exceptionType' => get_class($e),
+                'errorMessage' => $e->getMessage(),
+                'stackTrace' => $e->getTraceAsString()
+              ],
+              'method' => __METHOD__
+            ]);
+          }
 
           $dataSendMs = TimeHelper::getMilliseconds() - $unixTimeBeforeSendingData;
 
-          $errors = $responseDto->getErrors();
+          if (isset($responseDto)) {
+            $errors = $responseDto->getErrors();
+          }
 
           if (isset($errors) && !empty($errors)) {
             $totalDtosFailed = count($errors);
@@ -632,7 +684,9 @@ class InventoryUpdateService
       // time in result objects is in seconds
       $elapsedTime = (TimeHelper::getMilliseconds() - $unixTimeAtPageStart) * 0.001;
 
-      $pageResult =  $this->constructResultObject($fullInventory, $totalDtosAttempted, $totalDtosSaved, $totalDtosFailed, $elapsedTime, $totalVariationsAttempted, $dataGatherMs, $dataSendMs, $lastPage);
+      print('setting total variation count to: ' . $totalVariationsAttempted);
+      $pageResult = $this->constructResultObject($fullInventory, $totalDtosAttempted, $totalDtosSaved, $totalDtosFailed, $elapsedTime, $totalVariationsAttempted, $dataGatherMs, $dataSendMs, $lastPage);
+      print('result object is ' . json_encode($pageResult->toArray()));
 
       $this->logger->debug(
         TranslationHelper::getLoggerKey(self::LOG_KEY_DEBUG),
@@ -649,32 +703,6 @@ class InventoryUpdateService
       $externalLogs->addInfoLog("Finished page " . $pageNumber . " of " . ($fullInventory ? "Full " : "Partial ") . "inventory sync.", json_encode($pageResult->toArray()));
 
       return $pageResult;
-    } catch (AuthException $e) {
-      // bulk update failed, so everything we were going to save should be considered failing.
-      // (we want the failure amount to be more than zero in order for client to know this failed.)
-      $totalDtosFailed = $totalDtosAttempted;
-
-      $this->logFatalException($e, $fullInventory, $externalLogs);
-
-      // let caller report auth issue
-      throw $e;
-    } catch (InventoryException $e) {
-       // bulk update failed, so everything we were going to save should be considered failing.
-      // (we want the failure amount to be more than zero in order for client to know this failed.)
-      $totalDtosFailed = $totalDtosAttempted;
-
-      $this->logFatalException($e, $fullInventory, $externalLogs);
-
-      throw $e;
-    } catch (\Exception $e) {
-      // bulk update failed, so everything we were going to save should be considered failing.
-      // (we want the failure amount to be more than zero in order for client to know this failed.)
-      $totalDtosFailed = $totalDtosAttempted;
-
-      $this->logFatalException($e, $fullInventory, $externalLogs);
-
-      // wrap in InventoryException so that it can be handled as such
-      throw new InventoryException($e->getMessage() . ' at ' . $e->getTraceAsString());
     } finally {
       if (isset($externalLogs) && isset($this->logSenderService)) {
         $this->logSenderService->execute($externalLogs->getLogs());
