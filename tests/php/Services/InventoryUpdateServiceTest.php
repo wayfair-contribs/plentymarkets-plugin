@@ -606,6 +606,9 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
         $cases[] = ["errors from send - partial", null, false, InventoryStatusService::PARTIAL, self::TIMESTAMP_NOW, $collectionOneVariation, [[$emptyRequestDTO, $emptyRequestDTO, $emptyRequestDTO, $emptyRequestDTO, $emptyRequestDTO]], 4, false, false, 1, null, null];
         $cases[] = ["errors from send - full", null, true, InventoryStatusService::FULL, self::TIMESTAMP_NOW, $collectionOneVariation, [[$emptyRequestDTO, $emptyRequestDTO, $emptyRequestDTO, $emptyRequestDTO, $emptyRequestDTO]], 4, false, false, 1, null, null];
 
+        $cases[] = ["last page - partial", null, false, InventoryStatusService::PARTIAL, self::TIMESTAMP_NOW, $collectionOneVariation, [[$emptyRequestDTO]], 0, false, true, 3, null, null];
+        $cases[] = ["last page - full", null, true, InventoryStatusService::FULL, self::TIMESTAMP_NOW, $collectionOneVariation, [[$emptyRequestDTO]], 0, false, true, 3, null, null];
+
         return $cases;
     }
 
