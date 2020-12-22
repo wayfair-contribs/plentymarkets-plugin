@@ -21,7 +21,7 @@ class InventoryStatusService
   const OVERDUE_TIME_PARTIAL = 1800;
 
   // TODO: make these user-configurable in a future update
-  const MAX_INVENTORY_RUN_TIME_FULL = 21600;
+  const MAX_INVENTORY_RUN_TIME_FULL = 14400;
   const MAX_INVENTORY_RUN_TIME_PARTIAL = 3600;
 
   const LOG_KEY_STATE_CHANGE = 'inventoryStateChange';
