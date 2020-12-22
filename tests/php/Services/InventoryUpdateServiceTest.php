@@ -37,6 +37,7 @@ use InvalidArgumentException;
 use Plenty\Modules\Item\Variation\Contracts\VariationSearchRepositoryContract;
 use Wayfair\Core\Api\Services\InventoryService;
 use Wayfair\Core\Api\Services\LogSenderService;
+use Wayfair\Core\Dto\Inventory\ErrorDTO;
 use Wayfair\Core\Dto\Inventory\RequestDTO;
 use Wayfair\Core\Dto\Inventory\ResponseDTO;
 use Wayfair\Core\Exceptions\InventoryException;
@@ -388,7 +389,7 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
         $mostRecentAttemptTime = null,
         array $variationDataArraysForPage = [],
         array $cannedRequestDtoArraysForVariations = [],
-        array $cannedResponseDtosForPage = [],
+        int $amountOfErrorsInResponseDTO = 0,
         $allItemsActive = false,
         bool $lastPage = false,
         int $pageNumber = 1,
@@ -430,25 +431,43 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
             $totalAmountOfRequestDTOs += count($resultArray);
         }
 
+        $expectedSends = 0;
+
         /** @var InventoryMapper&\PHPUnit\Framework\MockObject\MockObject */
         $inventoryMapper = $this->createMock(InventoryMapper::class);
 
         $creationInvocation = $inventoryMapper->expects($this->exactly($numVariations))->method('createInventoryDTOsFromVariation');
         if (isset($exceptionThrownByDTOCreation)) {
+            $expectedSends = 0;
             $creationInvocation->willThrowException($exceptionThrownByDTOCreation);
         } else {
             $creationInvocation->willReturnOnConsecutiveCalls(...$cannedRequestDtoArraysForVariations);
+            if ($totalAmountOfRequestDTOs > 0) {
+                $expectedSends = 1;
+            }
         }
 
-        $numRequestDtos = count($cannedRequestDtoArraysForVariations);
         /** @var InventoryService&\PHPUnit\Framework\MockObject\MockObject */
         $inventoryService = $this->createMock(InventoryService::class);
 
-        $sendInvocation = $inventoryService->expects($this->exactly($numRequestDtos))->method('updateBulk');
-        if (isset($exceptionThrownByDTOSend)) {
-            $sendInvocation->willThrowException($exceptionThrownByDTOSend);
-        } else {
-            $sendInvocation->willReturnOnConsecutiveCalls(...$cannedResponseDtosForPage);
+        $sendInvocation = $inventoryService->expects($this->exactly($expectedSends))->method('updateBulk');
+
+        if ($expectedSends) {
+            if (isset($exceptionThrownByDTOSend)) {
+                $sendInvocation->willThrowException($exceptionThrownByDTOSend);
+            } else {
+                /** @var ResponseDTO&\PHPUnit\Framework\MockObject\MockObject */
+                $responseDTO = $this->createMock(ResponseDTO::class);
+
+                $errorDTO = new ErrorDTO();
+                $responseErrors = [];
+                for ($i = 0; $i < $amountOfErrorsInResponseDTO; $i++) {
+                    $responseErrors[] = $errorDTO;
+                }
+
+                $responseDTO->expects(($this->once()))->method('getErrors')->willReturn($responseErrors);
+                $sendInvocation->willReturn($responseDTO);
+            }
         }
 
         /** @var InventoryStatusService&\PHPUnit\Framework\MockObject\MockObject */
@@ -504,22 +523,36 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
 
             $expectedSaveAmount = 0;
             if (!isset($exceptionThrownByDTOCreation) && !isset($exceptionThrownByDTOSend)) {
-                $expectedSaveAmount = count($cannedResponseDtosForPage);
+                $expectedSaveAmount = $totalAmountOfRequestDTOs - $amountOfErrorsInResponseDTO;
             }
 
-            $this->assertEquals($expectedSaveAmount, $actualResult->getDtosSaved(), "amount of DTOs sent should match input");
+            $this->assertEquals($expectedSaveAmount, $actualResult->getDtosSaved(), "amount of DTOs saved should match input");
 
             // elapsed time is in seconds, so it is often zero!
             // $this->assertGreaterThan(0, $actualResult->getElapsedTime(), "Page sync should have spent some time doing work");
 
             if ($numVariations > 0 && !isset($exceptionThrownByDTOCreation)) {
-                $this->assertGreaterThan(0, $actualResult->getDataGatherMs(), "Page sync should have spent time gathering data");
 
-                if ($totalAmountOfRequestDTOs && !isset($exceptionThrownByDTOSend)) {
-                    $this->assertGreaterThan(0, $actualResult->getDataSendMs(), "Page sync should have spent some time sending data");
+                // this can take less than 1 millisecond. assertion can cause flaky tests.
+                // $this->assertGreaterThan(0, $actualResult->getDataGatherMs(), "Page sync should have spent time gathering data");
+
+                $expectedAmountOfErrors = 0;
+                if ($totalAmountOfRequestDTOs) {
+                    if (isset($exceptionThrownByDTOSend)) {
+                        // as the send fails, all DTOs that were to be sent failed.
+                        $expectedAmountOfErrors = $totalAmountOfRequestDTOs;
+                    } else {
+                        $expectedAmountOfErrors = $amountOfErrorsInResponseDTO;
+
+                        // this can take less than 1 millisecond. assertion can cause flaky tests.
+                        // $this->assertGreaterThan(0, $actualResult->getDataSendMs(), "Page sync should have spent some time sending data");
+                    }
                 } else {
                     $this->assertEquals(0, $actualResult->getDataSendMs(), "Page sync should NOT have spent any time sending data");
                 }
+
+
+                $this->assertEquals($expectedAmountOfErrors, $actualResult->getDtosFailed(), "amount of errors should match expectations");
             }
         } else {
             $this->assertNull($actualResult);
@@ -537,6 +570,8 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
             $collectionFiveVariations[] = $variationDataFactory->create(1, [12345]);
         }
 
+        $emptyRequestDTO = new RequestDTO();
+
         $cases = [];
 
         $cases[] = ["no variations - partial - not last", null, false, InventoryStatusService::PARTIAL, self::TIMESTAMP_NOW];
@@ -550,26 +585,26 @@ final class InventoryUpdateServiceTest extends \PHPUnit\Framework\TestCase
         $cases[] = ["full sync overridden by partial sync", InventorySyncInterruptedException::class, true, InventoryStatusService::PARTIAL, self::TIMESTAMP_FUTURE];
         $cases[] = ["full sync overridden by full sync", InventorySyncInterruptedException::class, true, InventoryStatusService::FULL, self::TIMESTAMP_FUTURE];
 
-        $cases[] = ["page number 0 invalid - partial", InvalidArgumentException::class, false, InventoryStatusService::PARTIAL, self::TIMESTAMP_NOW, [], [], [], false, false, 0];
-        $cases[] = ["page number 0 invalid - full", InvalidArgumentException::class, true, InventoryStatusService::FULL, self::TIMESTAMP_NOW, [], [], [], false, false, 0];
+        $cases[] = ["page number 0 invalid - partial", InvalidArgumentException::class, false, InventoryStatusService::PARTIAL, self::TIMESTAMP_NOW, [], [], 0, false, false, 0];
+        $cases[] = ["page number 0 invalid - full", InvalidArgumentException::class, true, InventoryStatusService::FULL, self::TIMESTAMP_NOW, [], [], 0, false, false, 0];
 
-        $cases[] = ["page number -1 invalid - partial", InvalidArgumentException::class, false, InventoryStatusService::PARTIAL, self::TIMESTAMP_NOW, [], [], [], false, false, -1];
-        $cases[] = ["page number -1 invalid - full", InvalidArgumentException::class, true, InventoryStatusService::FULL, self::TIMESTAMP_NOW, [], [], [], false, false, -1];
+        $cases[] = ["page number -1 invalid - partial", InvalidArgumentException::class, false, InventoryStatusService::PARTIAL, self::TIMESTAMP_NOW, [], [], 0, false, false, -1];
+        $cases[] = ["page number -1 invalid - full", InvalidArgumentException::class, true, InventoryStatusService::FULL, self::TIMESTAMP_NOW, [], [], 0, false, false, -1];
 
-        $cases[] = ["page number -5 invalid - partial", InvalidArgumentException::class, false, InventoryStatusService::PARTIAL, self::TIMESTAMP_NOW, [], [], [], false, false, -5];
-        $cases[] = ["page number -5 invalid - full", InvalidArgumentException::class, true, InventoryStatusService::FULL, self::TIMESTAMP_NOW, [], [], [], false, false, -5];
+        $cases[] = ["page number -5 invalid - partial", InvalidArgumentException::class, false, InventoryStatusService::PARTIAL, self::TIMESTAMP_NOW, [], [], 0, false, false, -5];
+        $cases[] = ["page number -5 invalid - full", InvalidArgumentException::class, true, InventoryStatusService::FULL, self::TIMESTAMP_NOW, [], [], 0, false, false, -5];
 
-        $cases[] = ["exception thrown at data gather - partial", null, false, InventoryStatusService::PARTIAL, self::TIMESTAMP_NOW, $collectionOneVariation, [], [], false, false, 1, new TestTimeException("DTO gather failure")];
-        $cases[] = ["exception thrown at data gather - full", null, true, InventoryStatusService::FULL, self::TIMESTAMP_NOW, $collectionOneVariation, [], [], false, false, 1, new TestTimeException("DTO gather failure")];
+        $cases[] = ["exception thrown at data gather - partial", null, false, InventoryStatusService::PARTIAL, self::TIMESTAMP_NOW, $collectionOneVariation, [], 0, false, false, 1, new TestTimeException("DTO gather failure")];
+        $cases[] = ["exception thrown at data gather - full", null, true, InventoryStatusService::FULL, self::TIMESTAMP_NOW, $collectionOneVariation, [], 0, false, false, 1, new TestTimeException("DTO gather failure")];
 
-        $cases[] = ["exception thrown at data send - partial", null, false, InventoryStatusService::PARTIAL, self::TIMESTAMP_NOW, $collectionOneVariation, [[new RequestDTO()]], [], false, false, 1, null, new TestTimeException("DTO send failure")];
-        $cases[] = ["exception thrown at data send - full", null, true, InventoryStatusService::FULL, self::TIMESTAMP_NOW, $collectionOneVariation, [[new RequestDTO()]], [], false, false, 1, null, new TestTimeException("DTO send failure")];
+        $cases[] = ["exception thrown at data send - partial", null, false, InventoryStatusService::PARTIAL, self::TIMESTAMP_NOW, $collectionOneVariation, [[$emptyRequestDTO]], 0, false, false, 1, null, new TestTimeException("DTO send failure")];
+        $cases[] = ["exception thrown at data send - full", null, true, InventoryStatusService::FULL, self::TIMESTAMP_NOW, $collectionOneVariation, [[$emptyRequestDTO]], 0, false, false, 1, null, new TestTimeException("DTO send failure")];
 
-        // TODO: accounting for errors in ResponseDTOs after sending data
+        $cases[] = ["one variation, one stock - partial", null, false, InventoryStatusService::PARTIAL, self::TIMESTAMP_NOW, $collectionOneVariation, [[$emptyRequestDTO]], 0, false, false, 1, null, null];
+        $cases[] = ["one variation, one stock - full", null, true, InventoryStatusService::FULL, self::TIMESTAMP_NOW, $collectionOneVariation, [[$emptyRequestDTO]], 0, false, false, 1, null, null];
 
-        // TODO: positive (more than 1) amounts of Variations combined with various results from InventoryMapper->createInventoryDTOsFromVariation
-
-        // TODO: positive (more than 1) amounts of Variations, positive results from InventoryMapper->createInventoryDTOsFromVariation, various results from InventoryService->updateBulk
+        $cases[] = ["errors from send - partial", null, false, InventoryStatusService::PARTIAL, self::TIMESTAMP_NOW, $collectionOneVariation, [[$emptyRequestDTO, $emptyRequestDTO, $emptyRequestDTO, $emptyRequestDTO, $emptyRequestDTO]], 4, false, false, 1, null, null];
+        $cases[] = ["errors from send - full", null, true, InventoryStatusService::FULL, self::TIMESTAMP_NOW, $collectionOneVariation, [[$emptyRequestDTO, $emptyRequestDTO, $emptyRequestDTO, $emptyRequestDTO, $emptyRequestDTO]], 4, false, false, 1, null, null];
 
         return $cases;
     }

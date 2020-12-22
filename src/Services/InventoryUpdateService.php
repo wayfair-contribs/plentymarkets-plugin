@@ -589,7 +589,6 @@ class InventoryUpdateService
 
         /** @var array $variationData information about a single Variation */
         foreach ($searchResults as $variationData) {
-          print("seeing variation");
           ++$totalVariationsAttempted;
 
           /** @var RequestDTO[] */
