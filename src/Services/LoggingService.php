@@ -51,8 +51,8 @@ class LoggingService implements LoggerContract
   /**
    * Detailed debug information.
    *
-   * @param string $code
-   * @param null   $loggingInfo
+   * @param string      $code
+   * @param array|null  $loggingInfo
    */
   public function debug(string $code, $loggingInfo = null)
   {
@@ -64,8 +64,8 @@ class LoggingService implements LoggerContract
   /**
    * Logs info.
    *
-   * @param string $code
-   * @param null   $loggingInfo
+   * @param string      $code
+   * @param array|null  $loggingInfo
    */
   public function info(string $code, $loggingInfo = null)
   {
@@ -77,8 +77,8 @@ class LoggingService implements LoggerContract
   /**
    * Errors that should be logged and monitored.
    *
-   * @param string $code
-   * @param null   $loggingInfo
+   * @param string      $code
+   * @param array|null  $loggingInfo
    */
   public function error(string $code, $loggingInfo = null)
   {
@@ -89,8 +89,8 @@ class LoggingService implements LoggerContract
   /**
    * Warnings that should be logged and monitored.
    *
-   * @param string $code
-   * @param null   $loggingInfo
+   * @param string      $code
+   * @param array|null  $loggingInfo
    */
   public function warning(string $code, $loggingInfo = null)
   {
@@ -128,6 +128,11 @@ class LoggingService implements LoggerContract
    */
   public function extractVars($loggingInfo): array
   {
+    if (!isset($loggingInfo) || empty($loggingInfo))
+    {
+      return [];
+    }
+
     /** @var ExternalLogs */
     $externalLogs = pluginApp(ExternalLogs::class);
     $clientID = $this->configHelper->getClientId();

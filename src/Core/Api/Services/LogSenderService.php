@@ -39,6 +39,12 @@ class LogSenderService {
   }
 
   public function execute(array $logs) {
+
+    if (!isset($logs) || empty($logs))
+    {
+      return;
+    }
+
     /** @var LoggerContract $loggerContract */
     $loggerContract = pluginApp(LoggerContract::class);
 

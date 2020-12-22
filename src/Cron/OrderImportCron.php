@@ -54,13 +54,13 @@ class OrderImportCron extends Cron
     /** @var ExternalLogs */
     $externalLogs = pluginApp(ExternalLogs::class);
     try {
-      $this->loggerContract->debug(TranslationHelper::getLoggerKey('cronStartedMessage'), ['method' => __METHOD__]);
+      $this->loggerContract->info(TranslationHelper::getLoggerKey('cronStartedMessage'), ['method' => __METHOD__]);
       $this->orderService->process($externalLogs, 1);
     } finally {
       if (count($externalLogs->getLogs())) {
         $this->logSenderService->execute($externalLogs->getLogs());
       }
-      $this->loggerContract->debug(TranslationHelper::getLoggerKey('cronFinishedMessage'), ['method' => __METHOD__]);
+      $this->loggerContract->info(TranslationHelper::getLoggerKey('cronFinishedMessage'), ['method' => __METHOD__]);
     }
   }
 }

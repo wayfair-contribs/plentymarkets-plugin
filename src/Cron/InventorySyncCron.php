@@ -46,7 +46,7 @@ class InventorySyncCron extends Cron
    */
   public function handle()
   {
-    $this->loggerContract->debug(TranslationHelper::getLoggerKey('cronStartedMessage'), [
+    $this->loggerContract->info(TranslationHelper::getLoggerKey('cronStartedMessage'), [
       'additionalInfo' => [
         'full' => $this->fullInventory
       ],
@@ -63,7 +63,7 @@ class InventorySyncCron extends Cron
         'method' => __METHOD__
       ]);
     } finally {
-      $this->loggerContract->debug(TranslationHelper::getLoggerKey('cronFinishedMessage'), [
+      $this->loggerContract->info(TranslationHelper::getLoggerKey('cronFinishedMessage'), [
         'additionalInfo' => [
           'full' => $this->fullInventory,
           'result' => $syncResult

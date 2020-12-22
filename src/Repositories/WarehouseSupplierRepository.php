@@ -90,7 +90,7 @@ class WarehouseSupplierRepository extends Repository
   /**
    * @param mixed $warehouseId
    *
-   * @return mixed|null
+   * @return mixed
    */
   public function findByWarehouseId($warehouseId)
   {

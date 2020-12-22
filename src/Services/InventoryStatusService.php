@@ -21,7 +21,7 @@ class InventoryStatusService
   const OVERDUE_TIME_PARTIAL = 1800;
 
   // TODO: make these user-configurable in a future update
-  const MAX_INVENTORY_RUN_TIME_FULL = 21600;
+  const MAX_INVENTORY_RUN_TIME_FULL = 14400;
   const MAX_INVENTORY_RUN_TIME_PARTIAL = 3600;
 
   const LOG_KEY_STATE_CHANGE = 'inventoryStateChange';
@@ -164,7 +164,7 @@ class InventoryStatusService
   {
     $state = $this->keyValueRepository->get(self::DB_KEY_INVENTORY_STATUS);
 
-    if (!isset($state)) {
+    if (!isset($state) || empty($state)) {
       $state = self::STATE_IDLE;
     }
 
@@ -253,12 +253,29 @@ class InventoryStatusService
   }
 
   /**
-   * Set the status back to idle state
+   * Set the status back to idle.
+   *
+   * The behavior is as such:
+   *  - status is currently unknown =  change to idle
+   *  - status is not already IDLE = do nothing
+   *  - status is not IDLE and argument matches timestamp in DB = change to idle
+   *
    * @return void
    */
-  public function markInventoryIdle()
+  public function markInventoryIdle($syncStartTimestamp = null)
   {
-    $this->setServiceStatusValue(self::STATE_IDLE);
+    $currentStatus = $this->getServiceStatusValue();
+    $mostRecentAttempt = $this->getStartOfMostRecentAttempt();
+
+    if (
+      !isset($currentStatus) || empty(trim($currentStatus)) ||
+      ($currentStatus != self::STATE_IDLE &&
+        (!isset($syncStartTimestamp) || empty(trim($syncStartTimestamp)) ||
+          !isset($mostRecentAttempt) || empty(trim($mostRecentAttempt)) ||
+          (strtotime($syncStartTimestamp) >= strtotime($mostRecentAttempt))))
+    ) {
+      $this->setServiceStatusValue(self::STATE_IDLE);
+    }
   }
 
   /**
@@ -279,8 +296,7 @@ class InventoryStatusService
     $this->keyValueRepository->putOrReplace($keyCompletionEnd, $ts);
     $this->keyValueRepository->putOrReplace($keyCompletionStart, $startTime);
     $this->keyValueRepository->putOrReplace($keyCompletionAmount, $amount);
-    // timestamp on state change should match timestamp of last completion
-    $this->setServiceStatusValue(self::STATE_IDLE);
+    $this->markInventoryIdle($startTime);
   }
 
   /**
@@ -447,14 +463,29 @@ class InventoryStatusService
   {
     $curStatus = $this->getServiceStatusValue();
 
-    if (!isset($curStatus) || empty($curStatus) || self::STATE_IDLE == $curStatus)
-    {
+    if (!isset($curStatus) || empty(trim($curStatus)) || self::STATE_IDLE == $curStatus) {
       return false;
     }
 
+    $startTimestamp = $this->getStartOfMostRecentAttempt();
+
+    if (!isset($startTimestamp) || empty(trim($startTimestamp))) {
+      // no idea when things started so assume it's dead/done
+      return true;
+    }
+
+    $startTimeValue = strtotime($startTimestamp);
+
+    if (!$startTimestamp) {
+      // start timestamp is invalid so assume it's dead/done
+      return true;
+    }
+
+    $elapsedTime = time() - $startTimeValue;
+
     $maxTime = self::FULL == $curStatus ? self::MAX_INVENTORY_RUN_TIME_FULL : self::MAX_INVENTORY_RUN_TIME_PARTIAL;
-    $startTime = $this->getStartOfMostRecentAttempt();
-    $elapsedTime = time() - $startTime;
+
+    // TODO: account for an inventory sync that is stuck or has died by checking for a recent heartbeat
 
     return $elapsedTime >= $maxTime;
   }
