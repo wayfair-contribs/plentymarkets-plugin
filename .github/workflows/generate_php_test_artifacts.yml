@@ -5,7 +5,7 @@ on:
 
 jobs:
   php-test-artifacts:
-    # ubuntu 16.04 has PHP 7.0 installed by default.
+    # ubuntu 16.04 has PHP 7.0 installed, but it is NOT selected anymore (December 2020).
     # Plenty plugin code must be PHP 7.0 only.
     # other OSes / ubuntu versions will not be compatible.
     runs-on: ubuntu-16.04
@@ -14,17 +14,10 @@ jobs:
       - name: checkout
         uses: actions/checkout@v2
 
-      - name: Cache Composer packages
-        id: composer-cache
-        uses: actions/cache@v2
-        with:
-          path: vendor
-          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-php-
+      - name: switch to php 7.0
+        run: sudo update-alternatives --set php /usr/bin/php7.0
 
       - name: Install dependencies
-        if: steps.composer-cache.outputs.cache-hit != 'true'
         run: composer install --prefer-dist --no-progress --no-suggest
 
       - name: Run test suite to generate artifacts
