@@ -19,7 +19,7 @@ The plugin allows for the following automatic processes to take place:
 
 **DE:** Dieses Dokument richtet sich an Softwareentwickler. Wenn Sie ein Plentymarkets-Benutzer sind und das Wayfair-Plugin verwenden möchten, verwenden Sie diese Links:
 
-* [Benutzerhandbuch](meta/documents/user_guide_en.md)
+* [Benutzerhandbuch](meta/documents/user_guide_de.md)
 
 * [Wayfair auf dem plentyMarketplace](https://marketplace.plentymarkets.com/plugins/integration/wayfair_6273)
 
